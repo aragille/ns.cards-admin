@@ -32,7 +32,7 @@
   --brand:#FC7C1A; --brand-600:#EC6A0B; --brand-700:#FC7C1A; --brand-50:#FFF5EC; --brand-100:#FFE8D5; --brand-200:#FFDDBF;
 
   --bg:#FAFAF9; --surface:#FFFFFF; --surface-2:#F5F5F4; --hover:#F4F4F2; --row-hover:#FBFBFA; --head-bg:#FCFCFB;
-  --line:#EDEDEB; --line-soft:#F3F3F1; --line-strong:#E3E3E0; --cb-border:#CFCFCB; --scroll:#E4E4E1; --scroll-hover:#CFCFCB;
+  --line:#EDEDEB; --line-soft:#F3F3F1; --line-strong:#E3E3E0; --cb-border:#CFCFCB; --prev:#D4D4D0; --scroll:#E4E4E1; --scroll-hover:#CFCFCB;
 
   --ink:#111111; --ink-2:#6B6B6B; --ink-3:#A0A09C; --nav-ink:#3D3D3B;
   --inv:#111111; --on-inv:#FFFFFF; --inv-hover:#2A2A2A;      /* inverted controls (dark buttons, checked boxes) */
@@ -47,7 +47,7 @@
   --neutral:#B5B5B1; --neutral-bg:#F2F2F0; --neutral-ink:#5E5E5B;
 
   /* categorical chart palette (validated per theme: CVD + normal-vision separation) */
-  --c1:#F57314; --c2:#2F6FE0; --c3:#0E9F9A; --c4:#A044E8; --c5:#D6336C;
+  --c1:#FC7C1A; --c2:#42AAFF; --c3:#9FC600; --c4:#B247FF; --c5:#FD359B;
 
   --r-sm:8px; --r:12px; --r-lg:16px; --r-xl:20px; --pill:999px;
   --shadow-sm:0 1px 2px rgba(17,17,17,.04);
@@ -63,7 +63,7 @@
   --brand-600:#FF8A33; --brand-700:#FC7C1A; --brand-50:rgba(252,124,26,.10); --brand-100:rgba(252,124,26,.18); --brand-200:rgba(252,124,26,.28);
 
   --bg:#0E0E0F; --surface:#161618; --surface-2:#1D1D20; --hover:#222226; --row-hover:#1A1A1D; --head-bg:#19191C;
-  --line:#26262A; --line-soft:#1F1F23; --line-strong:#323237; --cb-border:#4A4A50; --scroll:#2E2E33; --scroll-hover:#3E3E44;
+  --line:#26262A; --line-soft:#1F1F23; --line-strong:#323237; --cb-border:#4A4A50; --prev:#45454B; --scroll:#2E2E33; --scroll-hover:#3E3E44;
 
   --ink:#F2F2F0; --ink-2:#A3A3A0; --ink-3:#6E6E6B; --nav-ink:#C9C9C6;
   --inv:#F2F2F0; --on-inv:#111111; --inv-hover:#FFFFFF;
@@ -77,7 +77,7 @@
   --feature:#C07BF7; --feature-bg:rgba(192,123,247,.15); --feature-ink:#D3A2FA;
   --neutral:#6E6E6B; --neutral-bg:#232327; --neutral-ink:#B0B0AC;
 
-  --c1:#E06210; --c2:#3F7BEA; --c3:#0E9F9A; --c4:#A651EC; --c5:#DB3F75;
+  --c1:#FC7C1A; --c2:#42AAFF; --c3:#9FC600; --c4:#B247FF; --c5:#FD359B;
 
   --shadow-sm:0 1px 2px rgba(0,0,0,.3);
   --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);
@@ -184,7 +184,6 @@ h1 .count{font-family:var(--mono);font-size:14px;font-weight:400;color:var(--ink
 .btn-ghost{background:var(--surface);border:1px solid var(--line-strong)}
 .btn-ghost:hover{background:var(--hover)}
 .btn-sm{height:30px;padding:0 12px;font-size:13px}
-.btn-danger{color:var(--error-ink)}
 .link-btn{font-size:13px;color:var(--ink-2);font-weight:500;padding:0 6px;height:30px}
 .link-btn:hover{color:var(--ink)}
 .ghost-ic{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--ink-2)}
@@ -219,9 +218,6 @@ h1 .count{font-family:var(--mono);font-size:14px;font-weight:400;color:var(--ink
 .rd{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--cb-border);flex:none}
 .rd.on{border:5px solid var(--inv)}
 
-.av{border-radius:50%;display:grid;place-items:center;font-weight:600;flex:none;letter-spacing:-.02em}
-.av-0{background:#FFE8D6;color:#B4530A}.av-1{background:#E3EEFF;color:#2556B8}.av-2{background:#DDF5F3;color:#0B7A76}.av-3{background:#F1E6FD;color:#7A33B8}.av-4{background:#FDE4EC;color:#B02457}.av-5{background:#EEF6DD;color:#4B7A08}.av-6{background:#F0F0EE;color:#555}
-[data-theme="dark"] .av-0{background:rgba(252,124,26,.16);color:#FFA45E}[data-theme="dark"] .av-1{background:rgba(63,123,234,.18);color:#8EB4FA}[data-theme="dark"] .av-2{background:rgba(14,159,154,.18);color:#5ED4CE}[data-theme="dark"] .av-3{background:rgba(166,81,236,.18);color:#C99AF5}[data-theme="dark"] .av-4{background:rgba(219,63,117,.18);color:#F28DB0}[data-theme="dark"] .av-5{background:rgba(122,179,23,.16);color:#A9D86A}[data-theme="dark"] .av-6{background:#26262A;color:#B0B0AC}
 
 /* ───────────────────────── Users list ───────────────────────── */
 /* stat pre-filters share the segmented-control look: grey track, white raised selection */
@@ -273,7 +269,6 @@ th.sorted{color:var(--ink)} th.sorted .srt{opacity:1}
 td{height:54px;padding:0 12px;border-bottom:1px solid var(--line-soft);white-space:nowrap;font-size:13.5px}
 .compact td{height:40px}
 .compact .ucell .ue{display:none}
-.compact .ucell .av{width:24px!important;height:24px!important;font-size:10px!important}
 tbody tr{cursor:pointer}
 tbody tr:hover td{background:var(--row-hover)}
 tbody tr.sel td{background:var(--brand-50)}
@@ -283,6 +278,24 @@ th.act-h,td.act{width:84px}
 .row-actions{display:flex;justify-content:flex-end;gap:2px;opacity:0;transition:opacity .1s}
 tr:hover .row-actions{opacity:1}
 .ucell{display:flex;align-items:center;gap:10px;min-width:0}
+.ucell>div{min-width:0}
+.ucell .un,.ucell .ue{overflow:hidden;text-overflow:ellipsis}
+/* resizable users table */
+table.ut{min-width:100%;width:auto}
+table.ut.fixed{table-layout:fixed}
+.ut td{overflow:hidden;text-overflow:ellipsis}
+.ut .th-in{max-width:100%;overflow:hidden}
+.col-rs{position:absolute;top:0;right:-5px;width:10px;height:100%;cursor:col-resize;z-index:3}
+.col-rs::after{content:"";position:absolute;left:4.5px;top:11px;bottom:11px;width:1px;background:var(--line-strong);opacity:0;transition:opacity .12s}
+th:hover .col-rs::after{opacity:1}
+.col-rs:hover::after,.col-rs.on::after{opacity:1;top:0;bottom:0;left:4px;width:2px;background:var(--brand)}
+body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
+/* horizontal scroll hint */
+.hs-wrap{position:relative}
+.hs-wrap::before,.hs-wrap::after{content:"";position:absolute;top:0;bottom:0;width:56px;z-index:4;pointer-events:none;opacity:0;transition:opacity .2s;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.hs-wrap::after{right:0;background:linear-gradient(to right,transparent,var(--surface));-webkit-mask-image:linear-gradient(to right,transparent,#000 70%);mask-image:linear-gradient(to right,transparent,#000 70%)}
+.hs-wrap::before{left:0;background:linear-gradient(to left,transparent,var(--surface));-webkit-mask-image:linear-gradient(to left,transparent,#000 70%);mask-image:linear-gradient(to left,transparent,#000 70%)}
+.hs-wrap.hs-r::after,.hs-wrap.hs-l::before{opacity:1}
 .ucell .un{font-weight:500;line-height:1.25}
 .ucell .ue{color:var(--ink-2);font-size:12.5px;line-height:1.3}
 .copy{display:inline-flex;align-items:center;gap:6px;padding:3px 6px;margin:0 -6px;border-radius:6px;color:var(--ink)}
@@ -350,7 +363,6 @@ tr:hover .row-actions{opacity:1}
 .bulk .sep{width:1px;height:20px;background:rgba(255,255,255,.14);margin:0 4px}
 .bulk button{height:32px;padding:0 11px;border-radius:9px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px;white-space:nowrap;color:rgba(255,255,255,.92)}
 .bulk button:hover{background:rgba(255,255,255,.1)}
-.bulk .bk-danger{color:#FF8A8A}
 .bulk .bk-x{width:32px;padding:0;justify-content:center}
 .bulk .bk-link{color:#FFA45E}
 .bulk .bk-save{background:var(--brand);color:#fff}
@@ -359,6 +371,7 @@ tr:hover .row-actions{opacity:1}
 /* ───────────────────────── User page ───────────────────────── */
 .up-head{align-items:center}
 .up-id{display:flex;align-items:center;gap:16px;min-width:0}
+.up-head h1{font-size:20px;letter-spacing:-.02em}
 .up-sub{display:flex;align-items:center;gap:8px;color:var(--ink-2);font-size:13px;margin-top:6px;flex-wrap:wrap}
 .up-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
 .tabs{display:flex;align-items:center;gap:4px;padding:0 20px;overflow-x:auto;scrollbar-width:none}
@@ -446,8 +459,8 @@ tr:hover .row-actions{opacity:1}
 .meter{height:6px;border-radius:6px;background:var(--surface-2);overflow:hidden;position:relative}
 .meter i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:var(--ink)}
 .tl{position:relative;padding-left:26px}
-.tl::before{content:"";position:absolute;left:10px;top:8px;bottom:8px;width:1px;background:var(--line)}
 .tl-i{position:relative;padding:8px 0 12px}
+.tl-i:not(:last-child)::before{content:"";position:absolute;left:-16px;top:29px;bottom:-8px;width:1px;background:var(--line)}
 .tl-i .tl-dot{position:absolute;left:-26px;top:8px;width:21px;height:21px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--ink-2)}
 .tl-i .tl-t{font-weight:500;font-size:13.5px}
 .tl-i .tl-s{font-size:12.5px;color:var(--ink-2)}
@@ -488,7 +501,6 @@ tr:hover .row-actions{opacity:1}
 .pi .pl{flex:1;overflow:hidden;text-overflow:ellipsis}
 .pi .pc{color:var(--ink-3);font-size:11.5px}
 .pi .chk{margin-left:auto;color:var(--ink)}
-.pi.danger{color:var(--error-ink)} .pi.danger>.i{color:var(--error)}
 .pop-sep{height:1px;background:var(--line);margin:6px -6px}
 .pop-sec{padding:8px 6px 4px}
 .pop-sec+.pop-sec{border-top:1px solid var(--line);margin-top:4px}
@@ -545,19 +557,12 @@ tr:hover .row-actions{opacity:1}
 .legend{display:flex;align-items:center;gap:14px;font-size:12px;color:var(--ink-2);flex-wrap:wrap}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .lg-line{width:14px;height:2px;border-radius:2px;background:var(--c1)}
-.lg-dash{width:14px;height:0;border-top:2px dashed var(--ink-3)}
+.lg-dash{width:14px;height:0;border-top:2px dashed var(--prev)}
 .chart-card{display:flex;flex-direction:column}
 .chart{position:relative;flex:1 1 0;min-height:200px}
 .chart svg{position:absolute;inset:0}
 .chart svg{display:block;overflow:visible}
 .ax{font-family:var(--mono);font-size:10.5px;fill:var(--ink-3)}
-.funnel-r{padding:7px 0}
-.funnel-h{display:flex;align-items:baseline;gap:8px;font-size:13px;margin-bottom:8px}
-.funnel-h>span:first-child{flex:1}
-.funnel-h b{font-weight:500;font-variant-numeric:tabular-nums}
-.funnel-h .fpct{color:var(--ink-3);font-size:12px;min-width:34px;text-align:right;font-variant-numeric:tabular-nums}
-.fbar{height:8px;border-radius:8px;background:var(--surface-2);position:relative;overflow:hidden}
-.fbar i{position:absolute;left:0;top:0;bottom:0;border-radius:8px;background:var(--brand)}
 .stack{display:flex;gap:2px;height:28px;border-radius:7px;overflow:hidden;margin:4px 0 16px}
 .stack i{display:block;height:100%;transition:opacity .12s}
 .stack i:first-child{border-radius:6px 0 0 6px}.stack i:last-child{border-radius:0 6px 6px 0}
@@ -569,9 +574,13 @@ tr:hover .row-actions{opacity:1}
 .lr .lr-v{font-family:var(--mono);font-size:12.5px}
 .lr .lr-p{font-family:var(--mono);font-size:12px;color:var(--ink-3);width:40px;text-align:right}
 .barlist .bl{position:relative;height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;margin-bottom:6px;font-size:13px;border-radius:8px}
-.barlist .bl i{position:absolute;left:0;top:0;bottom:0;background:var(--brand-100);border-radius:8px;z-index:0}
+.barlist .bl i{position:absolute;left:0;top:0;bottom:0;background:var(--neutral-bg);border-radius:8px;z-index:0}
 .barlist .bl>span{position:relative;z-index:1;display:flex;align-items:center;gap:8px}
-.barlist .bl:hover i{background:var(--brand-200)}
+.barlist .bl:hover i{background:var(--line)}
+.barlist .bl-p{color:var(--ink-3);font-size:12px;min-width:36px;text-align:right}
+.card.fill{display:flex;flex-direction:column}
+.card.fill .barlist{flex:1;display:flex;flex-direction:column;justify-content:space-between}
+.card.fill .barlist .bl{margin-bottom:0}
 .rk{display:flex;align-items:center;gap:12px;height:56px;border-bottom:1px solid var(--line-soft);width:100%}
 .rk:last-child{border-bottom:0}
 .rk:hover .rk-go{color:var(--ink);transform:translateX(2px)}
@@ -584,7 +593,8 @@ tr:hover .row-actions{opacity:1}
 .res-h{display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:7px}
 .res-h .rn{display:flex;align-items:center;gap:8px;font-weight:500}
 .res .meter{height:6px;overflow:visible}
-.res .meter.under i{background:var(--warning)}
+.res .meter i{background:var(--tone)}
+.res-v{display:inline-flex;align-items:center;gap:6px}
 .res .meter .par{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--surface);box-shadow:0 0 0 1px var(--ink-3);border-radius:1px;z-index:1}
 .su{display:flex;align-items:center;gap:10px;height:52px;border-bottom:1px solid var(--line-soft);cursor:pointer;margin:0 -8px;padding:0 8px;border-radius:10px}
 .su:hover{background:var(--row-hover)}
@@ -844,10 +854,6 @@ const STAT_TILES = [
   { id: 'blocked', label: 'Blocked', tone: 'neutral', filter: { key: 'status', values: ['blocked'] }, sub: (L, n) => `${(n / L.length * 100).toFixed(1)}%` },
 ];
 
-const avatar = (u, s = 30) => {
-  const ini = u.name ? u.name.split(' ').map(p => p[0]).slice(0, 2).join('') : u.email.slice(0, 2).toUpperCase();
-  return `<span class="av av-${u.id % 7}" style="width:${s}px;height:${s}px;font-size:${Math.round(s * .38)}px">${esc(ini)}</span>`;
-};
 const badge = (o, pre = '') => `<span class="badge t-${o.tone || 'neutral'}"><i class="dot"></i>${pre}${o.label}</span>`;
 const statusCell = s => `<span class="stat"><i class="dot t-${STATUS[s].tone}"></i>${STATUS[s].label}</span>`;
 function riskIcon(r) {
@@ -857,7 +863,7 @@ function riskIcon(r) {
 }
 const riskCell = r => `<span class="risk">${riskIcon(r)}<span class="${r === 'unknown' ? 'faint' : ''}">${RISK[r].label}</span></span>`;
 const ctryCell = c => c ? `<span class="ctry"><span class="flag">${flag(COUNTRIES[c].cc)}</span><span class="mono">${c}</span></span>` : '<span class="faint">—</span>';
-const userCell = u => `<div class="ucell">${avatar(u)}<div style="min-width:0">${u.name ? `<div class="un">${esc(u.name)}</div><div class="ue">${esc(u.email)}</div>` : `<div class="un">${esc(u.email)}</div><div class="ue faint">No profile yet</div>`}</div></div>`;
+const userCell = u => `<div class="ucell"><div style="min-width:0">${u.name ? `<div class="un">${esc(u.name)}</div><div class="ue">${esc(u.email)}</div>` : `<div class="un">${esc(u.email)}</div><div class="ue faint">No profile yet</div>`}</div></div>`;
 
 const COLS = [
   { key: 'id', label: 'ID', val: u => u.id, dir: 'desc', cell: u => `<span class="num muted">${u.id}</span>` },
@@ -881,7 +887,7 @@ const S = {
   filters: [], search: '', sort: { key: 'id', dir: 'desc' }, page: 1, perPage: 25,
   view: 'table', groupBy: 'kyc', density: store.get('nsc.density', 'comfortable'),
   hidden: new Set(store.get('nsc.hidden', ['type', 'cards', 'twofa'])), selected: new Set(),
-  collapsed: new Set(), more: {}, userTab: 'overview', draft: {}, _list: [],
+  collapsed: new Set(), more: {}, colW: store.get('nsc.colw', {}), userTab: 'overview', draft: {}, _list: [],
   navClosed: new Set(store.get('nsc.navClosed', [])),
 };
 
@@ -916,7 +922,7 @@ function renderSidebar() {
 
 // Header = page title (breadcrumb) + that page's actions
 function crumbs() {
-  if (S.route === 'users' && S.userId) { const u = byId(S.userId); return [['Users', '#/users'], [u ? u.name || u.email : '#' + S.userId]]; }
+  if (S.route === 'users' && S.userId) { const u = byId(S.userId); return [['Users', '#/users'], ['#' + S.userId]]; }
   return [[NAV_FLAT.find(n => n.id === S.route).label]];
 }
 function topbarActions() {
@@ -937,10 +943,10 @@ function topbarActions() {
   return '';
 }
 function renderTopbar() {
-  const c = crumbs(), acts = topbarActions(), list = S.route === 'users' && !S.userId;
+  const c = crumbs(), acts = topbarActions();
   $('#topbar').innerHTML = `
     <button class="icon-btn menu-btn" data-act="mobile-menu" aria-label="Menu">${icon('menu', 18)}</button>
-    <nav class="crumbs" aria-label="Breadcrumb">${c.map(([l, h], i) => (i ? '<span class="crumb-sep">/</span>' : '') + (h ? `<a href="${h}">${esc(l)}</a>` : `<span class="cur">${esc(l)}</span>`)).join('')}${list ? '<span class="count" id="uCount"></span>' : ''}</nav>
+    <nav class="crumbs" aria-label="Breadcrumb">${c.map(([l, h], i) => (i ? '<span class="crumb-sep">/</span>' : '') + (h ? `<a href="${h}">${esc(l)}</a>` : `<span class="cur">${esc(l)}</span>`)).join('')}</nav>
     <div class="tb-sp"></div>
     ${acts ? `<div class="tb-ctx">${acts}</div>` : ''}`;
 }
@@ -973,7 +979,7 @@ function toggleSidebar() {
   const t = $('.sb-toggle'); t.innerHTML = icon(col ? 'panelOpen' : 'panelClose', 18); t.dataset.tip = `${col ? 'Expand' : 'Collapse'} sidebar  ⌘B`;
   closePop(); $('#tt').classList.remove('show'); $('#tt').dataset.for = '';
 }
-$('#sidebar').addEventListener('transitionend', e => { if (e.target.id === 'sidebar' && e.propertyName === 'width' && S.route === 'dashboard' && S._dash) drawMainChart(S._dash); });
+$('#sidebar').addEventListener('transitionend', e => { if (e.target.id === 'sidebar' && e.propertyName === 'width') { if (S.route === 'dashboard' && S._dash) drawMainChart(S._dash); refreshHints(); } });
 
 /* ════════════════════════════ Router ════════════════════════════ */
 function route() {
@@ -1126,7 +1132,7 @@ function renderDashboard() {
   const mix = [['Card spend', .42, 'var(--c1)'], ['Crypto exchange', .24, 'var(--c2)'], ['IBAN transfers', .18, 'var(--c3)'], ['Deposits', .10, 'var(--c4)'], ['Withdrawals', .06, 'var(--c5)']];
   const top = Object.entries(COUNTRIES).map(([k, c]) => [k, c, Math.round(c.w / 100 * 26480 * (.92 + (hash(k) % 16) / 100))]).sort((a, b) => b[2] - a[2]).slice(0, 6);
   const highRisk = USERS.filter(u => u.risk === 'high').length, kycQueue = USERS.filter(u => ['pending', 'review'].includes(u.kyc)).length;
-  const reserves = [['EUR', '€', 'var(--asset-eur)', 104.2], ['USDT', '₮', '#0E9F9A', 101.8], ['USDC', '$', '#2F6FE0', 100.6], ['BTC', '₿', '#F57314', 112.4], ['ETH', 'Ξ', '#6B6B6B', 99.2]];
+  const reserves = [['EUR', '€', 'var(--asset-eur)', 104.2], ['USDT', '₮', '#9FC600', 101.8], ['USDC', '$', '#42AAFF', 100.6], ['BTC', '₿', '#FC7C1A', 112.4], ['ETH', 'Ξ', '#B247FF', 99.2]];
 
   $('#main').innerHTML = `<div class="page">
     <section class="kpis band">${kpis.map(k => `
@@ -1141,12 +1147,9 @@ function renderDashboard() {
         <div class="big"><b>${M.fmt(sum(cur.cur))}</b>${deltaPill(pct(sum(cur.cur), sum(cur.prev)))}</div>
         <div class="chart" id="mainChart"></div>
       </div>
-      <div class="card span-4">
+      <div class="card span-4 fill">
         <div class="card-h"><span class="card-t">Onboarding funnel</span><span class="card-tag">All time</span></div>
-        ${funnel.map(([l, v], i) => `<div class="funnel-r" data-tt="${l}|${fmtInt(v)}|${(v / funnel[0][1] * 100).toFixed(1)}% of sign-ups">
-          <div class="funnel-h"><span>${l}</span><b>${fmtInt(v)}</b><span class="fpct">${i ? (v / funnel[i - 1][1] * 100).toFixed(0) + '%' : '100%'}</span></div>
-          <div class="fbar"><i style="width:${v / funnel[0][1] * 100}%;opacity:${1 - i * .14}"></i></div>
-        </div>`).join('')}
+        <div class="barlist">${funnel.map(([l, v], i) => `<div class="bl" data-tt="${l}|${fmtInt(v)}|${(v / funnel[0][1] * 100).toFixed(1)}% of sign-ups${i ? ` · ${(v / funnel[i - 1][1] * 100).toFixed(0)}% from ${funnel[i - 1][0].toLowerCase()}` : ''}"><i style="width:${v / funnel[0][1] * 100}%"></i><span>${l}</span><span><span class="num">${fmtInt(v)}</span><span class="bl-p">${i ? (v / funnel[i - 1][1] * 100).toFixed(0) + '%' : '100%'}</span></span></div>`).join('')}</div>
       </div>
 
       <div class="card span-4">
@@ -1169,11 +1172,11 @@ function renderDashboard() {
       </div>
 
       <div class="card span-4">
-        <div class="card-h"><span class="card-t">Reserve coverage</span><span class="badge t-success"><i class="dot"></i>103.6% overall</span></div>
-        ${reserves.map(([a, sym, c, p]) => `<div class="res">
-          <div class="res-h"><span class="rn"><span class="asset-ic" style="width:22px;height:22px;font-size:11px;background:${c}">${sym}</span>${a}</span><span class="num" style="${p < 100 ? 'color:var(--warning-ink)' : ''}">${p.toFixed(1)}%${p < 100 ? ' · under' : ''}</span></div>
-          <div class="meter ${p < 100 ? 'under' : ''}" data-tt="${a}|${p.toFixed(1)}% backed|Liabilities = 100%"><i style="width:${Math.min(p, 120) / 120 * 100}%"></i><span class="par" style="left:${100 / 120 * 100}%"></span></div>
-        </div>`).join('')}
+        <div class="card-h"><span class="card-t">Reserve coverage</span><span class="card-tag">103.6% overall</span></div>
+        ${reserves.map(([a, sym, c, p]) => { const [tone, st] = p >= 102 ? ['success', 'Healthy'] : p >= 100 ? ['warning', 'Thin buffer'] : ['error', 'Under-backed']; return `<div class="res">
+          <div class="res-h"><span class="rn"><span class="asset-ic" style="width:22px;height:22px;font-size:11px;background:${c}">${sym}</span>${a}</span><span class="num res-v t-${tone}"><i class="dot"></i>${p.toFixed(1)}%</span></div>
+          <div class="meter t-${tone}" data-tt="${a} · ${st}|${p.toFixed(1)}% backed|Marker = 100% of liabilities"><i style="width:${Math.min(p, 120) / 120 * 100}%"></i><span class="par" style="left:${100 / 120 * 100}%"></span></div>
+        </div>`; }).join('')}
       </div>
       <div class="card span-4">
         <div class="card-h"><span class="card-t">Cards</span><span class="card-tag">Issued</span></div>
@@ -1188,7 +1191,7 @@ function renderDashboard() {
       </div>
       <div class="card span-4">
         <div class="card-h"><span class="card-t">Latest sign-ups</span><a class="link-btn" href="#/users" style="display:flex;align-items:center;gap:2px;height:auto">All ${icon('chevRight', 14)}</a></div>
-        ${USERS.slice(0, 6).map(u => `<div class="su" data-uid="${u.id}">${avatar(u, 30)}<div class="sm"><div>${esc(u.name || u.email)}</div><div>${u.name ? esc(u.email) : 'No profile yet'}</div></div>${badge(KYC[u.kyc])}<span class="mono faint" style="width:56px;text-align:right">${rel(u.created)}</span></div>`).join('')}
+        ${USERS.slice(0, 6).map(u => `<div class="su" data-uid="${u.id}"><div class="sm"><div>${esc(u.name || u.email)}</div><div>${u.name ? esc(u.email) : 'No profile yet'}</div></div>${badge(KYC[u.kyc])}<span class="mono faint" style="width:56px;text-align:right">${rel(u.created)}</span></div>`).join('')}
       </div>
     </div>
   </div>`;
@@ -1223,9 +1226,9 @@ function drawMainChart(d) {
     <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--c1)" stop-opacity=".16"/><stop offset="1" stop-color="var(--c1)" stop-opacity="0"/></linearGradient></defs>
     ${grid}${xl}
     <path d="${line}L${x(n - 1)} ${y(0)}L${x(0)} ${y(0)}Z" fill="url(#ag)"/>
-    <path d="${smoothPath(Q)}" fill="none" stroke="var(--ink-3)" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <path d="${smoothPath(Q)}" fill="none" stroke="var(--prev)" stroke-width="1.5" stroke-dasharray="4 4"/>
     <path d="${line}" fill="none" stroke="var(--c1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    <g id="xh" style="display:none"><line id="xhl" y1="${pt}" y2="${H - pb}" stroke="var(--ink-3)" stroke-width="1"/><circle id="xhp" r="4" fill="var(--surface)" stroke="var(--ink-3)" stroke-width="1.5"/><circle id="xhc" r="4.5" fill="var(--c1)" stroke="var(--surface)" stroke-width="2"/></g>
+    <g id="xh" style="display:none"><line id="xhl" y1="${pt}" y2="${H - pb}" stroke="var(--ink-3)" stroke-width="1"/><circle id="xhp" r="4" fill="var(--surface)" stroke="var(--prev)" stroke-width="1.5"/><circle id="xhc" r="4.5" fill="var(--c1)" stroke="var(--surface)" stroke-width="2"/></g>
     <rect x="${pl}" y="0" width="${W - pl - pr}" height="${H}" fill="transparent" id="hit"/>
   </svg>`;
   const hit = $('#hit', el), xh = $('#xh', el), tt = $('#tt');
@@ -1235,7 +1238,7 @@ function drawMainChart(d) {
     $('#xhc', el).setAttribute('cx', x(i)); $('#xhc', el).setAttribute('cy', y(cur[i])); $('#xhp', el).setAttribute('cx', x(i)); $('#xhp', el).setAttribute('cy', y(prev[i]));
     const dl = d.unit === 'hour' ? `${fmtDay(d.dates[i])}, ${hh(d.dates[i])}` : d.unit === 'month' ? d.dates[i].toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : d.dates[i].toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
     tt.className = 'tt'; tt.dataset.src = 'chart';
-    tt.innerHTML = `<div class="tt-d">${dl}</div><div class="tt-r"><span><i class="sw" style="background:var(--c1)"></i>${M.label}</span><b>${M.fmt(cur[i])}</b></div><div class="tt-r"><span><i class="sw" style="background:var(--ink-3)"></i>Previous</span><span>${M.fmt(prev[i])}</span></div>`;
+    tt.innerHTML = `<div class="tt-d">${dl}</div><div class="tt-r"><span><i class="sw" style="background:var(--c1)"></i>${M.label}</span><b>${M.fmt(cur[i])}</b></div><div class="tt-r"><span><i class="sw" style="background:var(--prev)"></i>Previous</span><span>${M.fmt(prev[i])}</span></div>`;
     const sr = el.getBoundingClientRect(); placeTT(sr.left + x(i), sr.top + Math.min(y(cur[i]), y(prev[i])));
   });
   hit.addEventListener('mouseleave', () => { xh.style.display = 'none'; tt.classList.remove('show'); });
@@ -1248,6 +1251,7 @@ function placeTT(cx, cy) {
 }
 // Tooltips: data-tt="Title|value|sub" for data marks; data-tip="Label" for controls (data-tip-collapsed = only when sidebar is collapsed)
 document.addEventListener('mousemove', e => {
+  if (!e.target.closest || RS) return; // no tooltips while dragging a column edge
   const tt = $('#tt');
   const tip = e.target.closest('[data-tip]');
   if (tip && (!tip.hasAttribute('data-tip-collapsed') || $('#app').classList.contains('collapsed'))) {
@@ -1267,7 +1271,7 @@ document.addEventListener('mousemove', e => {
   tt.innerHTML = `<div class="tt-d">${a}</div><div class="tt-r"><b>${b}</b></div>${c ? `<div class="tt-r"><span>${c}</span></div>` : ''}`;
   placeTT(e.clientX, e.clientY);
 });
-let rsz; window.addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(() => { if (S.route === 'dashboard' && S._dash) drawMainChart(S._dash); if (popAnchor) positionPop(); }, 80); });
+let rsz; window.addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(() => { if (S.route === 'dashboard' && S._dash) drawMainChart(S._dash); if (popAnchor) positionPop(); refreshHints(); }, 80); });
 
 /* ════════════════════════════ Users list ════════════════════════════ */
 const applyFilters = (list, filters, skip) => filters.reduce((l, f) => (f.key === skip || !f.values.length) ? l : l.filter(u => matchField(f.key, u, f.values)), list);
@@ -1322,30 +1326,42 @@ function renderLayoutSeg() {
 }
 function renderResults() {
   const list = getList(); S._list = list;
-  $('#uCount').textContent = fmtInt(list.length);
   const el = $('#results');
   if (!list.length) {
     el.innerHTML = `<div class="tcard"><div class="empty"><div class="em-ic">${icon('search', 22)}</div><h3>No users match</h3><p>Try a different search or remove a filter.</p><button class="btn btn-ghost btn-sm" data-act="clear-all">Clear search and filters</button></div></div>`;
     return;
   }
   el.innerHTML = S.view === 'table' ? tableHTML(list) : S.view === 'list' ? listHTML(list) : boardHTML(list);
+  if (S.view === 'table') fitColumns();
 }
 
-/* table */
+/* table — column widths are fitted once to the first page shown, saved, and after that only change when dragged */
+const tableW = cols => cols.reduce((s, c) => s + S.colW[c.key], 0) + 44 + 84;
+function fitColumns() {
+  const t = $('#results table.ut'); if (!t || t.classList.contains('fixed')) return;
+  $$('th[data-key]', t).forEach(th => { const k = th.dataset.key; if (!S.colW[k]) S.colW[k] = Math.ceil(th.getBoundingClientRect().width) + 4; }); // +4 keeps sub-pixel content from clipping
+  store.set('nsc.colw', S.colW); applyColW(t);
+}
+function applyColW(t) {
+  $$('col[data-col]', t).forEach(col => col.style.width = S.colW[col.dataset.col] + 'px');
+  t.style.width = tableW(COLS.filter(c => !S.hidden.has(c.key))) + 'px'; t.classList.add('fixed');
+}
 function tableHTML(list) {
   const cols = COLS.filter(c => !S.hidden.has(c.key));
   const pages = Math.max(1, Math.ceil(list.length / S.perPage)); S.page = Math.min(S.page, pages);
   const start = (S.page - 1) * S.perPage, rows = list.slice(start, start + S.perPage);
   const all = rows.every(u => S.selected.has(u.id)), some = rows.some(u => S.selected.has(u.id));
-  return `<div class="tcard ${S.density}"><div class="tscroll"><table>
+  const fixed = cols.every(c => S.colW[c.key]);
+  return `<div class="tcard ${S.density}"><div class="hs-wrap"><div class="tscroll hs"><table class="ut ${fixed ? 'fixed' : ''}" style="${fixed ? `width:${tableW(cols)}px` : ''}">
+    <colgroup><col style="width:44px">${cols.map(c => `<col data-col="${c.key}" ${fixed ? `style="width:${S.colW[c.key]}px"` : ''}>`).join('')}<col></colgroup>
     <thead><tr><th class="cbcell"><button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="sel-page" aria-label="Select page">${icon('check', 11, 3)}</button></th>
-    ${cols.map(c => { const on = S.sort.key === c.key; return `<th class="sortable ${on ? 'sorted' : ''} ${c.right ? 'r' : ''}" data-act="sort" data-key="${c.key}"><span class="th-in">${c.label}<span class="srt">${icon(on && S.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 12, 2)}</span></span></th>`; }).join('')}
+    ${cols.map(c => { const on = S.sort.key === c.key; return `<th class="sortable ${on ? 'sorted' : ''} ${c.right ? 'r' : ''}" data-act="sort" data-key="${c.key}"><span class="th-in">${c.label}<span class="srt">${icon(on && S.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 12, 2)}</span></span><span class="col-rs" data-rs="${c.key}" data-tip="Drag to resize · double-click to fit"></span></th>`; }).join('')}
     <th class="act-h"></th></tr></thead>
     <tbody>${rows.map(u => `<tr data-uid="${u.id}" class="${S.selected.has(u.id) ? 'sel' : ''}">
       <td class="cbcell"><button class="cb ${S.selected.has(u.id) ? 'on' : ''}" data-act="sel" data-id="${u.id}" aria-label="Select">${icon('check', 11, 3)}</button></td>
       ${cols.map(c => `<td class="${c.right ? 'r' : ''}">${c.cell(u)}</td>`).join('')}
       <td class="act"><div class="row-actions"><button class="ghost-ic" data-act="impersonate" data-id="${u.id}" data-tip="Login as user">${icon('login', 15)}</button><button class="ghost-ic" data-act="row-more" data-id="${u.id}" data-tip="More">${icon('more', 15)}</button></div></td>
-    </tr>`).join('')}</tbody></table></div>${pagerHTML(list.length, pages, start, rows.length)}</div>`;
+    </tr>`).join('')}</tbody></table></div></div>${pagerHTML(list.length, pages, start, rows.length)}</div>`;
 }
 function pagerHTML(total, pages, start, len, o = {}) {
   const p = o.page ?? S.page, act = o.act || 'page', nums = [];
@@ -1373,20 +1389,19 @@ function groupHead(by, key, o) {
 }
 function listHTML(list) {
   const by = S.groupBy, gs = groupsOf(list, by);
-  return `<div class="tcard ${S.density}"><div class="tscroll">${gs.map(g => {
+  return `<div class="tcard ${S.density}"><div class="hs-wrap"><div class="tscroll hs">${gs.map(g => {
     const lim = S.more[g.key] || 30, col = S.collapsed.has(g.key);
     return `<div class="lg ${col ? 'collapsed' : ''}">
       ${by !== 'none' ? `<button class="lg-h" data-act="toggle-group" data-g="${g.key}">${icon('chevDown', 14)}${groupHead(by, g.key, g.o)}<span class="mono faint">${g.items.length}</span></button>` : ''}
       <div class="lg-b">${g.items.slice(0, lim).map(u => lrowHTML(u, by)).join('')}
       ${g.items.length > lim ? `<button class="more-row" data-act="more" data-g="${g.key}">Show ${g.items.length - lim} more</button>` : ''}</div>
     </div>`;
-  }).join('')}</div></div>`;
+  }).join('')}</div></div></div>`;
 }
 function lrowHTML(u, by) {
   const sel = S.selected.has(u.id);
   return `<div class="lrow ${sel ? 'sel' : ''}" data-uid="${u.id}">
     <button class="cb ${sel ? 'on' : ''}" data-act="sel" data-id="${u.id}">${icon('check', 11, 3)}</button>
-    ${avatar(u, 30)}
     <div class="lmain"><div class="lname">${esc(u.name || u.email)}<span class="mono faint" style="font-size:11.5px">#${u.id}</span></div><div class="lsub">${u.name ? esc(u.email) : 'No profile yet'}</div></div>
     <div class="lmeta">
       <span class="hide-sm">${ctryCell(u.country)}</span>
@@ -1416,7 +1431,7 @@ function boardHTML(list) {
 }
 function bcardHTML(u, by) {
   return `<div class="bcard" draggable="true" data-uid="${u.id}">
-    <div class="bc-top">${avatar(u, 24)}<span class="bc-name">${esc(u.name || 'No profile yet')}</span><span class="mono faint" style="font-size:11.5px">#${u.id}</span></div>
+    <div class="bc-top"><span class="bc-name">${esc(u.name || 'No profile yet')}</span><span class="mono faint" style="font-size:11.5px">#${u.id}</span></div>
     <div class="bc-email">${esc(u.email)}</div>
     <div class="bc-tags">
       ${u.country ? `<span class="tag"><span class="flag" style="font-size:12px">${flag(COUNTRIES[u.country].cc)}</span>${u.country}</span>` : ''}
@@ -1448,7 +1463,7 @@ function renderFloat() {
     <button data-act="bulk-set" data-field="level">${icon('tag', 15)}Level</button>
     <button data-act="bulk-set" data-field="risk">${icon('alert', 15)}Risk</button>
     <button data-act="bulk-export">${icon('download', 15)}Export</button>
-    <button class="bk-danger" data-act="bulk-block">${icon('ban', 15)}Block</button>
+    <button data-act="bulk-block">${icon('ban', 15)}Block</button>
     <span class="sep"></span>
     <button class="bk-x" data-act="sel-clear" title="Clear selection">${icon('x', 15)}</button>`;
   el.classList.add('show');
@@ -1467,13 +1482,13 @@ function selBtn(field, val) {
 }
 /* ── Per-user data: generated once from the user's id, then changed by actions on the page ── */
 const ASSETS = [
-  { c: 'BTC', n: 'Bitcoin', s: '₿', col: '#F57314', rate: 61200, net: 'Bitcoin', dp: 6 },
-  { c: 'ETH', n: 'Ethereum', s: 'Ξ', col: '#6B6B6B', rate: 2380, net: 'Ethereum · ERC-20', dp: 5 },
+  { c: 'BTC', n: 'Bitcoin', s: '₿', col: '#FC7C1A', rate: 61200, net: 'Bitcoin', dp: 6 },
+  { c: 'ETH', n: 'Ethereum', s: 'Ξ', col: '#B247FF', rate: 2380, net: 'Ethereum · ERC-20', dp: 5 },
   { c: 'EUR', n: 'Euro', s: '€', col: 'var(--asset-eur)', rate: 1, net: 'SEPA', dp: 2, fiat: 1 },
-  { c: 'TRX', n: 'Tron', s: 'T', col: '#D6336C', rate: .11, net: 'Tron · TRC-20', dp: 2 },
-  { c: 'USDC', n: 'USD Coin', s: '$', col: '#2F6FE0', rate: .92, net: 'Ethereum · ERC-20', dp: 2 },
-  { c: 'USDT', n: 'Tether', s: '₮', col: '#0E9F9A', rate: .92, net: 'Tron · TRC-20', dp: 2 },
-  { c: 'ZNX', n: 'ZNX', s: 'Z', col: '#A044E8', rate: .35, net: 'BNB Chain · BEP-20', dp: 2 },
+  { c: 'TRX', n: 'Tron', s: 'T', col: '#FD359B', rate: .11, net: 'Tron · TRC-20', dp: 2 },
+  { c: 'USDC', n: 'USD Coin', s: '$', col: '#42AAFF', rate: .92, net: 'Ethereum · ERC-20', dp: 2 },
+  { c: 'USDT', n: 'Tether', s: '₮', col: '#9FC600', rate: .92, net: 'Tron · TRC-20', dp: 2 },
+  { c: 'ZNX', n: 'ZNX', s: 'Z', col: '#9B9B98', rate: .35, net: 'BNB Chain · BEP-20', dp: 2 },
 ];
 const ASSET = Object.fromEntries(ASSETS.map(a => [a.c, a]));
 const TX = {
@@ -1581,8 +1596,8 @@ const tabCount = n => n ? ` <span class="tab-n">${n}</span>` : '';
 function dtable(heads, rows, empty = '') {
   if (!rows.length) return empty;
   const H = heads.map(h => { const k = h.lastIndexOf('|'); return k < 0 ? { l: h, al: '' } : { l: h.slice(0, k), al: h.slice(k + 1) }; });
-  return `<div class="dt-wrap"><table class="dt"><thead><tr>${H.map(h => `<th class="${h.al}">${h.l}</th>`).join('')}</tr></thead>
-    <tbody>${rows.map(r => { const cells = Array.isArray(r) ? r : r.cells; return `<tr class="${r.cls || ''}">${cells.map((c, i) => `<td class="${H[i].al}">${c}</td>`).join('')}</tr>`; }).join('')}</tbody></table></div>`;
+  return `<div class="hs-wrap"><div class="dt-wrap hs"><table class="dt"><thead><tr>${H.map(h => `<th class="${h.al}">${h.l}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(r => { const cells = Array.isArray(r) ? r : r.cells; return `<tr class="${r.cls || ''}">${cells.map((c, i) => `<td class="${H[i].al}">${c}</td>`).join('')}</tr>`; }).join('')}</tbody></table></div></div>`;
 }
 const tcard = (title, acts, body, tools = '') => `<div class="card flush"><div class="card-h"><span class="card-t">${title}</span>${acts ? `<div class="ch-act">${acts}</div>` : ''}</div>${tools ? `<div class="card-tools">${tools}</div>` : ''}${body}</div>`;
 
@@ -1608,14 +1623,14 @@ function renderUserPage() {
   const ws = D.wallets.filter(w => w.amt > 0);
   main.innerHTML = `<div class="page">
     <header class="page-head band up-head">
-      <div class="up-id">${avatar(u, 56)}<div style="min-width:0">
+      <div class="up-id"><div style="min-width:0">
         <h1>${esc(u.name || u.email)}</h1>
         <div class="up-sub">${u.name ? `<span>${esc(u.email)}</span>` : '<span>No profile yet</span>'}<span class="faint">·</span>${copyVal(u.uid)}</div>
         <div class="up-badges">${badge(STATUS[d.status])}${badge(KYC[d.kyc], 'KYC ')}<span class="badge t-neutral">${riskIcon(d.risk)}${RISK[d.risk].label} risk</span><span class="badge t-${LEVEL[d.level].tone}">${LEVEL[d.level].label}</span></div>
       </div></div>
       <div class="ph-right">
         <button class="btn btn-dark" data-act="impersonate" data-id="${u.id}">${icon('login', 15)}Login as user</button>
-        <button class="btn btn-ghost ${u.status === 'blocked' ? '' : 'btn-danger'}" data-act="toggle-block" data-id="${u.id}">${icon(u.status === 'blocked' ? 'refresh' : 'ban', 15)}${u.status === 'blocked' ? 'Unblock' : 'Block'}</button>
+        <button class="btn btn-ghost" data-act="toggle-block" data-id="${u.id}">${icon(u.status === 'blocked' ? 'refresh' : 'ban', 15)}${u.status === 'blocked' ? 'Unblock' : 'Block'}</button>
         <button class="icon-btn" data-act="u-more" data-tip="More">${icon('more', 16)}</button>
       </div>
     </header>
@@ -1931,7 +1946,7 @@ function displayPop() {
     ${S.view !== 'table' ? `<div class="pop-sec"><div class="pop-lbl">Group by</div><div class="pills">${groupOpts.map(k => `<button class="pill ${curGroup === k ? 'on' : ''}" data-act="disp-group" data-v="${k}">${gl(k)}</button>`).join('')}</div></div>` : ''}
     <div class="pop-sec"><div class="pop-row"><span>Order by</span><span style="display:flex;gap:6px"><button class="mini-sel" data-act="disp-sort" style="font-family:var(--font)">${sortCol.label}${icon('chevDown', 13)}</button><button class="icon-btn sm" data-act="disp-dir" title="Direction">${icon(S.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 14)}</button></span></div>
     ${S.view !== 'board' ? `<div class="pop-row"><span>Density</span><div class="seg sm">${['comfortable', 'compact'].map(k => `<button class="${S.density === k ? 'on' : ''}" data-act="disp-density" data-v="${k}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('')}</div></div>` : ''}</div>
-    ${S.view === 'table' ? `<div class="pop-sec"><div class="pop-lbl">Columns<span>${COLS.length - S.hidden.size}/${COLS.length}</span></div><div class="pills">${COLS.filter(c => !c.lock).map(c => `<button class="pill ${S.hidden.has(c.key) ? '' : 'on'}" data-act="disp-col" data-v="${c.key}">${c.label}</button>`).join('')}</div></div>` : ''}`;
+    ${S.view === 'table' ? `<div class="pop-sec"><div class="pop-lbl">Columns<button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="reset-colw">Reset widths</button></div><div class="pills">${COLS.filter(c => !c.lock).map(c => `<button class="pill ${S.hidden.has(c.key) ? '' : 'on'}" data-act="disp-col" data-v="${c.key}">${c.label}</button>`).join('')}</div></div>` : ''}`;
 }
 const refreshDisplayPop = () => { if (popOpts.kind === 'display') { pop.innerHTML = displayPop(); positionPop(); } };
 
@@ -2045,7 +2060,7 @@ const ACT = {
 
   'copy': a => { try { navigator.clipboard.writeText(a.dataset.copy); } catch {} closePop(); toast('Copied to clipboard', 'copy'); },
   'impersonate': a => { closePop(); const u = byId(+a.dataset.id); toast(`Opening session as ${esc(u.name || u.email)}`, 'login'); },
-  'row-more': a => { const u = byId(+a.dataset.id); openPop(a, menuItems([{ act: 'open-user', data: { id: u.id }, icon: 'user', label: 'Open profile' }, { act: 'impersonate', data: { id: u.id }, icon: 'login', label: 'Login as user' }, { act: 'copy', data: { copy: u.email }, icon: 'mail', label: 'Copy email' }, { act: 'copy', data: { copy: u.uid }, icon: 'hash', label: 'Copy unique ID' }, '-', { act: 'toggle-block', data: { id: u.id }, icon: 'ban', label: u.status === 'blocked' ? 'Unblock' : 'Block user', cls: u.status === 'blocked' ? '' : 'danger' }]), { align: 'right', width: 210 }); },
+  'row-more': a => { const u = byId(+a.dataset.id); openPop(a, menuItems([{ act: 'open-user', data: { id: u.id }, icon: 'user', label: 'Open profile' }, { act: 'impersonate', data: { id: u.id }, icon: 'login', label: 'Login as user' }, { act: 'copy', data: { copy: u.email }, icon: 'mail', label: 'Copy email' }, { act: 'copy', data: { copy: u.uid }, icon: 'hash', label: 'Copy unique ID' }, '-', { act: 'toggle-block', data: { id: u.id }, icon: 'ban', label: u.status === 'blocked' ? 'Unblock' : 'Block user', }]), { align: 'right', width: 210 }); },
   'open-user': (a, e) => { closePop(); goUser(+a.dataset.id, e); },
   'toggle-block': a => { closePop(); const u = byId(+a.dataset.id); u.status = u.status === 'blocked' ? 'active' : 'blocked'; u.updated = NOW; delete S.draft.status; toast(`${esc(u.name || u.email)} ${u.status === 'blocked' ? 'blocked' : 'unblocked'}`, u.status === 'blocked' ? 'ban' : 'check'); afterDataChange(); },
 
@@ -2156,6 +2171,7 @@ const ACT = {
     D.forms.unshift({ id: 900 + u.id % 100 + D.forms.length + 1, type: t, status: 'REQUESTED', date: new Date(NOW) });
     toast(`${FORM_TYPES[t].title} form requested`, 'send'); renderUserPage();
   },
+  'reset-colw': () => { S.colW = {}; store.set('nsc.colw', {}); renderResults(); toast('Column widths fitted to this page', 'columns'); },
   'modal-close': closeModal,
 };
 
@@ -2201,6 +2217,29 @@ document.addEventListener('keydown', e => {
   if (S.userId && e.key === 'j') stepUser(1);
   if (S.userId && e.key === 'k') stepUser(-1);
 });
+
+/* column resize */
+let RS = null;
+document.addEventListener('mousedown', e => {
+  const h = e.target.closest?.('.col-rs'); if (!h) return;
+  e.preventDefault(); e.stopPropagation(); fitColumns();
+  RS = { k: h.dataset.rs, t: h.closest('table'), x: e.clientX, w: S.colW[h.dataset.rs], h };
+  h.classList.add('on'); document.body.classList.add('resizing'); $('#tt').classList.remove('show');
+}, true);
+document.addEventListener('mousemove', e => { if (!RS) return; S.colW[RS.k] = Math.max(56, Math.round(RS.w + e.clientX - RS.x)); applyColW(RS.t); refreshHints(); });
+document.addEventListener('mouseup', () => { if (!RS) return; RS.h.classList.remove('on'); document.body.classList.remove('resizing'); store.set('nsc.colw', S.colW); S._resized = Date.now(); RS = null; });
+document.addEventListener('click', e => { if (S._resized && Date.now() - S._resized < 400) { e.stopPropagation(); e.preventDefault(); S._resized = 0; } }, true); // the click that ends a drag must not sort
+document.addEventListener('dblclick', e => { const h = e.target.closest?.('.col-rs'); if (!h) return; delete S.colW[h.dataset.rs]; store.set('nsc.colw', S.colW); renderResults(); });
+
+/* horizontal scroll hint: soft blurred fade on the side that has more content */
+function updHint(el) {
+  const w = el.parentElement; if (!w?.classList.contains('hs-wrap')) return;
+  const max = el.scrollWidth - el.clientWidth;
+  w.classList.toggle('hs-r', el.scrollLeft < max - 2); w.classList.toggle('hs-l', el.scrollLeft > 2);
+}
+const refreshHints = () => $$('.hs').forEach(updHint);
+document.addEventListener('scroll', e => { if (e.target.classList?.contains('hs')) updHint(e.target); }, true);
+new MutationObserver(refreshHints).observe($('#main'), { childList: true, subtree: true });
 
 /* board drag & drop */
 let dragId = null;
