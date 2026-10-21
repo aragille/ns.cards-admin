@@ -224,11 +224,14 @@ h1 .count{font-family:var(--mono);font-size:14px;font-weight:400;color:var(--ink
 [data-theme="dark"] .av-0{background:rgba(252,124,26,.16);color:#FFA45E}[data-theme="dark"] .av-1{background:rgba(63,123,234,.18);color:#8EB4FA}[data-theme="dark"] .av-2{background:rgba(14,159,154,.18);color:#5ED4CE}[data-theme="dark"] .av-3{background:rgba(166,81,236,.18);color:#C99AF5}[data-theme="dark"] .av-4{background:rgba(219,63,117,.18);color:#F28DB0}[data-theme="dark"] .av-5{background:rgba(122,179,23,.16);color:#A9D86A}[data-theme="dark"] .av-6{background:#26262A;color:#B0B0AC}
 
 /* ───────────────────────── Users list ───────────────────────── */
-.ustats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;padding:20px 28px 0}
-.ust{padding:12px 14px 11px;text-align:left;min-width:0;background:transparent;border:1px solid var(--line-strong);border-radius:12px;transition:background .12s,transform .08s}
-.ust:hover{background:var(--hover)}
+/* stat pre-filters share the segmented-control look: grey track, white raised selection */
+.ustats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding:3px;margin:20px 28px 0;background:var(--surface-2);border:1px solid var(--line);border-radius:14px}
+.ust{padding:10px 13px 9px;text-align:left;min-width:0;background:transparent;border-radius:11px;transition:background .12s,box-shadow .12s,transform .08s}
+.ust:hover{background:var(--line)}
 .ust:active{transform:scale(.985)}
-.ust.on,.ust.on:hover{background:var(--surface)}
+.ust.on,.ust.on:hover{background:var(--surface);box-shadow:0 1px 2px rgba(17,17,17,.08),0 0 0 1px var(--line)}
+.ust .ust-v b{color:var(--ink-2);transition:color .12s}
+.ust:hover .ust-v b,.ust.on .ust-v b{color:var(--ink)}
 .ust-l{display:flex;align-items:center;gap:6px;font-family:var(--font);font-size:11px;font-weight:500;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
 .ust.on .ust-l{color:var(--ink-2)}
 .ust-v{display:flex;align-items:baseline;gap:8px;margin-top:6px;white-space:nowrap}
@@ -365,6 +368,57 @@ tr:hover .row-actions{opacity:1}
 .tab.on::after{content:"";position:absolute;left:8px;right:8px;bottom:-1px;height:2px;background:var(--brand);border-radius:2px}
 .up-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;padding:24px 28px 96px;align-items:start}
 .up-main,.up-side{display:flex;flex-direction:column;gap:16px;min-width:0}
+.up-grid.single{grid-template-columns:minmax(0,1fr)}
+.tab-n{font-size:12px;font-weight:500;color:var(--ink-3)}
+/* user page sections: cards with a header, optional filter row and an edge-to-edge table */
+.card.flush{padding:0;overflow:hidden}
+.card.flush>.card-h{padding:16px 20px 0;margin-bottom:14px}
+.card-t .ct{font-weight:500;color:var(--ink-3);margin-left:6px}
+.ch-act{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 20px 14px}
+.dt-wrap{overflow-x:auto;border-top:1px solid var(--line)}
+.dt{min-width:720px}
+.dt th{position:static;height:38px;font-size:12px}
+.dt td{height:52px}
+.dt th:first-child,.dt td:first-child{padding-left:20px}
+.dt th:last-child,.dt td:last-child{padding-right:20px}
+.dt th.r,.dt td.r{text-align:right} .dt th.c,.dt td.c{text-align:center} .dt th.w,.dt td.w{width:1%}
+.dt tbody tr{cursor:default}
+.card.flush .pager{border-top:1px solid var(--line)}
+.code{font-size:12px;color:var(--ink-3);font-weight:400}
+.code .copy{color:var(--ink-3)}
+.txt{display:inline-flex;align-items:center;gap:7px} .txt .i{color:var(--ink-3)}
+.num.pos{color:var(--success-ink)}
+.empty.sm{padding:44px 20px}
+.sel{height:34px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B9B98' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 9px center/14px;padding:0 30px 0 11px;font-size:13px;color:var(--ink);appearance:none;-webkit-appearance:none;outline:0;cursor:pointer}
+.sel.sm{height:30px;font-size:12.5px;border-radius:9px}
+.inp{height:34px;width:150px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);padding:0 11px;font-size:13px;color:var(--ink);outline:0}
+.inp::placeholder{color:var(--ink-3)}
+.sel:focus,.inp:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-100)}
+.wlist{border-top:1px solid var(--line)}
+.wrow{display:flex;align-items:center;gap:12px;height:62px;padding:0 20px;border-bottom:1px solid var(--line-soft);cursor:pointer}
+.wrow:hover{background:var(--row-hover)}
+.wrow .wn{flex:1;min-width:0}
+.wrow .wn>div:first-child{font-weight:500;display:flex;align-items:center;gap:8px}
+.wrow .wa{text-align:right}
+.wrow.zero .wn>div:first-child,.wrow.zero .wa .num{color:var(--ink-3)}
+.wchev{color:var(--ink-3);transition:transform .15s} .wrow.open .wchev{transform:rotate(180deg)}
+.wdet{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:16px;align-items:center;padding:14px 20px 16px 64px;background:var(--row-hover);border-bottom:1px solid var(--line-soft)}
+.wdet .kl{font-size:12px;color:var(--ink-3);margin-bottom:4px}
+.wdet-act{display:flex;gap:8px}
+.wlist>:last-child{border-bottom:0}
+.mini-card{width:36px;height:24px;border-radius:5px;background:linear-gradient(135deg,#2C2C2C,#111);display:grid;place-items:center;flex:none}
+.mini-card.alt{background:linear-gradient(135deg,#FF9A4D,#E0600A)}
+.docs{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.docs-h{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sub-t{font-weight:600;font-size:13.5px}
+.doc{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font-size:13.5px}
+.doc-ic{width:32px;height:32px;border-radius:9px;background:var(--surface-2);display:grid;place-items:center;color:var(--ink-2);flex:none}
+.dropzone{display:flex;flex-direction:column;align-items:center;gap:6px;padding:26px 16px;border:1.5px dashed var(--line-strong);border-radius:12px;color:var(--ink-2);font-size:13px;text-align:center;cursor:pointer;transition:background .12s,border-color .12s}
+.dropzone:hover{background:var(--row-hover)} .dropzone.over{border-color:var(--brand);background:var(--brand-50)}
+.dropzone b{color:var(--ink);font-weight:500}
+.adj-pane{display:none;flex-direction:column;gap:14px} .adj-pane.on{display:flex}
+.hint{font-size:12.5px;color:var(--ink-2)}
 .card .kv-r:last-child{border-bottom:0}
 .kv-r{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:44px;border-bottom:1px solid var(--line-soft);font-size:13.5px}
 .kv-r>span:first-child{color:var(--ink-2)}
@@ -389,16 +443,6 @@ tr:hover .row-actions{opacity:1}
 .asset .an{flex:1}
 .asset .an div:last-child,.asset .aa div:last-child{font-size:12.5px;color:var(--ink-2)}
 .asset .aa{text-align:right}
-.pcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
-.pcard{aspect-ratio:1.586;border-radius:16px;padding:18px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;background:radial-gradient(120% 140% at 100% 0%,#2C2C2C 0%,#111 60%);position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
-.pcard.alt{background:radial-gradient(120% 140% at 100% 0%,#FF9A4D 0%,#FC7C1A 45%,#E0600A 100%)}
-.pcard .pc-top{display:flex;justify-content:space-between;align-items:center}
-.pcard .pc-no{font-size:16px;letter-spacing:.08em;font-variant-numeric:tabular-nums}
-.pcard .pc-bot{display:flex;justify-content:space-between;align-items:flex-end;font-size:12px;opacity:.85}
-.pcard .pc-st{font-family:var(--font);font-size:10.5px;font-weight:500;text-transform:uppercase;letter-spacing:.03em;background:rgba(255,255,255,.16);padding:3px 7px;border-radius:6px}
-.lim{padding:14px 0;border-bottom:1px solid var(--line-soft)}
-.lim:last-child{border-bottom:0}
-.lim-h{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:10px}
 .meter{height:6px;border-radius:6px;background:var(--surface-2);overflow:hidden;position:relative}
 .meter i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:var(--ink)}
 .tl{position:relative;padding-left:26px}
@@ -409,8 +453,30 @@ tr:hover .row-actions{opacity:1}
 .tl-i .tl-s{font-size:12.5px;color:var(--ink-2)}
 
 /* ───────────────────────── Popover / tooltip / toast / modal ───────────────────────── */
-.pop{position:fixed;z-index:70;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-pop);min-width:220px;padding:6px;display:none;animation:pop-in .12s ease}
+.pop{position:fixed;z-index:70;max-width:calc(100vw - 16px);background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-pop);min-width:220px;padding:6px;display:none;animation:pop-in .12s ease}
 .pop.open{display:block}
+/* date range picker: presets on the left, month calendar on the right */
+.dp-btn{display:inline-flex;align-items:center;gap:7px;height:34px;max-width:260px;padding:0 10px 0 11px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap}
+.dp-btn span{overflow:hidden;text-overflow:ellipsis}
+.dp-btn .i{color:var(--ink-3)}
+.dp-btn:hover{background:var(--hover)}
+.topbar .dp-btn{height:36px}
+.dp{display:flex;margin:-6px}
+.dp-presets{width:168px;flex:none;padding:6px;border-right:1px solid var(--line)}
+.dp-presets .pi.on{font-weight:500}
+.dp-cal{flex:1;min-width:0;padding:12px 14px}
+.dp-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.dp-h b{font-weight:600;font-size:13.5px}
+.dp-grid{display:grid;grid-template-columns:repeat(7,1fr);row-gap:2px}
+.dp-w{height:28px;line-height:28px;text-align:center;font-size:11px;font-weight:500;color:var(--ink-3)}
+.dp-day{height:36px;border-radius:9px;font-size:13px;color:var(--ink);text-align:center;font-variant-numeric:tabular-nums}
+.dp-day:hover:not(:disabled){background:var(--hover)}
+.dp-day.today{font-weight:600;color:var(--brand)}
+.dp-day.in{background:var(--surface-2);border-radius:0}
+.dp-day.start,.dp-day.end,.dp-day.start:hover,.dp-day.end:hover{background:var(--inv);color:var(--on-inv)}
+.dp-f{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.dp-sum{flex:1;font-size:12.5px;color:var(--ink-2)}
+
 .pop-head{display:flex;align-items:center;gap:6px;height:34px;padding:0 4px;font-weight:600;font-size:13px;margin-bottom:2px}
 .pop-search{display:flex;align-items:center;gap:8px;height:36px;padding:0 10px;margin:-6px -6px 6px;border-bottom:1px solid var(--line);color:var(--ink-3)}
 .pop-head+.pop-search{margin-top:0;border-top:1px solid var(--line)}
@@ -542,7 +608,13 @@ tr:hover .row-actions{opacity:1}
   .up-grid{grid-template-columns:minmax(0,1fr)}
   .lmeta .hide-md{display:none}
 }
+@media (max-width:640px){
+  .dp{flex-direction:column}
+  .dp-presets{width:auto;display:flex;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}
+  .dp-presets .pi{width:auto;flex:none}
+}
 @media (max-width:900px){
+  .topbar .dp-btn{max-width:150px}
   .app.collapsed .sb-label{max-height:44px;padding:18px 13px 6px}
   .app{grid-template-columns:minmax(0,1fr)}
   .sidebar,.app.collapsed .sidebar{position:fixed;left:0;top:0;bottom:0;width:260px;transform:translateX(-100%);transition:transform .22s ease;box-shadow:var(--shadow-pop)}
@@ -560,13 +632,15 @@ tr:hover .row-actions{opacity:1}
   .kpi{border-right:1px solid var(--line)!important;border-top:1px solid var(--line)}
   .kpi:nth-of-type(-n+2){border-top:0}
   .kpi:nth-of-type(2n){border-right:0!important}
-  .ustats{display:flex;overflow-x:auto;scrollbar-width:none;padding:12px 16px 2px}
-  .ust{flex:0 0 150px}
+  .ustats{display:flex;overflow-x:auto;scrollbar-width:none;margin:12px 16px 0}
+  .ust{flex:0 0 140px}
   .search{width:100%}
   .seg button .sl,.tool-btn .sl{display:none}
   .lmeta{gap:10px}.lmeta .hide-sm{display:none}
   .tscroll{max-height:none}
   .kv2{grid-template-columns:1fr}
+  .wdet{grid-template-columns:1fr 1fr;padding-left:20px}
+  .card-tools .inp{width:100%}
   .kv2 .kv-r:nth-last-child(2):nth-child(odd){border-bottom:1px solid var(--line-soft)}
 }
 </style>
@@ -677,6 +751,12 @@ const ICONS = {
   refresh: '<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>',
   hash: '<path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/>',
   keyboard: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10"/>',
+  pencil: '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/>',
+  upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/>',
+  file: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>',
+  mapPin: '<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+  trash: '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>',
+  send: '<path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/>',
   bookmark: '<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>',
 };
 const icon = (n, s = 16, sw = 1.75) => `<svg class="i" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ''}</svg>`;
@@ -751,7 +831,7 @@ const FIELDS = {
   eea:     { label: 'Region', icon: 'globe', options: { eea: { label: 'EEA' }, non: { label: 'Non-EEA' } }, get: u => u.country ? (COUNTRIES[u.country].eea ? 'eea' : 'non') : 'unset' },
   type:    { label: 'Type', icon: 'user', options: TYPE, get: u => u.type },
   twofa:   { label: '2FA', icon: 'lock', options: { on: { label: 'Enabled' }, off: { label: 'Disabled' } }, get: u => u.twofa ? 'on' : 'off' },
-  created: { label: 'Created', icon: 'calendar', single: 1, options: { '1': { label: 'Last 24 hours' }, '7': { label: 'Last 7 days' }, '30': { label: 'Last 30 days' }, '90': { label: 'Last 90 days' } }, test: (u, v) => (NOW - u.created) / 864e5 <= +v[0] },
+  created: { label: 'Created', icon: 'calendar', date: 1, options: {}, test: (u, v) => inRange(u.created, v[0]) },
 };
 const matchField = (k, u, vals) => FIELDS[k].test ? FIELDS[k].test(u, vals) : vals.includes(FIELDS[k].get(u));
 
@@ -797,7 +877,7 @@ const COLS = [
 
 /* ════════════════════════════ State ════════════════════════════ */
 const S = {
-  route: 'dashboard', userId: null, period: '30D', metric: 'volume',
+  route: 'dashboard', userId: null, range: { key: '30d' }, metric: 'volume',
   filters: [], search: '', sort: { key: 'id', dir: 'desc' }, page: 1, perPage: 25,
   view: 'table', groupBy: 'kyc', density: store.get('nsc.density', 'comfortable'),
   hidden: new Set(store.get('nsc.hidden', ['type', 'cards', 'twofa'])), selected: new Set(),
@@ -841,7 +921,7 @@ function crumbs() {
 }
 function topbarActions() {
   if (S.route === 'dashboard') return `
-    <div class="seg">${Object.keys(PERIODS).map(k => `<button class="${k === S.period ? 'on' : ''}" data-act="period" data-v="${k}">${k}</button>`).join('')}</div>
+    ${dpButton(S.range, 'dash-range')}
     <button class="btn btn-ghost tb-hide-sm" data-act="toast" data-msg="Report exported">${icon('download', 15)}Export</button>`;
   if (S.route === 'users' && !S.userId) return `
     <button class="tool-btn solid" id="displayBtn" data-act="display"></button>
@@ -900,7 +980,7 @@ function route() {
   const [id, sub] = location.hash.replace(/^#\/?/, '').split('/');
   const r = NAV_FLAT.some(n => n.id === id) ? id : 'dashboard';
   const uid = r === 'users' && sub ? +sub : null;
-  if (uid !== S.userId) S.draft = {};
+  if (uid !== S.userId) { S.draft = {}; S.tx = txDefault(); S.openWallet = null; }
   if (!uid) S.userTab = 'overview';
   S.route = r; S.userId = uid;
   closePop(); $('#app').classList.remove('mobile-open'); $('#tt').classList.remove('show');
@@ -921,31 +1001,102 @@ function renderPlaceholder() {
   </div>`;
 }
 
+/* ════════════════════════════ Date range picker ════════════════════════════ */
+// A range is { key } for a dynamic preset (re-evaluated against "now") or { key: 'custom', from, to } (ms timestamps).
+const DAY = 864e5;
+const sod = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const sameDay = (a, b) => a && b && sod(a).getTime() === sod(b).getTime();
+const RANGE_PRESETS = {
+  today: { label: 'Today', get: () => [sod(NOW), NOW] },
+  yesterday: { label: 'Yesterday', get: () => [new Date(sod(NOW) - DAY), new Date(sod(NOW) - 1)] },
+  week: { label: 'This week', get: () => [new Date(sod(NOW) - ((NOW.getDay() + 6) % 7) * DAY), NOW] },
+  '7d': { label: 'Last 7 days', get: () => [new Date(sod(NOW) - 6 * DAY), NOW] },
+  month: { label: 'This month', get: () => [new Date(NOW.getFullYear(), NOW.getMonth(), 1), NOW] },
+  lastmonth: { label: 'Last month', get: () => [new Date(NOW.getFullYear(), NOW.getMonth() - 1, 1), new Date(new Date(NOW.getFullYear(), NOW.getMonth(), 1) - 1)] },
+  '30d': { label: 'Last 30 days', get: () => [new Date(sod(NOW) - 29 * DAY), NOW] },
+  '90d': { label: 'Last 90 days', get: () => [new Date(sod(NOW) - 89 * DAY), NOW] },
+  year: { label: 'This year', get: () => [new Date(NOW.getFullYear(), 0, 1), NOW] },
+  '12m': { label: 'Last 12 months', get: () => [new Date(NOW.getFullYear(), NOW.getMonth() - 11, 1), NOW] },
+  all: { label: 'All time', get: () => [new Date(0), NOW] },
+};
+const fmtDay = (d, y = true) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', ...(y ? { year: 'numeric' } : {}) });
+function fmtRange(a, b) {
+  if (sameDay(a, b)) return fmtDay(a);
+  return a.getFullYear() === b.getFullYear() ? `${fmtDay(a, false)} – ${fmtDay(b)}` : `${fmtDay(a)} – ${fmtDay(b)}`;
+}
+function resolveRange(r) {
+  if (r.key === 'custom') { const from = new Date(r.from), to = new Date(r.to); return { from, to, label: fmtRange(from, to) }; }
+  const [from, to] = RANGE_PRESETS[r.key].get();
+  return { from, to, label: RANGE_PRESETS[r.key].label };
+}
+const inRange = (d, r) => { const { from, to } = resolveRange(r); return d >= from && d <= to; };
+const dpButton = (r, act, extra = '') => `<button class="dp-btn" data-act="${act}" ${extra}>${icon('calendar', 15)}<span>${esc(resolveRange(r).label)}</span>${icon('chevDown', 13)}</button>`;
+
+let DP = null;
+function openDatePicker(anchor, current, onApply, opts = {}) {
+  const res = resolveRange(current), custom = current.key === 'custom';
+  DP = { onApply, cur: current, presets: Object.keys(RANGE_PRESETS).filter(k => !(opts.noAll && k === 'all')),
+    a: current.key === 'all' ? null : res.from, b: current.key === 'all' ? null : res.to, custom };
+  DP.view = new Date((DP.b || NOW).getFullYear(), (DP.b || NOW).getMonth(), 1);
+  openPop(anchor, dpHTML(), { width: 540, keep: opts.keep, align: opts.align, kind: 'dp', anchorSel: opts.anchorSel });
+}
+function dpHTML() {
+  const v = DP.view, y = v.getFullYear(), m = v.getMonth(), lead = (new Date(y, m, 1).getDay() + 6) % 7, days = new Date(y, m + 1, 0).getDate();
+  const a = DP.a && sod(DP.a), b = DP.b && sod(DP.b), atNow = y === NOW.getFullYear() && m === NOW.getMonth();
+  const cells = Array.from({ length: lead }, () => '<span></span>').concat(Array.from({ length: days }, (_, i) => {
+    const d = new Date(y, m, i + 1), t = d.getTime(), fut = d > NOW;
+    const cls = [sameDay(d, NOW) && 'today', a && t === a.getTime() && 'start', b && t === b.getTime() && 'end', a && b && t > a && t < b && 'in'].filter(Boolean).join(' ');
+    return `<button class="dp-day ${cls}" data-act="dp-day" data-ts="${t}" ${fut ? 'disabled' : ''}>${i + 1}</button>`;
+  }));
+  const sum = DP.a ? (DP.b ? fmtRange(DP.a, DP.b) : `${fmtDay(DP.a)} – …`) : 'Pick a start date';
+  return `<div class="dp">
+    <div class="dp-presets">${DP.presets.map(k => `<button class="pi ${!DP.custom && DP.cur.key === k ? 'on' : ''}" data-act="dp-preset" data-k="${k}"><span class="pl">${RANGE_PRESETS[k].label}</span>${!DP.custom && DP.cur.key === k ? `<span class="chk">${icon('check', 14, 2)}</span>` : ''}</button>`).join('')}</div>
+    <div class="dp-cal">
+      <div class="dp-h"><button class="ghost-ic" data-act="dp-nav" data-d="-1" aria-label="Previous month">${icon('chevLeft', 16)}</button><b>${v.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</b><button class="ghost-ic" data-act="dp-nav" data-d="1" ${atNow ? 'disabled' : ''} aria-label="Next month">${icon('chevRight', 16)}</button></div>
+      <div class="dp-grid">${['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(w => `<span class="dp-w">${w}</span>`).join('')}${cells.join('')}</div>
+      <div class="dp-f"><span class="dp-sum">${sum}</span><button class="btn btn-ghost btn-sm" data-act="dp-cancel">Cancel</button><button class="btn btn-dark btn-sm" data-act="dp-apply" ${DP.a ? '' : 'disabled'}>Apply</button></div>
+    </div>
+  </div>`;
+}
+const dpRefresh = () => { pop.innerHTML = dpHTML(); };
+function dpCommit(r) { const fn = DP.onApply; closePop(); DP = null; fn(r); }
+// live preview of the range while choosing the end date
+document.addEventListener('mouseover', e => {
+  const day = e.target.closest?.('.dp-day'); if (!day || !DP || !DP.a || DP.b) return;
+  const a = sod(DP.a).getTime(), h = +day.dataset.ts, lo = Math.min(a, h), hi = Math.max(a, h);
+  $$('.dp-day').forEach(el => { const t = +el.dataset.ts; el.classList.toggle('in', t > lo && t < hi); el.classList.toggle('end', t === h && t !== a); });
+});
+
 /* ════════════════════════════ Dashboard ════════════════════════════ */
-const PERIODS = { '7D': { n: 7, unit: 'day' }, '30D': { n: 30, unit: 'day' }, '90D': { n: 90, unit: 'day' }, '12M': { n: 12, unit: 'month' } };
 const METRICS = {
   volume: { label: 'Volume', base: 1.62e6, fmt: v => '€' + compact(v) },
   revenue: { label: 'Revenue', base: 10400, fmt: v => '€' + compact(v) },
   signups: { label: 'Sign-ups', base: 118, fmt: v => fmtInt(v) },
 };
 function genSeries(dates, base, seed, unit) {
-  const r = rng(seed), n = dates.length, trend = unit === 'month' ? .022 : .003;
+  const r = rng(seed), n = dates.length, trend = unit === 'month' ? .022 : unit === 'day' ? .003 : 0;
   let lvl = base * (1 - trend * n / 2); const out = [];
   for (let i = 0; i < n; i++) {
     lvl *= 1 + trend + (r() - .5) * .05;
     let v = lvl * (1 + (r() - .5) * .16);
     if (unit === 'day' && [0, 6].includes(dates[i].getDay())) v *= .8;
+    if (unit === 'hour') v *= .3 + .7 * Math.max(0, Math.sin((dates[i].getHours() - 6) / 18 * Math.PI));
     out.push(v);
   }
   return out;
 }
-function dashData(pk) {
-  const P = PERIODS[pk], mult = P.unit === 'month' ? 30.4 : 1;
-  const dates = Array.from({ length: P.n }, (_, i) => P.unit === 'day' ? new Date(NOW.getTime() - (P.n - 1 - i) * 864e5) : new Date(NOW.getFullYear(), NOW.getMonth() - (P.n - 1 - i), 1));
-  const d = { dates, unit: P.unit };
+// Bucket size follows the range: hours for ≤ 2 days, days for ≤ 120 days, months beyond
+function dashData(range) {
+  const { from, to } = resolveRange(range), ms = Math.max(36e5, to - from);
+  const unit = ms <= 2 * DAY ? 'hour' : ms <= 120 * DAY ? 'day' : 'month';
+  const dates = unit === 'month'
+    ? Array.from({ length: Math.max(2, (to.getFullYear() - from.getFullYear()) * 12 + to.getMonth() - from.getMonth() + 1) }, (_, i) => new Date(from.getFullYear(), from.getMonth() + i, 1))
+    : Array.from({ length: Math.max(2, Math.ceil(ms / (unit === 'hour' ? 36e5 : DAY))) }, (_, i) => new Date(from.getTime() + i * (unit === 'hour' ? 36e5 : DAY)));
+  const mult = unit === 'month' ? 30.4 : unit === 'hour' ? 1 / 24 : 1, key = range.key === 'custom' ? `${range.from}-${range.to}` : range.key;
+  const d = { dates, unit, days: Math.max(1, ms / DAY) };
   for (const [k, M] of Object.entries(METRICS)) {
-    const s = hash(pk + k);
-    d[k] = { cur: genSeries(dates, M.base * mult, s, P.unit), prev: genSeries(dates, M.base * mult * .91, s + 11, P.unit) };
+    const s = hash(key + k);
+    d[k] = { cur: genSeries(dates, M.base * mult, s, unit), prev: genSeries(dates, M.base * mult * .91, s + 11, unit) };
   }
   return d;
 }
@@ -959,9 +1110,9 @@ function spark(data) {
 }
 
 function renderDashboard() {
-  const d = dashData(S.period);
+  const d = dashData(S.range);
   const vol = sum(d.volume.cur), volP = sum(d.volume.prev), rev = sum(d.revenue.cur), revP = sum(d.revenue.prev), su = sum(d.signups.cur), suP = sum(d.signups.prev);
-  const active = { '7D': 9840, '30D': 14212, '90D': 17930, '12M': 21480 }[S.period];
+  const active = Math.round(2500 + 19000 * (1 - Math.exp(-d.days / 45)));
   const kpis = [
     { l: 'Volume', v: '€' + compact(vol), d: pct(vol, volP), s: d.volume.cur },
     { l: 'Revenue', v: '€' + compact(rev), d: pct(rev, revP), s: d.revenue.cur },
@@ -999,7 +1150,7 @@ function renderDashboard() {
       </div>
 
       <div class="card span-4">
-        <div class="card-h"><span class="card-t">Transaction mix</span><span class="card-tag">${S.period}</span></div>
+        <div class="card-h"><span class="card-t">Transaction mix</span><span class="card-tag">${esc(resolveRange(S.range).label)}</span></div>
         <div class="stack">${mix.map(([l, p, c]) => `<i style="width:${p * 100}%;background:${c}" data-tt="${l}|€${compact(vol * p)}|${(p * 100).toFixed(0)}% of volume"></i>`).join('')}</div>
         <div class="lrows">${mix.map(([l, p, c]) => `<div class="lr"><i class="sw" style="background:${c}"></i><span class="lr-l">${l}</span><span class="lr-v">€${compact(vol * p)}</span><span class="lr-p">${(p * 100).toFixed(0)}%</span></div>`).join('')}</div>
       </div>
@@ -1062,7 +1213,8 @@ function drawMainChart(d) {
   const max = niceMax(Math.max(...cur, ...prev) * 1.05);
   const x = i => pl + (n === 1 ? 0 : i * (W - pl - pr) / (n - 1)), y = v => pt + (1 - v / max) * (H - pt - pb);
   const P = cur.map((v, i) => [x(i), y(v)]), Q = prev.map((v, i) => [x(i), y(v)]);
-  const lbl = dt => d.unit === 'month' ? dt.toLocaleDateString('en-GB', { month: 'short' }) : dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  const hh = dt => String(dt.getHours()).padStart(2, '0') + ':00';
+  const lbl = dt => d.unit === 'hour' ? hh(dt) : d.unit === 'month' ? dt.toLocaleDateString('en-GB', { month: 'short' }) : dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   const step = Math.max(1, Math.ceil(n / 6));
   const grid = [0, .25, .5, .75, 1].map(f => `<line x1="${pl}" x2="${W - pr}" y1="${y(max * f)}" y2="${y(max * f)}" stroke="var(--line)" ${f ? 'stroke-dasharray="2 4"' : ''}/><text class="ax" x="${pl - 10}" y="${y(max * f) + 3.5}" text-anchor="end">${f ? M.fmt(max * f).replace('.00', '') : '0'}</text>`).join('');
   const xl = d.dates.map((dt, i) => (i % step === 0 || i === n - 1) && !(i !== n - 1 && n - 1 - i < step / 2) ? `<text class="ax" x="${x(i)}" y="${H - 8}" text-anchor="${i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'}">${lbl(dt)}</text>` : '').join('');
@@ -1081,7 +1233,7 @@ function drawMainChart(d) {
     const r = hit.getBoundingClientRect(); const i = Math.max(0, Math.min(n - 1, Math.round((e.clientX - r.left) / r.width * (n - 1))));
     xh.style.display = ''; $('#xhl', el).setAttribute('x1', x(i)); $('#xhl', el).setAttribute('x2', x(i));
     $('#xhc', el).setAttribute('cx', x(i)); $('#xhc', el).setAttribute('cy', y(cur[i])); $('#xhp', el).setAttribute('cx', x(i)); $('#xhp', el).setAttribute('cy', y(prev[i]));
-    const dl = d.unit === 'month' ? d.dates[i].toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : d.dates[i].toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+    const dl = d.unit === 'hour' ? `${fmtDay(d.dates[i])}, ${hh(d.dates[i])}` : d.unit === 'month' ? d.dates[i].toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : d.dates[i].toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
     tt.className = 'tt'; tt.dataset.src = 'chart';
     tt.innerHTML = `<div class="tt-d">${dl}</div><div class="tt-r"><span><i class="sw" style="background:var(--c1)"></i>${M.label}</span><b>${M.fmt(cur[i])}</b></div><div class="tt-r"><span><i class="sw" style="background:var(--ink-3)"></i>Previous</span><span>${M.fmt(prev[i])}</span></div>`;
     const sr = el.getBoundingClientRect(); placeTT(sr.left + x(i), sr.top + Math.min(y(cur[i]), y(prev[i])));
@@ -1155,12 +1307,12 @@ function renderStats() {
     </button>`;
   }).join('');
 }
-function optLabel(k, v) { const o = FIELDS[k].options[v]; return o ? (o.flag ? `${o.flag} ${o.code}` : o.label) : v; }
+function optLabel(k, v) { if (FIELDS[k].date) return esc(resolveRange(v).label); const o = FIELDS[k].options[v]; return o ? (o.flag ? `${o.flag} ${o.code}` : o.label) : v; }
 function renderChips() {
   $('#chips').innerHTML = S.filters.map(f => {
     const F = FIELDS[f.key], vals = f.values;
     const vt = !vals.length ? '<span class="faint">Select…</span>' : vals.length <= 2 ? vals.map(v => optLabel(f.key, v)).join(', ') : `${vals.length} ${F.plural || 'values'}`;
-    const op = F.single ? 'in' : vals.length > 1 ? 'is any of' : 'is';
+    const op = F.date ? 'in' : vals.length > 1 ? 'is any of' : 'is';
     return `<div class="chip" data-chip="${f.key}"><span class="cf">${icon(F.icon, 14)}${F.label}</span><span class="co">${op}</span><button class="cv" data-act="edit-filter" data-key="${f.key}">${vt}</button><button class="cx" data-act="rm-filter" data-key="${f.key}" aria-label="Remove filter">${icon('x', 13)}</button></div>`;
   }).join('') + (S.filters.length ? `<button class="link-btn" data-act="clear-filters">Clear</button>` : '');
 }
@@ -1195,14 +1347,15 @@ function tableHTML(list) {
       <td class="act"><div class="row-actions"><button class="ghost-ic" data-act="impersonate" data-id="${u.id}" data-tip="Login as user">${icon('login', 15)}</button><button class="ghost-ic" data-act="row-more" data-id="${u.id}" data-tip="More">${icon('more', 15)}</button></div></td>
     </tr>`).join('')}</tbody></table></div>${pagerHTML(list.length, pages, start, rows.length)}</div>`;
 }
-function pagerHTML(total, pages, start, len) {
-  const p = S.page, nums = [];
+function pagerHTML(total, pages, start, len, o = {}) {
+  const p = o.page ?? S.page, act = o.act || 'page', nums = [];
   for (let i = 1; i <= pages; i++) if (i === 1 || i === pages || Math.abs(i - p) <= 1) nums.push(i); else if (nums[nums.length - 1] !== '…') nums.push('…');
+  const range = `${start + 1}–${start + len} of ${fmtInt(total)}`;
   return `<div class="pager">
-    <div class="pp">Rows <button class="mini-sel" data-act="perpage">${S.perPage}${icon('chevDown', 13)}</button><span style="margin-left:8px">${start + 1}–${start + len} of ${fmtInt(total)}</span></div>
-    <div class="pg"><button class="icon-btn sm bare" data-act="page" data-p="${p - 1}" ${p <= 1 ? 'disabled' : ''}>${icon('chevLeft', 16)}</button>
-    ${nums.map(n => n === '…' ? '<span class="faint" style="padding:0 4px">…</span>' : `<button class="pn ${n === p ? 'on' : ''}" data-act="page" data-p="${n}">${n}</button>`).join('')}
-    <button class="icon-btn sm bare" data-act="page" data-p="${p + 1}" ${p >= pages ? 'disabled' : ''}>${icon('chevRight', 16)}</button></div>
+    <div class="pp">${o.per === false ? range : `Rows <button class="mini-sel" data-act="perpage">${S.perPage}${icon('chevDown', 13)}</button><span style="margin-left:8px">${range}</span>`}</div>
+    <div class="pg"><button class="icon-btn sm bare" data-act="${act}" data-p="${p - 1}" ${p <= 1 ? 'disabled' : ''}>${icon('chevLeft', 16)}</button>
+    ${nums.map(n => n === '…' ? '<span class="faint" style="padding:0 4px">…</span>' : `<button class="pn ${n === p ? 'on' : ''}" data-act="${act}" data-p="${n}">${n}</button>`).join('')}
+    <button class="icon-btn sm bare" data-act="${act}" data-p="${p + 1}" ${p >= pages ? 'disabled' : ''}>${icon('chevRight', 16)}</button></div>
   </div>`;
 }
 
@@ -1312,15 +1465,130 @@ function selBtn(field, val) {
   const content = field === 'status' ? statusCell(val) : field === 'risk' ? riskCell(val) : field === 'country' ? (val ? `<span class="flag">${o.flag}</span>${o.label}` : '<span class="faint">Not set</span>') : o.label;
   return `<button class="sel-btn ${field in S.draft ? 'dirty' : ''}" data-act="u-select" data-field="${field}">${content}${icon('chevsUD', 14)}</button>`;
 }
-function walletsOf(u) {
-  const r = rng(u.id), b = u.balance;
-  if (!b) return [];
-  const eur = b * (.3 + r() * .4), usdt = b * r() * .4, rest = Math.max(0, b - eur - usdt), btc = rest * r(), eth = rest - btc;
-  return [['Euro', 'EUR', '€', 'var(--asset-eur)', eur, eur], ['Tether', 'USDT', '₮', '#0E9F9A', usdt / .92, usdt], ['Bitcoin', 'BTC', '₿', '#F57314', btc / 61200, btc], ['Ethereum', 'ETH', 'Ξ', '#6B6B6B', eth / 2380, eth]].filter(w => w[5] > 1);
+/* ── Per-user data: generated once from the user's id, then changed by actions on the page ── */
+const ASSETS = [
+  { c: 'BTC', n: 'Bitcoin', s: '₿', col: '#F57314', rate: 61200, net: 'Bitcoin', dp: 6 },
+  { c: 'ETH', n: 'Ethereum', s: 'Ξ', col: '#6B6B6B', rate: 2380, net: 'Ethereum · ERC-20', dp: 5 },
+  { c: 'EUR', n: 'Euro', s: '€', col: 'var(--asset-eur)', rate: 1, net: 'SEPA', dp: 2, fiat: 1 },
+  { c: 'TRX', n: 'Tron', s: 'T', col: '#D6336C', rate: .11, net: 'Tron · TRC-20', dp: 2 },
+  { c: 'USDC', n: 'USD Coin', s: '$', col: '#2F6FE0', rate: .92, net: 'Ethereum · ERC-20', dp: 2 },
+  { c: 'USDT', n: 'Tether', s: '₮', col: '#0E9F9A', rate: .92, net: 'Tron · TRC-20', dp: 2 },
+  { c: 'ZNX', n: 'ZNX', s: 'Z', col: '#A044E8', rate: .35, net: 'BNB Chain · BEP-20', dp: 2 },
+];
+const ASSET = Object.fromEntries(ASSETS.map(a => [a.c, a]));
+const TX = {
+  DEPOSIT: { label: 'Deposit', icon: 'arrowDown' }, WITHDRAW: { label: 'Withdrawal', icon: 'arrowUp' },
+  EXCHANGE: { label: 'Exchange', icon: 'arrows' }, BANK_DEPOSIT: { label: 'Bank deposit', icon: 'bank' },
+  CARD_TOPUP: { label: 'Card top-up', icon: 'card' }, CARD_PAYMENT: { label: 'Card payment', icon: 'card' },
+  ADJUSTMENT: { label: 'Manual adjustment', icon: 'sliders' }, FEE: { label: 'Fee', icon: 'tag' },
+};
+const TX_SIGN = { DEPOSIT: 1, WITHDRAW: -1, BANK_DEPOSIT: 1, CARD_TOPUP: -1, CARD_PAYMENT: -1, FEE: -1 };
+const SOURCES = { APP: 'App', API: 'API', ADMIN: 'Admin', PARTNER: 'Partner' };
+const IBAN_STATUS = { ACTIVE: { label: 'Active', tone: 'success' }, PENDING: { label: 'Pending', tone: 'warning' }, CLOSED: { label: 'Closed', tone: 'neutral' } };
+const CC_STATUS = { APPROVED: { label: 'Approved', tone: 'success' }, ACCESS_REQUESTED: { label: 'Access requested', tone: 'info' }, NOT_ALL_FORM_SUBMITTED: { label: 'Forms incomplete', tone: 'warning' } };
+const FORM_TYPES = {
+  SOURCE_OF_FUNDS: { title: 'Source of funds', desc: 'Origin of funds for deposits above €10,000' },
+  PROOF_OF_ADDRESS: { title: 'Proof of address', desc: 'Utility bill or bank statement under 3 months old' },
+  EDD: { title: 'Enhanced due diligence', desc: 'Extended questionnaire for high-risk profiles' },
+  TAX_RESIDENCY: { title: 'Tax residency', desc: 'Self-certification of tax residence (CRS)' },
+};
+const FORM_STATUS = { REQUESTED: { label: 'Requested', tone: 'warning' }, SUBMITTED: { label: 'Submitted', tone: 'info' }, APPROVED: { label: 'Approved', tone: 'success' } };
+const DOC_TYPES = { PASSPORT: 'Passport', ID_CARD: 'ID card', PROOF_OF_ADDRESS: 'Proof of address', SELFIE: 'Selfie', BANK_STATEMENT: 'Bank statement' };
+const ADDR = { DEU: ['Berlin', 'Torstraße 112', '10119'], ESP: ['Madrid', 'Calle Mayor 8', '28013'], FRA: ['Paris', 'Rue de Rivoli 45', '75001'], ITA: ['Milan', 'Via Torino 21', '20123'], NLD: ['Amsterdam', 'Keizersgracht 120', '1015 CX'], POL: ['Warsaw', 'ul. Marszałkowska 10', '00-590'], PRT: ['Lisbon', 'Rua Augusta 50', '1100-053'], AUT: ['Vienna', 'Mariahilfer Str. 3', '1060'], LTU: ['Vilnius', 'Gedimino pr. 9', '01103'], CYP: ['Limassol', 'Makariou Ave 17', '3036'], IRL: ['Dublin', 'Grafton St 4', 'D02 K068'], GBR: ['London', '221 Baker St', 'NW1 6XE'], CHE: ['Zurich', 'Bahnhofstrasse 7', '8001'], ARE: ['Dubai', 'Sheikh Zayed Rd 1', '00000'], UKR: ['Kyiv', 'Khreshchatyk 22', '01001'], GEO: ['Tbilisi', 'Rustaveli Ave 14', '0108'], ARM: ['Yerevan', 'Abovyan St 5', '0001'], TUR: ['Istanbul', 'İstiklal Cd. 33', '34433'] };
+const MERCHANTS = ['Lidl', 'Uber', 'Spotify', 'Amazon', 'Zara', 'Bolt', 'Apple', 'IKEA'];
+const FEE_DEFAULTS = [
+  { op: 'BUY_PRODUCT', user: { pct: .02, fixed: { USD: 2, USDT: 2 } }, api: { pct: .02, fixed: { USD: 2, USDT: 2 } } },
+  { op: 'BANK_TRANSFER_WITHDRAW', user: { pct: .003 }, api: { pct: .003 } },
+  { op: 'TOKEN_CLAIM', user: { pct: 0, fixed: { BNB: .01 } }, api: { pct: 0, fixed: { BNB: .01 } } },
+  { op: 'EXCHANGE', user: { pct: .005 }, api: { pct: .004 } },
+  { op: 'CRYPTO_WITHDRAW', user: { pct: 0, fixed: { USDT: 1 } }, api: { pct: 0, fixed: { USDT: 1 } } },
+  { op: 'CARD_TOPUP', user: { pct: .01 }, api: { pct: .01 } },
+];
+const opLabel = op => op.charAt(0) + op.slice(1).toLowerCase().replace(/_/g, ' ');
+const fmtSize = b => b > 1e6 ? (b / 1e6).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1e3)) + ' KB';
+
+const UD = new Map();
+function ud(u) {
+  if (UD.has(u.id)) return UD.get(u.id);
+  const r = rng(u.id * 7 + 3), pk = a => a[Math.floor(r() * a.length)];
+  const wp = o => { const e = Object.entries(o); let x = r() * e.reduce((s, [, w]) => s + w, 0); for (const [k, w] of e) if ((x -= w) < 0) return k; return e[0][0]; };
+  const hx = (n, set = '0123456789abcdef') => Array.from({ length: n }, () => set[Math.floor(r() * set.length)]).join('');
+  const t0 = u.created.getTime(), span = Math.max(36e5, NOW - t0), approved = u.kyc === 'approved';
+  const at = f => new Date(Math.min(NOW.getTime(), t0 + (NOW - t0) * f)); // a moment between sign-up and now
+
+  const w = ASSETS.map(a => u.balance && r() < (a.c === 'EUR' || a.c === 'USDT' ? .95 : .4) ? .2 + r() : 0), wsum = w.reduce((s, x) => s + x, 0) || 1;
+  const wallets = ASSETS.map((a, i) => {
+    const amt = u.balance * w[i] / wsum / a.rate;
+    return { c: a.c, amt, locked: amt && r() < .2 ? amt * r() * .15 : 0, frozen: false,
+      address: a.fiat ? null : a.c === 'BTC' ? 'bc1q' + hx(38) : a.net.startsWith('Tron') ? 'T' + hx(33, '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz') : '0x' + hx(40) };
+  });
+
+  const cards = Array.from({ length: u.cards }, (_, i) => ({
+    id: 51000 + (u.id % 997) * 3 + i, physical: i === 1, productId: i === 1 ? 12 : 11, product: i === 1 ? 'NS Physical EUR' : 'NS Virtual EUR',
+    ext: `${hx(8)}-${hx(4)}-${hx(4)}`, crypto: 'USDT', display: 'EUR', provider: 'Wallester', last4: String(1000 + Math.floor(r() * 9000)),
+    exp: `${String(1 + Math.floor(r() * 12)).padStart(2, '0')}/${29 + Math.floor(r() * 3)}`, balance: Math.round(r() * 80000) / 100,
+    emboss: (u.name || '').toUpperCase(), frozen: i > 0 && r() < .3,
+  }));
+
+  const held = wallets.filter(x => x.amt > 0).map(x => x.c);
+  const n = u.balance ? 14 + Math.floor(r() * 40) : u.kyc !== 'new' && r() < .4 ? 1 + Math.floor(r() * 3) : 0;
+  const details = (type, c) => ({
+    DEPOSIT: 'From external wallet', WITHDRAW: c === 'EUR' ? 'SEPA transfer' : `To 0x${hx(4)}…${hx(4)}`, EXCHANGE: `${c} → ${pk(['EUR', 'USDT', 'BTC'].filter(x => x !== c))}`,
+    BANK_DEPOSIT: `SEPA · ${hx(10).toUpperCase()}`, CARD_TOPUP: `Card •• ${cards[0]?.last4 || '0000'}`, CARD_PAYMENT: `Card •• ${cards[0]?.last4 || '0000'} · ${pk(MERCHANTS)}`,
+    ADJUSTMENT: 'Admin correction', FEE: 'Monthly card fee',
+  }[type]);
+  const history = Array.from({ length: n }, (_, i) => {
+    const type = u.balance ? wp({ DEPOSIT: 20, WITHDRAW: 10, EXCHANGE: 16, BANK_DEPOSIT: 10, CARD_TOPUP: cards.length ? 10 : 0, CARD_PAYMENT: cards.length ? 26 : 0, ADJUSTMENT: 2, FEE: cards.length ? 6 : 0 }) : 'DEPOSIT';
+    const c = ['BANK_DEPOSIT', 'CARD_TOPUP', 'CARD_PAYMENT', 'FEE'].includes(type) ? 'EUR' : held.length ? pk(held) : 'USDT';
+    const a = ASSET[c], eur = 5 + Math.pow(r(), 2) * 1500, sign = TX_SIGN[type] ?? (r() < .5 ? 1 : -1), created = new Date(t0 + r() * span);
+    return { id: u.id * 100 + i, type, c, amount: sign * eur / a.rate, before: eur * (1 + r() * 6) / a.rate,
+      commission: ['WITHDRAW', 'EXCHANGE', 'CARD_TOPUP', 'BANK_DEPOSIT'].includes(type) ? eur * .005 / a.rate : 0,
+      created, updated: new Date(Math.min(NOW, created.getTime() + r() * 6e5)), opDate: new Date(created.getTime() - r() * 9e5),
+      source: wp({ APP: 70, API: 15, ADMIN: 10, PARTNER: 5 }), ref: r() < .25 ? hx(8).toUpperCase() : '', details: details(type, c) };
+  }).sort((x, y) => y.created - x.created);
+
+  const D = {
+    wallets, cards, history,
+    ibans: approved && r() < .65 ? [{ id: 8800 + u.id % 1000, iban: `LT${10 + Math.floor(r() * 89)} 3250 0${hx(3, '0123456789')} ${hx(4, '0123456789')} ${hx(4, '0123456789')}`, productId: 3, productName: 'EUR account (LT)', provider: 'Banking Circle', source: 'APP', currency: 'EUR', status: r() < .85 ? 'ACTIVE' : 'PENDING', ext: hx(12) }] : [],
+    fees: clone(FEE_DEFAULTS),
+    limits: [
+      { op: 'DEPOSIT', day: 1e6, month: 25e6, year: 36.5e6, cur: 'USDT' },
+      { op: 'WITHDRAW', day: approved ? 50000 : 0, month: approved ? 250000 : 0, year: approved ? 1e6 : 0, cur: 'USDT' },
+    ],
+    addresses: u.country ? [{ id: 4400 + u.id % 1000, country: u.country, city: ADDR[u.country][0], street: ADDR[u.country][1], zip: ADDR[u.country][2] }] : [],
+    kyc: [{ id: 31000 + u.id % 1000, provider: 'SUMSUB', downloaded: approved, def: true, created: at(.05), updated: u.updated }],
+    creditco: approved
+      ? { id: 'CC-' + hx(6).toUpperCase(), email: u.email, status: 'APPROVED', kycStatus: 'VERIFIED', remark: '', created: at(.2), updated: u.updated, docs: [{ type: 'PASSPORT', name: 'passport.pdf', size: '1.2 MB', date: at(.2) }] }
+      : { id: null, email: null, status: 'NOT_ALL_FORM_SUBMITTED', kycStatus: null, remark: null, created: null, updated: null, docs: [] },
+    forms: approved && r() < .4 ? [{ id: 900 + u.id % 100, type: 'SOURCE_OF_FUNDS', status: 'SUBMITTED', date: at(.5) }] : [],
+  };
+  UD.set(u.id, D);
+  return D;
 }
+const eurOf = w => w.amt * ASSET[w.c].rate;
+const syncBalance = (u, D) => { u.balance = Math.round(D.wallets.reduce((s, w) => s + eurOf(w), 0)); u.updated = new Date(NOW); };
+const fmtAmt = (v, c, signed) => {
+  const a = ASSET[c] || { dp: 2 }, s = Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: a.fiat ? 2 : 0, maximumFractionDigits: a.dp });
+  return (signed ? (v > 0 ? '+' : v < 0 ? '−' : '') : '') + s + ' ' + c;
+};
+const assetIc = (c, s = 28) => `<span class="asset-ic" style="width:${s}px;height:${s}px;font-size:${Math.round(s * .42)}px;background:${ASSET[c].col}">${ASSET[c].s}</span>`;
+const yes = v => `<span class="ver-ic ${v ? 'ok' : 'no'}" style="margin:0 auto">${icon(v ? 'check' : 'minus', 12, 2.5)}</span>`;
+const dash = '<span class="faint">—</span>';
+const copyVal = (v, shown = v) => `<button class="copy num" data-act="copy" data-copy="${esc(v)}">${esc(shown)}${icon('copy', 12)}</button>`;
+const emptyBlock = (ic, t, p, btn = '') => `<div class="empty sm"><div class="em-ic">${icon(ic, 20)}</div><h3>${t}</h3><p>${p}</p>${btn}</div>`;
+const tabCount = n => n ? ` <span class="tab-n">${n}</span>` : '';
+// Data table inside a card. heads: 'Label' or 'Label|r' (right) / '|c' (centre) / '|w' (shrink). rows: arrays of cells, or { cls, cells }.
+function dtable(heads, rows, empty = '') {
+  if (!rows.length) return empty;
+  const H = heads.map(h => { const k = h.lastIndexOf('|'); return k < 0 ? { l: h, al: '' } : { l: h.slice(0, k), al: h.slice(k + 1) }; });
+  return `<div class="dt-wrap"><table class="dt"><thead><tr>${H.map(h => `<th class="${h.al}">${h.l}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(r => { const cells = Array.isArray(r) ? r : r.cells; return `<tr class="${r.cls || ''}">${cells.map((c, i) => `<td class="${H[i].al}">${c}</td>`).join('')}</tr>`; }).join('')}</tbody></table></div>`;
+}
+const tcard = (title, acts, body, tools = '') => `<div class="card flush"><div class="card-h"><span class="card-t">${title}</span>${acts ? `<div class="ch-act">${acts}</div>` : ''}</div>${tools ? `<div class="card-tools">${tools}</div>` : ''}${body}</div>`;
+
 function eventsOf(u) {
   const r = rng(u.id + 1), ev = [], pk = a => a[Math.floor(r() * a.length)];
-  if (u.balance) { ev.push(['card', 'Card payment', `${pk(['Lidl', 'Uber', 'Spotify', 'Amazon', 'Zara', 'Bolt'])} · ${fmtEur(r() * 120 + 4, 2)}`, 2]); ev.push(['arrows', 'Exchange', `USDT → EUR · ${fmtEur(r() * 900 + 50, 2)}`, 20]); }
+  if (u.balance) { ev.push(['card', 'Card payment', `${pk(MERCHANTS)} · ${fmtEur(r() * 120 + 4, 2)}`, 2]); ev.push(['arrows', 'Exchange', `USDT → EUR · ${fmtEur(r() * 900 + 50, 2)}`, 20]); }
   ev.push(['login', 'Signed in', `${u.country ? COUNTRIES[u.country].name : 'Unknown location'} · Chrome on macOS`, 30]);
   if (u.kyc === 'approved') ev.push(['shieldCheck', 'KYC approved', 'Sumsub · Level ' + LEVEL[u.level].label, 300]);
   if (['pending', 'review'].includes(u.kyc)) ev.push(['idcard', 'KYC documents submitted', 'Passport + selfie', 60]);
@@ -1329,18 +1597,20 @@ function eventsOf(u) {
   return ev.map(([ic, t, s, m]) => ({ ic, t, s, when: m > 0 ? rel(new Date(Math.max(u.created.getTime(), NOW.getTime() - m * 6e4 * (1 + r())))) : '' }));
 }
 const timeline = evs => `<div class="tl">${evs.map(e => `<div class="tl-i"><span class="tl-dot">${icon(e.ic, 12)}</span><div class="tl-t">${e.t}</div><div class="tl-s">${e.s}${e.when ? ` · ${e.when}` : ''}</div></div>`).join('')}</div>`;
+const txDefault = () => ({ view: 'wallet', range: { key: 'all' }, cur: '', type: '', source: '', ref: '', page: 1, sel: new Set() });
 
 function renderUserPage() {
   const u = byId(S.userId), main = $('#main');
   if (!u) { main.innerHTML = `<div class="page"><div class="ph"><div class="empty"><div class="em-ic">${icon('user', 22)}</div><h3>User not found</h3><p>#${S.userId} doesn’t exist.</p><a class="btn btn-dark btn-sm" href="#/users">Back to Users</a></div></div></div>`; return; }
-  const d = { ...u, ...S.draft }, scroll = main.scrollTop;
-  const tabs = [['overview', 'Overview'], ['wallets', 'Wallets'], ['cards', `Cards${u.cards ? ` <span class="mono faint">${u.cards}</span>` : ''}`], ['limits', 'Limits'], ['activity', 'Activity']];
-  const ws = walletsOf(u);
+  const d = { ...u, ...S.draft }, D = ud(u), scroll = main.scrollTop, over = S.userTab === 'overview';
+  const tabs = [['overview', 'Overview'], ['wallets', 'Wallets' + tabCount(D.wallets.filter(w => w.amt > 0).length)], ['transactions', 'Transactions' + tabCount(D.history.length)],
+    ['cards', 'Cards' + tabCount(D.cards.length)], ['iban', 'IBAN' + tabCount(D.ibans.length)], ['fees', 'Fees & limits'], ['addresses', 'Addresses' + tabCount(D.addresses.length)], ['verification', 'Verification']];
+  const ws = D.wallets.filter(w => w.amt > 0);
   main.innerHTML = `<div class="page">
     <header class="page-head band up-head">
       <div class="up-id">${avatar(u, 56)}<div style="min-width:0">
         <h1>${esc(u.name || u.email)}</h1>
-        <div class="up-sub">${u.name ? `<span>${esc(u.email)}</span>` : '<span>No profile yet</span>'}<span class="faint">·</span><button class="copy num" data-act="copy" data-copy="${u.uid}">${u.uid}${icon('copy', 12)}</button></div>
+        <div class="up-sub">${u.name ? `<span>${esc(u.email)}</span>` : '<span>No profile yet</span>'}<span class="faint">·</span>${copyVal(u.uid)}</div>
         <div class="up-badges">${badge(STATUS[d.status])}${badge(KYC[d.kyc], 'KYC ')}<span class="badge t-neutral">${riskIcon(d.risk)}${RISK[d.risk].label} risk</span><span class="badge t-${LEVEL[d.level].tone}">${LEVEL[d.level].label}</span></div>
       </div></div>
       <div class="ph-right">
@@ -1350,26 +1620,27 @@ function renderUserPage() {
       </div>
     </header>
     <nav class="tabs band">${tabs.map(([k, lb]) => `<button class="tab ${S.userTab === k ? 'on' : ''}" data-act="u-tab" data-v="${k}">${lb}</button>`).join('')}</nav>
-    <div class="up-grid">
-      <div class="up-main">${userTab(u, d)}</div>
-      <aside class="up-side">
+    <div class="up-grid ${over ? '' : 'single'}">
+      <div class="up-main">${userTab(u, d, D)}</div>
+      ${over ? `<aside class="up-side">
         <div class="card">
-          <div class="card-h"><span class="card-t">Balance</span>${ws.length ? `<button class="link-btn" data-act="u-tab" data-v="wallets" style="height:auto;display:flex;align-items:center;gap:2px">Wallets ${icon('chevRight', 14)}</button>` : ''}</div>
+          <div class="card-h"><span class="card-t">Balance</span><button class="link-btn" data-act="u-tab" data-v="wallets" style="height:auto;display:flex;align-items:center;gap:2px">Wallets ${icon('chevRight', 14)}</button></div>
           <div class="w-total"><b>${fmtEur(u.balance, 2)}</b></div>
-          ${ws.length ? `<div class="stack" style="height:8px;margin:12px 0 10px">${ws.map(w => `<i style="width:${w[5] / u.balance * 100}%;background:${w[3]}" data-tt="${w[1]}|${fmtEur(w[5])}|${(w[5] / u.balance * 100).toFixed(0)}%"></i>`).join('')}</div>
-          <div class="legend">${ws.map(w => `<span><i class="sw" style="background:${w[3]}"></i>${w[1]}</span>`).join('')}</div>` : '<div class="faint" style="font-size:13px">No deposits yet</div>'}
+          ${ws.length ? `<div class="stack" style="height:8px;margin:12px 0 10px">${ws.map(w => `<i style="width:${eurOf(w) / u.balance * 100}%;background:${ASSET[w.c].col}" data-tt="${w.c}|${fmtEur(eurOf(w))}|${(eurOf(w) / u.balance * 100).toFixed(0)}%"></i>`).join('')}</div>
+          <div class="legend">${ws.map(w => `<span><i class="sw" style="background:${ASSET[w.c].col}"></i>${w.c}</span>`).join('')}</div>` : '<div class="faint" style="font-size:13px">No deposits yet</div>'}
         </div>
         <div class="card">
-          <div class="card-h"><span class="card-t">Recent activity</span>${S.userTab !== 'activity' ? `<button class="link-btn" data-act="u-tab" data-v="activity" style="height:auto;display:flex;align-items:center;gap:2px">All ${icon('chevRight', 14)}</button>` : ''}</div>
+          <div class="card-h"><span class="card-t">Recent activity</span><button class="link-btn" data-act="u-tab" data-v="transactions" style="height:auto;display:flex;align-items:center;gap:2px">Transactions ${icon('chevRight', 14)}</button></div>
           ${timeline(eventsOf(u).slice(0, 4))}
         </div>
-      </aside>
+      </aside>` : ''}
     </div>
   </div>`;
   main.scrollTop = scroll;
   renderFloat();
 }
-function userTab(u, d) {
+
+function userTab(u, d, D) {
   const kv = (l, v) => `<div class="kv-r"><span>${l}</span>${v}</div>`;
   const ver = (l, ok, v, extra = '') => `<div class="kv-r"><span class="ver-l"><span class="ver-ic ${ok ? 'ok' : 'no'}">${icon(ok ? 'check' : 'minus', 12, 2.5)}</span><span style="color:var(--ink)">${l}</span></span><span style="display:flex;align-items:center;gap:8px">${extra}${v}</span></div>`;
   switch (S.userTab) {
@@ -1378,37 +1649,225 @@ function userTab(u, d) {
         ${kv('Status', selBtn('status', d.status))}${kv('Level', selBtn('level', d.level))}
         ${kv('Risk level', selBtn('risk', d.risk))}${kv('Residency', selBtn('country', d.country))}
         ${kv('Type', `<b>${TYPE[d.type].label}</b>`)}${kv('Company', `<a class="lnk" href="#/companies">${d.company}</a>`)}
-        ${kv('Language', `<b class="mono">${d.lang}</b>`)}${kv('Invited by', u.invitedBy ? `<span class="num">#${u.invitedBy}</span>` : '<span class="faint">—</span>')}
+        ${kv('Language', `<b>${d.lang}</b>`)}${kv('Invited by', u.invitedBy ? `<span class="num">#${u.invitedBy}</span>` : dash)}
       </div></div>
-      <div class="card"><div class="card-h"><span class="card-t">Verification</span></div><div class="kv2">
+      <div class="card"><div class="card-h"><span class="card-t">Verification</span><button class="link-btn" data-act="u-tab" data-v="verification" style="height:auto;display:flex;align-items:center;gap:2px">Details ${icon('chevRight', 14)}</button></div><div class="kv2">
         ${ver('Email', d.emailVerified, `<span class="${d.emailVerified ? '' : 'faint'}">${d.emailVerified ? 'Verified' : 'Not verified'}</span>`, d.emailVerified ? '' : `<button class="link-btn" data-act="toast" data-msg="Verification email sent">Resend</button>`)}
         ${ver('KYC', d.kyc === 'approved', badge(KYC[d.kyc]))}
         ${ver('Identity (IDV)', d.idv, `<span class="${d.idv ? '' : 'faint'}">${d.idv ? 'Passed' : 'Not started'}</span>`)}
         ${ver('Two-factor auth', d.twofa, `<span class="${d.twofa ? '' : 'faint'}">${d.twofa ? 'Enabled' : 'Disabled'}</span>`, d.twofa ? `<button class="link-btn" data-act="reset-2fa" data-id="${u.id}">Reset</button>` : '')}
       </div></div>
       <div class="card"><div class="card-h"><span class="card-t">Account</span></div><div class="kv2">
-        ${kv('Unique ID', `<button class="copy num" data-act="copy" data-copy="${u.uid}">${u.uid}${icon('copy', 12)}</button>`)}
-        ${kv('Referral code', `<button class="copy num" data-act="copy" data-copy="${u.referral}">${u.referral}${icon('copy', 12)}</button>`)}
+        ${kv('Unique ID', copyVal(u.uid))}${kv('Referral code', copyVal(u.referral))}
         ${kv('Created', `<span>${fmtDateTime(u.created)}</span>`)}${kv('Updated', `<span>${fmtDateTime(u.updated)}</span>`)}
-        ${kv('Cards', `<span class="num">${u.cards}</span>`)}${kv('Temporary password', `<button class="link-btn" style="margin-right:-6px" data-act="toast" data-msg="Temporary password issued">Issue</button>`)}
+        ${kv('Cards', `<span class="num">${D.cards.length}</span>`)}${kv('Temporary password', `<button class="link-btn" style="margin-right:-6px" data-act="toast" data-msg="Temporary password issued">Issue</button>`)}
       </div></div>`;
-    case 'wallets': {
-      const ws = walletsOf(u);
-      if (!ws.length) return `<div class="card"><div class="empty"><div class="em-ic">${icon('wallet', 22)}</div><h3>No funds yet</h3><p>Wallets appear after the first deposit.</p></div></div>`;
-      return `<div class="card"><div class="card-h"><span class="card-t">Wallets</span><span class="card-tag">${ws.length} assets</span></div>
-        ${ws.map(([n, c, s, col, amt, eur]) => `<div class="asset"><span class="asset-ic" style="background:${col}">${s}</span><div class="an"><div style="font-weight:500">${n}</div><div class="mono">${c}</div></div><div class="aa"><div class="num">${amt.toLocaleString('en-US', { maximumFractionDigits: c === 'BTC' || c === 'ETH' ? 5 : 2 })} ${c}</div><div class="num">${fmtEur(eur, 2)}</div></div></div>`).join('')}</div>`;
-    }
-    case 'cards': {
-      if (!u.cards) return `<div class="card"><div class="empty"><div class="em-ic">${icon('card', 22)}</div><h3>No cards</h3><p>${u.kyc === 'approved' ? 'This user hasn’t ordered a card yet.' : 'Cards are available after KYC approval.'}</p></div></div>`;
-      const r = rng(u.id + 7);
-      return `<div class="pcards">${Array.from({ length: u.cards }, (_, i) => { const phys = i === 1, frozen = i > 0 && r() < .3; return `<div class="pcard ${i % 2 ? 'alt' : ''}"><div class="pc-top">${LOGO_SIGN(20, '#fff')}<span class="pc-st">${frozen ? 'Frozen' : 'Active'}</span></div><div class="pc-no">•••• ${String(Math.floor(r() * 9000 + 1000))}</div><div class="pc-bot"><span>${phys ? 'Physical' : 'Virtual'} · Visa</span><span class="mono">${String(Math.floor(r() * 12 + 1)).padStart(2, '0')}/${29 + Math.floor(r() * 3)}</span></div></div>`; }).join('')}</div>`;
-    }
-    case 'limits': {
-      const m = { basic: 1, middle: 2.5, premium: 6 }[d.level], r = rng(u.id + 3);
-      return `<div class="card"><div class="card-h"><span class="card-t">Limits</span><span class="badge t-${LEVEL[d.level].tone}">${LEVEL[d.level].label}</span></div>${[['Daily card spend', 2500], ['Monthly card spend', 25000], ['ATM withdrawal / day', 1000], ['Crypto withdrawal / month', 20000], ['IBAN outgoing / month', 50000]].map(([lb, lim]) => { const L = lim * m, used = u.balance ? L * r() * .8 : 0, p = used / L * 100; return `<div class="lim"><div class="lim-h"><span>${lb}</span><span class="num"><span>${fmtEur(used)}</span><span class="faint"> / ${fmtEur(L)}</span></span></div><div class="meter"><i style="width:${p}%;${p > 75 ? 'background:var(--warning)' : ''}"></i></div></div>`; }).join('')}</div>`;
-    }
-    case 'activity': return `<div class="card"><div class="card-h"><span class="card-t">Activity</span></div>${timeline(eventsOf(u))}</div>`;
+    case 'wallets': return walletsTab(u, D);
+    case 'transactions': return txTab(u, D);
+    case 'cards': return cardsTab(u, D);
+    case 'iban': return ibanTab(u, D);
+    case 'fees': return feesTab(u, D);
+    case 'addresses': return addrTab(u, D);
+    case 'verification': return verifTab(u, D);
   }
+}
+
+/* Wallets — every supported asset, expandable for address, available / locked and actions */
+function walletsTab(u, D) {
+  const rows = [...D.wallets].sort((x, y) => eurOf(y) - eurOf(x)).map(w => {
+    const a = ASSET[w.c], open = S.openWallet === w.c;
+    return `<div class="wrow ${w.amt ? '' : 'zero'} ${open ? 'open' : ''}" data-act="wallet-toggle" data-c="${w.c}">
+      ${assetIc(w.c, 32)}
+      <div class="wn"><div>${a.n}${w.frozen ? ' <span class="badge t-info">Frozen</span>' : ''}</div><div class="code">${w.c} · ${a.net}</div></div>
+      <div class="wa"><div class="num">${fmtAmt(w.amt, w.c)}</div><div class="code">${fmtEur(eurOf(w), 2)}</div></div>
+      <span class="wchev">${icon('chevDown', 16)}</span>
+    </div>
+    ${open ? `<div class="wdet">
+      <div><div class="kl">Available</div><div class="num">${fmtAmt(w.amt - w.locked, w.c)}</div></div>
+      <div><div class="kl">Locked</div><div class="num">${fmtAmt(w.locked, w.c)}</div></div>
+      <div><div class="kl">${a.fiat ? 'Rail' : 'Deposit address'}</div>${w.address ? copyVal(w.address, `${w.address.slice(0, 10)}…${w.address.slice(-6)}`) : `<span>${a.net}</span>`}</div>
+      <div class="wdet-act">
+        <button class="btn btn-ghost btn-sm" data-act="adj-open" data-c="${w.c}">${icon('sliders', 14)}Adjust</button>
+        <button class="btn btn-ghost btn-sm" data-act="wallet-freeze" data-c="${w.c}">${icon(w.frozen ? 'refresh' : 'lock', 14)}${w.frozen ? 'Unfreeze' : 'Freeze'}</button>
+      </div>
+    </div>` : ''}`;
+  }).join('');
+  return tcard(`Wallets <span class="ct">${fmtEur(u.balance, 2)}</span>`, `<button class="btn btn-ghost btn-sm" data-act="adj-open">${icon('sliders', 14)}Adjust balance</button>`, `<div class="wlist">${rows}</div>`);
+}
+
+/* Transactions — wallet history and aggregated history share filters */
+function txFiltered(D) {
+  const f = S.tx, { from, to } = resolveRange(f.range), ref = f.ref.trim().toLowerCase();
+  return D.history.filter(h => h.created >= from && h.created <= to && (!f.cur || h.c === f.cur) && (!f.type || h.type === f.type)
+    && (f.view !== 'agg' || ((!f.source || h.source === f.source) && (!ref || h.ref.toLowerCase().includes(ref)))));
+}
+function txTab(u, D) {
+  const f = S.tx, agg = f.view === 'agg';
+  const opts = (o, v, all) => `<option value="">${all}</option>` + Object.entries(o).map(([k, l]) => `<option value="${k}" ${v === k ? 'selected' : ''}>${l}</option>`).join('');
+  const tools = `
+    ${dpButton(f.range, 'tx-range')}
+    <select class="sel" data-tx="cur">${opts(Object.fromEntries(ASSETS.map(a => [a.c, a.c])), f.cur, 'All currencies')}</select>
+    <select class="sel" data-tx="type">${opts(Object.fromEntries(Object.entries(TX).map(([k, t]) => [k, t.label])), f.type, 'All types')}</select>
+    ${agg ? `<select class="sel" data-tx="source">${opts(SOURCES, f.source, 'All sources')}</select><input class="inp" data-tx="ref" placeholder="Referral ID" value="${esc(f.ref)}" autocomplete="off">` : ''}`;
+  const acts = `${agg ? `<button class="btn btn-ghost btn-sm" data-act="tx-copy" ${f.sel.size ? '' : 'disabled'}>${icon('copy', 14)}Copy${f.sel.size ? ` ${f.sel.size}` : ''}</button>` : ''}
+    <button class="btn btn-ghost btn-sm" data-act="tx-export">${icon('download', 14)}Export${icon('chevDown', 13)}</button>`;
+  return `<div class="card flush">
+    <div class="card-h"><div class="seg">${[['wallet', 'Wallet history'], ['agg', 'Aggregated']].map(([k, l]) => `<button class="${f.view === k ? 'on' : ''}" data-act="tx-view" data-v="${k}">${l}</button>`).join('')}</div><div class="ch-act">${acts}</div></div>
+    <div class="card-tools">${tools}</div>
+    <div id="txBody">${txBody(D)}</div>
+  </div>`;
+}
+function txBody(D) {
+  const f = S.tx, list = txFiltered(D), per = 15, pages = Math.max(1, Math.ceil(list.length / per));
+  f.page = Math.min(f.page, pages);
+  if (!list.length) return D.history.length ? emptyBlock('search', 'No transactions match', 'Try a wider date range or clear a filter.') : emptyBlock('arrows', 'No transactions yet', 'Deposits, exchanges and card spend will show up here.');
+  const start = (f.page - 1) * per, rows = list.slice(start, start + per);
+  const type = h => `<span class="txt">${icon(TX[h.type].icon, 14)}${TX[h.type].label}</span>`;
+  const cur = h => `<span class="ctry">${assetIc(h.c, 20)}${h.c}</span>`;
+  const amt = h => `<span class="num ${h.amount > 0 ? 'pos' : ''}">${fmtAmt(h.amount, h.c, true)}</span>`;
+  let table;
+  if (f.view === 'agg') {
+    const all = rows.every(h => f.sel.has(h.id)), some = rows.some(h => f.sel.has(h.id));
+    table = dtable([`<button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="tx-sel-page" aria-label="Select page">${icon('check', 11, 3)}</button>|w`, 'Operation date', 'Type', 'Currency', 'Amount|r', 'Commission|r', 'Details', 'Source', 'Referral'],
+      rows.map(h => ({ cls: f.sel.has(h.id) ? 'sel' : '', cells: [`<button class="cb ${f.sel.has(h.id) ? 'on' : ''}" data-act="tx-sel" data-id="${h.id}" aria-label="Select">${icon('check', 11, 3)}</button>`,
+        fmtDateTime(h.opDate), type(h), cur(h), amt(h), h.commission ? `<span class="num muted">${fmtAmt(h.commission, h.c)}</span>` : dash, `<span class="muted">${esc(h.details)}</span>`, SOURCES[h.source], h.ref ? `<span class="num">${h.ref}</span>` : dash] })));
+  } else {
+    table = dtable(['Created', 'Type', 'Currency', 'Amount|r', 'Balance before|r', 'Updated|r'],
+      rows.map(h => [fmtDateTime(h.created), type(h), cur(h), amt(h), `<span class="num muted">${fmtAmt(h.before, h.c)}</span>`, `<span class="muted">${rel(h.updated)}</span>`]));
+  }
+  return table + pagerHTML(list.length, pages, start, rows.length, { page: f.page, act: 'tx-page', per: false });
+}
+const refreshTx = () => { const el = $('#txBody'); if (el) el.innerHTML = txBody(ud(byId(S.userId))); };
+
+/* Cards */
+function cardsTab(u, D) {
+  return tcard('Cards', D.cards.length ? `<button class="btn btn-ghost btn-sm" data-act="cards-update">${icon('refresh', 14)}Update balances</button>` : '',
+    dtable(['Card', 'Product', 'Provider', 'Currency', 'Balance|r', 'Emboss name', 'Status', '|w'], D.cards.map((c, i) => [
+      `<span class="ctry"><span class="mini-card ${c.physical ? 'alt' : ''}">${LOGO_SIGN(9, '#fff')}</span><span><div>•••• ${c.last4}</div><div class="code">${c.physical ? 'Physical' : 'Virtual'} · exp ${c.exp}</div></span></span>`,
+      `<div>${c.product}</div><div class="code">Product ${c.productId} · ext ${copyVal(c.ext, c.ext.slice(0, 8) + '…')}</div>`,
+      c.provider, `<span class="muted">${c.crypto} → ${c.display}</span>`, `<span class="num">${fmtAmt(c.balance, 'EUR')}</span>`, c.emboss ? `<span class="muted">${esc(c.emboss)}</span>` : dash,
+      badge(c.frozen ? { label: 'Frozen', tone: 'info' } : { label: 'Active', tone: 'success' }),
+      `<button class="ghost-ic" data-act="card-more" data-i="${i}" data-tip="More">${icon('more', 15)}</button>`]),
+      emptyBlock('card', 'No cards', u.kyc === 'approved' ? 'This user hasn’t ordered a card yet.' : 'Cards are available after KYC approval.')));
+}
+
+/* IBAN */
+function ibanTab(u, D) {
+  const ok = u.kyc === 'approved';
+  return tcard('IBAN accounts', '',
+    dtable(['IBAN', 'Product', 'Provider', 'Source', 'Status', 'External ID'], D.ibans.map(b => [
+      copyVal(b.iban.replace(/ /g, ''), b.iban), `<div>${b.productName}</div><div class="code">Product ${b.productId} · ${b.currency}</div>`,
+      b.provider, SOURCES[b.source], badge(IBAN_STATUS[b.status]), copyVal(b.ext)]),
+      emptyBlock('bank', 'No IBAN accounts', ok ? 'Issue a EUR account for this user.' : 'IBAN accounts are available after KYC approval.', ok ? `<button class="btn btn-dark btn-sm" data-act="iban-issue">${icon('plus', 14)}Issue IBAN</button>` : '')));
+}
+
+/* Fees & limits — readable versions of the per-operation JSON */
+const feeStr = f => { const p = []; if (f.pct) p.push(+(f.pct * 100).toFixed(3) + '%'); Object.entries(f.fixed || {}).forEach(([c, v]) => v && p.push(`${v} ${c}`)); return p.length ? p.join(' + ') : '<span class="faint">Free</span>'; };
+const fixedStr = o => Object.entries(o || {}).filter(([, v]) => v).map(([c, v]) => `${v} ${c}`).join(', ');
+const parseFixed = s => Object.fromEntries(s.split(',').map(x => x.trim().split(/\s+/)).filter(p => p.length === 2 && !isNaN(+p[0])).map(([v, c]) => [c.toUpperCase(), +v]));
+const editBtn = (act, i) => `<button class="ghost-ic" data-act="${act}" data-i="${i}" data-tip="Edit">${icon('pencil', 15)}</button>`;
+const opCell = (op, extra = '') => `<div style="display:flex;align-items:center;gap:8px">${opLabel(op)}${extra}</div><div class="code">${op}</div>`;
+function feesTab(u, D) {
+  const lim = v => v ? `<span class="num">${fmtInt(v)}</span>` : '<span class="num faint">0</span>';
+  return tcard('Fees', '<span class="code">App users vs API clients</span>', dtable(['Operation', 'App fee', 'API fee', '|w'],
+      D.fees.map((f, i) => [opCell(f.op), feeStr(f.user), feeStr(f.api), editBtn('fee-edit', i)])))
+    + tcard('Limits', '', dtable(['Operation', 'Daily|r', 'Monthly|r', 'Yearly|r', 'Currency', '|w'],
+      D.limits.map((l, i) => [opCell(l.op, !l.day && !l.month && !l.year ? badge({ label: 'Blocked', tone: 'error' }) : ''), lim(l.day), lim(l.month), lim(l.year), l.cur, editBtn('limit-edit', i)])));
+}
+
+/* Addresses */
+function addrTab(u, D) {
+  return tcard('Addresses', `<button class="btn btn-ghost btn-sm" data-act="addr-add">${icon('plus', 14)}Add address</button>`,
+    dtable(['ID', 'Country', 'City', 'Address', 'Post code', '|w'], D.addresses.map((a, i) => [`<span class="num muted">${a.id}</span>`,
+      `<span class="ctry"><span class="flag">${flag(COUNTRIES[a.country].cc)}</span>${COUNTRIES[a.country].name}</span>`, esc(a.city), esc(a.street), `<span class="num">${esc(a.zip)}</span>`,
+      `<button class="ghost-ic" data-act="addr-rm" data-i="${i}" data-tip="Remove">${icon('trash', 15)}</button>`]),
+      emptyBlock('mapPin', 'No addresses', 'Add the user’s residential address.')));
+}
+
+/* Verification — KYC provider records, CreditCo and requested forms */
+function verifTab(u, D) {
+  const C = D.creditco, kv = (l, v) => `<div class="kv-r"><span>${l}</span>${v || dash}</div>`;
+  const kyc = tcard('KYC', '', dtable(['ID', 'Provider', 'Status', 'IDV|c', 'KYC verified|c', 'Downloaded|c', 'Default|c', 'Created', 'Updated', '|w'], D.kyc.map((k, i) => [
+    `<span class="num muted">${k.id}</span>`, k.provider,
+    `<select class="sel sm" data-kyc="${i}">${Object.entries(KYC).map(([v, o]) => `<option value="${v}" ${u.kyc === v ? 'selected' : ''}>${o.label}</option>`).join('')}</select>`,
+    yes(u.idv), yes(u.kyc === 'approved'), yes(k.downloaded), yes(k.def), `<span class="muted">${fmtDateTime(k.created)}</span>`, `<span class="muted">${fmtDateTime(k.updated)}</span>`,
+    `<button class="btn btn-ghost btn-sm" data-act="toast" data-msg="Identity verification link sent">${icon('send', 14)}Resend</button>`])));
+  const cc = `<div class="card">
+    <div class="card-h"><span class="card-t">CreditCo</span><button class="btn btn-ghost btn-sm" data-act="cc-actions">Actions${icon('chevDown', 13)}</button></div>
+    <div class="kv2">${kv('ID', C.id && copyVal(C.id))}${kv('CreditCo email', C.email && esc(C.email))}${kv('Status', badge(CC_STATUS[C.status]))}${kv('KYC status', C.kycStatus)}
+      ${kv('KYC remark', C.remark)}${kv('Created', C.created && fmtDateTime(C.created))}${kv('Updated', C.updated && fmtDateTime(C.updated))}${kv('Documents', `<span class="num">${C.docs.length}</span>`)}</div>
+    <div class="docs">
+      <div class="docs-h"><span class="sub-t">Documents</span><select class="sel sm" id="docType"><option value="">Document type</option>${Object.entries(DOC_TYPES).map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select></div>
+      ${C.docs.map(x => `<div class="doc"><span class="doc-ic">${icon('file', 15)}</span><div style="flex:1;min-width:0"><div>${esc(x.name)}</div><div class="code">${DOC_TYPES[x.type]} · ${x.size} · ${rel(x.date)}</div></div></div>`).join('')}
+      <label class="dropzone" id="dropzone"><input type="file" id="docFile" hidden accept=".pdf,.jpg,.jpeg,.png">${icon('upload', 18)}<div><b>Click to upload</b> or drag and drop</div><div class="code">PDF, JPG or PNG, up to 10 MB</div></label>
+    </div>
+  </div>`;
+  const forms = tcard('Forms', `<select class="sel sm" id="formType"><option value="">Form type</option>${Object.entries(FORM_TYPES).map(([k, f]) => `<option value="${k}">${f.title}</option>`).join('')}</select><button class="btn btn-dark btn-sm" data-act="form-request">Request</button>`,
+    dtable(['ID', 'Form', 'Description', 'Status', 'Requested|r'], D.forms.map(f => [`<span class="num muted">${f.id}</span>`,
+      `<div>${FORM_TYPES[f.type].title}</div><div class="code">${f.type}</div>`, `<span class="muted">${FORM_TYPES[f.type].desc}</span>`, badge(FORM_STATUS[f.status]), `<span class="muted">${rel(f.date)}</span>`]),
+      emptyBlock('file', 'No forms requested', 'Request a form to collect extra information from this user.')));
+  return kyc + cc + forms;
+}
+
+/* Dialogs used by the user page */
+function adjustModal(c) {
+  const D = ud(byId(S.userId)), manual = !!c;
+  openModal(`<div class="modal">
+    <div class="modal-h">Adjust balance<button class="icon-btn sm bare" data-act="modal-close">${icon('x', 17)}</button></div>
+    <div class="modal-b">
+      <div class="seg" style="width:100%" id="adjMode">${[['bank', 'Bank deposit'], ['manual', 'Manual adjustment']].map(([k, l]) => `<button style="flex:1;justify-content:center" class="${(k === 'manual') === manual ? 'on' : ''}" data-act="adj-mode" data-v="${k}">${l}</button>`).join('')}</div>
+      <div class="adj-pane ${manual ? '' : 'on'}" data-pane="bank">
+        <div class="field"><label>Amount in EUR, including fee</label><input id="adjBankAmt" type="number" min="0" step="0.01" placeholder="0.00"></div>
+        <div class="field"><label>Fee</label><input id="adjBankFee" type="number" min="0" step="0.01" placeholder="0.00"></div>
+        <div class="hint" id="adjNet">Credited to the EUR wallet: €0.00</div>
+      </div>
+      <div class="adj-pane ${manual ? 'on' : ''}" data-pane="manual">
+        <div class="field"><label>Wallet</label><select id="adjCur">${D.wallets.map(w => `<option value="${w.c}" ${w.c === c ? 'selected' : ''}>${w.c} · ${fmtAmt(w.amt, w.c)}</option>`).join('')}</select></div>
+        <div class="field"><label>Direction</label><div class="seg" style="width:100%" id="adjDir"><button class="on" style="flex:1;justify-content:center" data-act="adj-dir" data-v="1">${icon('plus', 14)}Credit</button><button style="flex:1;justify-content:center" data-act="adj-dir" data-v="-1">${icon('minus', 14)}Debit</button></div></div>
+        <div class="field"><label>Amount</label><input id="adjAmt" type="number" min="0" step="any" placeholder="0"></div>
+        <div class="field"><label>Reason</label><input id="adjReason" placeholder="Shown in the audit log" autocomplete="off"></div>
+      </div>
+    </div>
+    <div class="modal-f"><button class="btn btn-ghost btn-sm" data-act="modal-close">Cancel</button><button class="btn btn-primary btn-sm" data-act="adj-submit">Apply</button></div>
+  </div>`, m => $(manual ? '#adjAmt' : '#adjBankAmt', m).focus());
+}
+function pushTx(u, D, o) {
+  const w = D.wallets.find(x => x.c === o.c), at = new Date(NOW);
+  D.history.unshift({ id: u.id * 100 + 90 + D.history.length, commission: 0, source: 'ADMIN', ref: '', created: at, updated: at, opDate: at, before: w.amt, ...o });
+  w.amt += o.amount; syncBalance(u, D);
+}
+function adjSubmit() {
+  const u = byId(S.userId), D = ud(u), mode = $('#adjMode .on').dataset.v;
+  const bad = (sel, msg) => { const el = $(sel); el.style.borderColor = 'var(--error)'; el.focus(); toast(msg, 'alert'); };
+  if (mode === 'bank') {
+    const amt = +$('#adjBankAmt').value, fee = +$('#adjBankFee').value || 0;
+    if (!(amt > 0)) return bad('#adjBankAmt', 'Enter an amount');
+    if (fee >= amt) return bad('#adjBankFee', 'Fee must be less than the amount');
+    pushTx(u, D, { type: 'BANK_DEPOSIT', c: 'EUR', amount: amt - fee, commission: fee, details: 'Manual bank deposit' });
+    toast(`Deposited ${fmtEur(amt - fee, 2)} to EUR wallet`);
+  } else {
+    const c = $('#adjCur').value, dir = +$('#adjDir .on').dataset.v, amt = +$('#adjAmt').value, w = D.wallets.find(x => x.c === c);
+    if (!(amt > 0)) return bad('#adjAmt', 'Enter an amount');
+    if (dir < 0 && amt > w.amt) return bad('#adjAmt', `Only ${fmtAmt(w.amt, c)} available`);
+    pushTx(u, D, { type: 'ADJUSTMENT', c, amount: dir * amt, details: $('#adjReason').value.trim() || 'Admin correction' });
+    toast(`${dir > 0 ? 'Credited' : 'Debited'} ${fmtAmt(amt, c)}`);
+  }
+  closeModal(); renderUserPage(); renderTopbar();
+}
+function fieldsModal(title, fields, saveAct) {
+  openModal(`<div class="modal">
+    <div class="modal-h">${title}<button class="icon-btn sm bare" data-act="modal-close">${icon('x', 17)}</button></div>
+    <div class="modal-b">${fields.map(f => `<div class="field"><label>${f.label}</label>${f.options
+      ? `<select id="${f.id}">${f.options.map(([v, l]) => `<option value="${v}" ${v === f.value ? 'selected' : ''}>${l}</option>`).join('')}</select>`
+      : `<input id="${f.id}" value="${esc(f.value ?? '')}" placeholder="${f.ph || ''}" ${f.type ? `type="${f.type}" step="any" min="0"` : ''} autocomplete="off">`}${f.hint ? `<div class="hint" style="margin-top:6px">${f.hint}</div>` : ''}</div>`).join('')}</div>
+    <div class="modal-f"><button class="btn btn-ghost btn-sm" data-act="modal-close">Cancel</button><button class="btn btn-primary btn-sm" data-act="${saveAct}">Save</button></div>
+  </div>`, m => $('input,select', m)?.focus());
+}
+function uploadDoc(file) {
+  const type = $('#docType')?.value;
+  if (!type) { toast('Choose a document type first', 'alert'); $('#docType')?.focus(); return; }
+  ud(byId(S.userId)).creditco.docs.unshift({ type, name: file.name, size: fmtSize(file.size), date: new Date(NOW) });
+  toast(`${DOC_TYPES[type]} uploaded`, 'upload'); renderUserPage();
 }
 
 /* ════════════════════════════ Popovers ════════════════════════════ */
@@ -1485,11 +1944,13 @@ function toast(msg, ic = 'check') {
   const t = document.createElement('div'); t.className = 'toast'; t.innerHTML = `${icon(ic, 15, 2)}${msg}`;
   $('#toasts').appendChild(t); setTimeout(() => { t.style.transition = 'opacity .3s'; t.style.opacity = 0; setTimeout(() => t.remove(), 300); }, 2400);
 }
-function exportCSV(list, name = 'users') {
-  const head = ['id', 'unique_id', 'name', 'email', 'residency', 'status', 'kyc', 'risk', 'level', 'type', 'balance_eur', 'cards', '2fa', 'created'];
-  const rows = list.map(u => [u.id, u.uid, u.name, u.email, u.country || '', u.status, u.kyc, u.risk, u.level, u.type, u.balance, u.cards, u.twofa, u.created.toISOString()]);
-  const csv = [head, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+function downloadCSV(name, head, rows) {
+  const csv = [head, ...rows].map(r => r.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = `${name}-${NOW.toISOString().slice(0, 10)}.csv`; a.click();
+}
+function exportCSV(list, name = 'users') {
+  downloadCSV(name, ['id', 'unique_id', 'name', 'email', 'residency', 'status', 'kyc', 'risk', 'level', 'type', 'balance_eur', 'cards', '2fa', 'created'],
+    list.map(u => [u.id, u.uid, u.name, u.email, u.country || '', u.status, u.kyc, u.risk, u.level, u.type, u.balance, u.cards, u.twofa, u.created.toISOString()]));
   toast(`Exported ${fmtInt(list.length)} users`, 'download');
 }
 function newUserModal() {
@@ -1515,6 +1976,11 @@ function setFilterVal(key, v) {
   if (FIELDS[key].single) f.values = [v]; else f.values = f.values.includes(v) ? f.values.filter(x => x !== v) : [...f.values, v];
   filtersChanged();
 }
+function setDateFilter(key, r) {
+  let f = S.filters.find(x => x.key === key);
+  if (!f) { f = { key, values: [] }; S.filters.push(f); }
+  f.values = [r]; filtersChanged();
+}
 function goFilter(key, values) {
   S.filters = [{ key, values }]; S.search = ''; S.page = 1; S.selected.clear();
   if (location.hash === '#/users') refreshUsers(); else location.hash = '#/users';
@@ -1528,7 +1994,12 @@ const ACT = {
   'me': a => openPop(a, meMenu(), { width: 260, kind: 'me' }),
   'shortcuts': () => { closePop(); shortcutsModal(); },
   'toast': a => { closePop(); toast(a.dataset.msg); },
-  'period': a => { S.period = a.dataset.v; renderTopbar(); renderDashboard(); },
+  'dash-range': a => openDatePicker(a, S.range, r => { S.range = r; renderTopbar(); renderDashboard(); }, { noAll: 1, align: 'right' }),
+  'dp-preset': a => dpCommit({ key: a.dataset.k }),
+  'dp-nav': a => { DP.view = new Date(DP.view.getFullYear(), DP.view.getMonth() + +a.dataset.d, 1); dpRefresh(); },
+  'dp-day': a => { const d = new Date(+a.dataset.ts); if (!DP.a || DP.b) { DP.a = d; DP.b = null; } else if (d < sod(DP.a)) { DP.b = sod(DP.a); DP.a = d; } else DP.b = d; DP.custom = true; dpRefresh(); },
+  'dp-apply': () => { const b = DP.b || DP.a; dpCommit({ key: 'custom', from: sod(DP.a).getTime(), to: Math.min(NOW.getTime(), sod(b).getTime() + DAY - 1) }); },
+  'dp-cancel': closePop,
   'metric': a => { S.metric = a.dataset.v; renderDashboard(); },
   'route': a => { closePop(); location.hash = '#/' + a.dataset.arg; },
   'go-filter': a => { closePop(); const [k, v] = a.dataset.arg.split('|'); goFilter(k, v.split(',')); },
@@ -1550,9 +2021,9 @@ const ACT = {
   'sort': a => { const c = COLS.find(c => c.key === a.dataset.key); S.sort = S.sort.key === c.key ? { key: c.key, dir: S.sort.dir === 'asc' ? 'desc' : 'asc' } : { key: c.key, dir: c.dir }; renderStats(); renderResults(); },
 
   'add-filter': a => openPop(a, fieldsPop(), { width: 260, onMount: p => $('#popQ', p).focus() }),
-  'pick-field': a => { const k = a.dataset.key; openPop($('#addFilter'), valuesPop(k, true), { width: 280, keep: 1, onMount: p => $('#popVQ', p)?.focus() }); },
+  'pick-field': a => { const k = a.dataset.key; if (FIELDS[k].date) { openDatePicker($('#addFilter'), S.filters.find(f => f.key === k)?.values[0] || { key: '7d' }, r => setDateFilter(k, r), { keep: 1 }); return; } openPop($('#addFilter'), valuesPop(k, true), { width: 280, keep: 1, onMount: p => $('#popVQ', p)?.focus() }); },
   'pop-back': () => openPop($('#addFilter'), fieldsPop(), { width: 260, keep: 1, onMount: p => $('#popQ', p).focus() }),
-  'edit-filter': a => { const k = a.dataset.key; openPop(a, valuesPop(k, false), { width: 280, anchorSel: `[data-chip="${k}"] .cv`, onMount: p => $('#popVQ', p)?.focus() }); },
+  'edit-filter': a => { const k = a.dataset.key; if (FIELDS[k].date) { openDatePicker(a, S.filters.find(f => f.key === k).values[0], r => setDateFilter(k, r), { anchorSel: `[data-chip="${k}"] .cv` }); return; } openPop(a, valuesPop(k, false), { width: 280, anchorSel: `[data-chip="${k}"] .cv`, onMount: p => $('#popVQ', p)?.focus() }); },
   'toggle-val': a => {
     const k = a.dataset.key; setFilterVal(k, a.dataset.v);
     if (FIELDS[k].single) { closePop(); return; }
@@ -1593,7 +2064,7 @@ const ACT = {
   'set-draft': a => { const { field, v } = a.dataset, u = byId(S.userId), val = field === 'country' && v === 'none' ? null : v; if (u[field] === val) delete S.draft[field]; else S.draft[field] = val; closePop(); renderUserPage(); },
   'u-discard': () => { S.draft = {}; renderUserPage(); },
   'u-save': () => { const u = byId(S.userId); Object.assign(u, S.draft); u.updated = NOW; S.draft = {}; toast('Changes saved'); renderUserPage(); },
-  'u-more': a => { const u = byId(S.userId); openPop(a, menuItems([{ act: 'toast', data: { msg: 'Password reset link sent' }, icon: 'key', label: 'Send password reset' }, { act: 'reset-2fa', data: { id: u.id }, icon: 'lock', label: 'Reset 2FA' }, { act: 'copy', data: { copy: u.email }, icon: 'mail', label: 'Copy email' }, { act: 'export-one', data: { id: u.id }, icon: 'download', label: 'Export data' }]), { align: 'right', width: 220 }); },
+  'u-more': a => { const u = byId(S.userId); openPop(a, menuItems([{ act: 'adj-open', icon: 'sliders', label: 'Adjust balance' }, { act: 'toast', data: { msg: 'Password reset link sent' }, icon: 'key', label: 'Send password reset' }, { act: 'reset-2fa', data: { id: u.id }, icon: 'lock', label: 'Reset 2FA' }, { act: 'copy', data: { copy: u.email }, icon: 'mail', label: 'Copy email' }, { act: 'export-one', data: { id: u.id }, icon: 'download', label: 'Export data' }]), { align: 'right', width: 220 }); },
   'export-one': a => { closePop(); exportCSV([byId(+a.dataset.id)], 'user-' + a.dataset.id); },
   'reset-2fa': a => { closePop(); const u = byId(+a.dataset.id); u.twofa = false; delete S.draft.twofa; toast('2FA reset — user will re-enroll at next sign-in', 'lock'); afterDataChange(); },
 
@@ -1606,6 +2077,85 @@ const ACT = {
     USERS.unshift({ id, uid: hex(6), name: '', email, country: null, status: 'active', kyc: 'new', risk: 'unknown', level: 'basic', type: $('#nuType .on').dataset.v, company: $('#nuCompany').value, balance: 0, cards: 0, twofa: false, emailVerified: false, idv: false, lang: 'EN', referral: hex(12).toLowerCase(), invitedBy: null, created: new Date(NOW), updated: new Date(NOW) });
     closeModal(); toast('User created — invite sent', 'mail'); goUser(id);
   },
+
+  // user page · wallets & balance
+  'wallet-toggle': a => { S.openWallet = S.openWallet === a.dataset.c ? null : a.dataset.c; renderUserPage(); },
+  'wallet-freeze': a => { const w = ud(byId(S.userId)).wallets.find(x => x.c === a.dataset.c); w.frozen = !w.frozen; toast(`${w.c} wallet ${w.frozen ? 'frozen' : 'unfrozen'}`, w.frozen ? 'lock' : 'check'); renderUserPage(); },
+  'adj-open': a => { closePop(); adjustModal(a.dataset.c || null); },
+  'adj-mode': a => { $$('#adjMode button').forEach(b => b.classList.toggle('on', b === a)); $$('.adj-pane').forEach(p => p.classList.toggle('on', p.dataset.pane === a.dataset.v)); $(`.adj-pane.on input`)?.focus(); },
+  'adj-dir': a => $$('#adjDir button').forEach(b => b.classList.toggle('on', b === a)),
+  'adj-submit': adjSubmit,
+  // user page · transactions
+  'tx-view': a => { S.tx.view = a.dataset.v; S.tx.page = 1; S.tx.sel.clear(); renderUserPage(); },
+  'tx-range': a => openDatePicker(a, S.tx.range, r => { S.tx.range = r; S.tx.page = 1; S.tx.sel.clear(); renderUserPage(); }),
+  'tx-page': a => { S.tx.page = +a.dataset.p; refreshTx(); },
+  'tx-sel': a => { const id = +a.dataset.id; S.tx.sel.has(id) ? S.tx.sel.delete(id) : S.tx.sel.add(id); renderUserPage(); },
+  'tx-sel-page': () => { const D = ud(byId(S.userId)), l = txFiltered(D).slice((S.tx.page - 1) * 15, S.tx.page * 15), all = l.every(h => S.tx.sel.has(h.id)); l.forEach(h => all ? S.tx.sel.delete(h.id) : S.tx.sel.add(h.id)); renderUserPage(); },
+  'tx-copy': () => {
+    const rows = ud(byId(S.userId)).history.filter(h => S.tx.sel.has(h.id));
+    try { navigator.clipboard.writeText(rows.map(h => [fmtDateTime(h.opDate), TX[h.type].label, fmtAmt(h.amount, h.c, true), h.details, SOURCES[h.source]].join('\t')).join('\n')); } catch {}
+    toast(`Copied ${rows.length} row${rows.length > 1 ? 's' : ''}`, 'copy');
+  },
+  'tx-export': a => openPop(a, menuItems([{ act: 'tx-export-do', data: { f: 'csv' }, icon: 'download', label: 'CSV' }, { act: 'tx-export-do', data: { f: 'pdf' }, icon: 'file', label: 'PDF' }, { act: 'tx-export-do', data: { f: 'xlsx' }, icon: 'table', label: 'Excel (XLSX)' }]), { align: 'right', width: 190 }),
+  'tx-export-do': a => {
+    closePop(); const u = byId(S.userId), list = txFiltered(ud(u));
+    if (a.dataset.f !== 'csv') { toast(`${a.dataset.f.toUpperCase()} export of ${list.length} rows started`, 'download'); return; }
+    downloadCSV(`transactions-${u.id}`, ['id', 'created', 'operation_date', 'type', 'currency', 'amount', 'commission', 'balance_before', 'details', 'source', 'referral'],
+      list.map(h => [h.id, h.created.toISOString(), h.opDate.toISOString(), h.type, h.c, h.amount, h.commission, h.before, h.details, h.source, h.ref]));
+    toast(`Exported ${list.length} transactions`, 'download');
+  },
+  // user page · cards & IBAN
+  'cards-update': () => { const D = ud(byId(S.userId)); D.cards.forEach(c => c.balance = Math.max(0, Math.round((c.balance + (Math.random() - .5) * 40) * 100) / 100)); toast('Card balances updated', 'refresh'); renderUserPage(); },
+  'card-more': a => { const c = ud(byId(S.userId)).cards[+a.dataset.i]; openPop(a, menuItems([{ act: 'card-freeze', data: { i: a.dataset.i }, icon: c.frozen ? 'refresh' : 'lock', label: c.frozen ? 'Unfreeze card' : 'Freeze card' }, { act: 'copy', data: { copy: c.ext }, icon: 'copy', label: 'Copy external ID' }]), { align: 'right', width: 200 }); },
+  'card-freeze': a => { closePop(); const c = ud(byId(S.userId)).cards[+a.dataset.i]; c.frozen = !c.frozen; toast(`Card •• ${c.last4} ${c.frozen ? 'frozen' : 'unfrozen'}`, c.frozen ? 'lock' : 'check'); renderUserPage(); },
+  'iban-issue': () => {
+    const u = byId(S.userId), D = ud(u), n = () => String(Math.floor(Math.random() * 1e4)).padStart(4, '0');
+    D.ibans.push({ id: 8800 + u.id % 1000, iban: `LT${10 + Math.floor(Math.random() * 89)} 3250 0${n().slice(1)} ${n()} ${n()}`, productId: 3, productName: 'EUR account (LT)', provider: 'Banking Circle', source: 'ADMIN', currency: 'EUR', status: 'PENDING', ext: Math.random().toString(16).slice(2, 14) });
+    toast('IBAN requested — pending with provider', 'bank'); renderUserPage();
+  },
+  // user page · fees, limits, addresses
+  'fee-edit': a => {
+    const f = ud(byId(S.userId)).fees[+a.dataset.i]; S._edit = +a.dataset.i;
+    fieldsModal(`${opLabel(f.op)} fee`, [
+      { id: 'feUserPct', label: 'App fee, %', value: +(f.user.pct * 100).toFixed(3), type: 'number' }, { id: 'feUserFix', label: 'App fixed fees', value: fixedStr(f.user.fixed), ph: 'e.g. 2 USD, 2 USDT' },
+      { id: 'feApiPct', label: 'API fee, %', value: +(f.api.pct * 100).toFixed(3), type: 'number' }, { id: 'feApiFix', label: 'API fixed fees', value: fixedStr(f.api.fixed), ph: 'e.g. 2 USD', hint: 'Comma-separated amount and currency pairs.' }], 'fee-save');
+  },
+  'fee-save': () => {
+    const f = ud(byId(S.userId)).fees[S._edit];
+    f.user = { pct: (+$('#feUserPct').value || 0) / 100, fixed: parseFixed($('#feUserFix').value) }; f.api = { pct: (+$('#feApiPct').value || 0) / 100, fixed: parseFixed($('#feApiFix').value) };
+    closeModal(); toast(`${opLabel(f.op)} fee updated`); renderUserPage();
+  },
+  'limit-edit': a => {
+    const l = ud(byId(S.userId)).limits[+a.dataset.i]; S._edit = +a.dataset.i;
+    fieldsModal(`${opLabel(l.op)} limits`, [{ id: 'liDay', label: 'Daily', value: l.day, type: 'number' }, { id: 'liMonth', label: 'Monthly', value: l.month, type: 'number' }, { id: 'liYear', label: 'Yearly', value: l.year, type: 'number', hint: '0 everywhere blocks this operation.' },
+      { id: 'liCur', label: 'Currency', value: l.cur, options: ASSETS.map(x => [x.c, x.c]) }], 'limit-save');
+  },
+  'limit-save': () => {
+    const l = ud(byId(S.userId)).limits[S._edit];
+    Object.assign(l, { day: +$('#liDay').value || 0, month: +$('#liMonth').value || 0, year: +$('#liYear').value || 0, cur: $('#liCur').value });
+    closeModal(); toast(`${opLabel(l.op)} limits updated`); renderUserPage();
+  },
+  'addr-add': () => { const u = byId(S.userId); fieldsModal('Add address', [{ id: 'adCountry', label: 'Country', value: u.country || 'DEU', options: Object.entries(COUNTRIES).map(([k, c]) => [k, c.name]) }, { id: 'adCity', label: 'City' }, { id: 'adStreet', label: 'Address' }, { id: 'adZip', label: 'Post code' }], 'addr-save'); },
+  'addr-save': () => {
+    const u = byId(S.userId), D = ud(u), city = $('#adCity').value.trim(), street = $('#adStreet').value.trim();
+    if (!city || !street) { const el = $(city ? '#adStreet' : '#adCity'); el.style.borderColor = 'var(--error)'; el.focus(); return; }
+    D.addresses.push({ id: 4400 + u.id % 1000 + D.addresses.length * 1000, country: $('#adCountry').value, city, street, zip: $('#adZip').value.trim() || '—' });
+    closeModal(); toast('Address added', 'mapPin'); renderUserPage();
+  },
+  'addr-rm': a => { ud(byId(S.userId)).addresses.splice(+a.dataset.i, 1); toast('Address removed', 'trash'); renderUserPage(); },
+  // user page · verification
+  'cc-actions': a => openPop(a, menuItems([['Request access', 'key'], ['Resend proof of address', 'send'], ['Update KYC personal data', 'idcard'], ['Resend Ondato report', 'send'], ['Fetch KYC status', 'refresh']].map(([l, ic]) => ({ act: 'cc-do', data: { l }, icon: ic, label: l }))), { align: 'right', width: 250 }),
+  'cc-do': a => {
+    closePop(); const C = ud(byId(S.userId)).creditco, l = a.dataset.l;
+    if (l === 'Request access' && C.status !== 'APPROVED') { C.status = 'ACCESS_REQUESTED'; C.updated = new Date(NOW); C.created ||= new Date(NOW); }
+    toast(l === 'Fetch KYC status' ? `CreditCo KYC status: ${C.kycStatus || 'not started'}` : `${l} — sent to CreditCo`, 'send'); renderUserPage();
+  },
+  'form-request': () => {
+    const t = $('#formType').value, u = byId(S.userId), D = ud(u);
+    if (!t) { toast('Choose a form type first', 'alert'); $('#formType').focus(); return; }
+    D.forms.unshift({ id: 900 + u.id % 100 + D.forms.length + 1, type: t, status: 'REQUESTED', date: new Date(NOW) });
+    toast(`${FORM_TYPES[t].title} form requested`, 'send'); renderUserPage();
+  },
   'modal-close': closeModal,
 };
 
@@ -1616,8 +2166,17 @@ document.addEventListener('click', e => {
   if (r && !e.target.closest('.pop')) goUser(+r.dataset.uid, e);
   if (e.target.closest('.nav') && innerWidth <= 900) $('#app').classList.remove('mobile-open');
 });
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.dataset.tx && t.tagName === 'SELECT') { S.tx[t.dataset.tx] = t.value; S.tx.page = 1; S.tx.sel.clear(); renderUserPage(); }
+  else if (t.dataset.kyc != null) { const u = byId(S.userId); u.kyc = t.value; u.idv = t.value === 'approved'; u.updated = new Date(NOW); toast(`KYC status set to ${KYC[t.value].label}`); renderUserPage(); }
+  else if (t.id === 'docFile' && t.files[0]) uploadDoc(t.files[0]);
+});
 document.addEventListener('input', e => {
   const t = e.target;
+  if (t.dataset.tx === 'ref') { S.tx.ref = t.value; S.tx.page = 1; refreshTx(); return; }
+  if (t.id === 'adjBankAmt' || t.id === 'adjBankFee') { const net = Math.max(0, (+$('#adjBankAmt').value || 0) - (+$('#adjBankFee').value || 0)); $('#adjNet').textContent = `Credited to the EUR wallet: ${fmtEur(net, 2)}`; t.style.borderColor = ''; }
+  if (t.closest?.('.modal')) t.style.borderColor = '';
   if (t.id === 'uSearch') { S.search = t.value; S.page = 1; renderStats(); renderResults(); renderFloat(); }
   else if (t.id === 'popQ') $('#popFields').innerHTML = fieldItems(t.value);
   else if (t.id === 'popVQ') $('#popVals').innerHTML = valueItems(t.dataset.key, t.value);
@@ -1648,6 +2207,9 @@ let dragId = null;
 document.addEventListener('dragstart', e => { const c = e.target.closest?.('.bcard'); if (!c) return; dragId = +c.dataset.uid; c.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragId); });
 document.addEventListener('dragend', e => { e.target.closest?.('.bcard')?.classList.remove('dragging'); $$('.col.over').forEach(c => c.classList.remove('over')); });
 document.addEventListener('dragover', e => { const col = e.target.closest?.('.col'); if (!col || dragId == null) return; e.preventDefault(); $$('.col.over').forEach(c => c !== col && c.classList.remove('over')); col.classList.add('over'); });
+document.addEventListener('dragover', e => { const z = e.target.closest?.('#dropzone'); if (z) { e.preventDefault(); z.classList.add('over'); } });
+document.addEventListener('dragleave', e => { const z = e.target.closest?.('#dropzone'); if (z && !z.contains(e.relatedTarget)) z.classList.remove('over'); });
+document.addEventListener('drop', e => { const z = e.target.closest?.('#dropzone'); if (!z) return; e.preventDefault(); z.classList.remove('over'); const f = e.dataTransfer.files[0]; f && uploadDoc(f); });
 document.addEventListener('drop', e => {
   const col = e.target.closest?.('.col'); if (!col || dragId == null) return; e.preventDefault();
   const u = byId(dragId), f = col.dataset.field, v = col.dataset.col; dragId = null;
