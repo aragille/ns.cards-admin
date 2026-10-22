@@ -15,7 +15,8 @@
   • Users stat widgets  → STAT_TILES
   • Users table columns → COLS
   • Filter fields       → FIELDS
-  Routes: #/dashboard, #/users, #/users/<id> (other nav items show a placeholder)
+  • Companies           → genCompanies(), CARD_PRODUCTS / IBAN_PRODUCTS, cd() for per-company tabs
+  Routes: #/dashboard, #/users, #/users/<id>, #/companies, #/companies/access, #/companies/<id> (other nav items show a placeholder)
   Shortcuts: ⌘K command menu · ⌘B / [ toggle sidebar · "/" focus search · j / k next/prev user · Esc back/close
 -->
 <script>
@@ -151,6 +152,7 @@ a{color:inherit;text-decoration:none}
 .crumbs .cur{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis}
 .crumb-sep{color:var(--line-strong)}
 .tb-ctx{display:flex;align-items:center;gap:8px}
+.tb-lead{margin-left:12px}
 .crumbs .count{font-family:var(--mono);font-size:12.5px;color:var(--ink-3);margin-left:-2px}
 .topbar .vsep{margin:0 4px}
 kbd{font-family:var(--mono);font-size:11px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:0 5px;line-height:18px}
@@ -288,6 +290,10 @@ tbody tr:hover td{background:var(--row-hover)}
 tbody tr.sel td{background:var(--hover)}
 tbody tr:last-child td{border-bottom:0}
 th.cbcell,td.cbcell{width:44px;padding:0 4px 0 18px}
+/* bulk-select column stays pinned on the left while the table scrolls sideways (mirrors the pinned row actions on the right) */
+th.cbcell,td.cbcell,.dt th.cbcell{position:sticky;left:0}
+td.cbcell{z-index:1;background:var(--surface)}
+th.cbcell{z-index:3;background:var(--head-bg)}
 th.act-h{width:84px}
 td.act{position:sticky;right:0;z-index:1;padding:0!important;background:transparent!important;overflow:visible!important}
 tbody tr:hover td.act{z-index:5}
@@ -312,7 +318,7 @@ body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
 .hs-wrap{position:relative}
 .hs-wrap::before,.hs-wrap::after{content:"";position:absolute;top:0;bottom:0;width:96px;z-index:4;pointer-events:none;opacity:0;transition:opacity .2s;backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px)}
 .hs-wrap::after{right:0;-webkit-mask-image:linear-gradient(to right,transparent,#000 70%);mask-image:linear-gradient(to right,transparent,#000 70%)}
-.hs-wrap::before{left:0;-webkit-mask-image:linear-gradient(to left,transparent,#000 70%);mask-image:linear-gradient(to left,transparent,#000 70%)}
+.hs-wrap::before{left:var(--hs-l,0px);-webkit-mask-image:linear-gradient(to left,transparent,#000 70%);mask-image:linear-gradient(to left,transparent,#000 70%)}
 .hs-wrap.hs-r::after,.hs-wrap.hs-l::before{opacity:1}
 .ucell .un{font-weight:500;line-height:1.25}
 .ucell .ue{color:var(--ink-2);font-size:12.5px;line-height:1.3}
@@ -646,6 +652,99 @@ body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
 .ms b{display:block;font-size:18px;font-weight:600;letter-spacing:-.02em;margin-top:6px}
 .ph{display:grid;place-items:center;min-height:calc(100vh - 72px - 140px)}
 
+/* ───────────────────────── Companies ───────────────────────── */
+.src{display:inline-flex;align-items:center;height:22px;padding:0 7px;border-radius:6px;border:1px solid var(--line-strong);background:var(--surface);font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--ink-2);white-space:nowrap}
+.pchips{display:inline-flex;gap:6px}
+.pchips .tag .i{color:var(--ink-3)}
+.sw-t{position:relative;display:inline-block;width:30px;height:18px;border-radius:9px;background:var(--line-strong);transition:background .15s;flex:none;vertical-align:middle}
+.sw-t::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+.sw-t.on{background:var(--success)} .sw-t.on::after{transform:translateX(12px)}
+.tool-btn .cb{width:14px;height:14px;border-radius:4px}
+.su-step{display:flex;align-items:center;gap:10px;width:100%;height:42px;border-bottom:1px solid var(--line-soft);font-size:13.5px;color:var(--ink)}
+.su-step:last-child{border-bottom:0}
+.su-step .pl{flex:1}
+.su-step>.i{color:var(--ink-3);transition:transform .12s}
+.su-step:hover>.i{color:var(--ink);transform:translateX(2px)}
+.su-step.done .pl{color:var(--ink-2)}
+.inp.w{width:100%}
+.inp.dirty,.fsel.dirty{border-color:var(--brand-200);background-color:var(--brand-50)}
+.hint .warn{color:var(--warning-ink)} .hint .ok{color:var(--success-ink)}
+.modal-wrap{overflow-y:auto}
+.tools-sep{width:1px;height:22px;background:var(--line);margin:0 4px}
+.key-box{display:flex;align-items:center;gap:8px;padding:12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);font-family:var(--mono);font-size:12.5px;word-break:break-all}
+.key-box .copy{margin:0}
+/* product access matrix: sticky company column + sticky two-row header with vertical product names */
+.mx{min-width:0;width:auto}
+.mx th,.mx td{padding:0}
+.mx tbody tr{cursor:default}
+.mx th.mx-corner{left:0;z-index:4;width:260px;min-width:260px;padding:0 16px 12px;vertical-align:bottom;border-right:1px solid var(--line);font-size:12.5px}
+.mx th.mx-g{height:34px;padding:0 10px;font-size:11px;font-weight:500;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);border-left:1px solid var(--line-soft)}
+.mx th.mx-g .th-in{gap:6px}
+.mx th.mx-pth{top:34px;height:212px;width:40px;min-width:40px;max-width:40px;vertical-align:bottom;border-left:1px solid var(--line-soft)}
+.mx th.mx-nh{width:72px;min-width:72px;padding:0 16px 12px;vertical-align:bottom;text-align:right;border-left:1px solid var(--line)}
+.mx-ph{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:8px;width:100%;height:100%;padding:10px 0}
+.mx-pl{writing-mode:vertical-rl;transform:rotate(180deg);max-height:168px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:500;color:var(--ink-2);line-height:1}
+.mx-ph:hover .mx-pl,.mx th.hl .mx-pl{color:var(--ink)}
+.mx-pc{font-size:11px;font-variant-numeric:tabular-nums;color:var(--ink-3);min-width:20px;height:18px;line-height:18px;border-radius:6px;background:var(--surface-2)}
+.mx td{height:46px;text-align:center;border-left:1px solid var(--line-soft)}
+.mx td .cb{margin:0 auto}
+.mx td.mx-co{position:sticky;left:0;z-index:1;text-align:left;padding:0 16px;border-left:0;border-right:1px solid var(--line);background:var(--surface);max-width:260px}
+.mx tbody tr:hover td.mx-co{background:var(--row-hover)}
+.mx-co a{display:flex;align-items:center;gap:10px;min-width:0;font-weight:500}
+.mx-co a span{overflow:hidden;text-overflow:ellipsis}
+.mx-co a:hover span:not(.code){text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px}
+.mx td.mx-n{text-align:right;padding:0 16px;border-left:1px solid var(--line)}
+.mx .first-ib{border-left:1px solid var(--line-strong)!important}
+.mx col.hl{background:var(--hover)}
+.mx th.hl{background:var(--hover)}
+.mx td.dirty{background:var(--brand-50)!important}
+.mx td.dirty .cb{border-color:var(--brand)}
+.mx td.dirty .cb.on{background:var(--brand)}
+/* branding */
+.br-grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}
+.br-main{display:flex;flex-direction:column;gap:16px;min-width:0}
+.br-side{position:sticky;top:16px}
+.bf-r{display:grid;grid-template-columns:190px minmax(0,1fr);align-items:center;gap:16px;min-height:58px;padding:9px 0;border-bottom:1px solid var(--line-soft)}
+.bf-r:last-child{border-bottom:0}
+.bf-r>label{font-size:13.5px;color:var(--ink-2)}
+.bf-r .inp{height:38px}
+.clr{display:flex;align-items:center;gap:8px}
+.clr input[type=color]{width:38px;height:38px;padding:3px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);cursor:pointer;flex:none}
+.clr input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+.clr input[type=color]::-webkit-color-swatch{border:0;border-radius:7px}
+.clr .inp:not(.w){width:120px;font-variant-numeric:tabular-nums;text-transform:uppercase}
+/* brand preview: shows the partner's own colours, so it does not follow the admin theme */
+.bp{--bp-ink:#111;border-radius:18px;overflow:hidden;background:var(--bp-bg);color:var(--bp-ink);border:1px solid var(--line);font-size:13px}
+.bp-top{display:flex;align-items:center;gap:9px;padding:16px 16px 12px;font-weight:600}
+.bp-logo{width:28px;height:28px;border-radius:9px;background:var(--bp-c);color:var(--bp-t);display:grid;place-items:center;font-size:11px;font-weight:700;overflow:hidden;flex:none}
+.bp-logo img{width:100%;height:100%;object-fit:cover;background:#fff}
+.bp-top .bp-me{margin-left:auto;width:26px;height:26px;border-radius:50%;background:color-mix(in srgb,var(--bp-ink) 10%,transparent)}
+.bp-card{margin:0 16px;border-radius:16px;padding:16px;background:linear-gradient(135deg,var(--bp-c),color-mix(in srgb,var(--bp-c) 72%,#000));color:var(--bp-t)}
+.bp-card .l{font-size:11.5px;opacity:.8}
+.bp-card .v{font-size:24px;font-weight:600;letter-spacing:-.02em;margin:4px 0 18px}
+.bp-card .n{display:flex;justify-content:space-between;font-size:12px;opacity:.85}
+.bp-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:2px}
+.bp-row{display:flex;align-items:center;gap:10px;height:42px;border-bottom:1px solid color-mix(in srgb,var(--bp-ink) 8%,transparent)}
+.bp-row:last-of-type{border-bottom:0}
+.bp-row i{width:28px;height:28px;border-radius:50%;background:color-mix(in srgb,var(--bp-c) 14%,transparent);flex:none}
+.bp-row span{flex:1} .bp-row b{font-weight:500}
+.bp-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.bp-btn{height:40px;border-radius:999px;background:var(--bp-c);color:var(--bp-t);display:grid;place-items:center;font-weight:600}
+.bp-btn.alt{background:color-mix(in srgb,var(--bp-ink) 7%,transparent);color:var(--bp-ink)}
+.bp-mail{margin:0 16px 16px;padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--bp-ink) 5%,transparent);font-size:12px;line-height:1.6}
+.bp-mail b{display:block;font-size:13px;margin:2px 0}
+.bp-mail .m{opacity:.6}
+.bp-cap{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--ink-3);margin-top:10px}
+/* exchange fee tiers: grouped two-row header */
+.dt.grp thead tr:first-child th{border-bottom:1px solid var(--line-soft)}
+.dt.grp th.gs,.dt.grp td.gs{border-left:1px solid var(--line-soft)}
+@media (max-width:1180px){ .br-grid{grid-template-columns:minmax(0,1fr)} .br-side{position:static} }
+@media (max-width:900px){
+  .bf-r{grid-template-columns:minmax(0,1fr);gap:6px}
+  .mx th.mx-corner,.mx td.mx-co{width:170px;min-width:170px;max-width:170px}
+  .card-tools .search{width:100%!important}
+}
+
 /* ───────────────────────── Responsive ───────────────────────── */
 @media (max-width:1180px){
   .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -896,11 +995,6 @@ const KYC = { new: { label: 'New', tone: 'neutral' }, pending: { label: 'Pending
 const RISK = { low: { label: 'Low', tone: 'success', n: 1 }, medium: { label: 'Medium', tone: 'warning', n: 2 }, high: { label: 'High', tone: 'error', n: 3 }, unknown: { label: 'Unknown', tone: 'neutral', n: 0 } };
 const LEVEL = { basic: { label: 'Basic', tone: 'neutral' }, middle: { label: 'Middle', tone: 'info' }, premium: { label: 'Premium', tone: 'feature' } };
 const TYPE = { individual: { label: 'Individual' }, company: { label: 'Company user' } };
-const COMPANIES = [
-  { id: 47, name: 'Default NS.Cards', source: 'INTERNAL', ref: 'nscards-main' }, { id: 52, name: 'Maxx Space', source: 'API', ref: 'maxx-space' },
-  { id: 58, name: 'Nexton Labs', source: 'PARTNER', ref: 'nexton-labs' }, { id: 61, name: 'Aqa Next', source: 'API', ref: 'aqa-next' },
-];
-const companyOf = u => COMPANIES.find(c => c.id === u.companyId) || COMPANIES[0];
 const COUNTRIES = {
   DEU: { cc: 'DE', name: 'Germany', eea: 1, w: 22 }, ESP: { cc: 'ES', name: 'Spain', eea: 1, w: 13 }, FRA: { cc: 'FR', name: 'France', eea: 1, w: 11 },
   ITA: { cc: 'IT', name: 'Italy', eea: 1, w: 9 }, NLD: { cc: 'NL', name: 'Netherlands', eea: 1, w: 7 }, POL: { cc: 'PL', name: 'Poland', eea: 1, w: 6 },
@@ -913,6 +1007,78 @@ const FIRST = ['Max', 'Anna', 'Lukas', 'Sofia', 'Jonas', 'Elena', 'Mateo', 'Clar
 const LAST = ['Müller', 'Schmidt', 'Weber', 'Rossi', 'Bianchi', 'García', 'Martínez', 'Dubois', 'Laurent', 'Kowalski', 'Nowak', 'Silva', 'Costa', 'Jansen', 'de Vries', 'Petrauskas', 'Kazlauskas', 'Hofer', 'Gruber', 'Papadopoulos', 'Murphy', 'Yilmaz', 'Kaya', 'Hakobyan', 'Sargsyan', 'Beridze', 'Shevchenko', 'Bondarenko', 'Fischer', 'Wagner', 'Novak', 'Horvat', 'Lindqvist', 'Andersen', 'Moreau', 'Ferreira', 'Santos', 'Keller', 'Meyer', 'Romano'];
 const DOMAINS = ['gmail.com', 'outlook.com', 'proton.me', 'icloud.com', 'gmx.de', 'yahoo.com', 'web.de', 'hotmail.com'];
 const LANGS = { DEU: 'DE', AUT: 'DE', CHE: 'DE', FRA: 'FR', ESP: 'ES', ITA: 'IT', POL: 'PL', PRT: 'PT', NLD: 'NL' };
+
+/* Companies — the first four keep their ids (mock users point at them); all come from their own generator so mock users stay the same */
+const CO_SOURCES = { NSCARDS: 'NS.Cards', FNT: 'FNT', GUP: 'GUP', IPAY: 'iPay' };
+const CO_TYPE = { single: { label: 'Single user' }, multi: { label: 'Multi user' } };
+const KYC_ON = { none: { label: 'Not required', tone: 'neutral' }, ...LEVEL };
+const CARD_PRODUCTS = [
+  { id: 11, name: 'NS Virtual EUR', provider: 'Wallester', kind: 'virtual', cur: 'EUR' }, { id: 12, name: 'NS Physical EUR', provider: 'Wallester', kind: 'physical', cur: 'EUR' },
+  { id: 14, name: 'Standard Card', provider: 'Wallester', kind: 'virtual', cur: 'EUR' }, { id: 15, name: 'Gold', provider: 'Wallester', kind: 'physical', cur: 'EUR' },
+  { id: 16, name: 'Blue', provider: 'Wallester', kind: 'virtual', cur: 'EUR' }, { id: 18, name: 'Entry Platinum Virtual USD', provider: 'Finci', kind: 'virtual', cur: 'USD' },
+  { id: 19, name: 'Entry Corporate Platinum Virtual USD', provider: 'Finci', kind: 'virtual', cur: 'USD' }, { id: 21, name: 'Finci ATM', provider: 'Finci', kind: 'physical', cur: 'EUR' },
+  { id: 22, name: 'Finci second account', provider: 'Finci', kind: 'virtual', cur: 'EUR' }, { id: 24, name: 'CreditCo card with directors & KYC', provider: 'CreditCo', kind: 'physical', cur: 'EUR' },
+  { id: 25, name: 'CreditCo cardholder retry', provider: 'CreditCo', kind: 'virtual', cur: 'EUR' }, { id: 27, name: 'Mediabuy free with promocode', provider: 'Mediabuy', kind: 'virtual', cur: 'USD' },
+  { id: 28, name: 'Mediabuy with discount', provider: 'Mediabuy', kind: 'virtual', cur: 'USD' }, { id: 29, name: 'Mediabuy funded by company', provider: 'Mediabuy', kind: 'virtual', cur: 'USD' },
+  { id: 30, name: 'Mediabuy partially funded', provider: 'Mediabuy', kind: 'virtual', cur: 'USD' }, { id: 31, name: 'Mediabuy custom payment methods', provider: 'Mediabuy', kind: 'virtual', cur: 'USD' },
+  { id: 33, name: 'Tau Impex VIP', provider: 'Vertex', kind: 'physical', cur: 'EUR' }, { id: 34, name: 'Tau Impex VIP free promocode', provider: 'Vertex', kind: 'virtual', cur: 'EUR' },
+  { id: 36, name: 'Vertex Mastercard', provider: 'Vertex', kind: 'virtual', cur: 'EUR' }, { id: 37, name: 'Vertex Visa BIN 4111', provider: 'Vertex', kind: 'virtual', cur: 'USD' },
+  { id: 39, name: 'Gimbutis GXAU', provider: 'Gimbutis', kind: 'virtual', cur: 'USD' }, { id: 40, name: 'Gimbutis USDT', provider: 'Gimbutis', kind: 'virtual', cur: 'USD' },
+  { id: 42, name: 'Viking', provider: 'Wallester', kind: 'physical', cur: 'EUR' }, { id: 43, name: 'Brighty', provider: 'Wallester', kind: 'virtual', cur: 'EUR' },
+  { id: 45, name: 'FNC Partner card', provider: 'Finci', kind: 'physical', cur: 'EUR' },
+];
+const IBAN_PRODUCTS = [
+  { id: 3, name: 'EUR account (LT)', cur: 'EUR', type: 'Personal', provider: 'Banking Circle', price: 0, fee: 2.5 },
+  { id: 4, name: 'EUR business account', cur: 'EUR', type: 'Business', provider: 'Banking Circle', price: 50, fee: 15 },
+  { id: 5, name: 'GBP account (UK)', cur: 'GBP', type: 'Personal', provider: 'Clear Junction', price: 0, fee: 3 },
+  { id: 6, name: 'USD SWIFT account', cur: 'USD', type: 'Business', provider: 'Clear Junction', price: 100, fee: 25 },
+  { id: 7, name: 'CHF account', cur: 'CHF', type: 'Personal', provider: 'Banking Circle', price: 0, fee: 4 },
+];
+const PROD_BY = { c: Object.fromEntries(CARD_PRODUCTS.map(p => [p.id, p])), i: Object.fromEntries(IBAN_PRODUCTS.map(p => [p.id, p])) };
+const PAY_GROUPS = ['DEFAULT', 'CRYPTO_ONLY', 'FIAT_ONLY', 'PARTNER'];
+const BRAND_COLORS = ['#FC7C1A', '#2563EB', '#0F9D58', '#7C3AED', '#E11D48', '#0891B2', '#111111', '#D97706', '#DB2777', '#0D9488'];
+const tint = (h, a) => '#' + [1, 3, 5].map(i => Math.round(255 - (255 - parseInt(h.slice(i, i + 2), 16)) * a).toString(16).padStart(2, '0')).join('').toUpperCase();
+const coSlug = s => s.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+let ASSIGN_ID = 1200;
+const cpDefaults = (pid, at = new Date(NOW)) => { const phys = PROD_BY.c[pid].kind === 'physical'; return { id: ASSIGN_ID++, pid, active: true, minLevel: 'basic', cost: phys ? 25 : 0, discount: 0, material: phys ? 'MAT-100' : '', group: 'DEFAULT', limit: 10000, funded: false, maxFunded: 0, purchase: true, monthly: phys ? 2.5 : 0, created: at, updated: at }; };
+const ipDefaults = (pid, at = new Date(NOW)) => ({ id: ASSIGN_ID++, pid, active: true, created: at, updated: at });
+const coBrand = (name, email, color) => ({ name, color, bg: tint(color, .05), btn: '#FFFFFF', logo: '', url: '', sender: 'noreply@wallet.ns.cards', support: email, mode: 'Database' });
+function genCompanies() {
+  const r = rng(231), pk = a => a[Math.floor(r() * a.length)];
+  const wp = o => { const e = Object.entries(o); let x = r() * e.reduce((s, [, w]) => s + w, 0); for (const [k, w] of e) if ((x -= w) < 0) return k; return e[0][0]; };
+  const hx = n => Array.from({ length: n }, () => '0123456789ABCDEF'[Math.floor(r() * 16)]).join('');
+  const pickN = (arr, n) => { const a = [...arr], out = []; while (out.length < n && a.length) out.push(a.splice(Math.floor(r() * a.length), 1)[0]); return out; };
+  const names = ['Tau Impex', 'Mediabuy Group', 'Ipay Valetax', 'Brighty', 'Finci Partners', 'Gimbutis Capital', 'Vertex Finance', 'Viking Pay', 'Hercus Trade', 'Hoppa Travel', 'CreditCo Europe',
+    'Lumen Wallet', 'Orbit Exchange', 'Kite Payments', 'Northwind Trading', 'Atlas Freight', 'Bluefin Media', 'Cobalt Labs', 'Delta Rewards', 'Ember Studio', 'Fjord Logistics', 'Granite Holdings',
+    'Helix Health', 'Ion Mobility', 'Juniper Retail', 'Kestrel Ads', 'Lyra Gaming', 'Mosaic Agency', 'Nimbus Cloud', 'Onyx Partners', 'Pulse Fitness', 'Quartz Consulting', 'Riviera Hotels',
+    'Sable Fashion', 'Tidal Energy', 'Umbra Security', 'Vela Yachts', 'Willow Care', 'Xeno Robotics', 'Yarrow Foods', 'Zephyr Air', 'Acme Corp', 'Test company flow', 'Country test'];
+  const rows = [[47, 'Default NS.Cards', 'NSCARDS', 'nscards-main', 'support@ns.cards'], [52, 'Maxx Space', 'FNT', 'maxx-space'], [58, 'Nexton Labs', 'GUP', 'nexton-labs'], [61, 'Aqa Next', 'IPAY', 'aqa-next'],
+    ...names.map((n, i) => [62 + Math.round((i + 1) * 169 / names.length), n, pk(['NSCARDS', 'FNT', 'FNT', 'GUP', 'IPAY']), hx(10)])];
+  const cw = Object.fromEntries(Object.entries(COUNTRIES).map(([k, c]) => [k, c.w]));
+  return rows.map(([id, name, source, ref, email]) => {
+    const s = coSlug(name), base = id === 47, test = /test/i.test(name);
+    const created = new Date(NOW.getTime() - (232 - id) * (2.1 + r()) * 864e5), color = base ? '#FC7C1A' : pk(BRAND_COLORS);
+    const cardIds = base ? [11, 12, 14, 15, 16] : test ? [] : pickN(CARD_PRODUCTS, +wp({ 0: 22, 1: 34, 2: 20, 3: 14, 5: 10 })).map(p => p.id);
+    const ibanIds = base ? [3, 4] : test ? [] : pickN(IBAN_PRODUCTS, +wp({ 0: 55, 1: 35, 2: 10 })).map(p => p.id);
+    const cp = cardIds.map(pid => {
+      const a = cpDefaults(pid, created), phys = a.material !== '', funded = r() < .2;
+      return Object.assign(a, { active: r() < .9, minLevel: r() < .8 ? 'basic' : 'middle', cost: phys ? pk([25, 35, 50]) : pk([0, 0, 5, 10]), discount: pk([0, 0, 0, 5, 10, 15]),
+        material: phys ? 'MAT-' + (100 + Math.floor(r() * 900)) : '', group: wp({ DEFAULT: 6, CRYPTO_ONLY: 2, FIAT_ONLY: 1, PARTNER: 1 }), limit: pk([5000, 10000, 25000, 50000]),
+        funded, maxFunded: funded ? 1 + Math.floor(r() * 3) : 0, purchase: r() < .9, monthly: phys ? 2.5 : pk([0, 1]) });
+    });
+    const ip = ibanIds.map(pid => Object.assign(ipDefaults(pid, created), { active: r() < .9 }));
+    const mail = email || `${pk(['ops', 'admin', 'finance', 'hello', 'partners'])}@${s}.com`;
+    return {
+      id, name, email: mail, source, ref, created, updated: new Date(Math.min(NOW.getTime(), created.getTime() + r() * 40 * 864e5)),
+      status: base || test ? 'active' : wp({ active: 80, inactive: 14, blocked: 6 }), type: base ? 'multi' : r() < .55 ? 'single' : 'multi',
+      minLevel: base ? 'basic' : wp({ basic: 75, middle: 20, premium: 5 }), kycLevel: base ? 'basic' : wp({ none: 60, basic: 25, middle: 15 }),
+      emboss: name.toUpperCase().replace(/[^A-Z0-9 ]/g, '').slice(0, 21), country: base ? 'LTU' : wp(cw), cp, ip,
+      brand: Object.assign(coBrand(name, mail, color), base ? { url: 'https://wallet.ns.cards', logo: '' } : r() < .4 ? { url: `https://wallet.${s}.com` } : {}),
+    };
+  }).map(c => (c.kycLevel = c.kycLevel === 'none' ? null : c.kycLevel, c)).sort((a, b) => b.id - a.id);
+}
+const COMPANIES = genCompanies();
+const companyOf = u => COMPANIES.find(c => c.id === u.companyId) || COMPANIES.find(c => c.id === 47);
 
 const R = rng(20261021);
 const pick = a => a[Math.floor(R() * a.length)];
@@ -971,7 +1137,7 @@ const FIELDS = {
   twofa:   { label: '2FA', icon: 'lock', options: { on: { label: 'Enabled' }, off: { label: 'Disabled' } }, get: u => u.twofa ? 'on' : 'off' },
   created: { label: 'Created', icon: 'calendar', date: 1, options: {}, test: (u, v) => inRange(u.created, v[0]) },
 };
-const matchField = (k, u, vals) => FIELDS[k].test ? FIELDS[k].test(u, vals) : vals.includes(FIELDS[k].get(u));
+const matchField = (k, u, vals, F = FIELDS) => F[k].test ? F[k].test(u, vals) : vals.includes(F[k].get(u));
 
 // Pre-filter widgets above the Users table: each tile shows a count and toggles its filter.
 const STAT_TILES = [
@@ -1020,7 +1186,7 @@ const COLS = [
   { key: 'companyId', label: 'Company ID', val: u => u.companyId, dir: 'asc', cell: u => `<span class="num muted">${u.companyId}</span>` },
   { key: 'companyName', label: 'Company', val: u => companyOf(u).name, dir: 'asc', cell: u => companyOf(u).name },
   { key: 'companyRef', label: 'Company referral code', val: u => companyOf(u).ref, dir: 'asc', cell: u => `<span class="num muted">${companyOf(u).ref}</span>` },
-  { key: 'companySource', label: 'Company source', val: u => companyOf(u).source, dir: 'asc', cell: u => `<span class="muted">${companyOf(u).source}</span>` },
+  { key: 'companySource', label: 'Company source', val: u => companyOf(u).source, dir: 'asc', cell: u => `<span class="muted">${CO_SOURCES[companyOf(u).source]}</span>` },
   { key: 'created', label: 'Created', val: u => u.created.getTime(), dir: 'desc', right: 1, cell: u => `<span class="muted" title="${fmtDateTime(u.created)}">${rel(u.created)}</span>` },
   { key: 'updated', label: 'Updated', val: u => u.updated.getTime(), dir: 'desc', right: 1, cell: u => `<span class="muted" title="${fmtDateTime(u.updated)}">${rel(u.updated)}</span>` },
 ];
@@ -1070,6 +1236,7 @@ function renderSidebar() {
 // Header = page title (breadcrumb) + that page's actions
 function crumbs() {
   if (S.route === 'users' && S.userId) { const u = byId(S.userId); return [['Users', '#/users'], ['#' + S.userId]]; }
+  if (S.route === 'companies' && S.coId) { const c = coById(S.coId); return [['Companies', '#/companies'], [c ? c.name : '#' + S.coId]]; }
   return [[NAV_FLAT.find(n => n.id === S.route).label]];
 }
 function topbarActions() {
@@ -1087,13 +1254,15 @@ function topbarActions() {
       <button class="icon-btn sm" data-act="u-step" data-d="1" ${i >= l.length - 1 ? 'disabled' : ''} data-tip="Next  j">${icon('chevDown', 16)}</button>
       <button class="icon-btn sm bare" data-act="copy" data-copy="https://admin.ns.cards/users/${S.userId}" data-tip="Copy link">${icon('link', 16)}</button>`;
   }
+  if (S.route === 'companies') return coTopbar();
   return '';
 }
 function renderTopbar() {
-  const c = crumbs(), acts = topbarActions();
+  const c = crumbs(), acts = topbarActions(), lead = S.route === 'companies' && !S.coId ? coSwitch() : '';
   $('#topbar').innerHTML = `
     <button class="icon-btn menu-btn" data-act="mobile-menu" aria-label="Menu">${icon('menu', 18)}</button>
     <nav class="crumbs" aria-label="Breadcrumb">${c.map(([l, h], i) => (i ? '<span class="crumb-sep">/</span>' : '') + (h ? `<a href="${h}">${esc(l)}</a>` : `<span class="cur">${esc(l)}</span>`)).join('')}</nav>
+    ${lead ? `<div class="tb-ctx tb-lead">${lead}</div>` : ''}
     <div class="tb-sp"></div>
     ${acts ? `<div class="tb-ctx">${acts}</div>` : ''}`;
 }
@@ -1135,12 +1304,16 @@ function route() {
   const uid = r === 'users' && sub ? +sub : null;
   if (uid !== S.userId) { S.draft = {}; S.tx = txDefault(); S.openWallet = null; }
   if (!uid) S.userTab = 'overview';
-  S.route = r; S.userId = uid;
+  const cid = r === 'companies' && sub && sub !== 'access' ? +sub : null;
+  if (cid !== S.coId) { S.coDraft = {}; S.brandDraft = {}; S.coUserQ = ''; S.coUserPage = 1; S.curProv = ''; }
+  if (!cid) S.coTab = 'overview';
+  S.route = r; S.userId = uid; S.coId = cid; S.coView = r === 'companies' && sub === 'access' ? 'access' : 'list';
   closePop(); $('#app').classList.remove('mobile-open'); $('#tt').classList.remove('show');
   renderSidebar(); renderTopbar();
   $('#main').scrollTop = 0;
   if (r === 'dashboard') renderDashboard();
   else if (r === 'users') uid ? renderUserPage() : renderUsersPage();
+  else if (r === 'companies') cid ? renderCompanyPage() : S.coView === 'access' ? renderAccess() : renderCompanies();
   else renderPlaceholder();
   renderFloat();
 }
@@ -1150,7 +1323,7 @@ const goUser = (id, e) => { const url = '#/users/' + id; if (e && (e.metaKey || 
 function renderPlaceholder() {
   const it = NAV_FLAT.find(n => n.id === S.route);
   $('#main').innerHTML = `<div class="page">
-    <div class="ph"><div class="empty"><div class="em-ic">${icon(it.icon, 22)}</div><h3>Not in this prototype yet</h3><p>Users and Overview are fully clickable.</p><a class="btn btn-dark btn-sm" href="#/users">Open Users</a></div></div>
+    <div class="ph"><div class="empty"><div class="em-ic">${icon(it.icon, 22)}</div><h3>Not in this prototype yet</h3><p>Overview, Users and Companies are fully clickable.</p><a class="btn btn-dark btn-sm" href="#/users">Open Users</a></div></div>
   </div>`;
 }
 
@@ -1458,8 +1631,12 @@ document.addEventListener('mousemove', e => {
 let rsz; window.addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(() => { if (S.route === 'dashboard' && S._dash) drawMainChart(S._dash); if (popAnchor) positionPop(); refreshHints(); }, 80); });
 
 /* ════════════════════════════ Users list ════════════════════════════ */
-const applyFilters = (list, filters, skip) => filters.reduce((l, f) => (f.key === skip || !f.values.length) ? l : l.filter(u => matchField(f.key, u, f.values)), list);
+const applyFilters = (list, filters, skip, F = FIELDS) => filters.reduce((l, f) => (f.key === skip || !f.values.length) ? l : l.filter(u => matchField(f.key, u, f.values, F)), list);
 const searchFilter = (list, q) => { q = q.trim().toLowerCase(); return q ? list.filter(u => `${u.name} ${u.email} ${u.id} ${u.uid}`.toLowerCase().includes(q)) : list; };
+// The filter bar (Filter button, chips, value popovers) is shared by the Users and Companies lists; fx() is the one on screen
+const fx = () => S.route === 'companies'
+  ? { F: CO_FIELDS, items: COMPANIES, get list() { return S.co.filters; }, set list(v) { S.co.filters = v; }, search: l => coSearchFilter(l, S.co.search), changed: coFiltersChanged }
+  : { F: FIELDS, items: USERS, get list() { return S.filters; }, set list(v) { S.filters = v; }, search: l => searchFilter(l, S.search), changed: filtersChanged };
 function getList() {
   let list = searchFilter(applyFilters(USERS, S.filters), S.search);
   const col = COLS.find(c => c.key === S.sort.key), m = S.sort.dir === 'asc' ? 1 : -1;
@@ -1484,7 +1661,7 @@ function refreshUsers() {
 }
 function filtersChanged() { S.page = 1; S.selected.clear(); renderStats(); renderChips(); renderResults(); renderFloat(); reanchor(); }
 
-const tileOn = t => t.clear ? !S.filters.length && !S.search : S.filters.length === 1 && S.filters[0].key === t.filter.key && [...S.filters[0].values].sort().join() === [...t.filter.values].sort().join();
+const tileOn = (t, L = S.filters, q = S.search) => t.clear ? !L.length && !q : L.length === 1 && L[0].key === t.filter.key && [...L[0].values].sort().join() === [...t.filter.values].sort().join();
 function renderStats() {
   $('#uStats').innerHTML = STAT_TILES.map(t => {
     const n = t.filter ? applyFilters(USERS, [t.filter]).length : 0;
@@ -1495,14 +1672,15 @@ function renderStats() {
     </button>`;
   }).join('');
 }
-function optLabel(k, v) { if (FIELDS[k].date) return esc(resolveRange(v).label); const o = FIELDS[k].options[v]; return o ? (o.flag ? `${o.flag} ${o.code}` : o.label) : v; }
+function optLabel(k, v, F = FIELDS) { if (F[k].date) return esc(resolveRange(v).label); const o = F[k].options[v]; return o ? (o.flag ? `${o.flag} ${o.code}` : o.label) : v; }
 function renderChips() {
-  $('#chips').innerHTML = S.filters.map(f => {
-    const F = FIELDS[f.key], vals = f.values;
-    const vt = !vals.length ? '<span class="faint">Select…</span>' : vals.length <= 2 ? vals.map(v => optLabel(f.key, v)).join(', ') : `${vals.length} ${F.plural || 'values'}`;
+  const X = fx();
+  $('#chips').innerHTML = X.list.map(f => {
+    const F = X.F[f.key], vals = f.values;
+    const vt = !vals.length ? '<span class="faint">Select…</span>' : vals.length <= 2 ? vals.map(v => optLabel(f.key, v, X.F)).join(', ') : `${vals.length} ${F.plural || 'values'}`;
     const op = F.date ? 'in' : vals.length > 1 ? 'is any of' : 'is';
     return `<div class="chip" data-chip="${f.key}"><span class="cf">${icon(F.icon, 14)}${F.label}</span><span class="co">${op}</span><button class="cv" data-act="edit-filter" data-key="${f.key}">${vt}</button><button class="cx" data-act="rm-filter" data-key="${f.key}" aria-label="Remove filter">${icon('x', 13)}</button></div>`;
-  }).join('') + (S.filters.length ? `<button class="link-btn" data-act="clear-filters">Clear</button>` : '');
+  }).join('') + (X.list.length ? `<button class="link-btn" data-act="clear-filters">Clear</button>` : '');
 }
 // Display button shows the current layout icon; layout itself is switched inside the Display popover
 function renderLayoutSeg() {
@@ -1519,16 +1697,21 @@ function renderResults() {
   if (S.view === 'table') fitColumns();
 }
 
-/* table — column widths are fitted once to the first page shown, saved, and after that only change when dragged */
-const tableW = cols => cols.reduce((s, c) => s + S.colW[c.key], 0) + 44 + 84;
+/* List tables (Users, Companies): column widths are fitted once to the first page shown, saved, and after that only change when dragged —
+   so filtering, searching, sorting or paging never makes columns jump. colCtx() is the list table on screen. */
+const colCtx = () => S.route === 'companies'
+  ? { cols: tVisible('companies').map(c => c.k), w: S.coColW, key: 'nsc.cocolw', sel: '#coResults table.ut', redraw: coResults }
+  : { cols: COLS.filter(c => !S.hidden.has(c.key)).map(c => c.key), w: S.colW, key: 'nsc.colw', sel: '#results table.ut', redraw: renderResults };
+const tableW = (X = colCtx()) => X.cols.reduce((s, k) => s + X.w[k], 0) + 44 + 84;
 function fitColumns() {
-  const t = $('#results table.ut'); if (!t || t.classList.contains('fixed')) return;
-  $$('th[data-key]', t).forEach(th => { const k = th.dataset.key; if (!S.colW[k]) S.colW[k] = Math.ceil(th.getBoundingClientRect().width) + 4; }); // +4 keeps sub-pixel content from clipping
-  store.set('nsc.colw', S.colW); applyColW(t);
+  const X = colCtx(), t = $(X.sel); if (!t || t.classList.contains('fixed')) return;
+  $$('th[data-key]', t).forEach(th => { const k = th.dataset.key; if (!X.w[k]) X.w[k] = Math.ceil(th.getBoundingClientRect().width) + 4; }); // +4 keeps sub-pixel content from clipping
+  store.set(X.key, X.w); applyColW(t);
 }
 function applyColW(t) {
-  $$('col[data-col]', t).forEach(col => col.style.width = S.colW[col.dataset.col] + 'px');
-  t.style.width = tableW(COLS.filter(c => !S.hidden.has(c.key))) + 'px'; t.classList.add('fixed');
+  const X = colCtx();
+  $$('col[data-col]', t).forEach(col => col.style.width = X.w[col.dataset.col] + 'px');
+  t.style.width = tableW(X) + 'px'; t.classList.add('fixed');
 }
 function tableHTML(list) {
   const cols = COLS.filter(c => !S.hidden.has(c.key));
@@ -1536,7 +1719,7 @@ function tableHTML(list) {
   const start = (S.page - 1) * S.perPage, rows = list.slice(start, start + S.perPage);
   const all = rows.every(u => S.selected.has(u.id)), some = rows.some(u => S.selected.has(u.id));
   const fixed = cols.every(c => S.colW[c.key]);
-  return `<div class="tcard ${S.density}"><div class="hs-wrap"><div class="tscroll hs"><table class="ut ${fixed ? 'fixed' : ''}" style="${fixed ? `width:${tableW(cols)}px` : ''}">
+  return `<div class="tcard ${S.density}"><div class="hs-wrap"><div class="tscroll hs"><table class="ut ${fixed ? 'fixed' : ''}" style="${fixed ? `width:${tableW()}px` : ''}">
     <colgroup><col style="width:44px">${cols.map(c => `<col data-col="${c.key}" ${fixed ? `style="width:${S.colW[c.key]}px"` : ''}>`).join('')}<col></colgroup>
     <thead><tr><th class="cbcell"><button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="sel-page" aria-label="Select page">${icon('check', 11, 3)}</button></th>
     ${cols.map(c => { const on = S.sort.key === c.key; return `<th class="sortable ${on ? 'sorted' : ''} ${c.right ? 'r' : ''}" data-act="sort" data-key="${c.key}"><span class="th-in">${c.label}<span class="srt">${icon(on && S.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 12, 2)}</span></span><span class="col-rs" data-rs="${c.key}" data-tip="Drag to resize · double-click to fit"></span></th>`; }).join('')}
@@ -1631,6 +1814,7 @@ function bcardHTML(u, by) {
 /* floating bar: bulk actions on the list, unsaved changes on a user page */
 function renderFloat() {
   const el = $('#bulk');
+  if (S.route === 'companies') { coFloat(el); return; }
   if (S.route === 'users' && S.userId) {
     const n = Object.keys(S.draft).length, tn = S.userTab === 'transactions' && S.tx?.view === 'agg' ? S.tx.sel.size : 0;
     if (!n && tn) {
@@ -1797,7 +1981,7 @@ function dtable(heads, rows, empty = '') {
     <tbody>${rows.map(r => { const cells = Array.isArray(r) ? r : r.cells; return `<tr class="${r.cls || ''}">${cells.map((c, i) => (H[i].al === 'a' ? `<td class="act"><div class="row-actions">${c}</div></td>` : `<td class="${H[i].al}">${c}</td>`)).join('')}</tr>`; }).join('')}</tbody></table></div></div>`;
 }
 /* Column chooser for user-page tables: TCOLS[table] = [{ k, l, al, on, cell(row) }]; each table remembers its visible columns */
-const tVisible = t => { const saved = (S.tcols ||= store.get('nsc.tcols', {}))[t]; return TCOLS[t].filter(c => saved ? saved.includes(c.k) : c.on); };
+const tVisible = t => { const saved = (S.tcols ||= store.get('nsc.tcols', {}))[t]; return TCOLS[t].filter(c => c.lock || (saved ? saved.includes(c.k) : c.on)); };
 function ctable(t, rows, empty, o = {}) {
   const cols = tVisible(t);
   const heads = [...(o.pre ? [o.pre.head] : []), ...cols.map(c => c.l + (c.al ? '|' + c.al : '')), ...(o.post ? ['|a'] : [])];
@@ -1807,7 +1991,7 @@ function ctable(t, rows, empty, o = {}) {
   }), empty);
 }
 const colsBtn = t => `<button class="icon-btn sm" data-act="tcols" data-t="${t}" data-tip="Columns">${icon('columns', 15)}</button>`;
-const tcolsPop = t => { const vis = new Set(tVisible(t).map(c => c.k)); return `<div class="pop-sec"><div class="pop-lbl">Columns<button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="tcols-reset" data-t="${t}">Reset columns</button></div><div class="pills">${TCOLS[t].map(c => `<button class="pill ${vis.has(c.k) ? 'on' : ''}" data-act="tcol" data-t="${t}" data-k="${c.k}">${c.l}</button>`).join('')}</div></div>`; };
+const tcolsPop = t => { const vis = new Set(tVisible(t).map(c => c.k)); return `<div class="pop-sec"><div class="pop-lbl">Columns<button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="tcols-reset" data-t="${t}">Reset columns</button></div><div class="pills">${TCOLS[t].filter(c => !c.lock).map(c => `<button class="pill ${vis.has(c.k) ? 'on' : ''}" data-act="tcol" data-t="${t}" data-k="${c.k}">${c.l}</button>`).join('')}</div></div>`; };
 const tcard = (title, acts, body, tools = '') => `<div class="card flush"><div class="card-h"><span class="card-t">${title}</span>${acts ? `<div class="ch-act">${acts}</div>` : ''}</div>${tools ? `<div class="card-tools">${tools}</div>` : ''}${body}</div>`;
 
 function eventsOf(u) {
@@ -1872,7 +2056,7 @@ function userTab(u, d, D) {
       <div class="card"><div class="card-h"><span class="card-t">Profile</span></div><div class="kv2 card-b">
         ${kv('Status', selBtn('status', d.status))}${kv('Level', selBtn('level', d.level))}
         ${kv('Risk level', selBtn('risk', d.risk))}${kv('Residency', selBtn('country', d.country))}
-        ${kv('Type', `<b>${TYPE[d.type].label}</b>`)}${kv('Company', `<a class="lnk" href="#/companies">${companyOf(d).name} #${d.companyId}</a>`)}
+        ${kv('Type', `<b>${TYPE[d.type].label}</b>`)}${kv('Company', `<a class="lnk" href="#/companies/${d.companyId}">${esc(companyOf(d).name)} #${d.companyId}</a>`)}
         ${kv('Language', `<b>${d.lang}</b>`)}${kv('Invited by', u.invitedBy ? `<span class="num">#${u.invitedBy}</span>` : dash)}
       </div></div>
       <div class="card"><div class="card-h"><span class="card-t">Verification</span><button class="link-btn" data-act="u-tab" data-v="verification" style="height:auto;display:flex;align-items:center;gap:2px">Details ${icon('chevRight', 14)}</button></div><div class="kv2 card-b">
@@ -2003,7 +2187,7 @@ function txBody(D) {
   const all = rows.every(h => f.sel.has(h.id)), some = rows.some(h => f.sel.has(h.id));
   const table = f.view === 'agg'
     ? ctable('txa', rows, '', { rowCls: h => f.sel.has(h.id) ? 'sel' : '',
-        pre: { head: `<button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="tx-sel-page" aria-label="Select page">${icon('check', 11, 3)}</button>|w`, cell: h => `<button class="cb ${f.sel.has(h.id) ? 'on' : ''}" data-act="tx-sel" data-id="${h.id}" aria-label="Select">${icon('check', 11, 3)}</button>` } })
+        pre: { head: `<button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="tx-sel-page" aria-label="Select page">${icon('check', 11, 3)}</button>|cbcell`, cell: h => `<button class="cb ${f.sel.has(h.id) ? 'on' : ''}" data-act="tx-sel" data-id="${h.id}" aria-label="Select">${icon('check', 11, 3)}</button>` } })
     : ctable('txw', rows, '');
   return table + pagerHTML(list.length, pages, start, rows.length, { page: f.page, act: 'tx-page', per: false });
 }
@@ -2156,6 +2340,8 @@ function closePop() {
   pop.classList.remove('open'); popAnchor = null; popOpts = {};
   const before = S.filters.length; S.filters = S.filters.filter(f => f.values.length);
   if (before !== S.filters.length && S.route === 'users' && !S.userId) { renderChips(); renderStats(); }
+  const cb = S.co.filters.length; S.co.filters = S.co.filters.filter(f => f.values.length);
+  if (cb !== S.co.filters.length && S.route === 'companies' && $('#coStats')) { renderChips(); coStats(); }
 }
 document.addEventListener('mousedown', e => { if (pop.classList.contains('open') && !pop.contains(e.target) && !(popAnchor && popAnchor.contains(e.target))) closePop(); });
 const menuItems = items => `<div class="pop-list">${items.map(it => it === '-' ? '<div class="pop-sep"></div>' : `<button class="pi ${it.cls || ''}" data-act="${it.act}" ${Object.entries(it.data || {}).map(([k, v]) => `data-${k}="${v}"`).join(' ')}>${it.icon ? icon(it.icon, 15) : ''}${it.html || `<span class="pl">${it.label}</span>`}${it.on ? `<span class="chk">${icon('check', 15, 2)}</span>` : ''}</button>`).join('')}</div>`;
@@ -2176,23 +2362,23 @@ const ddItems = (sel, q = '') => [...sel.options].filter(o => o.text.toLowerCase
 new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => n.nodeType === 1 && enhanceSelects(n.tagName === 'SELECT' ? n.parentNode : n)))).observe(document.body, { childList: true, subtree: true });
 
 /* filter popovers */
-const fieldItems = (q = '') => Object.entries(FIELDS).filter(([, F]) => F.label.toLowerCase().includes(q.toLowerCase())).map(([k, F]) => `<button class="pi" data-act="pick-field" data-key="${k}">${icon(F.icon, 15)}<span class="pl">${F.label}</span>${S.filters.some(f => f.key === k) ? `<span class="dot" style="--tone:var(--brand)"></span>` : ''}${icon('chevRight', 14)}</button>`).join('') || '<div class="pi faint">No matches</div>';
+const fieldItems = (q = '', X = fx()) => Object.entries(X.F).filter(([, F]) => F.label.toLowerCase().includes(q.toLowerCase())).map(([k, F]) => `<button class="pi" data-act="pick-field" data-key="${k}">${icon(F.icon, 15)}<span class="pl">${F.label}</span>${X.list.some(f => f.key === k) ? `<span class="dot" style="--tone:var(--brand)"></span>` : ''}${icon('chevRight', 14)}</button>`).join('') || '<div class="pi faint">No matches</div>';
 const fieldsPop = () => `<div class="pop-search">${icon('search', 14)}<input id="popQ" placeholder="Filter by…" autocomplete="off"></div><div class="pop-list" id="popFields">${fieldItems()}</div>`;
 function facetCounts(key) {
-  const base = searchFilter(applyFilters(USERS, S.filters, key), S.search), F = FIELDS[key], c = {};
+  const X = fx(), base = X.search(applyFilters(X.items, X.list, key, X.F)), F = X.F[key], c = {};
   if (F.test) Object.keys(F.options).forEach(v => c[v] = base.filter(u => F.test(u, [v])).length);
   else base.forEach(u => { const v = F.get(u); c[v] = (c[v] || 0) + 1; });
   return c;
 }
 function valueItems(key, q = '') {
-  const F = FIELDS[key], sel = S.filters.find(f => f.key === key)?.values || [], counts = facetCounts(key);
+  const X = fx(), F = X.F[key], sel = X.list.find(f => f.key === key)?.values || [], counts = facetCounts(key);
   return Object.entries(F.options).filter(([, o]) => o.label.toLowerCase().includes(q.toLowerCase())).map(([v, o]) => {
     const on = sel.includes(v);
     return `<button class="pi" data-act="toggle-val" data-key="${key}" data-v="${v}"><span class="${F.single ? 'rd' : 'cb'} ${on ? 'on' : ''}">${F.single ? '' : icon('check', 11, 3)}</span>${o.tone ? `<i class="dot t-${o.tone}"></i>` : ''}${o.flag ? `<span class="flag">${o.flag}</span>` : ''}<span class="pl">${o.label}</span><span class="pc mono">${fmtInt(counts[v] || 0)}</span></button>`;
   }).join('') || '<div class="pi faint">No matches</div>';
 }
 function valuesPop(key, back) {
-  const F = FIELDS[key], many = Object.keys(F.options).length > 8;
+  const F = fx().F[key], many = Object.keys(F.options).length > 8;
   return `<div class="pop-head">${back ? `<button class="ghost-ic" data-act="pop-back">${icon('chevLeft', 15)}</button>` : `<span style="width:6px"></span>`}${icon(F.icon, 14)}${F.label}</div>
     ${many ? `<div class="pop-search">${icon('search', 14)}<input id="popVQ" data-key="${key}" placeholder="Search ${F.label.toLowerCase()}…" autocomplete="off"></div>` : ''}
     <div class="pop-list" id="popVals">${valueItems(key)}</div>`;
@@ -2231,12 +2417,12 @@ function exportCSV(list, name = 'users') {
     list.map(u => [u.id, u.uid, u.name, u.email, u.country || '', u.status, u.kyc, u.risk, u.level, u.type, u.balance, u.cards, u.twofa, u.created.toISOString()]));
   toast(`Exported ${fmtInt(list.length)} users`, 'download');
 }
-function newUserModal() {
+function newUserModal(coId = 47) {
   openModal(`<div class="modal">
     <div class="modal-h">New user<button class="icon-btn sm bare" data-act="modal-close">${icon('x', 17)}</button></div>
     <div class="modal-b">
       <div class="field"><label>Email</label><div style="display:flex;gap:8px"><input id="nuEmail" type="email" placeholder="name@company.com" autocomplete="off" style="flex:1"><button class="btn btn-ghost" style="height:40px;border-radius:10px" data-act="nu-gen">${icon('refresh', 14)}Generate</button></div></div>
-      <div class="field"><label>Company</label><select id="nuCompany" data-search>${COMPANIES.map(c => `<option value="${c.id}">${c.name} · #${c.id}</option>`).join('')}</select></div>
+      <div class="field"><label>Company</label><select id="nuCompany" data-search>${COMPANIES.map(c => `<option value="${c.id}" ${c.id === coId ? 'selected' : ''}>${esc(c.name)} · #${c.id}</option>`).join('')}</select></div>
       <div class="field"><label>Referral code</label><input id="nuRef" placeholder="Optional" autocomplete="off"></div>
     </div>
     <div class="modal-f"><button class="btn btn-ghost btn-sm" data-act="modal-close">Cancel</button><button class="btn btn-primary btn-sm" data-act="create-user">Create user</button></div>
@@ -2249,15 +2435,15 @@ function afterDataChange() {
   if (S.userId) renderUserPage(); else { renderStats(); renderResults(); renderFloat(); }
 }
 function setFilterVal(key, v) {
-  let f = S.filters.find(x => x.key === key);
-  if (!f) { f = { key, values: [] }; S.filters.push(f); }
-  if (FIELDS[key].single) f.values = [v]; else f.values = f.values.includes(v) ? f.values.filter(x => x !== v) : [...f.values, v];
-  filtersChanged();
+  const X = fx(); let f = X.list.find(x => x.key === key);
+  if (!f) { f = { key, values: [] }; X.list.push(f); }
+  if (X.F[key].single) f.values = [v]; else f.values = f.values.includes(v) ? f.values.filter(x => x !== v) : [...f.values, v];
+  X.changed();
 }
 function setDateFilter(key, r) {
-  let f = S.filters.find(x => x.key === key);
-  if (!f) { f = { key, values: [] }; S.filters.push(f); }
-  f.values = [r]; filtersChanged();
+  const X = fx(); let f = X.list.find(x => x.key === key);
+  if (!f) { f = { key, values: [] }; X.list.push(f); }
+  f.values = [r]; X.changed();
 }
 function goFilter(key, values) {
   S.filters = [{ key, values }]; S.search = ''; S.page = 1; S.selected.clear();
@@ -2309,16 +2495,16 @@ const ACT = {
   'sort': a => { const c = COLS.find(c => c.key === a.dataset.key); S.sort = S.sort.key === c.key ? { key: c.key, dir: S.sort.dir === 'asc' ? 'desc' : 'asc' } : { key: c.key, dir: c.dir }; renderStats(); renderResults(); },
 
   'add-filter': a => openPop(a, fieldsPop(), { width: 260, onMount: p => $('#popQ', p).focus() }),
-  'pick-field': a => { const k = a.dataset.key; if (FIELDS[k].date) { openDatePicker($('#addFilter'), S.filters.find(f => f.key === k)?.values[0] || { key: '7d' }, r => setDateFilter(k, r), { keep: 1 }); return; } openPop($('#addFilter'), valuesPop(k, true), { width: 280, keep: 1, onMount: p => $('#popVQ', p)?.focus() }); },
+  'pick-field': a => { const k = a.dataset.key; if (fx().F[k].date) { openDatePicker($('#addFilter'), fx().list.find(f => f.key === k)?.values[0] || { key: '7d' }, r => setDateFilter(k, r), { keep: 1 }); return; } openPop($('#addFilter'), valuesPop(k, true), { width: 280, keep: 1, onMount: p => $('#popVQ', p)?.focus() }); },
   'pop-back': () => openPop($('#addFilter'), fieldsPop(), { width: 260, keep: 1, onMount: p => $('#popQ', p).focus() }),
-  'edit-filter': a => { const k = a.dataset.key; if (FIELDS[k].date) { openDatePicker(a, S.filters.find(f => f.key === k).values[0], r => setDateFilter(k, r), { anchorSel: `[data-chip="${k}"] .cv` }); return; } openPop(a, valuesPop(k, false), { width: 280, anchorSel: `[data-chip="${k}"] .cv`, onMount: p => $('#popVQ', p)?.focus() }); },
+  'edit-filter': a => { const k = a.dataset.key; if (fx().F[k].date) { openDatePicker(a, fx().list.find(f => f.key === k).values[0], r => setDateFilter(k, r), { anchorSel: `[data-chip="${k}"] .cv` }); return; } openPop(a, valuesPop(k, false), { width: 280, anchorSel: `[data-chip="${k}"] .cv`, onMount: p => $('#popVQ', p)?.focus() }); },
   'toggle-val': a => {
     const k = a.dataset.key; setFilterVal(k, a.dataset.v);
-    if (FIELDS[k].single) { closePop(); return; }
+    if (fx().F[k].single) { closePop(); return; }
     $('#popVals').innerHTML = valueItems(k, $('#popVQ')?.value || '');
   },
-  'rm-filter': a => { S.filters = S.filters.filter(f => f.key !== a.dataset.key); closePop(); filtersChanged(); },
-  'clear-filters': () => { S.filters = []; closePop(); filtersChanged(); },
+  'rm-filter': a => { const X = fx(); X.list = X.list.filter(f => f.key !== a.dataset.key); closePop(); X.changed(); },
+  'clear-filters': () => { const X = fx(); X.list = []; closePop(); X.changed(); },
   'clear-all': () => { S.filters = []; S.search = ''; $('#uSearch').value = ''; filtersChanged(); },
 
   'sel': a => { const id = +a.dataset.id; S.selected.has(id) ? S.selected.delete(id) : S.selected.add(id); renderResults(); renderFloat(); },
@@ -2357,7 +2543,7 @@ const ACT = {
   'export-one': a => { closePop(); exportCSV([byId(+a.dataset.id)], 'user-' + a.dataset.id); },
   'reset-2fa': a => { closePop(); const u = byId(+a.dataset.id); u.twofa = false; delete S.draft.twofa; toast('2FA reset — user will re-enroll at next sign-in', 'lock'); afterDataChange(); },
 
-  'new-user': newUserModal,
+  'new-user': () => newUserModal(),
   'nu-gen': () => { const el = $('#nuEmail'); el.value = `test-${Math.random().toString(36).slice(2, 8)}@ns.cards`; el.style.borderColor = ''; },
   'create-user': () => {
     const bad = sel => { const el = $(sel); el.style.borderColor = 'var(--error)'; el.focus(); };
@@ -2463,9 +2649,9 @@ const ACT = {
     const t = a.dataset.t, k = a.dataset.k, vis = tVisible(t).map(c => c.k);
     const next = vis.includes(k) ? vis.filter(x => x !== k) : TCOLS[t].map(c => c.k).filter(x => x === k || vis.includes(x));
     if (!next.length) return;
-    S.tcols[t] = next; store.set('nsc.tcols', S.tcols); renderUserPage(); pop.innerHTML = tcolsPop(t); reanchor();
+    S.tcols[t] = next; store.set('nsc.tcols', S.tcols); rerender(); pop.innerHTML = tcolsPop(t); reanchor();
   },
-  'tcols-reset': a => { const t = a.dataset.t; delete S.tcols[t]; store.set('nsc.tcols', S.tcols); renderUserPage(); pop.innerHTML = tcolsPop(t); reanchor(); },
+  'tcols-reset': a => { const t = a.dataset.t; delete S.tcols[t]; store.set('nsc.tcols', S.tcols); rerender(); pop.innerHTML = tcolsPop(t); reanchor(); },
   'dd': a => {
     const sel = a.previousElementSibling, search = sel.options.length > 8 || 'search' in sel.dataset;
     S._dd = sel; a.classList.add('open');
@@ -2477,11 +2663,791 @@ const ACT = {
   'modal-close': closeModal,
 };
 
+/* ════════════════════════════ Companies ════════════════════════════ */
+S.co = { search: '', filters: [], sort: { k: 'id', dir: 'desc' }, page: 1, sel: new Set() };
+S.mx = { kind: 'all', used: false, page: 1, draft: new Map() };
+Object.assign(S, { coColW: store.get('nsc.cocolw', {}), coId: null, coView: 'list', coTab: 'overview', coDraft: {}, brandDraft: {}, coUserQ: '', coUserPage: 1, curProv: '', _coList: [], _mxRows: [],
+  coSub: { products: 'cards', rates: 'bank', imports: 'users' }, rate: { level: 'basic', init: 'user' } });
+
+const coById = id => COMPANIES.find(c => c.id === id);
+const goCo = (id, e) => { const url = '#/companies/' + id; if (e && (e.metaKey || e.ctrlKey)) window.open(location.pathname + url, '_blank'); else location.hash = url; };
+const coInit = s => (s || '').replace(/[^\p{L}\p{N} ]/gu, '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?';
+const srcTag = s => `<span class="src">${CO_SOURCES[s]}</span>`;
+const coUsers = c => USERS.filter(u => u.companyId === c.id);
+const hasP = (c, k) => (k[0] === 'c' ? c.cp : c.ip).some(a => a.pid === +k.slice(2));
+const pOf = k => PROD_BY[k[0]][+k.slice(2)];
+function setP(c, k, on) {
+  const id = +k.slice(2), arr = k[0] === 'c' ? c.cp : c.ip, i = arr.findIndex(a => a.pid === id);
+  if (on && i < 0) arr.push(k[0] === 'c' ? cpDefaults(id) : ipDefaults(id)); else if (!on && i >= 0) arr.splice(i, 1); else return false;
+  c.updated = new Date(NOW); return true;
+}
+const money = (v, cur = 'EUR') => ({ EUR: '€', USD: '$', GBP: '£' }[cur] || cur + ' ') + (+v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const volFmt = v => v >= 1e9 ? v / 1e9 + 'B' : v >= 1e6 ? v / 1e6 + 'M' : v >= 1e3 ? v / 1e3 + 'K' : String(v);
+const prodCell = c => { const a = c.cp.length, b = c.ip.length; return !a && !b ? badge({ label: 'Not set up', tone: 'warning' }) : `<span class="pchips">${a ? `<span class="tag" data-tip="${a} card product${a > 1 ? 's' : ''}">${icon('card', 13)}${a}</span>` : ''}${b ? `<span class="tag" data-tip="${b} IBAN product${b > 1 ? 's' : ''}">${icon('bank', 13)}${b}</span>` : ''}</span>`; };
+const kycCell = v => v ? `<span>${LEVEL[v].label}</span>` : '<span class="faint">Not required</span>';
+const lum = h => { const c = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(v => v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; };
+const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+const hexOk = v => /^#[0-9A-F]{6}$/i.test(v || '');
+const linkBtn = (act, v, l) => `<button class="link-btn" data-act="${act}" data-v="${v}" style="height:auto;display:flex;align-items:center;gap:2px">${l} ${icon('chevRight', 14)}</button>`;
+
+Object.assign(TCOLS, {
+  companies: [
+    { k: 'company', l: 'Company', lock: 1, val: c => c.name.toLowerCase(), dir: 'asc', cell: c => `<div class="ucell"><div style="min-width:0"><div class="un">${esc(c.name)}</div><div class="ue">${esc(c.email)}</div></div></div>` },
+    { k: 'id', l: 'ID', on: 1, val: c => c.id, dir: 'desc', cell: c => numM(c.id) },
+    { k: 'source', l: 'Source', on: 1, val: c => c.source, dir: 'asc', cell: c => srcTag(c.source) },
+    { k: 'status', l: 'Status', on: 1, val: c => Object.keys(STATUS).indexOf(c.status), dir: 'asc', cell: c => statusCell(c.status) },
+    { k: 'products', l: 'Products', on: 1, val: c => c.cp.length + c.ip.length, dir: 'desc', cell: prodCell },
+    { k: 'users', l: 'Users', al: 'r', on: 1, val: c => coUsers(c).length, dir: 'desc', cell: c => { const n = coUsers(c).length; return `<span class="num ${n ? '' : 'zero'}">${fmtInt(n)}</span>`; } },
+    { k: 'ref', l: 'Referral code', on: 1, val: c => c.ref, dir: 'asc', cell: c => copyVal(c.ref) },
+    { k: 'level', l: 'Min. user level', on: 1, val: c => Object.keys(LEVEL).indexOf(c.minLevel), dir: 'desc', cell: c => muted(LEVEL[c.minLevel].label) },
+    { k: 'kyc', l: 'KYC required on', on: 1, val: c => c.kycLevel ? Object.keys(LEVEL).indexOf(c.kycLevel) : -1, dir: 'desc', cell: c => kycCell(c.kycLevel) },
+    { k: 'type', l: 'Type', val: c => c.type, dir: 'asc', cell: c => muted(CO_TYPE[c.type].label) },
+    { k: 'emboss', l: 'Emboss name', val: c => c.emboss, dir: 'asc', cell: c => `<span class="num muted">${esc(c.emboss)}</span>` },
+    { k: 'country', l: 'Country', val: c => c.country, dir: 'asc', cell: c => ctryCell(c.country) },
+    { k: 'created', l: 'Created', al: 'r', on: 1, val: c => c.created.getTime(), dir: 'desc', cell: c => `<span class="muted" title="${fmtDateTime(c.created)}">${rel(c.created)}</span>` },
+    { k: 'updated', l: 'Updated', al: 'r', val: c => c.updated.getTime(), dir: 'desc', cell: c => `<span class="muted" title="${fmtDateTime(c.updated)}">${rel(c.updated)}</span>` },
+  ],
+  coCards: [
+    { k: 'id', l: 'ID', on: 1, cell: a => numM(a.id) },
+    { k: 'product', l: 'Card product', on: 1, cell: a => { const p = PROD_BY.c[a.pid]; return `<div>${esc(p.name)}</div><div class="code">${p.provider} · product ${p.id}</div>`; } },
+    { k: 'active', l: 'Active', al: 'c', on: 1, cell: (a, i) => `<button class="sw-t ${a.active ? 'on' : ''}" data-act="cp-active" data-i="${i}" data-tip="${a.active ? 'Deactivate' : 'Activate'}" aria-label="Active"></button>` },
+    { k: 'level', l: 'Min. user level', on: 1, cell: a => muted(LEVEL[a.minLevel].label) },
+    { k: 'kind', l: 'Card type', on: 1, cell: a => PROD_BY.c[a.pid].kind === 'physical' ? 'Physical' : 'Virtual' },
+    { k: 'cost', l: 'Cost', al: 'r', on: 1, cell: a => a.cost ? `<span class="num">${money(a.cost, PROD_BY.c[a.pid].cur)}</span>` : '<span class="faint">Free</span>' },
+    { k: 'discount', l: 'Discount', al: 'r', on: 1, cell: a => a.discount ? `<span class="num">${a.discount}%</span>` : dash },
+    { k: 'material', l: 'Material ID', cell: a => a.material ? numM(a.material) : dash },
+    { k: 'group', l: 'Payment group', on: 1, cell: a => `<span class="code">${a.group}</span>` },
+    { k: 'limit', l: 'Monthly limit', al: 'r', on: 1, cell: a => `<span class="num">${money(a.limit, PROD_BY.c[a.pid].cur).replace(/\.00$/, '')}</span>` },
+    { k: 'funded', l: 'Company funded', al: 'c', on: 1, cell: a => yes(a.funded) },
+    { k: 'maxFunded', l: 'Max funded per user', al: 'r', cell: a => a.funded ? numM(a.maxFunded) : dash },
+    { k: 'purchase', l: 'Purchase allowed', al: 'c', on: 1, cell: a => yes(a.purchase) },
+    { k: 'created', l: 'Added', al: 'r', cell: a => muted(fmtDay(a.created)) },
+  ],
+  coIban: [
+    { k: 'id', l: 'ID', on: 1, cell: a => numM(a.id) },
+    { k: 'pid', l: 'IBAN product ID', cell: a => numM(a.pid) },
+    { k: 'name', l: 'Name', on: 1, cell: a => { const p = PROD_BY.i[a.pid]; return `<div>${esc(p.name)}</div><div class="code">product ${p.id}</div>`; } },
+    { k: 'cur', l: 'Currency', on: 1, cell: a => PROD_BY.i[a.pid].cur },
+    { k: 'type', l: 'Type', on: 1, cell: a => muted(PROD_BY.i[a.pid].type) },
+    { k: 'provider', l: 'Provider', on: 1, cell: a => PROD_BY.i[a.pid].provider },
+    { k: 'price', l: 'Price', al: 'r', on: 1, cell: a => { const p = PROD_BY.i[a.pid]; return p.price ? `<span class="num">${money(p.price, p.cur)}</span>` : '<span class="faint">Free</span>'; } },
+    { k: 'fee', l: 'Monthly fee', al: 'r', on: 1, cell: a => { const p = PROD_BY.i[a.pid]; return `<span class="num">${money(p.fee, p.cur)}</span>`; } },
+    { k: 'active', l: 'Active', al: 'c', on: 1, cell: (a, i) => `<button class="sw-t ${a.active ? 'on' : ''}" data-act="ip-active" data-i="${i}" data-tip="${a.active ? 'Deactivate' : 'Activate'}" aria-label="Active"></button>` },
+    { k: 'created', l: 'Created', on: 1, cell: a => muted(fmtDay(a.created)) },
+    { k: 'updated', l: 'Updated', al: 'r', cell: a => muted(rel(a.updated)) },
+  ],
+});
+
+/* ── Per-company data for the tabs: generated once from the company id, then changed by actions on the page ── */
+const SCOPES = ['users', 'cards', 'wallets', 'transactions', 'iban', 'webhooks'];
+const DIR_ROLE = { DIRECTOR: 'Director', UBO: 'Beneficial owner', BOTH: 'Director & owner' };
+const GIFT_STATUS = { ACTIVE: { label: 'Active', tone: 'success' }, REDEEMED: { label: 'Fully redeemed', tone: 'neutral' }, EXPIRED: { label: 'Expired', tone: 'warning' }, DISABLED: { label: 'Disabled', tone: 'error' } };
+const IMP_STATUS = { COMPLETED: { label: 'Completed', tone: 'success' }, PARTIAL: { label: 'With errors', tone: 'warning' }, FAILED: { label: 'Failed', tone: 'error' }, PROCESSING: { label: 'Processing', tone: 'info' } };
+const BANK_BASE = [['DEPOSIT', 'Banking Circle', 'EUR', .3, 0, 1], ['WITHDRAW', 'Banking Circle', 'EUR', .5, 1, 10], ['DEPOSIT', 'Clear Junction', 'GBP', .4, 0, 1], ['WITHDRAW', 'Clear Junction', 'GBP', .6, 1, 10], ['WITHDRAW', 'Clear Junction', 'USD', .8, 15, 50]];
+const PAIRS = [['BTC/EUR', .5], ['ETH/EUR', .5], ['USDT/EUR', .3], ['USDC/EUR', .3], ['BTC/USDT', .4], ['ETH/USDT', .4], ['TRX/USDT', .6]];
+const EX_TIERS = [[0, 5e4, .2], [5e4, 1e5, .18], [1e5, 2.5e5, .16], [2.5e5, 5e5, .14], [5e5, 1e6, .12], [1e6, 2.5e6, .08], [2.5e6, 1e7, .06], [1e7, 1e8, .05], [1e8, 2.5e8, .04], [2.5e8, 5e8, .03], [5e8, 1e9, .02], [1e9, null, .01]];
+const LVL_X = { basic: 1, middle: .85, premium: .6 };
+const NET_ID = { BTC: 'BTC', ETH: 'ETH', EUR: 'SEPA', TRX: 'TRX', USDC: 'ETH', USDT: 'TRX', ZNX: 'BSC' };
+const CD = new Map();
+function cd(c) {
+  if (CD.has(c.id)) return CD.get(c.id);
+  const r = rng(c.id * 11 + 5), pk = a => a[Math.floor(r() * a.length)], hx = n => Array.from({ length: n }, () => '0123456789abcdef'[Math.floor(r() * 16)]).join('');
+  const at = f => new Date(Math.min(NOW.getTime(), c.created.getTime() + (NOW - c.created) * f)), live = c.cp.length > 0;
+  if (c.city === undefined) { [c.city, c.street, c.zip] = ADDR[c.country]; c.regNo = r() < .85 ? String(300000000 + Math.floor(r() * 6e8)) : ''; }
+  const ops = (kind, n) => Array.from({ length: n }, (_, i) => {
+    const total = 20 + Math.floor(r() * 480), errors = r() < .4 ? Math.floor(r() * 12) : 0, skipped = Math.floor(r() * 6);
+    return { id: 5100 + c.id * 9 + i + (kind === 'topups' ? 4 : 0), file: `${kind}_${String(i + 1).padStart(2, '0')}.csv`, total, ok: total - errors - skipped, skipped, errors, status: errors ? 'PARTIAL' : 'COMPLETED', created: at(.4 + i * .15) };
+  }).reverse();
+  const D = {
+    gifts: live && r() < .65 ? Array.from({ length: 1 + Math.floor(r() * 6) }, (_, i) => {
+      const max = pk([1, 1, 10, 50, 100]), used = Math.floor(r() * (max + 1)), expires = new Date(NOW.getTime() + (r() * 300 - 60) * DAY);
+      return { code: (hx(4) + '-' + hx(4)).toUpperCase(), value: pk([10, 25, 50, 100]), pid: pk(c.cp).pid, used, max, expires, created: at(.5 + i * .08),
+        status: used >= max ? 'REDEEMED' : expires < NOW ? 'EXPIRED' : r() < .1 ? 'DISABLED' : 'ACTIVE' };
+    }) : [],
+    keys: live && r() < .7 ? Array.from({ length: 1 + Math.floor(r() * 3) }, (_, i) => ({ id: 700 + c.id * 3 + i, name: ['Production', 'Staging', 'Reporting'][i], key: `nsk_${i === 1 ? 'test' : 'live'}_${hx(32)}`,
+      scopes: (s => s.length ? s : ['users'])(SCOPES.filter(() => r() < .55)), ips: r() < .5 ? ['185.12.44.0/24', '91.198.120.7'].slice(0, 1 + Math.floor(r() * 2)) : [],
+      status: i === 2 && r() < .5 ? 'REVOKED' : 'ACTIVE', lastUsed: r() < .85 ? new Date(NOW.getTime() - r() * 3 * DAY) : null, created: at(.2 + i * .2) })) : [],
+    directors: c.type === 'multi' && r() < .8 ? Array.from({ length: 1 + Math.floor(r() * 3) }, (_, i) => {
+      const role = i ? pk(['DIRECTOR', 'UBO']) : 'BOTH';
+      return { id: 300 + c.id * 4 + i, name: `${pk(FIRST)} ${pk(LAST)}`, role, nat: pk(Object.keys(COUNTRIES)), dob: new Date(1962 + Math.floor(r() * 36), Math.floor(r() * 12), 1 + Math.floor(r() * 28)),
+        own: role === 'DIRECTOR' ? 0 : i ? 5 + Math.floor(r() * 20) : 30 + Math.floor(r() * 45), kyc: pk(['approved', 'approved', 'pending', 'new']), added: at(.05 + i * .1) };
+    }) : [],
+    imports: { users: c.type === 'multi' && live ? ops('users', Math.floor(r() * 4)) : [], topups: live && r() < .4 ? ops('topups', 1 + Math.floor(r() * 2)) : [] },
+    currencies: live ? ASSETS.filter(a => a.fiat || r() < .6).map((a, i) => ({ id: 600 + c.id * 7 + i, c: a.c, providerId: hx(8), provider: a.fiat ? 'Banking Circle' : pk(['Fireblocks', 'BitGo']), created: at(.1), updated: at(.3 + r() * .5) })) : [],
+    bank: {}, exfees: {}, spread: PAIRS.map(([pair, sys]) => ({ pair, sys, client: +(.2 + r() * .6).toFixed(2) })),
+  };
+  CD.set(c.id, D);
+  return D;
+}
+const bankRows = (D, l, i) => D.bank[l + '|' + i] ||= BANK_BASE.map(([op, provider, cur, p, fixed, min]) => ({ op, provider, cur, pct: +(p * LVL_X[l] * (i === 'api' ? .8 : 1)).toFixed(2), fixed, min }));
+const exRows = (D, l) => D.exfees[l] ||= EX_TIERS.map(([from, to, p]) => { const v = +(p * LVL_X[l]).toFixed(3); return { from, to, apiM: +(v * .8).toFixed(3), apiT: v, userM: v, userT: v }; });
+
+/* ── Topbar, floating bar ── */
+const coSwitch = () => `<div class="seg">${[['list', 'Companies', 'building'], ['access', 'Product access', 'table']].map(([k, l, ic]) => `<button class="${S.coView === k ? 'on' : ''}" data-act="route" data-arg="companies${k === 'access' ? '/access' : ''}">${icon(ic, 14)}<span class="sl">${l}</span></button>`).join('')}</div>`;
+function coTopbar() {
+  if (S.coId) {
+    const l = S._coList.some(c => c.id === S.coId) ? S._coList : COMPANIES, i = l.findIndex(c => c.id === S.coId);
+    return `<span class="mono faint tb-hide-sm" style="margin-right:2px">${i + 1} / ${fmtInt(l.length)}</span>
+      <button class="icon-btn sm" data-act="co-step" data-d="-1" ${i <= 0 ? 'disabled' : ''} data-tip="Previous  k">${icon('chevUp', 16)}</button>
+      <button class="icon-btn sm" data-act="co-step" data-d="1" ${i >= l.length - 1 ? 'disabled' : ''} data-tip="Next  j">${icon('chevDown', 16)}</button>
+      <button class="icon-btn sm bare" data-act="copy" data-copy="https://admin.ns.cards/companies/${S.coId}" data-tip="Copy link">${icon('link', 16)}</button>`;
+  }
+  return `${S.coView === 'list' ? `<button class="tool-btn solid" id="displayBtn" data-act="co-display">${icon('table', 15)}<span class="sl">Display</span>${icon('chevDown', 13)}</button>` : ''}
+    <button class="btn btn-ghost" data-act="co-export">${icon('download', 15)}<span class="tb-lbl">Export</span></button>
+    <button class="btn btn-primary" data-act="co-new">${icon('plus', 15, 2)}<span class="tb-lbl">New company</span></button>`;
+}
+// Display popover: same look and settings as the Users one (density is shared between the two lists)
+function coDisplayPop() {
+  const vis = new Set(tVisible('companies').map(c => c.k));
+  return `<div class="pop-sec"><div class="pop-row"><span>Density</span><div class="seg sm">${['comfortable', 'compact'].map(k => `<button class="${S.density === k ? 'on' : ''}" data-act="co-density" data-v="${k}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('')}</div></div></div>
+    <div class="pop-sec"><div class="pop-lbl">Columns<span style="display:flex;gap:12px"><button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="co-cols-reset">Reset columns</button><button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="co-reset-colw">Reset widths</button></span></div><div class="pills">${TCOLS.companies.filter(c => !c.lock).map(c => `<button class="pill ${vis.has(c.k) ? 'on' : ''}" data-act="co-col" data-k="${c.k}">${c.l}</button>`).join('')}</div></div>`;
+}
+const refreshCoDisplay = () => { coResults(); if (popOpts.kind === 'codisplay') { pop.innerHTML = coDisplayPop(); positionPop(); } };
+function stepCo(d) {
+  const l = S._coList.some(c => c.id === S.coId) ? S._coList : COMPANIES, nx = l[l.findIndex(c => c.id === S.coId) + d];
+  if (nx) location.hash = '#/companies/' + nx.id;
+}
+function coFloat(el) {
+  const show = h => { el.innerHTML = h; el.classList.add('show'); }, hide = () => el.classList.remove('show');
+  const save = (n, what, act) => `<span class="bk-n"><b>${n}</b>${what}${n > 1 ? 's' : ''}</span><span class="sep"></span><button data-act="${act}-discard">Discard</button><button class="bk-save" data-act="${act}-save">${icon('check', 15, 2)}Save changes</button>`;
+  if (S.coId) { const n = Object.keys(S.coDraft).length + Object.keys(S.brandDraft).length; return n ? show(save(n, 'unsaved change', 'co')) : hide(); }
+  if (S.coView === 'access') { const n = S.mx.draft.size; return n ? show(save(n, 'access change', 'mx')) : hide(); }
+  const n = S.co.sel.size;
+  if (!n) return hide();
+  show(`<span class="bk-n"><b>${n}</b>selected</span>
+    ${n < S._coList.length ? `<button class="bk-link" data-act="co-sel-all">Select all ${fmtInt(S._coList.length)}</button>` : ''}
+    <span class="sep"></span>
+    <button data-act="co-bulk-status">${icon('activity', 15)}Status</button>
+    <button data-act="co-bulk-grant">${icon('cardProduct', 15)}Grant product</button>
+    <button data-act="co-bulk-export">${icon('download', 15)}Export</button>
+    <span class="sep"></span>
+    <button class="bk-x" data-act="co-sel-clear" title="Clear selection">${icon('x', 15)}</button>`);
+}
+
+/* ── Companies list ── */
+// Filter fields for the Companies list — same shape as FIELDS, used by the shared filter bar (see fx())
+const CO_FIELDS = {
+  status:  { label: 'Status', icon: 'activity', options: STATUS, get: c => c.status },
+  source:  { label: 'Source', icon: 'folder', options: Object.fromEntries(Object.entries(CO_SOURCES).map(([k, l]) => [k, { label: l }])), get: c => c.source },
+  setup:   { label: 'Setup', icon: 'cardProduct', options: { done: { label: 'Has products', tone: 'success' }, none: { label: 'No products', tone: 'warning' } }, get: c => c.cp.length + c.ip.length ? 'done' : 'none' },
+  product: { label: 'Product', icon: 'card', plural: 'products', options: Object.fromEntries([...CARD_PRODUCTS.map(p => ['c:' + p.id, { label: p.name }]), ...IBAN_PRODUCTS.map(p => ['i:' + p.id, { label: p.name + ' (IBAN)' }])]), test: (c, v) => v.some(k => hasP(c, k)) },
+  level:   { label: 'Min. user level', icon: 'tag', options: LEVEL, get: c => c.minLevel },
+  kyc:     { label: 'KYC required on', icon: 'shieldCheck', options: KYC_ON, get: c => c.kycLevel || 'none' },
+  type:    { label: 'Type', icon: 'user', options: CO_TYPE, get: c => c.type },
+  country: { label: 'Country', icon: 'globe', plural: 'countries', options: Object.fromEntries(Object.entries(ctryOpts).filter(([k]) => k !== 'none')), get: c => c.country },
+  created: { label: 'Created', icon: 'calendar', date: 1, options: {}, test: (c, v) => inRange(c.created, v[0]) },
+};
+const coSearchFilter = (list, q) => { q = q.trim().toLowerCase(); return q ? list.filter(c => `${c.name} ${c.email} ${c.id} ${c.ref} ${c.emboss}`.toLowerCase().includes(q)) : list; };
+function coFiltersChanged() { S.co.page = 1; S.co.sel.clear(); coStats(); renderChips(); coResults(); renderFloat(); reanchor(); }
+const CO_TILES = [
+  { id: 'all', label: 'Companies', clear: 1, sub: L => `+${L.filter(c => NOW - c.created < 30 * DAY).length} this month` },
+  { id: 'active', label: 'Active', filter: { key: 'status', values: ['active'] }, sub: (L, n) => `${Math.round(n / L.length * 100)}%` },
+  { id: 'setup', label: 'Not set up', filter: { key: 'setup', values: ['none'] }, sub: () => 'No products assigned' },
+  { id: 'kyc', label: 'KYC required', filter: { key: 'kyc', values: ['basic', 'middle', 'premium'] }, sub: L => `${L.filter(c => c.kycLevel === 'basic').length} from Basic level` },
+  { id: 'off', label: 'Inactive or blocked', filter: { key: 'status', values: ['inactive', 'blocked'] }, sub: L => `${L.filter(c => c.status === 'blocked').length} blocked` },
+];
+function coList() {
+  const f = S.co, col = TCOLS.companies.find(c => c.k === f.sort.k), m = f.sort.dir === 'asc' ? 1 : -1;
+  return coSearchFilter(applyFilters(COMPANIES, f.filters, null, CO_FIELDS), f.search)
+    .sort((a, b) => { const x = col.val(a), y = col.val(b); return (x > y ? 1 : x < y ? -1 : b.id - a.id) * m; });
+}
+function renderCompanies() {
+  $('#main').innerHTML = `<div class="page fit">
+    <section class="ustats" id="coStats"></section>
+    <div class="toolbar">
+      <label class="search">${icon('search', 15)}<input id="coSearch" placeholder="Search name, email, ID, referral…" value="${esc(S.co.search)}" autocomplete="off"><kbd>/</kbd></label>
+      <button class="tool-btn" id="addFilter" data-act="add-filter">${icon('filter', 15)}Filter</button>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="results" id="coResults"></div>
+  </div>`;
+  coStats(); renderChips(); coResults(); renderFloat();
+}
+function coStats() {
+  const el = $('#coStats'); if (!el) return;
+  el.innerHTML = CO_TILES.map(t => { const n = t.filter ? applyFilters(COMPANIES, [t.filter], null, CO_FIELDS).length : COMPANIES.length; return `<button class="ust ${tileOn(t, S.co.filters, S.co.search) ? 'on' : ''}" data-act="co-tile" data-id="${t.id}">
+    <div class="ust-l">${t.label}</div><div class="ust-v"><b>${fmtInt(n)}</b><span>${t.sub(COMPANIES, n)}</span></div></button>`; }).join('');
+}
+function coResults() {
+  const el = $('#coResults'); if (!el) return;
+  const f = S.co, list = coList(); S._coList = list;
+  if (!list.length) { el.innerHTML = `<div class="tcard"><div class="empty"><div class="em-ic">${icon('search', 22)}</div><h3>No companies match</h3><p>Try a different search or remove a filter.</p><button class="btn btn-ghost btn-sm" data-act="co-clear-all">Clear search and filters</button></div></div>`; return; }
+  const cols = tVisible('companies'), fixed = cols.every(c => S.coColW[c.k]), per = 25, pages = Math.max(1, Math.ceil(list.length / per)); f.page = Math.min(f.page, pages);
+  const start = (f.page - 1) * per, rows = list.slice(start, start + per);
+  const all = rows.every(c => f.sel.has(c.id)), some = rows.some(c => f.sel.has(c.id));
+  el.innerHTML = `<div class="tcard ${S.density}"><div class="hs-wrap"><div class="tscroll hs"><table class="ut ${fixed ? 'fixed' : ''}" style="${fixed ? `width:${tableW()}px` : ''}">
+    <colgroup><col style="width:44px">${cols.map(c => `<col data-col="${c.k}" ${fixed ? `style="width:${S.coColW[c.k]}px"` : ''}>`).join('')}<col></colgroup>
+    <thead><tr><th class="cbcell"><button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="co-sel-page" aria-label="Select page">${icon('check', 11, 3)}</button></th>
+    ${cols.map(c => { const on = f.sort.k === c.k; return `<th class="sortable ${on ? 'sorted' : ''} ${c.al === 'r' ? 'r' : ''}" data-act="co-sort" data-k="${c.k}" data-key="${c.k}"><span class="th-in">${c.l}<span class="srt">${icon(on && f.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 12, 2)}</span></span><span class="col-rs" data-rs="${c.k}" data-tip="Drag to resize · double-click to fit"></span></th>`; }).join('')}
+    <th class="act-h"></th></tr></thead>
+    <tbody>${rows.map(c => `<tr data-cid="${c.id}" class="${f.sel.has(c.id) ? 'sel' : ''}">
+      <td class="cbcell"><button class="cb ${f.sel.has(c.id) ? 'on' : ''}" data-act="co-sel" data-id="${c.id}" aria-label="Select">${icon('check', 11, 3)}</button></td>
+      ${cols.map(x => `<td class="${x.al === 'r' ? 'r' : ''}">${x.cell(c)}</td>`).join('')}
+      <td class="act"><div class="row-actions"><button class="ghost-ic" data-act="co-open-tab" data-id="${c.id}" data-v="products" data-tip="Products">${icon('cardProduct', 15)}</button><button class="ghost-ic" data-act="co-row-more" data-id="${c.id}" data-tip="More">${icon('more', 15)}</button></div></td>
+    </tr>`).join('')}</tbody></table></div></div>${pagerHTML(list.length, pages, start, rows.length, { page: f.page, act: 'co-page', per: false })}</div>`;
+  fitColumns();
+}
+const coCSV = (l, name) => {
+  downloadCSV(name, ['id', 'name', 'email', 'source', 'status', 'type', 'min_user_level', 'kyc_required_on', 'referral_code', 'emboss_name', 'card_products', 'iban_products', 'users', 'created'],
+    l.map(c => [c.id, c.name, c.email, c.source, c.status, c.type, c.minLevel, c.kycLevel || '', c.ref, c.emboss, c.cp.map(a => a.pid).join(' '), c.ip.map(a => a.pid).join(' '), coUsers(c).length, c.created.toISOString()]));
+  toast(`Exported ${fmtInt(l.length)} compan${l.length === 1 ? 'y' : 'ies'}`, 'download');
+};
+
+/* ── Product access: companies × products, edits are staged and saved together ── */
+const mxOn = (c, k) => S.mx.draft.get(c.id + '|' + k) ?? hasP(c, k);
+const mxCompanies = () => COMPANIES;
+function mxProducts() {
+  const f = S.mx;
+  const all = [...(f.kind !== 'iban' ? CARD_PRODUCTS.map(p => ({ k: 'c:' + p.id, p, g: 'c' })) : []), ...(f.kind !== 'cards' ? IBAN_PRODUCTS.map(p => ({ k: 'i:' + p.id, p, g: 'i' })) : [])];
+  return all.filter(x => !f.used || COMPANIES.some(c => mxOn(c, x.k)));
+}
+function renderAccess() {
+  const f = S.mx;
+  $('#main').innerHTML = `<div class="page fit">
+    <div class="toolbar">
+      <div class="seg">${[['all', 'All products'], ['cards', 'Cards'], ['iban', 'IBAN']].map(([k, l]) => `<button class="${f.kind === k ? 'on' : ''}" data-act="mx-kind" data-v="${k}">${l}</button>`).join('')}</div>
+      <button class="tool-btn ${f.used ? 'solid' : ''}" data-act="mx-used"><span class="cb ${f.used ? 'on' : ''}">${icon('check', 10, 3)}</span>Only products in use</button>
+      <span class="tb-sp"></span><span class="hint" id="mxSum"></span>
+    </div>
+    <div class="results" id="mxResults"></div>
+  </div>`;
+  refreshMx(); renderFloat();
+}
+function refreshMx() {
+  const el = $('#mxResults'); if (!el) return;
+  const sc = $('#mxResults .tscroll'), pos = sc ? [sc.scrollLeft, sc.scrollTop] : [0, 0];
+  const f = S.mx, P = mxProducts(), L = mxCompanies(), per = 30, pages = Math.max(1, Math.ceil(L.length / per)); f.page = Math.min(f.page, pages);
+  const start = (f.page - 1) * per, rows = L.slice(start, start + per); S._mxRows = rows;
+  $('#mxSum').textContent = `${fmtInt(L.length)} companies · ${P.length} products`;
+  if (!P.length || !L.length) { el.innerHTML = `<div class="tcard">${emptyBlock('filter', 'No products in use', 'Turn off “Only products in use” to see every product.')}</div>`; return; }
+  const nC = P.filter(x => x.g === 'c').length, nI = P.length - nC, firstI = nC && nI ? nC : -1;
+  const ib = i => i === firstI ? 'first-ib' : '';
+  el.innerHTML = `<div class="tcard"><div class="hs-wrap"><div class="tscroll hs"><table class="mx">
+    <colgroup><col>${P.map((x, i) => `<col data-i="${i + 1}">`).join('')}<col></colgroup>
+    <thead><tr>
+      <th class="mx-corner" rowspan="2">Company</th>
+      ${nC ? `<th class="mx-g" colspan="${nC}"><span class="th-in">${icon('card', 13)}Card products</span></th>` : ''}${nI ? `<th class="mx-g ${nC ? 'first-ib' : ''}" colspan="${nI}"><span class="th-in">${icon('bank', 13)}IBAN</span></th>` : ''}
+      <th class="mx-nh" rowspan="2">Total</th></tr>
+    <tr>${P.map((x, i) => `<th class="mx-pth ${ib(i)}" data-i="${i + 1}"><button class="mx-ph" data-act="mx-col" data-k="${x.k}" data-tip="${esc(x.p.name)} · ${x.p.provider}"><span class="mx-pl">${esc(x.p.name)}</span><span class="mx-pc">${COMPANIES.filter(c => mxOn(c, x.k)).length}</span></button></th>`).join('')}</tr></thead>
+    <tbody>${rows.map(c => {
+      let n = 0;
+      const cells = P.map((x, i) => { const on = mxOn(c, x.k), d = f.draft.has(c.id + '|' + x.k); n += on; return `<td class="${d ? 'dirty' : ''} ${ib(i)}" data-i="${i + 1}"><button class="cb ${on ? 'on' : ''}" data-act="mx-tog" data-id="${c.id}" data-k="${x.k}" aria-label="${esc(x.p.name)} for ${esc(c.name)}">${icon('check', 11, 3)}</button></td>`; }).join('');
+      return `<tr><td class="mx-co"><a href="#/companies/${c.id}"><span>${esc(c.name)}</span><span class="code">#${c.id}</span></a></td>${cells}<td class="mx-n"><span class="num ${n ? '' : 'zero'}">${n}</span></td></tr>`;
+    }).join('')}</tbody></table></div></div>${pagerHTML(L.length, pages, start, rows.length, { page: f.page, act: 'mx-page', per: false })}</div>`;
+  const s2 = $('#mxResults .tscroll'); if (s2) { s2.scrollLeft = pos[0]; s2.scrollTop = pos[1]; }
+}
+document.addEventListener('mouseover', e => {
+  if (S.route !== 'companies' || S.coView !== 'access') return;
+  const cell = e.target.closest?.('table.mx [data-i]'), i = cell?.dataset.i;
+  $$('table.mx .hl').forEach(x => x.dataset.i !== i && x.classList.remove('hl'));
+  if (i) $$(`table.mx col[data-i="${i}"], table.mx th[data-i="${i}"]`).forEach(x => x.classList.add('hl'));
+});
+
+/* ── Company page ── */
+const CO_OPTS = { status: STATUS, type: CO_TYPE, minLevel: LEVEL, kycLevel: KYC_ON };
+function coSel(field, val) {
+  const content = field === 'status' ? statusCell(val) : field === 'kycLevel' && !val ? '<span class="faint">Not required</span>' : CO_OPTS[field][val].label;
+  return `<button class="sel-btn ${field in S.coDraft ? 'dirty' : ''}" data-act="co-select" data-field="${field}">${content}${icon('chevsUD', 14)}</button>`;
+}
+function renderCompanyPage() {
+  const c = coById(S.coId), main = $('#main');
+  if (!c) { main.innerHTML = `<div class="page"><div class="ph"><div class="empty"><div class="em-ic">${icon('building', 22)}</div><h3>Company not found</h3><p>#${S.coId} doesn’t exist.</p><a class="btn btn-dark btn-sm" href="#/companies">Back to Companies</a></div></div></div>`; return; }
+  const D = cd(c), d = { ...c, ...S.coDraft }, scroll = main.scrollTop, over = S.coTab === 'overview', nUsers = coUsers(c).length;
+  const tabs = [['overview', 'Overview'], ['products', 'Products' + tabCount(c.cp.length + c.ip.length)], ['gifts', 'Gift codes' + tabCount(D.gifts.length)], ['users', 'Users' + tabCount(nUsers)],
+    ['keys', 'API keys' + tabCount(D.keys.filter(k => k.status === 'ACTIVE').length)], ['directors', 'Directors' + tabCount(D.directors.length)], ['rates', 'Sell rates'], ['imports', 'Imports'], ['branding', 'Branding'], ['currencies', 'Currencies' + tabCount(D.currencies.length)]];
+  main.innerHTML = `<div class="page">
+    <header class="page-head band up-head">
+      <div class="up-id"><div style="min-width:0">
+        <h1>${esc(c.name)}</h1>
+        <div class="up-sub"><span>${esc(c.email)}</span><span class="faint">·</span>${copyVal(c.ref)}<span class="faint">·</span><span class="num faint">#${c.id}</span></div>
+        <div class="up-badges">${badge(STATUS[d.status])}${srcTag(c.source)}<span class="badge t-neutral">${CO_TYPE[d.type].label}</span><span class="badge t-${LEVEL[d.minLevel].tone}">Min. level ${LEVEL[d.minLevel].label}</span>${d.kycLevel ? `<span class="badge t-info">KYC from ${LEVEL[d.kycLevel].label}</span>` : ''}</div>
+      </div></div>
+      <div class="ph-right">
+        <button class="btn btn-dark" data-act="co-new-user">${icon('plus', 15, 2)}Create user</button>
+        <button class="btn btn-ghost" data-act="co-block" data-id="${c.id}">${icon(c.status === 'blocked' ? 'refresh' : 'ban', 15)}${c.status === 'blocked' ? 'Unblock' : 'Block'}</button>
+        <button class="icon-btn" data-act="co-more" data-tip="More">${icon('more', 16)}</button>
+      </div>
+    </header>
+    <nav class="tabs band">${tabs.map(([k, lb]) => `<button class="tab ${S.coTab === k ? 'on' : ''}" data-act="co-tab" data-v="${k}">${lb}</button>`).join('')}</nav>
+    <div class="up-grid ${over ? '' : 'single'}">
+      <div class="up-main">${coTab(c, d, D)}</div>
+      ${over ? coSide(c, D) : ''}
+    </div>
+  </div>`;
+  main.scrollTop = scroll;
+  renderFloat();
+}
+function coTab(c, d, D) {
+  const kv = (l, v) => `<div class="kv-r"><span>${l}</span>${v || dash}</div>`;
+  switch (S.coTab) {
+    case 'overview': {
+      const prods = [...c.cp.map(a => ({ a, p: PROD_BY.c[a.pid], k: (PROD_BY.c[a.pid].kind === 'physical' ? 'Physical' : 'Virtual') + ' card' })), ...c.ip.map(a => ({ a, p: PROD_BY.i[a.pid], k: 'IBAN · ' + PROD_BY.i[a.pid].cur }))];
+      return `
+      <div class="card"><div class="card-h"><span class="card-t">Company</span><button class="btn btn-ghost btn-sm" data-act="co-edit">${icon('pencil', 14)}Edit</button></div><div class="kv2 card-b">
+        ${kv('Status', coSel('status', d.status))}${kv('Type', coSel('type', d.type))}
+        ${kv('Minimal user level', coSel('minLevel', d.minLevel))}${kv('KYC required on level', coSel('kycLevel', d.kycLevel))}
+        ${kv('Email', `<span>${esc(c.email)}</span>`)}${kv('Emboss name', `<span class="num">${esc(c.emboss)}</span>`)}
+        ${kv('Referral code', copyVal(c.ref))}${kv('Source', srcTag(c.source))}
+      </div></div>
+      <div class="card"><div class="card-h"><span class="card-t">Registered address</span><button class="btn btn-ghost btn-sm" data-act="co-addr">${icon('pencil', 14)}Edit</button></div><div class="kv2 card-b">
+        ${kv('Country', `<span class="ctry"><span class="flag">${flag(COUNTRIES[c.country].cc)}</span>${COUNTRIES[c.country].name}</span>`)}${kv('City', esc(c.city))}
+        ${kv('Address', esc(c.street))}${kv('Post code', c.zip && `<span class="num">${esc(c.zip)}</span>`)}
+        ${kv('Registration number', c.regNo && copyVal(c.regNo))}${kv('Created', `<span>${fmtDateTime(c.created)}</span>`)}
+      </div></div>
+      ${tcard(`Products <span class="ct">${prods.length}</span>`, prods.length ? linkBtn('co-tab', 'products', 'Manage') : '',
+        dtable(['Product', 'Kind', 'Provider', 'Status'], prods.map(({ a, p, k }) => [`<div>${esc(p.name)}</div><div class="code">ID ${p.id}</div>`, muted(k), p.provider, badge(a.active ? { label: 'Active', tone: 'success' } : { label: 'Inactive', tone: 'neutral' })]),
+          emptyBlock('cardProduct', 'No products yet', 'Users of this company can’t order cards or open IBANs until a product is assigned.', `<button class="btn btn-dark btn-sm" data-act="co-tab" data-v="products">${icon('plus', 14)}Assign a product</button>`)))}`;
+    }
+    case 'products': return coProductsTab(c);
+    case 'gifts': return coGiftsTab(c, D);
+    case 'users': return coUsersTab(c);
+    case 'keys': return coKeysTab(c, D);
+    case 'directors': return coDirTab(c, D);
+    case 'rates': return coRatesTab(c, D);
+    case 'imports': return coImportsTab(c, D);
+    case 'branding': return coBrandTab(c);
+    case 'currencies': return coCurTab(c, D);
+  }
+}
+// Overview side: onboarding checklist (each step opens its tab) and the live brand preview
+function coSide(c, D) {
+  const steps = [
+    ['Product assigned', c.cp.length + c.ip.length > 0, 'products'],
+    ['Currencies enabled', D.currencies.length > 0, 'currencies'],
+    ['Branding set up', !!(c.brand.logo || c.brand.url), 'branding'],
+    ['API key issued', D.keys.some(k => k.status === 'ACTIVE'), 'keys'],
+    [c.type === 'single' ? 'Directors (not needed)' : 'Directors added', c.type === 'single' || D.directors.length > 0, 'directors'],
+    ['First user', coUsers(c).length > 0, 'users'],
+  ];
+  const done = steps.filter(s => s[1]).length;
+  return `<aside class="up-side">
+    <div class="card"><div class="card-h"><span class="card-t">Setup</span><span class="code">${done} of ${steps.length} done</span></div>
+      <div class="card-b" style="padding-top:14px"><div class="meter" style="margin-bottom:8px"><i style="width:${done / steps.length * 100}%;background:${done === steps.length ? 'var(--success)' : 'var(--brand)'}"></i></div>
+      ${steps.map(([l, ok, tab]) => `<button class="su-step ${ok ? 'done' : ''}" data-act="co-tab" data-v="${tab}"><span class="ver-ic ${ok ? 'ok' : 'no'}">${icon(ok ? 'check' : 'minus', 12, 2.5)}</span><span class="pl">${l}</span>${icon('chevRight', 14)}</button>`).join('')}</div>
+    </div>
+    <div class="card"><div class="card-h"><span class="card-t">Branding</span>${linkBtn('co-tab', 'branding', 'Edit')}</div><div class="card-b pad">${brandPreview(c.brand, true)}</div></div>
+  </aside>`;
+}
+
+const subSeg = (s, opts) => `<div class="seg">${opts.map(([k, l]) => `<button class="${S.coSub[s] === k ? 'on' : ''}" data-act="co-sub" data-s="${s}" data-v="${k}">${l}</button>`).join('')}</div>`;
+function coProductsTab(c) {
+  const seg = subSeg('products', [['cards', 'Cards' + tabCount(c.cp.length)], ['iban', 'IBAN' + tabCount(c.ip.length)]]);
+  const rm = (act, i) => `<button class="ghost-ic" data-act="${act}" data-i="${i}" data-tip="Remove">${icon('trash', 15)}</button>`;
+  if (S.coSub.products === 'cards') {
+    const add = `<button class="btn btn-dark btn-sm" data-act="cp-add">${icon('plus', 14)}Add card product</button>`;
+    return tcard('Products', (c.cp.length ? add : '') + colsBtn('coCards'), ctable('coCards', c.cp, emptyBlock('cardProduct', 'No card products', 'Assign a card product so this company’s users can order cards.', add),
+      { post: (a, i) => editBtn('cp-edit', i) + rm('cp-rm', i) }), seg);
+  }
+  const add = `<button class="btn btn-dark btn-sm" data-act="ip-add">${icon('plus', 14)}Add IBAN product</button>`;
+  return tcard('Products', (c.ip.length ? add : '') + colsBtn('coIban'), ctable('coIban', c.ip, emptyBlock('bank', 'No IBAN products', 'Assign an IBAN product so this company’s users can open accounts.', add), { post: (a, i) => rm('ip-rm', i) }), seg);
+}
+function coGiftsTab(c, D) {
+  const btn = c.cp.length ? `<button class="btn btn-dark btn-sm" data-act="gift-new">${icon('plus', 14)}Create gift codes</button>` : `<button class="btn btn-dark btn-sm" data-act="co-tab" data-v="products">Assign a card product</button>`;
+  return tcard('Gift codes', D.gifts.length ? btn : '', dtable(['Code', 'Value', 'Card product', 'Redeemed|r', 'Status', 'Expires', 'Created|r', '|a'], D.gifts.map((g, i) => {
+    const p = PROD_BY.c[g.pid];
+    return [copyVal(g.code), `<span class="num">${money(g.value, p.cur)}</span>`, `<div>${esc(p.name)}</div><div class="code">${p.provider}</div>`, `<span class="num">${g.used} / ${g.max}</span>`, badge(GIFT_STATUS[g.status]),
+      `<span class="${g.status === 'EXPIRED' ? 'faint' : 'muted'}">${fmtDay(g.expires)}</span>`, muted(rel(g.created)),
+      ['ACTIVE', 'DISABLED'].includes(g.status) ? `<button class="ghost-ic" data-act="gift-toggle" data-i="${i}" data-tip="${g.status === 'ACTIVE' ? 'Disable' : 'Enable'}">${icon(g.status === 'ACTIVE' ? 'ban' : 'refresh', 15)}</button>` : ''];
+  }), emptyBlock('tag', 'No gift codes', c.cp.length ? 'Create codes that give users a card for free or at a discount.' : 'Gift codes redeem against a card product — assign one first.', btn)));
+}
+function coUsersBody(c) {
+  const all = coUsers(c), q = S.coUserQ.trim().toLowerCase(), list = q ? all.filter(u => `${u.name} ${u.email} ${u.id} ${u.uid}`.toLowerCase().includes(q)) : all;
+  if (!all.length) return emptyBlock('users', 'No users yet', 'Create users one by one or import them from a CSV.', `<div style="display:flex;gap:8px;justify-content:center"><button class="btn btn-ghost btn-sm" data-act="co-tab" data-v="imports">${icon('upload', 14)}Import users</button><button class="btn btn-dark btn-sm" data-act="co-new-user">${icon('plus', 14)}Create user</button></div>`);
+  if (!list.length) return emptyBlock('search', 'No users match', 'Try a different name, email or ID.');
+  const per = 15, pages = Math.max(1, Math.ceil(list.length / per)); S.coUserPage = Math.min(S.coUserPage, pages);
+  const start = (S.coUserPage - 1) * per, rows = list.slice(start, start + per);
+  return `<div class="hs-wrap"><div class="dt-wrap hs"><table class="dt"><thead><tr><th>ID</th><th>User</th><th>Residency</th><th>Status</th><th>KYC</th><th>Risk</th><th class="r">Balance</th><th class="r">Created</th></tr></thead>
+    <tbody>${rows.map(u => `<tr data-uid="${u.id}" style="cursor:pointer"><td>${numM(u.id)}</td><td>${userCell(u)}</td><td>${ctryCell(u.country)}</td><td>${statusCell(u.status)}</td><td>${badge(KYC[u.kyc])}</td><td>${riskCell(u.risk)}</td><td class="r"><span class="num ${u.balance ? '' : 'zero'}">${fmtEur(u.balance)}</span></td><td class="r"><span class="muted">${rel(u.created)}</span></td></tr>`).join('')}</tbody></table></div></div>
+    ${pages > 1 ? pagerHTML(list.length, pages, start, rows.length, { page: S.coUserPage, act: 'co-user-page', per: false }) : ''}`;
+}
+function coUsersTab(c) {
+  const n = coUsers(c).length;
+  return tcard(`Users${n ? ` <span class="ct">${fmtInt(n)}</span>` : ''}`, n ? `<button class="btn btn-ghost btn-sm" data-act="co-tab" data-v="imports">${icon('upload', 14)}Import</button><button class="btn btn-dark btn-sm" data-act="co-new-user">${icon('plus', 14)}Create user</button>` : '',
+    `<div id="coUsersBody">${coUsersBody(c)}</div>`, n ? `<label class="search" style="width:300px">${icon('search', 15)}<input id="coUserQ" placeholder="Search name, email, ID…" value="${esc(S.coUserQ)}" autocomplete="off"></label>` : '');
+}
+function coKeysTab(c, D) {
+  const btn = `<button class="btn btn-dark btn-sm" data-act="key-new">${icon('plus', 14)}Add API key</button>`;
+  return tcard('API keys', D.keys.length ? btn : '', dtable(['Name', 'Key', 'Permissions', 'IP allowlist', 'Status', 'Last used', 'Created|r', '|a'], D.keys.map((k, i) => [
+    `<b style="font-weight:500">${esc(k.name)}</b>`, `<span class="num muted">${k.key.slice(0, 14)}••••${k.key.slice(-4)}</span>`,
+    `<span class="pchips">${k.scopes.map(s => `<span class="tag">${s}</span>`).join('')}</span>`, k.ips.length ? `<span class="num muted">${esc(k.ips.join(', '))}</span>` : '<span class="faint">Any IP</span>',
+    badge(k.status === 'ACTIVE' ? { label: 'Active', tone: 'success' } : { label: 'Revoked', tone: 'neutral' }), k.lastUsed ? muted(rel(k.lastUsed)) : '<span class="faint">Never</span>', muted(fmtDay(k.created)),
+    k.status === 'ACTIVE' ? `<button class="ghost-ic" data-act="key-revoke" data-i="${i}" data-tip="Revoke">${icon('ban', 15)}</button>` : '']),
+    emptyBlock('key', 'No API keys', 'Issue a key so this company can manage users and cards through the API.', btn)));
+}
+function coDirTab(c, D) {
+  const btn = `<button class="btn btn-dark btn-sm" data-act="dir-add">${icon('plus', 14)}Add person</button>`, own = D.directors.reduce((s, p) => s + p.own, 0);
+  return tcard(`Directors & owners${D.directors.length ? ` <span class="ct">${own}% ownership declared</span>` : ''}`, D.directors.length ? btn : '', dtable(['Name', 'Role', 'Nationality', 'Date of birth', 'Ownership|r', 'KYC', 'Added|r', '|a'], D.directors.map((p, i) => [
+    `<b style="font-weight:500">${esc(p.name)}</b>`, muted(DIR_ROLE[p.role]), `<span class="ctry"><span class="flag">${flag(COUNTRIES[p.nat].cc)}</span>${COUNTRIES[p.nat].name}</span>`,
+    `<span class="num">${fmtDay(p.dob)}</span>`, p.own ? `<span class="num">${p.own}%</span>` : dash, badge(KYC[p.kyc]), muted(fmtDay(p.added)),
+    (p.kyc !== 'approved' ? `<button class="ghost-ic" data-act="dir-kyc" data-i="${i}" data-tip="Send KYC link">${icon('send', 15)}</button>` : '') + `<button class="ghost-ic" data-act="dir-rm" data-i="${i}" data-tip="Remove">${icon('trash', 15)}</button>`]),
+    emptyBlock('idcard', 'No directors or owners', c.type === 'single' ? 'Single-user companies usually don’t need them, but you can still add people for KYB.' : 'Add the company’s directors and beneficial owners for KYB.', btn)));
+}
+function coRatesTab(c, D) {
+  const sub = S.coSub.rates, R = S.rate, custom = x => x.custom ? ' <span class="badge t-info">Custom</span>' : '';
+  const seg = subSeg('rates', [['bank', 'Bank deposit / withdrawal'], ['spread', 'Exchange spread'], ['exfees', 'Exchange fees'], ['cards', 'Card products']]);
+  const lvl = `<span class="tools-sep"></span><select class="fsel" data-rate="level">${Object.entries(LEVEL).map(([k, o]) => `<option value="${k}" ${R.level === k ? 'selected' : ''}>${o.label} level</option>`).join('')}</select>`;
+  const init = `<select class="fsel" data-rate="init">${[['user', 'Company user'], ['api', 'API']].map(([k, l]) => `<option value="${k}" ${R.init === k ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
+  const note = '<span class="code">Platform defaults · edited rows are marked Custom</span>';
+  if (sub === 'bank') return tcard('Sell rates', note, dtable(['Operation', 'Provider', 'Currency', 'Fee|r', 'Fixed|r', 'Minimum|r', '|a'], bankRows(D, R.level, R.init).map((x, i) => [
+    opCell(x.op, custom(x)), x.provider, x.cur, `<span class="num">${x.pct}%</span>`, x.fixed ? `<span class="num">${money(x.fixed, x.cur)}</span>` : dash, `<span class="num">${money(x.min, x.cur)}</span>`, editBtn('rate-bank', i)])), seg + lvl + init);
+  if (sub === 'spread') return tcard('Sell rates', note, dtable(['Pair', 'System|r', 'Client|r', 'Total|r', '|a'], D.spread.map((x, i) => [
+    `<b style="font-weight:500">${x.pair}</b>${custom(x)}`, numM(x.sys + '%'), `<span class="num">${x.client}%</span>`, `<span class="num" style="font-weight:600">${+(x.sys + x.client).toFixed(2)}%</span>`, editBtn('rate-spread', i)])), seg);
+  if (sub === 'exfees') {
+    const vol = v => v == null ? '<span class="faint">and above</span>' : `<span class="num">€${volFmt(v)}</span>`, n = v => `<span class="num">${v}%</span>`;
+    return tcard('Sell rates', note, `<div class="hs-wrap"><div class="dt-wrap hs"><table class="dt grp"><thead>
+      <tr><th colspan="2">30-day trading volume</th><th class="gs" colspan="2">API</th><th class="gs" colspan="2">User</th><th class="a"></th></tr>
+      <tr><th>From ≥</th><th>To &lt;</th><th class="r gs">Maker</th><th class="r">Taker</th><th class="r gs">Maker</th><th class="r">Taker</th><th class="a"></th></tr></thead>
+      <tbody>${exRows(D, R.level).map((x, i) => `<tr><td>${vol(x.from)}${custom(x)}</td><td>${vol(x.to)}</td><td class="r gs">${n(x.apiM)}</td><td class="r">${n(x.apiT)}</td><td class="r gs">${n(x.userM)}</td><td class="r">${n(x.userT)}</td><td class="act"><div class="row-actions">${editBtn('rate-ex', i)}</div></td></tr>`).join('')}</tbody></table></div></div>`, seg + lvl);
+  }
+  return tcard('Sell rates', c.cp.length ? linkBtn('co-tab', 'products', 'Edit prices in Products') : '', dtable(['ID', 'Provider', 'Name', 'Virtual issuing|r', 'Physical issuing|r', 'Monthly user fee|r', 'Cardholder', 'Active|c', 'Type'], c.cp.map(a => {
+    const p = PROD_BY.c[a.pid], phys = p.kind === 'physical', fee = v => v ? `<span class="num">${money(v, p.cur)}</span>` : '<span class="faint">Free</span>';
+    return [numM(p.id), p.provider, esc(p.name), phys ? dash : fee(a.cost), phys ? fee(a.cost) : dash, fee(a.monthly), muted(c.type === 'single' ? 'Individual' : 'Company'), yes(a.active), phys ? 'Physical' : 'Virtual'];
+  }), emptyBlock('cardProduct', 'No card products', 'Assign card products to this company to see their prices here.', `<button class="btn btn-dark btn-sm" data-act="co-tab" data-v="products">Assign a product</button>`)), seg);
+}
+function coImportsTab(c, D) {
+  const sub = S.coSub.imports, list = D.imports[sub], what = sub === 'users' ? 'users' : 'top-ups';
+  const acts = `<button class="btn btn-ghost btn-sm" data-act="imp-template">${icon('download', 14)}Template</button><button class="btn btn-dark btn-sm" data-act="imp-open">${icon('upload', 14)}Import ${what}</button>`;
+  return tcard('Bulk operations', acts, dtable(['Operation ID', 'File', 'Rows|r', 'Imported|r', 'Skipped|r', 'Errors|r', 'Status', 'Created|r', '|a'], list.map((o, i) => {
+    const run = o.status === 'PROCESSING', cnt = v => run ? dash : `<span class="num ${v ? '' : 'zero'}">${fmtInt(v)}</span>`;
+    return [numM(o.id), `<span class="txt">${icon('file', 14)}${esc(o.file)}</span>`, cnt(o.total), cnt(o.ok), cnt(o.skipped), run ? dash : `<span class="num ${o.errors ? '' : 'zero'}" style="${o.errors ? 'color:var(--error-ink)' : ''}">${o.errors}</span>`,
+      badge(IMP_STATUS[o.status]), muted(rel(o.created)), run ? '' : `<button class="ghost-ic" data-act="imp-report" data-i="${i}" data-tip="Download report">${icon('download', 15)}</button>`];
+  }), emptyBlock('upload', `No ${what} imported yet`, sub === 'users' ? 'Upload a CSV to create many users at once. Start from the template so columns match.' : 'Upload a CSV to top up many cards at once.', `<button class="btn btn-dark btn-sm" data-act="imp-open">${icon('upload', 14)}Import ${what}</button>`)),
+    subSeg('imports', [['users', 'User import'], ['topups', 'Card top-up']]));
+}
+function coCurTab(c, D) {
+  const provs = [...new Set(D.currencies.map(x => x.provider))], list = D.currencies.filter(x => !S.curProv || x.provider === S.curProv);
+  const btn = `<button class="btn btn-dark btn-sm" data-act="cur-add">${icon('plus', 14)}Add currency</button>`;
+  return tcard('Currencies', D.currencies.length ? `<select class="fsel sm" data-curprov="1"><option value="">All providers</option>${provs.map(p => `<option value="${p}" ${S.curProv === p ? 'selected' : ''}>${p}</option>`).join('')}</select>${btn}` : '',
+    dtable(['ID', 'Currency', 'Network', 'Type', 'Network ID', 'Provider ID', 'Provider', 'Created', 'Updated|r', '|a'], list.map(x => {
+      const a = ASSET[x.c];
+      return [numM(x.id), `<span class="ctry">${assetIc(x.c, 22)}<span><b style="font-weight:500">${x.c}</b> <span class="muted">${a.n}</span></span></span>`, muted(a.net), a.fiat ? 'Fiat' : 'Crypto', `<span class="code">${NET_ID[x.c]}</span>`,
+        copyVal(x.providerId), x.provider, muted(fmtDay(x.created)), muted(rel(x.updated)), `<button class="ghost-ic" data-act="cur-rm" data-id="${x.id}" data-tip="Remove">${icon('trash', 15)}</button>`];
+    }), D.currencies.length ? emptyBlock('search', 'No currencies for this provider', 'Pick another provider.') : emptyBlock('coins', 'No currencies enabled', 'Enable the assets this company’s users can hold and exchange.', btn)));
+}
+
+/* Branding — edits stage in S.brandDraft and redraw only the preview, so inputs keep focus */
+const contrastHint = b => {
+  if (!hexOk(b.color) || !hexOk(b.btn)) return '';
+  const r = contrast(b.color, b.btn);
+  return `<span class="${r >= 4.5 ? 'ok' : r >= 3 ? '' : 'warn'}">Button contrast ${r.toFixed(1)}:1 · ${r >= 4.5 ? 'passes WCAG AA' : r >= 3 ? 'OK for large text only' : 'too low, button labels will be hard to read'}</span>`;
+};
+function brandPreview(b, compact) {
+  const col = hexOk(b.color) ? b.color : '#FC7C1A', bg = hexOk(b.bg) ? b.bg : '#FFFFFF', tx = hexOk(b.btn) ? b.btn : '#FFFFFF', ink = lum(bg) < .3 ? '#F4F4F2' : '#111111';
+  return `<div class="bp" style="--bp-c:${col};--bp-bg:${bg};--bp-t:${tx};--bp-ink:${ink}">
+    <div class="bp-top"><span class="bp-logo">${b.logo ? `<img src="${esc(b.logo)}" alt="">` : coInit(b.name)}</span><span>${esc(b.name || 'Your brand')}</span><span class="bp-me"></span></div>
+    <div class="bp-card"><div class="l">Total balance</div><div class="v">€2,480.50</div><div class="n"><span>•••• 4821</span><span>Virtual · EUR</span></div></div>
+    <div class="bp-body">
+      ${compact ? '' : `<div class="bp-row"><i></i><span>Card payment · Lidl</span><b>−€24.90</b></div><div class="bp-row"><i></i><span>Top-up from USDT</span><b>+€500.00</b></div>`}
+      <div class="bp-btns"><span class="bp-btn">Top up</span><span class="bp-btn alt">Send</span></div>
+    </div>
+    ${compact ? '' : `<div class="bp-mail"><div class="m">From ${esc(b.sender || '—')} · reply-to ${esc(b.support || '—')}</div><b>Welcome to ${esc(b.name || 'your wallet')}</b><div class="m">${b.url ? esc(b.url.replace(/^https?:\/\//, '')) : 'No whitelabel URL yet'}</div></div>`}
+  </div>`;
+}
+function coBrandTab(c) {
+  const b = { ...c.brand, ...S.brandDraft }, dirty = k => k in S.brandDraft ? 'dirty' : '';
+  const row = (l, inner) => `<div class="bf-r"><label>${l}</label><div>${inner}</div></div>`;
+  const clr = k => `<div class="clr"><input type="color" data-brand="${k}" value="${hexOk(b[k]) ? b[k] : '#FFFFFF'}" aria-label="Pick colour"><input class="inp ${dirty(k)}" data-brand="${k}" value="${esc(b[k])}" maxlength="7" spellcheck="false" autocomplete="off"></div>`;
+  const txt = (k, ph = '') => `<input class="inp w ${dirty(k)}" data-brand="${k}" value="${esc(k === 'logo' && b.logo.startsWith('data:') ? '' : b[k])}" placeholder="${ph}" autocomplete="off" spellcheck="false">`;
+  return `<div class="br-grid"><div class="br-main">
+    <div class="card"><div class="card-h"><span class="card-t">Identity</span></div><div class="card-b">
+      ${row('Brand name', txt('name'))}
+      ${row('Logo', `<div class="clr">${txt('logo', b.logo.startsWith('data:') ? 'Uploaded image' : 'https://…/logo.svg')}<label class="btn btn-ghost btn-sm" style="height:38px;border-radius:10px;cursor:pointer;flex:none">${icon('upload', 14)}Upload<input type="file" id="logoFile" hidden accept="image/*"></label></div>`)}
+      ${row('Brand color', clr('color'))}
+      ${row('Background color', clr('bg'))}
+      ${row('Button text color', `${clr('btn')}<div class="hint" id="brContrast" style="margin-top:6px">${contrastHint(b)}</div>`)}
+    </div></div>
+    <div class="card"><div class="card-h"><span class="card-t">Domain & email</span></div><div class="card-b">
+      ${row('Whitelabel URL', txt('url', 'https://wallet.yourbrand.com'))}
+      ${row('Sender email', txt('sender', 'noreply@yourbrand.com'))}
+      ${row('Support email', txt('support', 'support@yourbrand.com'))}
+      ${row('Email templates', `<select class="fsel" data-brand="mode">${['Database', 'Default', 'Custom HTML'].map(m => `<option ${b.mode === m ? 'selected' : ''}>${m}</option>`).join('')}</select>`)}
+    </div></div>
+  </div>
+  <aside class="br-side"><div class="card"><div class="card-h"><span class="card-t">Preview</span><span class="code">Wallet home · welcome email</span></div><div class="card-b pad" id="brPreview">${brandPreview(b)}</div></div></aside></div>`;
+}
+function brandInput(t) {
+  const c = coById(S.coId), k = t.dataset.brand; let v = t.value;
+  if (['color', 'bg', 'btn'].includes(k)) {
+    v = v.trim().toUpperCase(); if (v && v[0] !== '#') v = '#' + v;
+    if (!hexOk(v)) return;
+    $$(`[data-brand="${k}"]`).forEach(el => el !== t && (el.value = el.type === 'color' ? v.toLowerCase() : v));
+  }
+  if (v === c.brand[k]) delete S.brandDraft[k]; else S.brandDraft[k] = v;
+  $$(`.inp[data-brand="${k}"]`).forEach(el => el.classList.toggle('dirty', k in S.brandDraft));
+  const b = { ...c.brand, ...S.brandDraft };
+  $('#brPreview').innerHTML = brandPreview(b); $('#brContrast').innerHTML = contrastHint(b);
+  renderFloat();
+}
+
+/* Dialogs used by the companies pages */
+function newCompanyModal() {
+  const opts = o => Object.entries(o).map(([k, x]) => `<option value="${k}">${x.label || x}</option>`).join('');
+  openModal(`<div class="modal">
+    <div class="modal-h">New company<button class="icon-btn sm bare" data-act="modal-close">${icon('x', 17)}</button></div>
+    <div class="modal-b">
+      <div class="field"><label>Company name</label><input id="ncName" placeholder="e.g. Orbit Exchange" autocomplete="off"></div>
+      <div class="field"><label>Contact email</label><input id="ncEmail" type="email" placeholder="ops@company.com" autocomplete="off"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field"><label>Source</label><select id="ncSource">${opts(CO_SOURCES)}</select></div>
+        <div class="field"><label>Type</label><select id="ncType">${opts(CO_TYPE)}</select></div>
+      </div>
+      <div class="field"><label>Minimal user level</label><select id="ncLevel">${opts(LEVEL)}</select></div>
+      <div class="hint">Products, branding and sell rates are set up on the company page after it’s created.</div>
+    </div>
+    <div class="modal-f"><button class="btn btn-ghost btn-sm" data-act="modal-close">Cancel</button><button class="btn btn-primary btn-sm" data-act="co-create">Create company</button></div>
+  </div>`, m => $('#ncName', m).focus());
+}
+function cpModal(i) {
+  const c = coById(S.coId), a = i >= 0 ? c.cp[i] : null, free = CARD_PRODUCTS.filter(p => !c.cp.some(x => x.pid === p.id));
+  if (!a && !free.length) { toast('Every card product is already assigned', 'alert'); return; }
+  S._edit = i;
+  const v = a || { minLevel: 'basic', cost: 0, discount: 0, material: '', group: 'DEFAULT', limit: 10000, funded: false, maxFunded: 0, purchase: true }, yn = [['1', 'Yes'], ['0', 'No']];
+  fieldsModal(a ? `Edit ${esc(PROD_BY.c[a.pid].name)}` : 'Add card product', [
+    ...(a ? [] : [{ id: 'cpPid', label: 'Card product', value: String(free[0].id), options: free.map(p => [String(p.id), `${p.name} · ${p.provider}`]) }]),
+    { id: 'cpLevel', label: 'Minimal user level', value: v.minLevel, options: Object.entries(LEVEL).map(([k, o]) => [k, o.label]) },
+    { id: 'cpGroup', label: 'Payment group', value: v.group, options: PAY_GROUPS.map(g => [g, g]) },
+    { id: 'cpCost', label: 'Cost', value: v.cost, type: 'number' }, { id: 'cpDisc', label: 'Discount, %', value: v.discount, type: 'number' },
+    { id: 'cpLimit', label: 'Monthly spend limit', value: v.limit, type: 'number' }, { id: 'cpMat', label: 'Material ID', value: v.material, ph: 'Physical cards only' },
+    { id: 'cpFunded', label: 'Company funded', value: v.funded ? '1' : '0', options: yn }, { id: 'cpMaxF', label: 'Max funded cards per user', value: v.maxFunded, type: 'number' },
+    { id: 'cpBuy', label: 'Purchase allowed', value: v.purchase ? '1' : '0', options: yn },
+  ], 'cp-save');
+  const m = $('.modal', modal), b = $('.modal-b', m); m.style.width = 'min(620px,100%)';
+  Object.assign(b.style, { display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '14px' });
+  if (!a) b.firstElementChild.style.gridColumn = '1 / -1';
+}
+function runImport(file) {
+  const c = coById(S.coId), D = cd(c), sub = S.coSub.imports;
+  if (!/\.(csv|xlsx)$/i.test(file.name)) { toast('Upload a CSV or XLSX file', 'alert'); return; }
+  const op = { id: 5100 + c.id * 9 + 40 + D.imports.users.length + D.imports.topups.length, file: file.name, total: 0, ok: 0, skipped: 0, errors: 0, status: 'PROCESSING', created: new Date(NOW) };
+  D.imports[sub].unshift(op); closeModal(); toast(`${esc(file.name)} uploaded — processing`, 'upload'); renderCompanyPage();
+  setTimeout(() => {
+    op.total = 40 + Math.floor(Math.random() * 160); op.errors = Math.random() < .5 ? Math.floor(Math.random() * 6) : 0; op.skipped = Math.floor(Math.random() * 4);
+    op.ok = op.total - op.errors - op.skipped; op.status = op.errors ? 'PARTIAL' : 'COMPLETED';
+    toast(`Import ${op.id}: ${op.ok} imported${op.errors ? `, ${op.errors} errors` : ''}`, op.errors ? 'alert' : 'check');
+    if (S.coId === c.id && S.coTab === 'imports') renderCompanyPage();
+  }, 1600);
+}
+document.addEventListener('dragover', e => { const z = e.target.closest?.('#impZone'); if (z) { e.preventDefault(); z.classList.add('over'); } });
+document.addEventListener('dragleave', e => { const z = e.target.closest?.('#impZone'); if (z && !z.contains(e.relatedTarget)) z.classList.remove('over'); });
+document.addEventListener('drop', e => { const z = e.target.closest?.('#impZone'); if (!z) return; e.preventDefault(); const f = e.dataTransfer.files[0]; f && runImport(f); });
+
+function rerender() { if (S.route === 'companies') S.coId ? renderCompanyPage() : renderCompanies(); else renderUserPage(); }
+function coChange(t) {
+  if (t.dataset.rate) { S.rate[t.dataset.rate] = t.value; renderCompanyPage(); }
+  else if (t.dataset.curprov) { S.curProv = t.value; renderCompanyPage(); }
+  else if (t.dataset.brand && t.tagName === 'SELECT') brandInput(t);
+  else if (t.id === 'logoFile' && t.files[0]) { const fr = new FileReader(); fr.onload = () => { S.brandDraft.logo = fr.result; renderCompanyPage(); toast('Logo uploaded — save to apply', 'upload'); }; fr.readAsDataURL(t.files[0]); }
+  else if (t.id === 'impFile' && t.files[0]) runImport(t.files[0]);
+}
+function coInput(t) {
+  if (t.id === 'coSearch') { S.co.search = t.value; S.co.page = 1; coStats(); coResults(); renderFloat(); }
+  else if (t.id === 'coUserQ') { S.coUserQ = t.value; S.coUserPage = 1; $('#coUsersBody').innerHTML = coUsersBody(coById(S.coId)); }
+  else if (t.dataset.brand && t.tagName === 'INPUT') brandInput(t);
+}
+const coBad = (sel, msg) => { const el = $(sel); el.style.borderColor = 'var(--error)'; el.focus(); if (msg) toast(msg, 'alert'); };
+const cur = () => coById(S.coId);
+
+Object.assign(ACT, {
+  // list
+  'co-tile': a => {
+    const t = CO_TILES.find(t => t.id === a.dataset.id);
+    if (t.clear || tileOn(t, S.co.filters, S.co.search)) { S.co.filters = []; if (t.clear) { S.co.search = ''; $('#coSearch').value = ''; } }
+    else S.co.filters = [clone(t.filter)];
+    coFiltersChanged();
+  },
+  'co-display': a => openPop(a, coDisplayPop(), { align: 'right', width: 380, kind: 'codisplay' }),
+  'co-density': a => { S.density = a.dataset.v; store.set('nsc.density', S.density); refreshCoDisplay(); },
+  'co-col': a => {
+    const k = a.dataset.k, vis = tVisible('companies').map(c => c.k);
+    S.tcols.companies = vis.includes(k) ? vis.filter(x => x !== k) : TCOLS.companies.map(c => c.k).filter(x => x === k || vis.includes(x));
+    store.set('nsc.tcols', S.tcols); refreshCoDisplay();
+  },
+  'co-reset-colw': () => { S.coColW = {}; store.set('nsc.cocolw', {}); coResults(); toast('Column widths fitted to this page', 'columns'); },
+  'co-cols-reset': () => { delete S.tcols.companies; store.set('nsc.tcols', S.tcols); refreshCoDisplay(); },
+  'co-sort': a => { const c = TCOLS.companies.find(x => x.k === a.dataset.k); S.co.sort = S.co.sort.k === c.k ? { k: c.k, dir: S.co.sort.dir === 'asc' ? 'desc' : 'asc' } : { k: c.k, dir: c.dir }; coResults(); },
+  'co-page': a => { S.co.page = +a.dataset.p; coResults(); $('#coResults .tscroll') && ($('#coResults .tscroll').scrollTop = 0); },
+  'co-clear-all': () => { S.co.filters = []; S.co.search = ''; $('#coSearch').value = ''; coFiltersChanged(); },
+  'co-sel': a => { const id = +a.dataset.id, s = S.co.sel; s.has(id) ? s.delete(id) : s.add(id); coResults(); renderFloat(); },
+  'co-sel-page': () => { const rows = S._coList.slice((S.co.page - 1) * 25, S.co.page * 25), all = rows.every(c => S.co.sel.has(c.id)); rows.forEach(c => all ? S.co.sel.delete(c.id) : S.co.sel.add(c.id)); coResults(); renderFloat(); },
+  'co-sel-all': () => { S._coList.forEach(c => S.co.sel.add(c.id)); coResults(); renderFloat(); },
+  'co-sel-clear': () => { S.co.sel.clear(); closePop(); coResults(); renderFloat(); },
+  'co-open-tab': (a, e) => { S.coTab = a.dataset.v; goCo(+a.dataset.id, e); },
+  'co-row-more': a => { const c = coById(+a.dataset.id); openPop(a, menuItems([{ act: 'co-open', data: { id: c.id }, icon: 'building', label: 'Open company' }, { act: 'co-open-tab', data: { id: c.id, v: 'products' }, icon: 'cardProduct', label: 'Products' }, { act: 'copy', data: { copy: c.ref }, icon: 'hash', label: 'Copy referral code' }, { act: 'copy', data: { copy: c.email }, icon: 'mail', label: 'Copy email' }, '-', { act: 'co-block', data: { id: c.id }, icon: 'ban', label: c.status === 'blocked' ? 'Unblock' : 'Block company' }]), { align: 'right', width: 210 }); },
+  'co-open': (a, e) => { closePop(); goCo(+a.dataset.id, e); },
+  'co-block': a => {
+    closePop(); const c = coById(+a.dataset.id); c.status = c.status === 'blocked' ? 'active' : 'blocked'; c.updated = new Date(NOW); delete S.coDraft.status;
+    toast(`${esc(c.name)} ${c.status === 'blocked' ? 'blocked — its users can’t sign in' : 'unblocked'}`, c.status === 'blocked' ? 'ban' : 'check');
+    S.coId ? renderCompanyPage() : (coStats(), coResults());
+  },
+  'co-bulk-status': a => openPop(a, `<div class="pop-head" style="padding-left:10px">Set status</div>` + menuItems(Object.entries(STATUS).map(([k, o]) => ({ act: 'co-bulk-status-do', data: { v: k }, html: `<span class="pl" style="display:flex;align-items:center;gap:8px"><i class="dot t-${o.tone}"></i>${o.label}</span>` }))), { width: 200 }),
+  'co-bulk-status-do': a => { S.co.sel.forEach(id => { const c = coById(id); c.status = a.dataset.v; c.updated = new Date(NOW); }); closePop(); toast(`Updated ${S.co.sel.size} companies`); coStats(); coResults(); },
+  'co-bulk-grant': a => openPop(a, `<div class="pop-head" style="padding-left:10px">Grant product to ${S.co.sel.size} compan${S.co.sel.size > 1 ? 'ies' : 'y'}</div>` + menuItems([
+    ...CARD_PRODUCTS.map(p => ({ act: 'co-bulk-grant-do', data: { k: 'c:' + p.id }, icon: 'card', html: `<span class="pl">${esc(p.name)}</span><span class="pc">${p.provider}</span>` })), '-',
+    ...IBAN_PRODUCTS.map(p => ({ act: 'co-bulk-grant-do', data: { k: 'i:' + p.id }, icon: 'bank', html: `<span class="pl">${esc(p.name)}</span><span class="pc">${p.provider}</span>` }))]), { width: 320 }),
+  'co-bulk-grant-do': a => { const k = a.dataset.k; let n = 0; S.co.sel.forEach(id => setP(coById(id), k, true) && n++); closePop(); toast(n ? `${esc(pOf(k).name)} granted to ${n} compan${n > 1 ? 'ies' : 'y'}` : 'All selected companies already have it', 'cardProduct'); coStats(); coResults(); },
+  'co-bulk-export': () => coCSV(COMPANIES.filter(c => S.co.sel.has(c.id)), 'companies-selected'),
+  'co-export': () => {
+    if (S.coView !== 'access') return coCSV(S._coList.length ? S._coList : COMPANIES, 'companies');
+    const P = mxProducts(), L = mxCompanies();
+    downloadCSV('company-product-access', ['company_id', 'company', ...P.map(x => x.p.name)], L.map(c => [c.id, c.name, ...P.map(x => mxOn(c, x.k) ? 1 : 0)]));
+    toast(`Exported product access for ${L.length} companies`, 'download');
+  },
+  'co-new': newCompanyModal,
+  'co-create': () => {
+    const name = $('#ncName').value.trim(), email = $('#ncEmail').value.trim();
+    if (!name) return coBad('#ncName');
+    if (COMPANIES.some(c => c.name.toLowerCase() === name.toLowerCase())) return coBad('#ncName', 'A company with this name already exists');
+    if (!/^\S+@\S+\.\S+$/.test(email)) return coBad('#ncEmail');
+    const id = Math.max(...COMPANIES.map(c => c.id)) + 1, at = new Date(NOW);
+    COMPANIES.unshift({ id, name, email, source: $('#ncSource').value, ref: Math.random().toString(16).slice(2, 12).toUpperCase().padEnd(10, '0'), created: at, updated: at, status: 'active', type: $('#ncType').value,
+      minLevel: $('#ncLevel').value, kycLevel: null, emboss: name.toUpperCase().replace(/[^A-Z0-9 ]/g, '').slice(0, 21), country: 'LTU', cp: [], ip: [], brand: coBrand(name, email, BRAND_COLORS[id % BRAND_COLORS.length]) });
+    closeModal(); toast('Company created — next, assign products', 'building'); goCo(id);
+  },
+  // matrix
+  'mx-kind': a => { S.mx.kind = a.dataset.v; renderAccess(); },
+  'mx-used': () => { S.mx.used = !S.mx.used; renderAccess(); },
+  'mx-page': a => { S.mx.page = +a.dataset.p; refreshMx(); $('#mxResults .tscroll').scrollTop = 0; },
+  'mx-tog': a => { const c = coById(+a.dataset.id), k = a.dataset.k, key = c.id + '|' + k, nv = !mxOn(c, k); nv === hasP(c, k) ? S.mx.draft.delete(key) : S.mx.draft.set(key, nv); refreshMx(); renderFloat(); },
+  'mx-col': a => {
+    const k = a.dataset.k, p = pOf(k), n = S._mxRows.length;
+    openPop(a, `<div class="pop-head" style="height:auto;padding:6px 10px 4px;flex-direction:column;align-items:flex-start;gap:2px">${esc(p.name)}<span class="code">${p.provider} · ${k[0] === 'c' ? (p.kind === 'physical' ? 'Physical card' : 'Virtual card') : 'IBAN · ' + p.cur} · ID ${p.id}</span></div><div class="pop-sep"></div>`
+      + menuItems([{ act: 'mx-col-set', data: { k, v: 1 }, icon: 'check', label: `Grant to all ${n} on this page` }, { act: 'mx-col-set', data: { k, v: 0 }, icon: 'minus', label: `Revoke from all ${n} on this page` }]), { width: 270 });
+  },
+  'mx-col-set': a => { const k = a.dataset.k, v = a.dataset.v === '1'; S._mxRows.forEach(c => { const key = c.id + '|' + k; v === hasP(c, k) ? S.mx.draft.delete(key) : S.mx.draft.set(key, v); }); closePop(); refreshMx(); renderFloat(); },
+  'mx-discard': () => { S.mx.draft.clear(); refreshMx(); renderFloat(); },
+  'mx-save': () => { let n = 0; S.mx.draft.forEach((v, key) => { const [id, k] = key.split('|'); setP(coById(+id), k, v) && n++; }); S.mx.draft.clear(); toast(`Product access saved · ${n} change${n === 1 ? '' : 's'}`); refreshMx(); renderFloat(); },
+  // company page
+  'co-step': a => stepCo(+a.dataset.d),
+  'co-tab': a => { closePop(); S.coTab = a.dataset.v; renderCompanyPage(); $('#main').scrollTop = 0; },
+  'co-sub': a => { S.coSub[a.dataset.s] = a.dataset.v; renderCompanyPage(); },
+  'co-select': a => {
+    const f = a.dataset.field, c = cur(), v = (f in S.coDraft ? S.coDraft[f] : c[f]) || 'none';
+    openPop(a, `<div class="pop-list">${Object.entries(CO_OPTS[f]).map(([k, o]) => `<button class="pi" data-act="co-set-draft" data-field="${f}" data-v="${k}">${o.tone ? `<i class="dot t-${o.tone}"></i>` : ''}<span class="pl">${o.label}</span>${k === v ? `<span class="chk">${icon('check', 15, 2)}</span>` : ''}</button>`).join('')}</div>`, { align: 'right', width: 220 });
+  },
+  'co-set-draft': a => { const { field, v } = a.dataset, c = cur(), val = field === 'kycLevel' && v === 'none' ? null : v; if (c[field] === val) delete S.coDraft[field]; else S.coDraft[field] = val; closePop(); renderCompanyPage(); },
+  'co-discard': () => { S.coDraft = {}; S.brandDraft = {}; renderCompanyPage(); },
+  'co-save': () => { const c = cur(); Object.assign(c, S.coDraft); Object.assign(c.brand, S.brandDraft); c.updated = new Date(NOW); S.coDraft = {}; S.brandDraft = {}; toast('Company saved'); renderCompanyPage(); },
+  'co-new-user': () => newUserModal(S.coId),
+  'co-more': a => { const c = cur(); openPop(a, menuItems([{ act: 'copy', data: { copy: `https://wallet.ns.cards/r/${c.ref}` }, icon: 'link', label: 'Copy referral link' }, { act: 'co-export-one', icon: 'download', label: 'Export company' }, '-', { act: 'co-deactivate', icon: c.status === 'inactive' ? 'refresh' : 'minus', label: c.status === 'inactive' ? 'Activate' : 'Deactivate' }]), { align: 'right', width: 230 }); },
+  'co-export-one': () => { closePop(); coCSV([cur()], 'company-' + S.coId); },
+  'co-deactivate': () => { closePop(); const c = cur(); c.status = c.status === 'inactive' ? 'active' : 'inactive'; c.updated = new Date(NOW); delete S.coDraft.status; toast(`${esc(c.name)} ${c.status === 'inactive' ? 'deactivated' : 'activated'}`); renderCompanyPage(); },
+  'co-edit': () => { const c = cur(); fieldsModal('Edit company', [{ id: 'ceName', label: 'Name', value: c.name }, { id: 'ceEmail', label: 'Email', value: c.email }, { id: 'ceEmboss', label: 'Emboss name', value: c.emboss, hint: 'Printed on physical cards · up to 21 Latin letters, digits and spaces.' }, { id: 'ceRef', label: 'Referral code', value: c.ref }], 'co-edit-save'); },
+  'co-edit-save': () => {
+    const c = cur(), name = $('#ceName').value.trim(), email = $('#ceEmail').value.trim(), emboss = $('#ceEmboss').value.trim().toUpperCase(), ref = $('#ceRef').value.trim();
+    if (!name) return coBad('#ceName');
+    if (!/^\S+@\S+\.\S+$/.test(email)) return coBad('#ceEmail');
+    if (!/^[A-Z0-9 ]{1,21}$/.test(emboss)) return coBad('#ceEmboss', 'Emboss name: up to 21 Latin letters, digits and spaces');
+    if (!ref || COMPANIES.some(x => x !== c && x.ref.toLowerCase() === ref.toLowerCase())) return coBad('#ceRef', 'This referral code is already taken');
+    Object.assign(c, { name, email, emboss, ref, updated: new Date(NOW) }); closeModal(); toast('Company details updated'); renderTopbar(); renderCompanyPage();
+  },
+  'co-addr': () => { const c = cur(); fieldsModal('Registered address', [{ id: 'caCountry', label: 'Country', value: c.country, options: Object.entries(COUNTRIES).map(([k, x]) => [k, x.name, flag(x.cc)]) }, { id: 'caCity', label: 'City', value: c.city }, { id: 'caStreet', label: 'Address', value: c.street }, { id: 'caZip', label: 'Post code', value: c.zip }, { id: 'caReg', label: 'Registration number', value: c.regNo }], 'co-addr-save'); },
+  'co-addr-save': () => {
+    const c = cur(), city = $('#caCity').value.trim(), street = $('#caStreet').value.trim();
+    if (!city) return coBad('#caCity'); if (!street) return coBad('#caStreet');
+    Object.assign(c, { country: $('#caCountry').value, city, street, zip: $('#caZip').value.trim(), regNo: $('#caReg').value.trim(), updated: new Date(NOW) }); closeModal(); toast('Address updated', 'mapPin'); renderCompanyPage();
+  },
+  // products
+  'cp-add': () => cpModal(-1),
+  'cp-edit': a => cpModal(+a.dataset.i),
+  'cp-save': () => {
+    const c = cur(), i = S._edit, num = id => Math.max(0, +$(id).value || 0);
+    const vals = { minLevel: $('#cpLevel').value, group: $('#cpGroup').value, cost: num('#cpCost'), discount: Math.min(100, num('#cpDisc')), limit: num('#cpLimit'), material: $('#cpMat').value.trim(), funded: $('#cpFunded').value === '1', purchase: $('#cpBuy').value === '1' };
+    vals.maxFunded = vals.funded ? num('#cpMaxF') : 0;
+    const a = i >= 0 ? Object.assign(c.cp[i], vals, { updated: new Date(NOW) }) : c.cp[c.cp.push(Object.assign(cpDefaults(+$('#cpPid').value), vals)) - 1];
+    c.updated = new Date(NOW); closeModal(); toast(`${esc(PROD_BY.c[a.pid].name)} ${i >= 0 ? 'updated' : 'assigned'}`, 'cardProduct'); renderCompanyPage();
+  },
+  'cp-rm': a => { const c = cur(), x = c.cp.splice(+a.dataset.i, 1)[0]; c.updated = new Date(NOW); toast(`${esc(PROD_BY.c[x.pid].name)} removed`, 'trash'); renderCompanyPage(); },
+  'cp-active': a => { const x = cur().cp[+a.dataset.i]; x.active = !x.active; x.updated = new Date(NOW); toast(`${esc(PROD_BY.c[x.pid].name)} ${x.active ? 'activated' : 'deactivated'}`); renderCompanyPage(); },
+  'ip-add': () => { const c = cur(), free = IBAN_PRODUCTS.filter(p => !c.ip.some(x => x.pid === p.id)); if (!free.length) { toast('Every IBAN product is already assigned', 'alert'); return; } fieldsModal('Add IBAN product', [{ id: 'ipPid', label: 'IBAN product', value: String(free[0].id), options: free.map(p => [String(p.id), `${p.name} · ${p.provider} · ${p.cur}`]) }], 'ip-save'); },
+  'ip-save': () => { const c = cur(), pid = +$('#ipPid').value; c.ip.push(ipDefaults(pid)); c.updated = new Date(NOW); closeModal(); toast(`${esc(PROD_BY.i[pid].name)} assigned`, 'bank'); renderCompanyPage(); },
+  'ip-rm': a => { const c = cur(), x = c.ip.splice(+a.dataset.i, 1)[0]; toast(`${esc(PROD_BY.i[x.pid].name)} removed`, 'trash'); renderCompanyPage(); },
+  'ip-active': a => { const x = cur().ip[+a.dataset.i]; x.active = !x.active; x.updated = new Date(NOW); toast(`${esc(PROD_BY.i[x.pid].name)} ${x.active ? 'activated' : 'deactivated'}`); renderCompanyPage(); },
+  // gift codes
+  'gift-new': () => { const c = cur(); fieldsModal('Create gift codes', [
+    { id: 'gfPid', label: 'Card product', value: String(c.cp[0].pid), options: c.cp.map(a => [String(a.pid), PROD_BY.c[a.pid].name]) },
+    { id: 'gfValue', label: 'Value', value: 25, type: 'number', hint: 'Applied to the card price, in the product’s currency.' }, { id: 'gfMax', label: 'Redemptions per code', value: 1, type: 'number' },
+    { id: 'gfDays', label: 'Valid for', value: '90', options: [['30', '30 days'], ['90', '90 days'], ['180', '180 days'], ['365', '1 year']] }, { id: 'gfQty', label: 'Number of codes', value: 1, type: 'number', hint: 'Up to 100 at a time.' }], 'gift-save'); },
+  'gift-save': () => {
+    const D = cd(cur()), value = +$('#gfValue').value, max = Math.floor(+$('#gfMax').value), qty = Math.floor(+$('#gfQty').value), h = () => Math.random().toString(16).slice(2, 6).toUpperCase().padEnd(4, '0');
+    if (!(value > 0)) return coBad('#gfValue'); if (!(max >= 1)) return coBad('#gfMax'); if (!(qty >= 1 && qty <= 100)) return coBad('#gfQty', 'Create between 1 and 100 codes');
+    for (let i = 0; i < qty; i++) D.gifts.unshift({ code: `${h()}-${h()}`, value, pid: +$('#gfPid').value, used: 0, max, status: 'ACTIVE', expires: new Date(NOW.getTime() + +$('#gfDays').value * DAY), created: new Date(NOW) });
+    closeModal(); toast(`${qty} gift code${qty > 1 ? 's' : ''} created`, 'tag'); renderCompanyPage();
+  },
+  'gift-toggle': a => { const g = cd(cur()).gifts[+a.dataset.i]; g.status = g.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE'; toast(`${g.code} ${g.status === 'ACTIVE' ? 'enabled' : 'disabled'}`, g.status === 'ACTIVE' ? 'check' : 'ban'); renderCompanyPage(); },
+  'co-user-page': a => { S.coUserPage = +a.dataset.p; $('#coUsersBody').innerHTML = coUsersBody(cur()); },
+  // API keys
+  'key-new': () => openModal(`<div class="modal">
+    <div class="modal-h">New API key<button class="icon-btn sm bare" data-act="modal-close">${icon('x', 17)}</button></div>
+    <div class="modal-b">
+      <div class="field"><label>Name</label><input id="akName" placeholder="e.g. Production backend" autocomplete="off"></div>
+      <div class="field"><label>Permissions</label><div class="pills" id="akScopes">${SCOPES.map(s => `<button class="pill ${['users', 'cards'].includes(s) ? 'on' : ''}" data-act="ak-scope">${s}</button>`).join('')}</div></div>
+      <div class="field"><label>IP allowlist</label><input id="akIps" placeholder="Optional · comma-separated IPs or CIDR ranges" autocomplete="off"><div class="hint" style="margin-top:6px">Leave empty to accept requests from any IP.</div></div>
+    </div>
+    <div class="modal-f"><button class="btn btn-ghost btn-sm" data-act="modal-close">Cancel</button><button class="btn btn-primary btn-sm" data-act="key-create">Create key</button></div>
+  </div>`, m => $('#akName', m).focus()),
+  'ak-scope': a => a.classList.toggle('on'),
+  'key-create': () => {
+    const c = cur(), D = cd(c), name = $('#akName').value.trim(), scopes = $$('#akScopes .pill.on').map(b => b.textContent);
+    if (!name) return coBad('#akName'); if (!scopes.length) { toast('Pick at least one permission', 'alert'); return; }
+    const key = 'nsk_live_' + Array.from({ length: 32 }, () => '0123456789abcdef'[Math.floor(Math.random() * 16)]).join('');
+    D.keys.unshift({ id: 700 + c.id * 3 + D.keys.length + 10, name, key, scopes, ips: $('#akIps').value.split(',').map(s => s.trim()).filter(Boolean), status: 'ACTIVE', lastUsed: null, created: new Date(NOW) });
+    renderCompanyPage();
+    openModal(`<div class="modal"><div class="modal-h">API key created<button class="icon-btn sm bare" data-act="modal-close">${icon('x', 17)}</button></div>
+      <div class="modal-b"><div class="hint">Copy the key now and store it somewhere safe. For security it won’t be shown again.</div>
+      <div class="key-box"><span style="flex:1">${key}</span><button class="icon-btn sm" data-act="copy" data-copy="${key}" data-tip="Copy">${icon('copy', 15)}</button></div></div>
+      <div class="modal-f"><button class="btn btn-primary btn-sm" data-act="modal-close">Done</button></div></div>`);
+  },
+  'key-revoke': a => { const k = cd(cur()).keys[+a.dataset.i]; k.status = 'REVOKED'; toast(`${esc(k.name)} key revoked — requests with it now fail`, 'ban'); renderCompanyPage(); },
+  // directors
+  'dir-add': () => fieldsModal('Add director or owner', [{ id: 'dName', label: 'Full name', ph: 'As in passport' }, { id: 'dRole', label: 'Role', value: 'DIRECTOR', options: Object.entries(DIR_ROLE) },
+    { id: 'dNat', label: 'Nationality', value: cur().country, options: Object.entries(COUNTRIES).map(([k, x]) => [k, x.name, flag(x.cc)]) }, { id: 'dDob', label: 'Date of birth', ph: 'DD.MM.YYYY' }, { id: 'dOwn', label: 'Ownership, %', value: 0, type: 'number' }], 'dir-save'),
+  'dir-save': () => {
+    const D = cd(cur()), name = $('#dName').value.trim(), dob = parseIn($('#dDob').value), own = Math.min(100, Math.max(0, +$('#dOwn').value || 0));
+    if (!name) return coBad('#dName'); if (!dob || dob > NOW) return coBad('#dDob', 'Enter the date as DD.MM.YYYY');
+    D.directors.push({ id: 300 + S.coId * 4 + D.directors.length + 20, name, role: $('#dRole').value, nat: $('#dNat').value, dob, own, kyc: 'new', added: new Date(NOW) });
+    closeModal(); toast(`${esc(name)} added — send a KYC link next`, 'idcard'); renderCompanyPage();
+  },
+  'dir-kyc': a => { const p = cd(cur()).directors[+a.dataset.i]; p.kyc = 'pending'; toast(`KYC link sent to ${esc(p.name)}`, 'send'); renderCompanyPage(); },
+  'dir-rm': a => { const p = cd(cur()).directors.splice(+a.dataset.i, 1)[0]; toast(`${esc(p.name)} removed`, 'trash'); renderCompanyPage(); },
+  // sell rates
+  'rate-bank': a => { const x = bankRows(cd(cur()), S.rate.level, S.rate.init)[+a.dataset.i]; S._edit = +a.dataset.i;
+    fieldsModal(`${opLabel(x.op)} · ${x.provider} ${x.cur}`, [{ id: 'rbPct', label: 'Fee, %', value: x.pct, type: 'number' }, { id: 'rbFix', label: `Fixed fee, ${x.cur}`, value: x.fixed, type: 'number' }, { id: 'rbMin', label: `Minimum amount, ${x.cur}`, value: x.min, type: 'number', hint: `Applies to ${LEVEL[S.rate.level].label} level · ${S.rate.init === 'api' ? 'API' : 'company user'} initiated.` }], 'rate-bank-save'); },
+  'rate-bank-save': () => { const x = bankRows(cd(cur()), S.rate.level, S.rate.init)[S._edit]; Object.assign(x, { pct: +$('#rbPct').value || 0, fixed: +$('#rbFix').value || 0, min: +$('#rbMin').value || 0, custom: true }); closeModal(); toast('Bank fee updated'); renderCompanyPage(); },
+  'rate-spread': a => { const x = cd(cur()).spread[+a.dataset.i]; S._edit = +a.dataset.i; fieldsModal(`${x.pair} spread`, [{ id: 'rsClient', label: 'Client spread, %', value: x.client, type: 'number', hint: `The platform’s ${x.sys}% system spread is added on top.` }], 'rate-spread-save'); },
+  'rate-spread-save': () => { const x = cd(cur()).spread[S._edit]; x.client = +(+$('#rsClient').value || 0).toFixed(2); x.custom = true; closeModal(); toast(`${x.pair} spread updated`); renderCompanyPage(); },
+  'rate-ex': a => { const x = exRows(cd(cur()), S.rate.level)[+a.dataset.i]; S._edit = +a.dataset.i;
+    fieldsModal(`Volume €${volFmt(x.from)}${x.to ? '–€' + volFmt(x.to) : '+'}`, [['reAM', 'API maker, %', x.apiM], ['reAT', 'API taker, %', x.apiT], ['reUM', 'User maker, %', x.userM], ['reUT', 'User taker, %', x.userT]].map(([id, label, value]) => ({ id, label, value, type: 'number' })), 'rate-ex-save'); },
+  'rate-ex-save': () => { const x = exRows(cd(cur()), S.rate.level)[S._edit]; Object.assign(x, { apiM: +$('#reAM').value || 0, apiT: +$('#reAT').value || 0, userM: +$('#reUM').value || 0, userT: +$('#reUT').value || 0, custom: true }); closeModal(); toast('Exchange fee tier updated'); renderCompanyPage(); },
+  // imports
+  'imp-open': () => { const u = S.coSub.imports === 'users'; openModal(`<div class="modal">
+    <div class="modal-h">${u ? 'Import users' : 'Import card top-ups'}<button class="icon-btn sm bare" data-act="modal-close">${icon('x', 17)}</button></div>
+    <div class="modal-b">
+      <label class="dropzone" id="impZone"><input type="file" id="impFile" hidden accept=".csv,.xlsx">${icon('upload', 18)}<div><b>Click to upload</b> or drag and drop</div><div class="code">CSV or XLSX · start from the template so columns match</div></label>
+      <div class="hint">Rows that fail validation are skipped. You can download a report for every import.</div>
+    </div>
+    <div class="modal-f"><button class="btn btn-ghost btn-sm" data-act="imp-template" style="margin-right:auto">${icon('download', 14)}Template</button><button class="btn btn-ghost btn-sm" data-act="modal-close">Cancel</button></div>
+  </div>`); },
+  'imp-template': () => {
+    const c = cur();
+    if (S.coSub.imports === 'users') downloadCSV('user-import-template', ['email', 'first_name', 'last_name', 'country', 'phone', 'card_product_id'], [['jane.doe@example.com', 'Jane', 'Doe', 'DEU', '+4915112345678', c.cp[0]?.pid ?? '']]);
+    else downloadCSV('card-topup-template', ['user_email', 'card_id', 'amount', 'currency'], [['jane.doe@example.com', '51003', '50.00', 'EUR']]);
+    toast('Template downloaded', 'download');
+  },
+  'imp-report': a => { const o = cd(cur()).imports[S.coSub.imports][+a.dataset.i]; downloadCSV(`import-${o.id}-report`, ['row', 'result', 'message'], Array.from({ length: o.errors + o.skipped }, (_, i) => [i * 7 + 3, i < o.errors ? 'error' : 'skipped', i < o.errors ? ['Invalid email', 'Country not allowed', 'Duplicate user'][i % 3] : 'User already exists'])); toast('Report downloaded', 'download'); },
+  // currencies
+  'cur-add': () => { const D = cd(cur()), free = ASSETS.filter(a => !D.currencies.some(x => x.c === a.c)); if (!free.length) { toast('Every currency is already enabled', 'alert'); return; }
+    fieldsModal('Add currency', [{ id: 'cuC', label: 'Currency', value: free[0].c, options: free.map(a => [a.c, `${a.c} · ${a.n} (${a.net})`]) }, { id: 'cuProv', label: 'Provider', value: 'Fireblocks', options: [['Fireblocks', 'Fireblocks'], ['BitGo', 'BitGo'], ['Banking Circle', 'Banking Circle']] }], 'cur-save'); },
+  'cur-save': () => { const c = cur(), D = cd(c), at = new Date(NOW); D.currencies.push({ id: 600 + c.id * 7 + D.currencies.length + 20, c: $('#cuC').value, providerId: Math.random().toString(16).slice(2, 10), provider: $('#cuProv').value, created: at, updated: at }); closeModal(); toast(`${$('#cuC').value} enabled`, 'coins'); renderCompanyPage(); },
+  'cur-rm': a => { const D = cd(cur()), i = D.currencies.findIndex(x => x.id === +a.dataset.id), x = D.currencies.splice(i, 1)[0]; toast(`${x.c} removed`, 'trash'); renderCompanyPage(); },
+});
+
 document.addEventListener('click', e => {
   const a = e.target.closest('[data-act]');
   if (a && !a.disabled) { e.preventDefault(); ACT[a.dataset.act] && ACT[a.dataset.act](a, e); return; }
   const r = e.target.closest('[data-uid]');
   if (r && !e.target.closest('.pop')) goUser(+r.dataset.uid, e);
+  const rc = e.target.closest('[data-cid]');
+  if (rc && !e.target.closest('.pop')) goCo(+rc.dataset.cid, e);
   if (e.target.closest('.nav') && innerWidth <= 900) $('#app').classList.remove('mobile-open');
 });
 document.addEventListener('change', e => {
@@ -2490,6 +3456,7 @@ document.addEventListener('change', e => {
   else if (t.dataset.kyc != null) { const u = byId(S.userId); u.kyc = t.value; u.idv = t.value === 'approved'; u.updated = new Date(NOW); toast(`KYC status set to ${KYC[t.value].label}`); renderUserPage(); }
   else if (t.id === 'docFile' && t.files[0]) uploadDoc(t.files[0]);
   else if (t.id === 'formStatus') { S.formStatus = t.value; renderUserPage(); }
+  else coChange(t);
 });
 document.addEventListener('input', e => {
   const t = e.target;
@@ -2501,6 +3468,7 @@ document.addEventListener('input', e => {
   else if (t.id === 'ddQ') $('#ddList').innerHTML = ddItems(S._dd, t.value);
   else if (t.id === 'dpFrom' || t.id === 'dpTo') dpTyped(t);
   else if (t.id === 'popVQ') $('#popVals').innerHTML = valueItems(t.dataset.key, t.value);
+  else coInput(t);
 });
 document.addEventListener('keydown', e => {
   const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName);
@@ -2515,6 +3483,8 @@ document.addEventListener('keydown', e => {
     else if (modal.classList.contains('open')) closeModal();
     else if (typing) document.activeElement.blur();
     else if (S.route === 'users' && S.userId) location.hash = '#/users';
+    else if (S.route === 'companies' && S.coId) location.hash = '#/companies';
+    else if (S.route === 'companies' && S.co.sel.size) ACT['co-sel-clear']();
     else if (S.selected.size) ACT['sel-clear']();
     return;
   }
@@ -2523,6 +3493,8 @@ document.addEventListener('keydown', e => {
   if (e.key === '/' && S.route === 'users' && !S.userId) { e.preventDefault(); $('#uSearch').focus(); }
   if (S.userId && e.key === 'j') stepUser(1);
   if (S.userId && e.key === 'k') stepUser(-1);
+  if (e.key === '/' && S.route === 'companies' && !S.coId) { e.preventDefault(); $('#coSearch')?.focus(); }
+  if (S.coId && (e.key === 'j' || e.key === 'k')) stepCo(e.key === 'j' ? 1 : -1);
 });
 
 /* column resize */
@@ -2530,18 +3502,19 @@ let RS = null;
 document.addEventListener('mousedown', e => {
   const h = e.target.closest?.('.col-rs'); if (!h) return;
   e.preventDefault(); e.stopPropagation(); fitColumns();
-  RS = { k: h.dataset.rs, t: h.closest('table'), x: e.clientX, w: S.colW[h.dataset.rs], h };
+  const X = colCtx(); RS = { k: h.dataset.rs, t: h.closest('table'), x: e.clientX, w: X.w[h.dataset.rs], W: X.w, key: X.key, h };
   h.classList.add('on'); document.body.classList.add('resizing'); $('#tt').classList.remove('show');
 }, true);
-document.addEventListener('mousemove', e => { if (!RS) return; S.colW[RS.k] = Math.max(56, Math.round(RS.w + e.clientX - RS.x)); applyColW(RS.t); refreshHints(); });
-document.addEventListener('mouseup', () => { if (!RS) return; RS.h.classList.remove('on'); document.body.classList.remove('resizing'); store.set('nsc.colw', S.colW); S._resized = Date.now(); RS = null; });
+document.addEventListener('mousemove', e => { if (!RS) return; RS.W[RS.k] = Math.max(56, Math.round(RS.w + e.clientX - RS.x)); applyColW(RS.t); refreshHints(); });
+document.addEventListener('mouseup', () => { if (!RS) return; RS.h.classList.remove('on'); document.body.classList.remove('resizing'); store.set(RS.key, RS.W); S._resized = Date.now(); RS = null; });
 document.addEventListener('click', e => { if (S._resized && Date.now() - S._resized < 400) { e.stopPropagation(); e.preventDefault(); S._resized = 0; } }, true); // the click that ends a drag must not sort
-document.addEventListener('dblclick', e => { const h = e.target.closest?.('.col-rs'); if (!h) return; delete S.colW[h.dataset.rs]; store.set('nsc.colw', S.colW); renderResults(); });
+document.addEventListener('dblclick', e => { const h = e.target.closest?.('.col-rs'); if (!h) return; const X = colCtx(); delete X.w[h.dataset.rs]; store.set(X.key, X.w); X.redraw(); });
 
 /* horizontal scroll hint: soft blurred fade on the side that has more content */
 function updHint(el) {
   const w = el.parentElement; if (!w?.classList.contains('hs-wrap')) return;
-  const max = el.scrollWidth - el.clientWidth;
+  const max = el.scrollWidth - el.clientWidth, pin = el.querySelector('th.cbcell, th.mx-corner');
+  w.style.setProperty('--hs-l', (pin ? pin.offsetWidth : 0) + 'px'); // left fade starts after pinned columns, so it never blurs them
   w.classList.toggle('hs-r', el.scrollLeft < max - 2); w.classList.toggle('hs-l', el.scrollLeft > 2);
 }
 const refreshHints = () => $$('.hs').forEach(updHint);
