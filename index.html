@@ -6,6 +6,7 @@
 <title>NS.Cards Admin</title>
 <!--
   NS.Cards Admin: clickable prototype
+  Icons: Solar "Linear" by 480 Design, CC BY 4.0 (SOLAR in <script>)
   ─────────────────────────────────────
   • Design tokens       → :root (light) and :root[data-theme="dark"] in <style>
   • Logo / favicon      → SIGN_D / WORD_D in <script>
@@ -214,6 +215,7 @@ h1 .count{font-family:var(--mono);font-size:14px;font-weight:400;color:var(--ink
 .cb .i{opacity:0}
 .cb.on{background:var(--inv);border-color:var(--inv)} .cb.on .i{opacity:1}
 .cb.mixed{background:var(--inv);border-color:var(--inv)}
+.cb.mixed .i{display:none}
 .cb.mixed::after{content:"";width:8px;height:1.75px;background:var(--on-inv);border-radius:2px}
 .rd{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--cb-border);flex:none}
 .rd.on{border:5px solid var(--inv)}
@@ -257,6 +259,18 @@ h1 .count{font-family:var(--mono);font-size:14px;font-weight:400;color:var(--ink
 .results{padding:0 28px 28px}
 .tcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm)}
 .tscroll{overflow:auto;max-height:calc(100vh - 278px);min-height:280px}
+/* no rubber-band bounce: scrolling past an edge must not pull the table header (or anything else) away */
+html,body,main,.tscroll,.dt-wrap,.board,.col-b,.sb-scroll,.pop-list{overscroll-behavior:none}
+/* list pages fill the viewport: the table body scrolls, its header and the pager stay in view */
+@media (min-width:901px){
+  .page.fit{height:100%;min-height:560px;display:flex;flex-direction:column}
+  .page.fit .results{flex:1;min-height:0;display:flex;flex-direction:column;padding-bottom:20px}
+  .page.fit .results>.tcard{flex:1;min-height:0;display:flex;flex-direction:column}
+  .page.fit .results .hs-wrap{flex:1;min-height:0}
+  .page.fit .tscroll{height:100%;max-height:none;min-height:0}
+  .page.fit .results>.board{flex:1;min-height:0}
+  .page.fit .col{max-height:100%}
+}
 table{border-collapse:separate;border-spacing:0;width:100%;min-width:1040px}
 th{position:sticky;top:0;z-index:2;background:var(--head-bg);text-align:left;font-weight:500;font-size:12.5px;color:var(--ink-2);height:40px;padding:0 12px;border-bottom:1px solid var(--line);white-space:nowrap;user-select:none}
 th.sortable{cursor:pointer}
@@ -271,12 +285,16 @@ td{height:54px;padding:0 12px;border-bottom:1px solid var(--line-soft);white-spa
 .compact .ucell .ue{display:none}
 tbody tr{cursor:pointer}
 tbody tr:hover td{background:var(--row-hover)}
-tbody tr.sel td{background:var(--brand-50)}
+tbody tr.sel td{background:var(--hover)}
 tbody tr:last-child td{border-bottom:0}
 th.cbcell,td.cbcell{width:44px;padding:0 4px 0 18px}
-th.act-h,td.act{width:84px}
-.row-actions{display:flex;justify-content:flex-end;gap:2px;opacity:0;transition:opacity .1s}
-tr:hover .row-actions{opacity:1}
+th.act-h{width:84px}
+td.act{position:sticky;right:0;z-index:1;padding:0!important;background:transparent!important;overflow:visible!important}
+tbody tr:hover td.act{z-index:5}
+.row-actions{position:absolute;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:flex-end;gap:2px;padding:0 14px 0 40px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .1s;
+  --rowbg:var(--row-hover);background:linear-gradient(to right,transparent,var(--rowbg) 32px)}
+tbody tr:hover .row-actions{opacity:1;pointer-events:auto}
+tbody tr.sel .row-actions{--rowbg:var(--hover)}
 .ucell{display:flex;align-items:center;gap:10px;min-width:0}
 .ucell>div{min-width:0}
 .ucell .un,.ucell .ue{overflow:hidden;text-overflow:ellipsis}
@@ -292,9 +310,9 @@ th:hover .col-rs::after{opacity:1}
 body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
 /* horizontal scroll hint */
 .hs-wrap{position:relative}
-.hs-wrap::before,.hs-wrap::after{content:"";position:absolute;top:0;bottom:0;width:56px;z-index:4;pointer-events:none;opacity:0;transition:opacity .2s;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
-.hs-wrap::after{right:0;background:linear-gradient(to right,transparent,var(--surface));-webkit-mask-image:linear-gradient(to right,transparent,#000 70%);mask-image:linear-gradient(to right,transparent,#000 70%)}
-.hs-wrap::before{left:0;background:linear-gradient(to left,transparent,var(--surface));-webkit-mask-image:linear-gradient(to left,transparent,#000 70%);mask-image:linear-gradient(to left,transparent,#000 70%)}
+.hs-wrap::before,.hs-wrap::after{content:"";position:absolute;top:0;bottom:0;width:96px;z-index:4;pointer-events:none;opacity:0;transition:opacity .2s;backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px)}
+.hs-wrap::after{right:0;-webkit-mask-image:linear-gradient(to right,transparent,#000 70%);mask-image:linear-gradient(to right,transparent,#000 70%)}
+.hs-wrap::before{left:0;-webkit-mask-image:linear-gradient(to left,transparent,#000 70%);mask-image:linear-gradient(to left,transparent,#000 70%)}
 .hs-wrap.hs-r::after,.hs-wrap.hs-l::before{opacity:1}
 .ucell .un{font-weight:500;line-height:1.25}
 .ucell .ue{color:var(--ink-2);font-size:12.5px;line-height:1.3}
@@ -323,7 +341,7 @@ body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
 .lrow{display:flex;align-items:center;gap:12px;padding:0 18px;height:58px;border-bottom:1px solid var(--line-soft);cursor:pointer}
 .compact .lrow{height:44px}
 .lrow:hover{background:var(--row-hover)}
-.lrow.sel{background:var(--brand-50)}
+.lrow.sel{background:var(--hover)}
 .lmain{flex:1;min-width:0}
 .lname{font-weight:500;display:flex;align-items:center;gap:8px}
 .lsub{font-size:12.5px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -385,16 +403,23 @@ body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
 .tab-n{font-size:12px;font-weight:500;color:var(--ink-3)}
 /* user page sections: cards with a header, optional filter row and an edge-to-edge table */
 .card.flush{padding:0;overflow:hidden}
-.card.flush>.card-h{padding:16px 20px 0;margin-bottom:14px}
+/* user page: every section card shares one header — 56px row, title left, actions right, divider below */
+.up-grid .card{padding:0;overflow:hidden}
+.up-grid .card>.card-h{min-height:56px;margin:0;padding:10px 20px;border-bottom:1px solid var(--line);flex-wrap:nowrap}
+.up-grid .card-b{padding:4px 20px 8px}
+.up-grid .card-b.pad{padding:16px 20px 18px}
+.up-grid .card-tools{padding:12px 20px;border-bottom:1px solid var(--line)}
+.card-tools .seg button{height:26px}
 .card-t .ct{font-weight:500;color:var(--ink-3);margin-left:6px}
 .ch-act{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .card-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 20px 14px}
-.dt-wrap{overflow-x:auto;border-top:1px solid var(--line)}
+.dt-wrap{overflow-x:auto}
 .dt{min-width:720px}
 .dt th{position:static;height:38px;font-size:12px}
 .dt td{height:52px}
 .dt th:first-child,.dt td:first-child{padding-left:20px}
 .dt th:last-child,.dt td:last-child{padding-right:20px}
+.dt th.a{width:1%;padding:0!important}
 .dt th.r,.dt td.r{text-align:right} .dt th.c,.dt td.c{text-align:center} .dt th.w,.dt td.w{width:1%}
 .dt tbody tr{cursor:default}
 .card.flush .pager{border-top:1px solid var(--line)}
@@ -403,12 +428,17 @@ body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
 .txt{display:inline-flex;align-items:center;gap:7px} .txt .i{color:var(--ink-3)}
 .num.pos{color:var(--success-ink)}
 .empty.sm{padding:44px 20px}
-.sel{height:34px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B9B98' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 9px center/14px;padding:0 30px 0 11px;font-size:13px;color:var(--ink);appearance:none;-webkit-appearance:none;outline:0;cursor:pointer}
-.sel.sm{height:30px;font-size:12.5px;border-radius:9px}
+.fsel{height:34px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B9B98' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 9px center/14px;padding:0 30px 0 11px;font-size:13px;color:var(--ink);appearance:none;-webkit-appearance:none;outline:0;cursor:pointer}
+.fsel.sm{height:30px;font-size:12.5px;border-radius:9px}
 .inp{height:34px;width:150px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);padding:0 11px;font-size:13px;color:var(--ink);outline:0}
 .inp::placeholder{color:var(--ink-3)}
-.sel:focus,.inp:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-100)}
-.wlist{border-top:1px solid var(--line)}
+.dd{text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px}
+.dd.dd-ph{color:var(--ink-3)}
+.dd .flag{margin-right:8px}
+.dd-field{display:block;width:100%;max-width:none;height:40px;border-radius:10px;border:1px solid var(--line-strong);padding:0 36px 0 12px;font-size:14px;color:var(--ink);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B9B98' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center/14px}
+.dd:hover{border-color:var(--cb-border)}
+.dd.open,.dd:focus-visible{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-100);outline:0}
+.fsel:focus,.inp:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-100)}
 .wrow{display:flex;align-items:center;gap:12px;height:62px;padding:0 20px;border-bottom:1px solid var(--line-soft);cursor:pointer}
 .wrow:hover{background:var(--row-hover)}
 .wrow .wn{flex:1;min-width:0}
@@ -422,7 +452,7 @@ body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
 .wlist>:last-child{border-bottom:0}
 .mini-card{width:36px;height:24px;border-radius:5px;background:linear-gradient(135deg,#2C2C2C,#111);display:grid;place-items:center;flex:none}
 .mini-card.alt{background:linear-gradient(135deg,#FF9A4D,#E0600A)}
-.docs{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.docs{padding:16px 20px 20px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
 .docs-h{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .sub-t{font-weight:600;font-size:13.5px}
 .doc{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font-size:13.5px}
@@ -466,7 +496,7 @@ body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
 .tl-i .tl-s{font-size:12.5px;color:var(--ink-2)}
 
 /* ───────────────────────── Popover / tooltip / toast / modal ───────────────────────── */
-.pop{position:fixed;z-index:70;max-width:calc(100vw - 16px);background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-pop);min-width:220px;padding:6px;display:none;animation:pop-in .12s ease}
+.pop{position:fixed;z-index:80;max-width:calc(100vw - 16px);background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-pop);min-width:220px;padding:6px;display:none;animation:pop-in .12s ease}
 .pop.open{display:block}
 /* date range picker: presets on the left, month calendar on the right */
 .dp-btn{display:inline-flex;align-items:center;gap:7px;height:34px;max-width:260px;padding:0 10px 0 11px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap}
@@ -480,6 +510,18 @@ body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
 .dp-cal{flex:1;min-width:0;padding:12px 14px}
 .dp-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .dp-h b{font-weight:600;font-size:13.5px}
+.dp-tbtn{height:28px;padding:0 10px;border-radius:8px;font-weight:600;font-size:13.5px}
+.dp-tbtn:hover{background:var(--hover)}
+.dp-body{min-height:282px}
+.dp-grid.m{grid-template-columns:repeat(3,1fr);gap:6px;padding-top:6px}
+.dp-mo{height:52px;border-radius:10px;font-size:13px;text-align:center;color:var(--ink);font-variant-numeric:tabular-nums}
+.dp-mo:hover:not(:disabled){background:var(--hover)}
+.dp-mo.today{color:var(--brand);font-weight:600}
+.dp-mo.on,.dp-mo.on:hover{background:var(--inv);color:var(--on-inv)}
+.dp-in{flex:1;min-width:0;display:flex;align-items:center;gap:5px}
+.dp-in .inp{flex:none;width:92px;height:30px;padding:0 9px;font-size:12.5px;font-variant-numeric:tabular-nums}
+.dp-in .inp.err{border-color:var(--error);box-shadow:0 0 0 3px var(--error-bg)}
+.dp-dash{color:var(--ink-3)}
 .dp-grid{display:grid;grid-template-columns:repeat(7,1fr);row-gap:2px}
 .dp-w{height:28px;line-height:28px;text-align:center;font-size:11px;font-weight:500;color:var(--ink-3)}
 .dp-day{height:36px;border-radius:9px;font-size:13px;color:var(--ink);text-align:center;font-variant-numeric:tabular-nums}
@@ -488,7 +530,6 @@ body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
 .dp-day.in{background:var(--surface-2);border-radius:0}
 .dp-day.start,.dp-day.end,.dp-day.start:hover,.dp-day.end:hover{background:var(--inv);color:var(--on-inv)}
 .dp-f{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
-.dp-sum{flex:1;font-size:12.5px;color:var(--ink-2)}
 
 .pop-head{display:flex;align-items:center;gap:6px;height:34px;padding:0 4px;font-weight:600;font-size:13px;margin-bottom:2px}
 .pop-search{display:flex;align-items:center;gap:8px;height:36px;padding:0 10px;margin:-6px -6px 6px;border-bottom:1px solid var(--line);color:var(--ink-3)}
@@ -512,7 +553,7 @@ body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
 .pill:hover{color:var(--ink)}
 .pill.on{background:var(--inv);border-color:var(--inv);color:var(--on-inv)}
 
-.tt{position:fixed;z-index:80;pointer-events:none;background:var(--float);color:#fff;border-radius:10px;padding:8px 10px;font-size:12.5px;box-shadow:var(--shadow-pop);opacity:0;transition:opacity .1s;min-width:120px}
+.tt{position:fixed;z-index:85;pointer-events:none;background:var(--float);color:#fff;border-radius:10px;padding:8px 10px;font-size:12.5px;box-shadow:var(--shadow-pop);opacity:0;transition:opacity .1s;min-width:120px}
 .tt.show{opacity:1}
 .tt.plain{min-width:0;padding:6px 9px;font-weight:500}
 .tt .tt-d{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.55);margin-bottom:5px}
@@ -578,13 +619,10 @@ body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
 .barlist .bl>span{position:relative;z-index:1;display:flex;align-items:center;gap:8px}
 .barlist .bl:hover i{background:var(--line)}
 .barlist .bl-p{color:var(--ink-3);font-size:12px;min-width:36px;text-align:right}
-.card.fill{display:flex;flex-direction:column}
-.card.fill .barlist{flex:1;display:flex;flex-direction:column;justify-content:space-between}
-.card.fill .barlist .bl{margin-bottom:0}
 .rk{display:flex;align-items:center;gap:12px;height:56px;border-bottom:1px solid var(--line-soft);width:100%}
 .rk:last-child{border-bottom:0}
 .rk:hover .rk-go{color:var(--ink);transform:translateX(2px)}
-.rk-ic{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:var(--tone-bg);color:var(--tone-ink);flex:none}
+.rk-ic{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:var(--neutral-bg);color:var(--tone-ink);flex:none}
 .rk-l{flex:1;font-size:13.5px}
 .rk-l div:last-child{font-size:12px;color:var(--ink-2)}
 .rk-v{font-family:var(--mono);font-size:15px;font-weight:500}
@@ -769,7 +807,88 @@ const ICONS = {
   send: '<path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/>',
   bookmark: '<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>',
 };
-const icon = (n, s = 16, sw = 1.75) => `<svg class="i" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ''}</svg>`;
+/* Solar "Linear" icons by 480 Design (CC BY 4.0), embedded from @iconify-json/solar. Single colour: they draw with currentColor. */
+const SOLAR = {
+  search: `<g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11.5" cy="11.5" r="9.5"/><path stroke-linecap="round" d="M18.5 18.5L22 22"/></g>`,
+  dashboard: `<path fill="none" stroke="currentColor" stroke-width="1.5" d="M2.5 6.5a4 4 0 1 1 8 0a4 4 0 0 1-8 0Zm11 11a4 4 0 1 1 8 0a4 4 0 0 1-8 0Zm8-11c0-1.886 0-2.828-.586-3.414S19.386 2.5 17.5 2.5s-2.828 0-3.414.586S13.5 4.614 13.5 6.5s0 2.828.586 3.414s1.528.586 3.414.586s2.828 0 3.414-.586s.586-1.528.586-3.414Zm-11 11c0-1.886 0-2.828-.586-3.414S8.386 13.5 6.5 13.5s-2.828 0-3.414.586S2.5 15.614 2.5 17.5s0 2.828.586 3.414s1.528.586 3.414.586s2.828 0 3.414-.586s.586-1.528.586-3.414Z"/>`,
+  users: `<g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="6" r="4"/><path stroke-linecap="round" d="M15 9a3 3 0 1 0 0-6"/><ellipse cx="9" cy="17" rx="7" ry="4"/><path stroke-linecap="round" d="M18 14c1.754.385 3 1.359 3 2.5c0 1.03-1.014 1.923-2.5 2.37"/></g>`,
+  building: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M22 22H2"/><path d="M17 22V6c0-1.886 0-2.828-.586-3.414S14.886 2 13 2h-2c-1.886 0-2.828 0-3.414.586S7 4.114 7 6v16m14 0V11.5c0-1.405 0-2.107-.337-2.611a2 2 0 0 0-.552-.552C19.607 8 18.904 8 17.5 8M3 22V11.5c0-1.405 0-2.107.337-2.611a2 2 0 0 1 .552-.552C4.393 8 5.096 8 6.5 8"/><path stroke-linecap="round" d="M12 22v-3M10 5h4m-4 3h4m-4 3h4m-4 3h4"/></g>`,
+  shieldCheck: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10.417c0-3.198 0-4.797.378-5.335c.377-.537 1.88-1.052 4.887-2.081l.573-.196C10.405 2.268 11.188 2 12 2s1.595.268 3.162.805l.573.196c3.007 1.029 4.51 1.544 4.887 2.081C21 5.62 21 7.22 21 10.417v1.574c0 5.638-4.239 8.375-6.899 9.536C13.38 21.842 13.02 22 12 22s-1.38-.158-2.101-.473C7.239 20.365 3 17.63 3 11.991z"/><path stroke-linecap="round" stroke-linejoin="round" d="m9.5 12.4l1.429 1.6l3.571-4"/></g>`,
+  arrows: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 10H4l5.5-6M4 14h16l-5.5 6"/>`,
+  wallet: `<g fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 8h4"/><path stroke-width="1.5" d="M20.833 9h-2.602C16.446 9 15 10.343 15 12s1.447 3 3.23 3h2.603c.084 0 .125 0 .16-.002c.54-.033.97-.432 1.005-.933c.002-.032.002-.071.002-.148v-3.834c0-.077 0-.116-.002-.148c-.036-.501-.465-.9-1.005-.933C20.959 9 20.918 9 20.834 9Z"/><path stroke-width="1.5" d="M20.965 9c-.078-1.872-.328-3.02-1.137-3.828C18.657 4 16.771 4 13 4h-3C6.229 4 4.343 4 3.172 5.172S2 8.229 2 12s0 5.657 1.172 6.828S6.229 20 10 20h3c3.771 0 5.657 0 6.828-1.172c.809-.808 1.06-1.956 1.137-3.828"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.991 12h.01"/></g>`,
+  bank: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-2.828 0-4.243.879-5.121C3.757 5 5.172 5 8 5h5c2.828 0 4.243 0 5.121.879C19 6.757 19 8.172 19 11s0 4.243-.879 5.121C17.243 17 15.828 17 13 17H8c-2.828 0-4.243 0-5.121-.879C2 15.243 2 13.828 2 11Z"/><path d="M19 8.076c.975.096 1.631.313 2.121.803c.88.878.88 2.293.88 5.121s0 4.243-.88 5.121c-.878.88-2.293.88-5.12.88h-5c-2.83 0-4.244 0-5.122-.88c-.49-.49-.707-1.146-.803-2.121"/><path d="M13 11a2.5 2.5 0 1 1-5 0a2.5 2.5 0 0 1 5 0Z"/><path stroke-linecap="round" d="M16 13V9M5 13V9"/></g>`,
+  card: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12c0-3.771 0-5.657 1.172-6.828S6.229 4 10 4h4c3.771 0 5.657 0 6.828 1.172S22 8.229 22 12s0 5.657-1.172 6.828S17.771 20 14 20h-4c-3.771 0-5.657 0-6.828-1.172S2 15.771 2 12Z"/><path stroke-linecap="round" d="M10 16H6m8 0h-1.5M2 10h20"/></g>`,
+  layers: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.979 9.685C2.993 8.891 2 8.494 2 8s.993-.89 2.979-1.685l2.808-1.123C9.773 4.397 10.767 4 12 4s2.227.397 4.213 1.192l2.808 1.123C21.007 7.109 22 7.506 22 8s-.993.89-2.979 1.685l-2.808 1.124C14.227 11.603 13.233 12 12 12s-2.227-.397-4.213-1.191z"/><path d="m5.766 10l-.787.315C2.993 11.109 2 11.507 2 12s.993.89 2.979 1.685l2.808 1.124C9.773 15.603 10.767 16 12 16s2.227-.397 4.213-1.191l2.808-1.124C21.007 12.891 22 12.493 22 12s-.993-.89-2.979-1.685L18.234 10"/><path d="m5.766 14l-.787.315C2.993 15.109 2 15.507 2 16s.993.89 2.979 1.685l2.808 1.124C9.773 19.603 10.767 20 12 20s2.227-.397 4.213-1.192l2.808-1.123C21.007 16.891 22 16.494 22 16c0-.493-.993-.89-2.979-1.685L18.234 14"/></g>`,
+  activity: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M5 15h1.394c.786 0 1.18 0 1.511.177c.332.178.55.505.986 1.159l.16.24c.422.633.633.95.92.933c.286-.017.459-.356.803-1.036l1.966-3.877c.359-.706.538-1.06.831-1.071c.293-.012.5.326.914 1.001l.637 1.04c.43.701.644 1.051.985 1.243c.342.19.752.19 1.573.19H19"/><path d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12Z"/></g>`,
+  radar: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M12 12L5.002 6.335c-.43-.347-1.063-.283-1.366.178a10 10 0 0 0-1.295 2.898C.91 14.746 4.077 20.23 9.41 21.66c5.336 1.43 10.819-1.737 12.248-7.071C23.09 9.253 19.923 3.77 14.59 2.34a9.97 9.97 0 0 0-7.502.95"/>`,
+  scale: `<g fill="none"><path stroke="currentColor" stroke-width="1.5" d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12Z"/><path stroke="currentColor" stroke-width="1.5" d="M5 11c0-2.828 0-4.243.879-5.121C6.757 5 8.172 5 11 5h2c2.828 0 4.243 0 5.121.879C19 6.757 19 8.172 19 11v2c0 2.828 0 4.243-.879 5.121C17.243 19 15.828 19 13 19h-2c-2.828 0-4.243 0-5.121-.879C5 17.243 5 15.828 5 13z"/><path stroke="currentColor" stroke-width="1.5" d="M8 12a4 4 0 1 1 8 0a4 4 0 0 1-8 0Z"/><path fill="currentColor" d="M13.5 12a1.5 1.5 0 1 1-3 0a1.5 1.5 0 0 1 3 0"/><path stroke="currentColor" stroke-width="1.5" d="M12 12V8m0 4l3.5 1.5M12 12l-3.5 1.5"/><path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M4.5 7v3m0 4v3"/></g>`,
+  coins: `<g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 6v12m3-8.5C15 8.12 13.657 7 12 7S9 8.12 9 9.5s1.343 2.5 3 2.5s3 1.12 3 2.5s-1.343 2.5-3 2.5s-3-1.12-3-2.5"/></g>`,
+  candles: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 22h18"/><path d="M3 11c0-.943 0-1.414.293-1.707S4.057 9 5 9s1.414 0 1.707.293S7 10.057 7 11v6c0 .943 0 1.414-.293 1.707S5.943 19 5 19s-1.414 0-1.707-.293S3 17.943 3 17zm7-4c0-.943 0-1.414.293-1.707S11.057 5 12 5s1.414 0 1.707.293S14 6.057 14 7v10c0 .943 0 1.414-.293 1.707S12.943 19 12 19s-1.414 0-1.707-.293S10 17.943 10 17zm7-3c0-.943 0-1.414.293-1.707S18.057 2 19 2s1.414 0 1.707.293S21 3.057 21 4v13c0 .943 0 1.414-.293 1.707S19.943 19 19 19s-1.414 0-1.707-.293S17 17.943 17 17z"/></g>`,
+  globe: `<g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="10" r="7"/><path stroke-linecap="round" d="M4 16.562A10.3 10.3 0 0 0 11.687 20C17.383 20 22 15.383 22 9.687C22 6.633 20.672 3.888 18.562 2"/><path d="M7 4.553c.585.552 1.79 2.063 1.931 3.684c.131 1.515 1.096 2.746 2.569 2.763c.566.006 1.139-.418 1.137-1.005c0-.182-.03-.367-.074-.538a1.14 1.14 0 0 1 .062-.79c.457-.978 1.357-1.241 2.07-1.772c.316-.236.604-.484.732-.684c.35-.553.702-1.658.526-2.211M19 11c-.22.62-.375 2.25-2.855 2.276c0 0-2.195 0-2.854 1.241c-.527.993-.22 2.07 0 2.483"/><path stroke-linecap="round" d="M12 22v-2m0 2h-2m4 0h-2"/></g>`,
+  userCog: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 10.417c0-3.198 0-4.797.378-5.335c.377-.537 1.88-1.052 4.887-2.081l.573-.196C10.405 2.268 11.188 2 12 2s1.595.268 3.162.805l.573.196c3.007 1.029 4.51 1.544 4.887 2.081C21 5.62 21 7.22 21 10.417v1.574c0 5.638-4.239 8.375-6.899 9.536C13.38 21.842 13.02 22 12 22s-1.38-.158-2.101-.473C7.239 20.365 3 17.63 3 11.991z"/><circle cx="12" cy="9" r="2"/><path d="M16 15c0 1.105 0 2-4 2s-4-.895-4-2s1.79-2 4-2s4 .895 4 2Z"/></g>`,
+  key: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linejoin="round" d="M15.68 14.587c3.49 0 6.32-2.818 6.32-6.294S19.17 2 15.68 2S9.363 4.818 9.363 8.293c0 1.61.734 2.781.734 2.781l-7.642 7.61c-.343.342-.823 1.23 0 2.05l.882.878c.343.293 1.205.703 1.91 0l1.03-1.024c1.028 1.024 2.204.439 2.645-.147c.734-1.024-.147-2.049-.147-2.049l.294-.293c1.41 1.406 2.645.586 3.086 0c.735-1.024 0-2.049 0-2.049c-.294-.585-.882-.585-.147-1.317l.882-.878c.705.585 2.155.732 2.792.732Z"/><path d="M17.885 8.294a2.2 2.2 0 0 1-2.204 2.195a2.2 2.2 0 0 1-2.204-2.195a2.2 2.2 0 0 1 2.204-2.196a2.2 2.2 0 0 1 2.204 2.196Z"/></g>`,
+  bell: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18.75 9.71v-.705C18.75 5.136 15.726 2 12 2S5.25 5.136 5.25 9.005v.705a4.4 4.4 0 0 1-.692 2.375L3.45 13.81c-1.011 1.575-.239 3.716 1.52 4.214a25.8 25.8 0 0 0 14.06 0c1.759-.498 2.531-2.639 1.52-4.213l-1.108-1.725a4.4 4.4 0 0 1-.693-2.375Z"/><path stroke-linecap="round" d="M7.5 19c.655 1.748 2.422 3 4.5 3s3.845-1.252 4.5-3"/></g>`,
+  help: `<g fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M10.125 8.875a1.875 1.875 0 1 1 2.828 1.615c-.475.281-.953.708-.953 1.26V13"/><circle cx="12" cy="16" r="1" fill="currentColor"/></g>`,
+  sun: `<g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><path stroke-linecap="round" d="M12 2v2m0 16v2M4 12H2m20 0h-2m-.222-7.777l-2.222 2.031M4.222 4.223l2.222 2.031m0 11.302l-2.222 2.222m15.556-.001l-2.222-2.222"/></g>`,
+  moon: `<path fill="currentColor" d="m21.067 11.857l-.642-.388zm-8.924-8.924l-.388-.642zM21.25 12A9.25 9.25 0 0 1 12 21.25v1.5c5.937 0 10.75-4.813 10.75-10.75zM12 21.25A9.25 9.25 0 0 1 2.75 12h-1.5c0 5.937 4.813 10.75 10.75 10.75zM2.75 12A9.25 9.25 0 0 1 12 2.75v-1.5C6.063 1.25 1.25 6.063 1.25 12zm12.75 2.25A5.75 5.75 0 0 1 9.75 8.5h-1.5a7.25 7.25 0 0 0 7.25 7.25zm4.925-2.781A5.75 5.75 0 0 1 15.5 14.25v1.5a7.25 7.25 0 0 0 6.21-3.505zM9.75 8.5a5.75 5.75 0 0 1 2.781-4.925l-.776-1.284A7.25 7.25 0 0 0 8.25 8.5zM12 2.75a.38.38 0 0 1-.268-.118a.3.3 0 0 1-.082-.155c-.004-.031-.002-.121.105-.186l.776 1.284c.503-.304.665-.861.606-1.299c-.062-.455-.42-1.026-1.137-1.026zm9.71 9.495c-.066.107-.156.109-.187.105a.3.3 0 0 1-.155-.082a.38.38 0 0 1-.118-.268h1.5c0-.717-.571-1.075-1.026-1.137c-.438-.059-.995.103-1.299.606z"/>`,
+  chevDown: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m19 9l-7 6l-7-6"/>`,
+  chevUp: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m19 15l-7-6l-7 6"/>`,
+  chevRight: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m9 5l6 7l-6 7"/>`,
+  chevLeft: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m15 5l-6 7l6 7"/>`,
+  chevsUD: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 18V6m0 0l4 4.125M16 6l-4 4.125M8 6v12m0 0l4-4.125M8 18l-4-4.125"/>`,
+  filter: `<path fill="none" stroke="currentColor" stroke-width="1.5" d="M19 3H5c-1.414 0-2.121 0-2.56.412S2 4.488 2 5.815v.69c0 1.037 0 1.556.26 1.986s.733.698 1.682 1.232l2.913 1.64c.636.358.955.537 1.183.735c.474.411.766.895.898 1.49c.064.284.064.618.064 1.285v2.67c0 .909 0 1.364.252 1.718c.252.355.7.53 1.594.88c1.879.734 2.818 1.101 3.486.683S15 19.452 15 17.542v-2.67c0-.666 0-1 .064-1.285a2.68 2.68 0 0 1 .899-1.49c.227-.197.546-.376 1.182-.735l2.913-1.64c.948-.533 1.423-.8 1.682-1.23c.26-.43.26-.95.26-1.988v-.69c0-1.326 0-1.99-.44-2.402C21.122 3 20.415 3 19 3Z"/>`,
+  sliders: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.5 14a3 3 0 1 1 0 6a3 3 0 0 1 0-6Zm5-10a3 3 0 1 0 0 6a3 3 0 0 0 0-6Z"/><path stroke-linecap="round" d="M15 16.959h7m-13-10H2m0 10h2m18-10h-2"/></g>`,
+  table: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828S6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172S22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828S17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172S2 16.771 2 13zm0 1h20"/><path stroke-linecap="round" d="M13.5 16.5H18m-4.5-9H18m-12 10v-2m0-7v-2m3 11v-2m0-7v-2"/></g>`,
+  list: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M20 7H4m11 5H4m5 5H4"/>`,
+  board: `<path fill="none" stroke="currentColor" stroke-width="1.5" d="M2.5 6.5c0-1.886 0-2.828.586-3.414S4.614 2.5 6.5 2.5s2.828 0 3.414.586s.586 1.528.586 3.414v11c0 1.886 0 2.828-.586 3.414S8.386 21.5 6.5 21.5s-2.828 0-3.414-.586S2.5 19.386 2.5 17.5zm11 9c0-1.886 0-2.828.586-3.414s1.528-.586 3.414-.586s2.828 0 3.414.586s.586 1.528.586 3.414v2c0 1.886 0 2.828-.586 3.414s-1.528.586-3.414.586s-2.828 0-3.414-.586s-.586-1.528-.586-3.414zm0-10c0-.932 0-1.398.152-1.765a2 2 0 0 1 1.083-1.083c.367-.152.833-.152 1.765-.152h2c.932 0 1.398 0 1.765.152a2 2 0 0 1 1.083 1.083c.152.367.152.833.152 1.765s0 1.398-.152 1.765a2 2 0 0 1-1.083 1.083c-.367.152-.833.152-1.765.152h-2c-.932 0-1.398 0-1.765-.152a2 2 0 0 1-1.083-1.083C13.5 6.898 13.5 6.432 13.5 5.5Z"/>`,
+  download: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 15c0 2.828 0 4.243.879 5.121C4.757 21 6.172 21 9 21h6c2.828 0 4.243 0 5.121-.879C21 19.243 21 17.828 21 15M12 3v13m0 0l4-4.375M12 16l-4-4.375"/>`,
+  more: `<g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></g>`,
+  copy: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 11c0-2.828 0-4.243.879-5.121C7.757 5 9.172 5 12 5h3c2.828 0 4.243 0 5.121.879C21 6.757 21 8.172 21 11v5c0 2.828 0 4.243-.879 5.121C19.243 22 17.828 22 15 22h-3c-2.828 0-4.243 0-5.121-.879C6 20.243 6 18.828 6 16z"/><path d="M6 19a3 3 0 0 1-3-3v-6c0-3.771 0-5.657 1.172-6.828S7.229 2 11 2h4a3 3 0 0 1 3 3"/></g>`,
+  login: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M8 16c0 2.828 0 4.243.879 5.121C9.757 22 11.172 22 14 22h1c2.828 0 4.243 0 5.121-.879C21 20.243 21 18.828 21 16V8c0-2.828 0-4.243-.879-5.121C19.243 2 17.828 2 15 2h-1c-2.828 0-4.243 0-5.121.879C8 3.757 8 5.172 8 8"/><path d="M8 19.5c-2.357 0-3.536 0-4.268-.732C3 18.035 3 16.857 3 14.5v-5c0-2.357 0-3.536.732-4.268S5.643 4.5 8 4.5"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 12h9m0 0l-2.5 2.5M15 12l-2.5-2.5"/></g>`,
+  logout: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M8.002 7c.012-2.175.109-3.353.877-4.121C9.758 2 11.172 2 14 2h1c2.829 0 4.243 0 5.122.879C21 3.757 21 5.172 21 8v8c0 2.828 0 4.243-.878 5.121C19.242 22 17.829 22 15 22h-1c-2.828 0-4.242 0-5.121-.879c-.768-.768-.865-1.946-.877-4.121"/><path d="M8 19.5c-2.357 0-3.536 0-4.268-.732C3 18.035 3 16.857 3 14.5v-5c0-2.357 0-3.536.732-4.268S5.643 4.5 8 4.5"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12H6m0 0l2 2m-2-2l2-2"/></g>`,
+  ban: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="m18.5 5.5l-13 13"/><circle cx="12" cy="12" r="10"/></g>`,
+  calendar: `<g fill="none"><path stroke="currentColor" stroke-width="1.5" d="M2 12c0-3.771 0-5.657 1.172-6.828S6.229 4 10 4h4c3.771 0 5.657 0 6.828 1.172S22 8.229 22 12v2c0 3.771 0 5.657-1.172 6.828S17.771 22 14 22h-4c-3.771 0-5.657 0-6.828-1.172S2 17.771 2 14z"/><path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M7 4V2.5M17 4V2.5M2.5 9h19"/><path fill="currentColor" d="M18 17a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/></g>`,
+  mail: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12c0-3.771 0-5.657 1.172-6.828S6.229 4 10 4h4c3.771 0 5.657 0 6.828 1.172S22 8.229 22 12s0 5.657-1.172 6.828S17.771 20 14 20h-4c-3.771 0-5.657 0-6.828-1.172S2 15.771 2 12Z"/><path stroke-linecap="round" d="m6 8l2.159 1.8c1.837 1.53 2.755 2.295 3.841 2.295s2.005-.765 3.841-2.296L18 8"/></g>`,
+  lock: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 16c0-2.828 0-4.243.879-5.121C3.757 10 5.172 10 8 10h8c2.828 0 4.243 0 5.121.879C22 11.757 22 13.172 22 16s0 4.243-.879 5.121C20.243 22 18.828 22 16 22H8c-2.828 0-4.243 0-5.121-.879C2 20.243 2 18.828 2 16Z"/><path stroke-linecap="round" d="M12 14v4m-6-8V8a6 6 0 1 1 12 0v2"/></g>`,
+  tag: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.728 16.137c-1.545-1.546-2.318-2.318-2.605-3.321c-.288-1.003-.042-2.068.45-4.197l.283-1.228c.413-1.792.62-2.688 1.233-3.302s1.51-.82 3.302-1.233l1.228-.284c2.13-.491 3.194-.737 4.197-.45c1.003.288 1.775 1.061 3.32 2.606l1.83 1.83C20.657 9.248 22 10.592 22 12.262c0 1.671-1.344 3.015-4.033 5.704c-2.69 2.69-4.034 4.034-5.705 4.034c-1.67 0-3.015-1.344-5.704-4.033z"/><circle cx="8.607" cy="8.879" r="2" transform="rotate(-45 8.607 8.879)"/><path stroke-linecap="round" d="m11.542 18.5l6.979-6.98"/></g>`,
+  alert: `<g fill="none"><path stroke="currentColor" stroke-width="1.5" d="M5.312 10.762C8.23 5.587 9.689 3 12 3s3.77 2.587 6.688 7.762l.364.644c2.425 4.3 3.638 6.45 2.542 8.022S17.786 21 12.364 21h-.728c-5.422 0-8.134 0-9.23-1.572s.117-3.722 2.542-8.022z"/><path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M12 8v5"/><circle cx="12" cy="16" r="1" fill="currentColor"/></g>`,
+  link: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="m14.163 18.488l-.721.72a6.117 6.117 0 0 1-8.65-8.65l.72-.72m4.325 4.325l4.326-4.326M9.837 5.512l.721-.72a6.117 6.117 0 1 1 8.65 8.65l-.72.72"/>`,
+  user: `<g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="6" r="4"/><ellipse cx="12" cy="17" rx="7" ry="4"/></g>`,
+  idcard: `<g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="2"/><path d="M13 15c0 1.105 0 2-4 2s-4-.895-4-2s1.79-2 4-2s4 .895 4 2Z"/><path d="M2 12c0-3.771 0-5.657 1.172-6.828S6.229 4 10 4h4c3.771 0 5.657 0 6.828 1.172S22 8.229 22 12s0 5.657-1.172 6.828S17.771 20 14 20h-4c-3.771 0-5.657 0-6.828-1.172S2 15.771 2 12Z"/><path stroke-linecap="round" d="M19 12h-4m4-3h-5m5 6h-3"/></g>`,
+  refresh: `<path fill="currentColor" d="M3.68 11.333h-.75zm0 1.667l-.528.532a.75.75 0 0 0 1.056 0zm2.208-1.134A.75.75 0 1 0 4.83 10.8zM2.528 10.8a.75.75 0 0 0-1.056 1.065zm16.088-3.408a.75.75 0 1 0 1.277-.786zM12.079 2.25c-5.047 0-9.15 4.061-9.15 9.083h1.5c0-4.182 3.42-7.583 7.65-7.583zm-9.15 9.083V13h1.5v-1.667zm1.28 2.2l1.679-1.667L4.83 10.8l-1.68 1.667zm0-1.065L2.528 10.8l-1.057 1.065l1.68 1.666zm15.684-5.86A9.16 9.16 0 0 0 12.08 2.25v1.5a7.66 7.66 0 0 1 6.537 3.643zM20.314 11l.527-.533a.75.75 0 0 0-1.054 0zM18.1 12.133a.75.75 0 0 0 1.055 1.067zm3.373 1.067a.75.75 0 1 0 1.054-1.067zM5.318 16.606a.75.75 0 1 0-1.277.788zm6.565 5.144c5.062 0 9.18-4.058 9.18-9.083h-1.5c0 4.18-3.43 7.583-7.68 7.583zm9.18-9.083V11h-1.5v1.667zm-1.276-2.2L18.1 12.133l1.055 1.067l1.686-1.667zm0 1.066l1.686 1.667l1.054-1.067l-1.686-1.666zM4.04 17.393a9.2 9.2 0 0 0 7.842 4.357v-1.5a7.7 7.7 0 0 1-6.565-3.644z"/>`,
+  hash: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 3L5 21M19 3l-5 18m8-12H4m16 7H2"/>`,
+  bookmark: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16.09v-4.992c0-4.29 0-6.433-1.318-7.766C18.364 2 16.242 2 12 2S5.636 2 4.318 3.332S3 6.81 3 11.098v4.993c0 3.096 0 4.645.734 5.321c.35.323.792.526 1.263.58c.987.113 2.14-.907 4.445-2.946c1.02-.901 1.529-1.352 2.118-1.47c.29-.06.59-.06.88 0c.59.118 1.099.569 2.118 1.47c2.305 2.039 3.458 3.059 4.445 2.945c.47-.053.913-.256 1.263-.579c.734-.676.734-2.224.734-5.321Z"/><path stroke-linecap="round" d="M15 6H9"/></g>`,
+  keyboard: `<g fill="none"><path fill="currentColor" d="M7 9a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0 3a1 1 0 1 1-2 0a1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-3a1 1 0 1 1-2 0a1 1 0 0 1 2 0m3 0a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0 3a1 1 0 1 1-2 0a1 1 0 0 1 2 0m3-3a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0 3a1 1 0 1 1-2 0a1 1 0 0 1 2 0m3-3a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0 3a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/><path stroke="currentColor" stroke-width="1.5" d="M2 11c0-2.828 0-4.243.879-5.121C3.757 5 5.172 5 8 5h8c2.828 0 4.243 0 5.121.879C22 6.757 22 8.172 22 11v2c0 2.828 0 4.243-.879 5.121C20.243 19 18.828 19 16 19H8c-2.828 0-4.243 0-5.121-.879C2 17.243 2 15.828 2 13z"/><path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M7 16h10"/></g>`,
+  pencil: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M4 22h16"/><path d="m13.888 3.663l.742-.742a3.146 3.146 0 1 1 4.449 4.45l-.742.74m-4.449-4.448s.093 1.576 1.483 2.966s2.966 1.483 2.966 1.483m-4.449-4.45L7.071 10.48c-.462.462-.693.692-.891.947a5.2 5.2 0 0 0-.599.969c-.139.291-.242.601-.449 1.22l-.875 2.626m14.08-8.13l-6.817 6.817c-.462.462-.692.692-.947.891q-.451.352-.969.599c-.291.139-.601.242-1.22.448l-2.626.876m0 0l-.641.213a.848.848 0 0 1-1.073-1.073l.213-.641m1.501 1.5l-1.5-1.5"/></g>`,
+  upload: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 15c0 2.828 0 4.243.879 5.121C4.757 21 6.172 21 9 21h6c2.828 0 4.243 0 5.121-.879C21 19.243 21 17.828 21 15m-9 1V3m0 0l4 4.375M12 3L8 7.375"/>`,
+  file: `<g fill="none"><path fill="currentColor" d="m15.393 4.054l-.502.557zm3.959 3.563l-.502.557zm2.302 2.537l-.685.305zM3.172 20.828l.53-.53zm17.656 0l-.53-.53zM14 21.25h-4v1.5h4zM2.75 14v-4h-1.5v4zm18.5-.437V14h1.5v-.437zM14.891 4.61l3.959 3.563l1.003-1.115l-3.958-3.563zm7.859 8.952c0-1.689.015-2.758-.41-3.714l-1.371.61c.266.598.281 1.283.281 3.104zm-3.9-5.389c1.353 1.218 1.853 1.688 2.119 2.285l1.37-.61c-.426-.957-1.23-1.66-2.486-2.79zM10.03 2.75c1.582 0 2.179.012 2.71.216l.538-1.4c-.852-.328-1.78-.316-3.248-.316zm5.865.746c-1.086-.977-1.765-1.604-2.617-1.93l-.537 1.4c.532.204.98.592 2.15 1.645zM10 21.25c-1.907 0-3.261-.002-4.29-.14c-1.005-.135-1.585-.389-2.008-.812l-1.06 1.06c.748.75 1.697 1.081 2.869 1.239c1.15.155 2.625.153 4.489.153zM1.25 14c0 1.864-.002 3.338.153 4.489c.158 1.172.49 2.121 1.238 2.87l1.06-1.06c-.422-.424-.676-1.004-.811-2.01c-.138-1.027-.14-2.382-.14-4.289zM14 22.75c1.864 0 3.338.002 4.489-.153c1.172-.158 2.121-.49 2.87-1.238l-1.06-1.06c-.424.422-1.004.676-2.01.811c-1.027.138-2.382.14-4.289.14zM21.25 14c0 1.907-.002 3.262-.14 4.29c-.135 1.005-.389 1.585-.812 2.008l1.06 1.06c.75-.748 1.081-1.697 1.239-2.869c.155-1.15.153-2.625.153-4.489zm-18.5-4c0-1.907.002-3.261.14-4.29c.135-1.005.389-1.585.812-2.008l-1.06-1.06c-.75.748-1.081 1.697-1.239 2.869C1.248 6.661 1.25 8.136 1.25 10zm7.28-8.75c-1.875 0-3.356-.002-4.511.153c-1.177.158-2.129.49-2.878 1.238l1.06 1.06c.424-.422 1.005-.676 2.017-.811c1.033-.138 2.395-.14 4.312-.14z"/><path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M6 14.5h8M6 18h5.5"/><path stroke="currentColor" stroke-width="1.5" d="M13 2.5V5c0 2.357 0 3.536.732 4.268S15.643 10 18 10h4"/></g>`,
+  mapPin: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 10.143C4 5.646 7.582 2 12 2s8 3.646 8 8.143c0 4.462-2.553 9.67-6.537 11.531a3.45 3.45 0 0 1-2.926 0C6.553 19.812 4 14.606 4 10.144Z"/><circle cx="12" cy="10" r="3"/></g>`,
+  trash: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M9.17 4a3.001 3.001 0 0 1 5.66 0m5.67 2h-17m15.333 2.5l-.46 6.9c-.177 2.654-.265 3.981-1.13 4.79s-2.196.81-4.856.81h-.774c-2.66 0-3.991 0-4.856-.81c-.865-.809-.954-2.136-1.13-4.79l-.46-6.9M9.5 11l.5 5m4.5-5l-.5 5"/>`,
+  send: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="m17.498 18.485l3.13-9.391c1.248-3.745 1.873-5.618.884-6.606c-.988-.989-2.86-.364-6.606.884l-9.331 3.11c-2.082.694-3.123 1.041-3.439 1.804q-.112.271-.133.564c-.059.824.717 1.6 2.269 3.151l.283.283c.254.254.382.382.478.523c.19.28.297.607.31.945c.008.171-.019.35-.072.705c-.196 1.304-.294 1.956-.179 2.458c.23 1 1.004 1.785 2 2.028c.5.123 1.154.034 2.46-.143l.072-.01c.368-.05.552-.075.729-.064c.32.019.63.124.898.303c.147.098.279.23.541.492l.252.252c1.51 1.51 2.265 2.265 3.066 2.226c.22-.011.438-.062.64-.152c.734-.323 1.072-1.336 1.747-3.362Z"/><path stroke-linecap="round" d="M6 18L21 3"/></g>`,
+  columns: `<path fill="none" stroke="currentColor" stroke-width="1.5" d="M2.5 6.5c0-1.886 0-2.828.586-3.414S4.614 2.5 6.5 2.5s2.828 0 3.414.586s.586 1.528.586 3.414v11c0 1.886 0 2.828-.586 3.414S8.386 21.5 6.5 21.5s-2.828 0-3.414-.586S2.5 19.386 2.5 17.5zm11 9c0-1.886 0-2.828.586-3.414s1.528-.586 3.414-.586s2.828 0 3.414.586s.586 1.528.586 3.414v2c0 1.886 0 2.828-.586 3.414s-1.528.586-3.414.586s-2.828 0-3.414-.586s-.586-1.528-.586-3.414zm0-10c0-.932 0-1.398.152-1.765a2 2 0 0 1 1.083-1.083c.367-.152.833-.152 1.765-.152h2c.932 0 1.398 0 1.765.152a2 2 0 0 1 1.083 1.083c.152.367.152.833.152 1.765s0 1.398-.152 1.765a2 2 0 0 1-1.083 1.083c-.367.152-.833.152-1.765.152h-2c-.932 0-1.398 0-1.765-.152a2 2 0 0 1-1.083-1.083C13.5 6.898 13.5 6.432 13.5 5.5Z"/>`,
+  menu: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M20 7H4m16 5H4m16 5H4"/>`,
+  documents: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 8c0-2.828 0-4.243.879-5.121C6.757 2 8.172 2 11 2h2c2.828 0 4.243 0 5.121.879C19 3.757 19 5.172 19 8v8c0 2.828 0 4.243-.879 5.121C17.243 22 15.828 22 13 22h-2c-2.828 0-4.243 0-5.121-.879C5 20.243 5 18.828 5 16zm0-3.924c-.975.096-1.631.313-2.121.803C2 5.757 2 7.172 2 10v4c0 2.828 0 4.243.879 5.121c.49.49 1.146.707 2.121.803M19 4.076c.975.096 1.631.313 2.121.803C22 5.757 22 7.172 22 10v4c0 2.828 0 4.243-.879 5.121c-.49.49-1.146.707-2.121.803"/><path stroke-linecap="round" d="M9 13h6M9 9h6m-6 8h3"/></g>`,
+  passport: `<g fill="none"><path stroke="currentColor" stroke-width="1.5" d="M4 6v13a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V9a3 3 0 0 0-3-3zm0 0V5"/><circle cx="12" cy="13" r="3" stroke="currentColor" stroke-width="1.5"/><path fill="currentColor" d="M18 6v.75h.75V6zm-2.283-3.674l-.106-.742zM4.92 3.87l-.106-.743zm.15 2.88H18v-1.5H5.071zM18.75 6V4.306h-1.5V6zm-3.139-4.416L4.814 3.126l.212 1.485L15.823 3.07zM4.814 3.126A1.82 1.82 0 0 0 3.25 4.93h1.5a.32.32 0 0 1 .276-.318zm13.936 1.18a2.75 2.75 0 0 0-3.139-2.722l.212 1.485a1.25 1.25 0 0 1 1.427 1.237zM5.071 5.25a.32.32 0 0 1-.321-.321h-1.5A1.82 1.82 0 0 0 5.071 6.75z"/><path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M10 19h4"/></g>`,
+  stakes: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12Z"/><path stroke-linecap="round" stroke-linejoin="round" d="m7 14l2.293-2.293a1 1 0 0 1 1.414 0l1.586 1.586a1 1 0 0 0 1.414 0L17 10m0 0v2.5m0-2.5h-2.5"/></g>`,
+  stakingDash: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12Z"/><path stroke-linecap="round" d="M7 18V9m5 9V6m5 12v-5"/></g>`,
+  payout: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17.414 10.414C18 9.828 18 8.886 18 7s0-2.828-.586-3.414m0 6.828C16.828 11 15.886 11 14 11h-4c-1.886 0-2.828 0-3.414-.586m10.828 0Zm0-6.828C16.828 3 15.886 3 14 3h-4c-1.886 0-2.828 0-3.414.586m10.828 0Zm-10.828 0C6 4.172 6 5.114 6 7s0 2.828.586 3.414m0-6.828Zm0 6.828ZM13 7a1 1 0 1 1-2 0a1 1 0 0 1 2 0Z"/><path stroke-linecap="round" d="M18 6a3 3 0 0 1-3-3m3 5a3 3 0 0 0-3 3M6 6a3 3 0 0 0 3-3M6 8a3 3 0 0 1 3 3m-4 9.388h2.26c1.01 0 2.033.106 3.016.308a14.9 14.9 0 0 0 5.33.118c.868-.14 1.72-.355 2.492-.727c.696-.337 1.549-.81 2.122-1.341c.572-.53 1.168-1.397 1.59-2.075c.364-.582.188-1.295-.386-1.728a1.89 1.89 0 0 0-2.22 0l-1.807 1.365c-.7.53-1.465 1.017-2.376 1.162q-.165.026-.345.047m0 0l-.11.012m.11-.012a1 1 0 0 0 .427-.24a1.49 1.49 0 0 0 .126-2.134a1.9 1.9 0 0 0-.45-.367c-2.797-1.669-7.15-.398-9.779 1.467m9.676 1.274a.5.5 0 0 1-.11.012m0 0a9.3 9.3 0 0 1-1.814.004"/><rect width="3" height="8" x="2" y="14" rx="1.5"/></g>`,
+  strategy: `<g fill="none"><path stroke="currentColor" stroke-width="1.5" d="M2 5.257C2 3.458 3.567 2 5.5 2S9 3.458 9 5.257C9 7.042 7.883 9.125 6.14 9.87a1.64 1.64 0 0 1-1.28 0C3.117 9.125 2 7.042 2 5.257Zm13 12C15 15.458 16.567 14 18.5 14s3.5 1.458 3.5 3.257c0 1.785-1.117 3.868-2.86 4.613a1.64 1.64 0 0 1-1.28 0c-1.743-.745-2.86-2.828-2.86-4.613Z"/><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.5 17.5h.009M5.49 5.5h.01"/><path fill="currentColor" d="M12 4.25a.75.75 0 0 0 0 1.5zM12 19l.53.53a.75.75 0 0 0 0-1.06zm5.206-10.313l.402.633zM6.795 15.313l.402.632zm4.236 1.657a.75.75 0 1 0-1.061 1.06zm-1.061 3a.75.75 0 1 0 1.06 1.06zm6.162-15.72H12v1.5h4.132zM12 18.25H7.868v1.5H12zm4.803-10.195L6.392 14.68l.805 1.265L17.61 9.32zM12.53 18.47l-1.5-1.5l-1.06 1.06l1.5 1.5zm-1.06 0l-1.5 1.5l1.06 1.06l1.5-1.5zm-3.602-.22c-1.25 0-1.726-1.633-.67-2.305l-.806-1.265c-2.321 1.477-1.275 5.07 1.476 5.07zm8.264-12.5c1.25 0 1.726 1.633.671 2.305l.805 1.265c2.322-1.477 1.275-5.07-1.476-5.07z"/></g>`,
+  pieChart: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6.222 4.601a9.5 9.5 0 0 1 1.395-.771c1.372-.615 2.058-.922 2.97-.33c.913.59.913 1.56.913 3.5v1.5c0 1.886 0 2.828.586 3.414s1.528.586 3.414.586H17c1.94 0 2.91 0 3.5.912c.592.913.285 1.599-.33 2.97a9.5 9.5 0 0 1-10.523 5.435A9.5 9.5 0 0 1 6.222 4.601Z"/><path d="M21.446 7.069a8.03 8.03 0 0 0-4.515-4.515C15.389 1.947 14 3.344 14 5v4a1 1 0 0 0 1 1h4c1.657 0 3.053-1.39 2.446-2.931Z"/></g>`,
+  walletStats: `<g fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 10h4"/><path stroke-width="1.5" d="M20.833 11h-2.602C16.446 11 15 12.343 15 14s1.447 3 3.23 3h2.603c.084 0 .125 0 .16-.002c.54-.033.97-.432 1.005-.933c.002-.032.002-.071.002-.148v-3.834c0-.077 0-.116-.002-.148c-.036-.501-.465-.9-1.005-.933c-.035-.002-.076-.002-.16-.002Z"/><path stroke-width="1.5" d="M20.965 11c-.078-1.872-.328-3.02-1.137-3.828C18.657 6 16.771 6 13 6h-3C6.229 6 4.343 6 3.172 7.172S2 10.229 2 14s0 5.657 1.172 6.828S6.229 22 10 22h3c3.771 0 5.657 0 6.828-1.172c.809-.808 1.06-1.956 1.137-3.828"/><path stroke-linecap="round" stroke-width="1.5" d="m6 6l3.735-2.477a3.24 3.24 0 0 1 3.53 0L17 6"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.991 14h.01"/></g>`,
+  aggTx: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 4v16l-6-5.5M14 20V4l6 5.5"/>`,
+  logs: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 4.002c2.175.012 3.353.109 4.121.877C21 5.758 21 7.172 21 10v6c0 2.829 0 4.243-.879 5.122C19.243 22 17.828 22 15 22H9c-2.828 0-4.243 0-5.121-.878C3 20.242 3 18.829 3 16v-6c0-2.828 0-4.242.879-5.121c.768-.768 1.946-.865 4.121-.877"/><path stroke-linecap="round" d="M10.5 14H17M7 14h.5M7 10.5h.5m-.5 7h.5m3-7H17m-6.5 7H17"/><path d="M8 3.5A1.5 1.5 0 0 1 9.5 2h5A1.5 1.5 0 0 1 16 3.5v1A1.5 1.5 0 0 1 14.5 6h-5A1.5 1.5 0 0 1 8 4.5z"/></g>`,
+  folder: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M22 11H2"/><path d="M2 6.95c0-.883 0-1.324.07-1.692A4 4 0 0 1 5.257 2.07C5.626 2 6.068 2 6.95 2c.386 0 .58 0 .766.017a4 4 0 0 1 2.18.904c.144.119.28.255.554.529L11 4c.816.816 1.224 1.224 1.712 1.495a4 4 0 0 0 .848.352C14.098 6 14.675 6 15.828 6h.374c2.632 0 3.949 0 4.804.77q.119.105.224.224c.77.855.77 2.172.77 4.804V14c0 3.771 0 5.657-1.172 6.828S17.771 22 14 22h-4c-3.771 0-5.657 0-6.828-1.172S2 17.771 2 14z"/></g>`,
+  ibanProduct: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19c-2.809 0-4.213 0-5.222-.674a4 4 0 0 1-1.104-1.104C2 16.213 2 14.81 2 12s0-4.213.674-5.222a4 4 0 0 1 1.104-1.104C4.787 5 6.19 5 9 5h6c2.809 0 4.213 0 5.222.674a4 4 0 0 1 1.104 1.104C22 7.787 22 9.19 22 12s0 4.213-.674 5.222a4 4 0 0 1-1.104 1.104C19.213 19 17.81 19 15 19z"/><path d="M12 9a3 3 0 1 1 0 6a3 3 0 0 1 0-6Z"/><path stroke-linecap="round" d="M5.5 15V9m13 6V9"/></g>`,
+  sbp: `<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="M19 14v6m0 0l2-2m-2 2l-2-2"/><path d="M22 12c0-3.771 0-5.657-1.172-6.828S17.771 4 14 4h-4C6.229 4 4.343 4 3.172 5.172S2 8.229 2 12s0 5.657 1.172 6.828S6.229 20 10 20h4m-4-4H6m7 0h-.5M2 10h20"/></g>`,
+  levels: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M16 22v-9c0-1.414 0-2.121-.44-2.56C15.122 10 14.415 10 13 10h-2c-1.414 0-2.121 0-2.56.44C8 10.878 8 11.585 8 13v9m0 0c0-1.414 0-2.121-.44-2.56C7.122 19 6.415 19 5 19s-2.121 0-2.56.44C2 19.878 2 20.585 2 22m20 0v-3c0-1.414 0-2.121-.44-2.56C21.122 16 20.415 16 19 16s-2.121 0-2.56.44C16 16.878 16 17.585 16 19v3"/><path d="M11.146 3.023C11.526 2.34 11.716 2 12 2s.474.34.854 1.023l.098.176c.108.194.162.29.246.354c.085.064.19.088.4.135l.19.044c.738.167 1.107.25 1.195.532s-.164.577-.667 1.165l-.13.152c-.143.167-.215.25-.247.354s-.021.215 0 .438l.02.203c.076.785.114 1.178-.115 1.352c-.23.175-.576.015-1.267-.303l-.178-.082c-.197-.09-.295-.136-.399-.136s-.202.046-.399.136l-.178.082c-.691.318-1.037.478-1.267.303c-.23-.174-.191-.567-.115-1.352l.02-.203c.021-.223.032-.334 0-.438s-.104-.187-.247-.354l-.13-.152c-.503-.588-.755-.882-.667-1.165c.088-.282.457-.365 1.195-.532l.19-.044c.21-.047.315-.07.4-.135c.084-.064.138-.16.246-.354z"/></g>`,
+  cardProduct: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12c0-3.771 0-5.657 1.172-6.828S6.229 4 10 4h4c3.771 0 5.657 0 6.828 1.172S22 8.229 22 12s0 5.657-1.172 6.828S17.771 20 14 20h-4c-3.771 0-5.657 0-6.828-1.172S2 15.771 2 12Z"/><path stroke-linecap="round" d="M10 16.5H6m2-3H6M2 10h20"/><path d="M14 15c0-.943 0-1.414.293-1.707S15.057 13 16 13s1.414 0 1.707.293S18 14.057 18 15s0 1.414-.293 1.707S16.943 17 16 17s-1.414 0-1.707-.293S14 15.943 14 15Z"/></g>`,
+  panelClose: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828S6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172S22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828S17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172S2 16.771 2 13z"/><path stroke-linecap="round" d="M15 21V3"/></g>`,
+  panelOpen: `<g transform="matrix(-1 0 0 1 24 0)"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828S6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172S22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828S17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172S2 16.771 2 13z"/><path stroke-linecap="round" d="M15 21V3"/></g></g>`,
+};
+// Solar where available; the plain stroke set (ICONS) covers tiny utility marks: check, plus, minus, ×, small arrows
+const icon = (n, s = 16, sw = 1.75) => SOLAR[n]
+  ? `<svg class="i" width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true">${SOLAR[n]}</svg>`
+  : `<svg class="i" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ''}</svg>`;
 
 /* ════════════════════════════ Domain ════════════════════════════ */
 const STATUS = { active: { label: 'Active', tone: 'success' }, inactive: { label: 'Inactive', tone: 'neutral' }, blocked: { label: 'Blocked', tone: 'error' } };
@@ -777,7 +896,11 @@ const KYC = { new: { label: 'New', tone: 'neutral' }, pending: { label: 'Pending
 const RISK = { low: { label: 'Low', tone: 'success', n: 1 }, medium: { label: 'Medium', tone: 'warning', n: 2 }, high: { label: 'High', tone: 'error', n: 3 }, unknown: { label: 'Unknown', tone: 'neutral', n: 0 } };
 const LEVEL = { basic: { label: 'Basic', tone: 'neutral' }, middle: { label: 'Middle', tone: 'info' }, premium: { label: 'Premium', tone: 'feature' } };
 const TYPE = { individual: { label: 'Individual' }, company: { label: 'Company user' } };
-const COMPANIES = ['Default NS.Cards (#47)', 'Maxx Space (#52)', 'Nexton Labs (#58)', 'Aqa Next (#61)'];
+const COMPANIES = [
+  { id: 47, name: 'Default NS.Cards', source: 'INTERNAL', ref: 'nscards-main' }, { id: 52, name: 'Maxx Space', source: 'API', ref: 'maxx-space' },
+  { id: 58, name: 'Nexton Labs', source: 'PARTNER', ref: 'nexton-labs' }, { id: 61, name: 'Aqa Next', source: 'API', ref: 'aqa-next' },
+];
+const companyOf = u => COMPANIES.find(c => c.id === u.companyId) || COMPANIES[0];
 const COUNTRIES = {
   DEU: { cc: 'DE', name: 'Germany', eea: 1, w: 22 }, ESP: { cc: 'ES', name: 'Spain', eea: 1, w: 13 }, FRA: { cc: 'FR', name: 'France', eea: 1, w: 11 },
   ITA: { cc: 'IT', name: 'Italy', eea: 1, w: 9 }, NLD: { cc: 'NL', name: 'Netherlands', eea: 1, w: 7 }, POL: { cc: 'PL', name: 'Poland', eea: 1, w: 6 },
@@ -815,13 +938,18 @@ function genUsers(n) {
     out.push({
       id, uid: hex(6), name: named ? `${fn} ${ln}` : '', email, country, status, kyc, risk, level,
       type: R() < .12 ? 'company' : 'individual',
-      company: R() < .8 ? COMPANIES[0] : pick(COMPANIES.slice(1)),
+      companyId: R() < .8 ? 47 : pick([52, 58, 61]),
       balance, cards: kyc === 'approved' ? wpick({ 0: 15, 1: 55, 2: 24, 3: 6 }) * 1 : 0,
       twofa: R() < (kyc === 'approved' ? .7 : .25), emailVerified: kyc !== 'new' || R() < .45, idv: kyc === 'approved',
       lang: (country && LANGS[country]) || 'EN', referral: hex(12).toLowerCase(),
       invitedBy: R() < .2 ? 27828 - Math.floor(n + R() * 2000) : null,
       created, updated: new Date(Math.min(NOW.getTime(), created.getTime() + R() * 9 * 864e5)),
     });
+    // fields added later come from their own generator so existing mock users stay the same
+    const r2 = rng(id * 13), last = out[out.length - 1];
+    last.source = r2() < .7 ? 'APP' : r2() < .5 ? 'API' : r2() < .7 ? 'PARTNER' : 'ADMIN';
+    last.riskPoints = { low: 5 + Math.floor(r2() * 25), medium: 31 + Math.floor(r2() * 29), high: 61 + Math.floor(r2() * 39), unknown: null }[risk];
+    last.tempPassword = r2() < .05;
     t -= (i < 40 ? .4 + R() * 1.6 : 1 + R() * 10) * 36e5;
   }
   return out;
@@ -865,20 +993,36 @@ const riskCell = r => `<span class="risk">${riskIcon(r)}<span class="${r === 'un
 const ctryCell = c => c ? `<span class="ctry"><span class="flag">${flag(COUNTRIES[c].cc)}</span><span class="mono">${c}</span></span>` : '<span class="faint">—</span>';
 const userCell = u => `<div class="ucell"><div style="min-width:0">${u.name ? `<div class="un">${esc(u.name)}</div><div class="ue">${esc(u.email)}</div>` : `<div class="un">${esc(u.email)}</div><div class="ue faint">No profile yet</div>`}</div></div>`;
 
+const DEFAULT_HIDDEN = ['email', 'kycVerified', 'idv', 'emailVerified', 'riskPoints', 'type', 'cards', 'twofa', 'tempPassword', 'lang', 'referral', 'invitedBy', 'source', 'companyId', 'companyName', 'companyRef', 'companySource', 'updated'];
 const COLS = [
   { key: 'id', label: 'ID', val: u => u.id, dir: 'desc', cell: u => `<span class="num muted">${u.id}</span>` },
   { key: 'user', label: 'User', val: u => (u.name || '~' + u.email).toLowerCase(), dir: 'asc', cell: userCell, lock: 1 },
   { key: 'uid', label: 'Unique ID', val: u => u.uid, dir: 'asc', cell: u => `<button class="copy num" data-act="copy" data-copy="${u.uid}" title="Copy">${u.uid}${icon('copy', 12)}</button>` },
   { key: 'country', label: 'Residency', val: u => u.country || 'ZZZ', dir: 'asc', cell: u => ctryCell(u.country) },
   { key: 'status', label: 'Status', val: u => Object.keys(STATUS).indexOf(u.status), dir: 'asc', cell: u => statusCell(u.status) },
+  { key: 'email', label: 'Email', val: u => u.email, dir: 'asc', cell: u => `<span class="muted">${esc(u.email)}</span>` },
   { key: 'kyc', label: 'KYC', val: u => Object.keys(KYC).indexOf(u.kyc), dir: 'asc', cell: u => badge(KYC[u.kyc]) },
+  { key: 'kycVerified', label: 'KYC verified', val: u => +(u.kyc === 'approved'), dir: 'desc', cell: u => u.kyc === 'approved' ? `<span style="color:var(--success-ink)">${icon('check', 15, 2.2)}</span>` : '<span class="faint">—</span>' },
+  { key: 'idv', label: 'IDV verified', val: u => +u.idv, dir: 'desc', cell: u => u.idv ? `<span style="color:var(--success-ink)">${icon('check', 15, 2.2)}</span>` : '<span class="faint">—</span>' },
+  { key: 'emailVerified', label: 'Email verified', val: u => +u.emailVerified, dir: 'desc', cell: u => u.emailVerified ? `<span style="color:var(--success-ink)">${icon('check', 15, 2.2)}</span>` : '<span class="faint">—</span>' },
   { key: 'risk', label: 'Risk', val: u => RISK[u.risk].n, dir: 'desc', cell: u => riskCell(u.risk) },
+  { key: 'riskPoints', label: 'Risk points', val: u => u.riskPoints ?? -1, dir: 'desc', right: 1, cell: u => u.riskPoints == null ? '<span class="faint">—</span>' : `<span class="num">${u.riskPoints}</span>` },
   { key: 'level', label: 'Level', val: u => Object.keys(LEVEL).indexOf(u.level), dir: 'desc', cell: u => `<span class="muted">${LEVEL[u.level].label}</span>` },
   { key: 'type', label: 'Type', val: u => u.type, dir: 'asc', cell: u => `<span class="muted">${TYPE[u.type].label}</span>` },
   { key: 'balance', label: 'Balance', val: u => u.balance, dir: 'desc', right: 1, cell: u => `<span class="num ${u.balance ? '' : 'zero'}">${fmtEur(u.balance)}</span>` },
   { key: 'cards', label: 'Cards', val: u => u.cards, dir: 'desc', right: 1, cell: u => `<span class="num ${u.cards ? '' : 'zero'}">${u.cards}</span>` },
   { key: 'twofa', label: '2FA', val: u => +u.twofa, dir: 'desc', cell: u => u.twofa ? `<span style="color:var(--success-ink)">${icon('check', 15, 2.2)}</span>` : '<span class="faint">—</span>' },
+  { key: 'tempPassword', label: 'Temporary password', val: u => +u.tempPassword, dir: 'desc', cell: u => u.tempPassword ? `<span style="color:var(--success-ink)">${icon('check', 15, 2.2)}</span>` : '<span class="faint">—</span>' },
+  { key: 'lang', label: 'Language', val: u => u.lang, dir: 'asc', cell: u => `<span class="muted">${u.lang}</span>` },
+  { key: 'referral', label: 'Referral code', val: u => u.referral, dir: 'asc', cell: u => `<span class="num muted">${u.referral}</span>` },
+  { key: 'invitedBy', label: 'Invited by', val: u => u.invitedBy || 0, dir: 'desc', cell: u => u.invitedBy ? `<span class="num">#${u.invitedBy}</span>` : '<span class="faint">—</span>' },
+  { key: 'source', label: 'Source', val: u => u.source, dir: 'asc', cell: u => `<span class="muted">${SOURCES[u.source]}</span>` },
+  { key: 'companyId', label: 'Company ID', val: u => u.companyId, dir: 'asc', cell: u => `<span class="num muted">${u.companyId}</span>` },
+  { key: 'companyName', label: 'Company', val: u => companyOf(u).name, dir: 'asc', cell: u => companyOf(u).name },
+  { key: 'companyRef', label: 'Company referral code', val: u => companyOf(u).ref, dir: 'asc', cell: u => `<span class="num muted">${companyOf(u).ref}</span>` },
+  { key: 'companySource', label: 'Company source', val: u => companyOf(u).source, dir: 'asc', cell: u => `<span class="muted">${companyOf(u).source}</span>` },
   { key: 'created', label: 'Created', val: u => u.created.getTime(), dir: 'desc', right: 1, cell: u => `<span class="muted" title="${fmtDateTime(u.created)}">${rel(u.created)}</span>` },
+  { key: 'updated', label: 'Updated', val: u => u.updated.getTime(), dir: 'desc', right: 1, cell: u => `<span class="muted" title="${fmtDateTime(u.updated)}">${rel(u.updated)}</span>` },
 ];
 
 /* ════════════════════════════ State ════════════════════════════ */
@@ -886,7 +1030,7 @@ const S = {
   route: 'dashboard', userId: null, range: { key: '30d' }, metric: 'volume',
   filters: [], search: '', sort: { key: 'id', dir: 'desc' }, page: 1, perPage: 25,
   view: 'table', groupBy: 'kyc', density: store.get('nsc.density', 'comfortable'),
-  hidden: new Set(store.get('nsc.hidden', ['type', 'cards', 'twofa'])), selected: new Set(),
+  hidden: new Set(store.get('nsc.hidden2', DEFAULT_HIDDEN)), selected: new Set(),
   collapsed: new Set(), more: {}, colW: store.get('nsc.colw', {}), userTab: 'overview', draft: {}, _list: [],
   navClosed: new Set(store.get('nsc.navClosed', [])),
 };
@@ -894,11 +1038,14 @@ const S = {
 /* ════════════════════════════ Shell ════════════════════════════ */
 const NAV = [
   { items: [{ id: 'dashboard', label: 'Overview', icon: 'dashboard' }] },
-  { sec: 'Customers', items: [{ id: 'users', label: 'Users', icon: 'users' }, { id: 'companies', label: 'Companies', icon: 'building' }, { id: 'confirmations', label: 'Confirmations', icon: 'shieldCheck', badge: 41 }] },
-  { sec: 'Financial', items: [{ id: 'transactions', label: 'Transactions', icon: 'arrows' }, { id: 'wallets', label: 'Wallets', icon: 'wallet' }, { id: 'iban', label: 'IBAN', icon: 'bank' }, { id: 'cards', label: 'Card products', icon: 'card' }, { id: 'staking', label: 'Staking', icon: 'layers' }] },
-  { sec: 'Risk', items: [{ id: 'kyt', label: 'KYT rules', icon: 'radar' }, { id: 'reserves', label: 'Reserves', icon: 'scale' }, { id: 'activity', label: 'Activity', icon: 'activity' }] },
-  { sec: 'Settings', items: [{ id: 'currencies', label: 'Currencies', icon: 'coins' }, { id: 'markets', label: 'Markets', icon: 'candles' }, { id: 'countries', label: 'Country lists', icon: 'globe' }] },
-  { sec: 'Admin', items: [{ id: 'admins', label: 'Administrators', icon: 'userCog' }, { id: 'roles', label: 'Roles', icon: 'key' }] },
+  { sec: 'Customers', items: [{ id: 'users', label: 'Users', icon: 'users' }, { id: 'companies', label: 'Companies', icon: 'building' }, { id: 'confirmations', label: 'Confirmations', icon: 'shieldCheck', badge: 41 }, { id: 'documents', label: 'Documents', icon: 'documents' }, { id: 'creditco', label: 'CreditCo KYC', icon: 'passport' }] },
+  { sec: 'Financial', items: [{ id: 'transactions', label: 'Transactions', icon: 'arrows' }, { id: 'aggregated', label: 'Aggregated transactions', icon: 'aggTx' }, { id: 'iban', label: 'IBAN', icon: 'bank' }, { id: 'cards', label: 'Cards', icon: 'card' }, { id: 'sbp', label: 'SBP top-up', icon: 'sbp' }] },
+  { sec: 'Staking', items: [{ id: 'staking', label: 'Staking dashboard', icon: 'stakingDash' }, { id: 'stakes', label: 'Stakes', icon: 'stakes' }, { id: 'payout-pools', label: 'Payout pools', icon: 'payout' }, { id: 'strategies', label: 'Strategies', icon: 'strategy' }] },
+  { sec: 'Risk', items: [{ id: 'kyt', label: 'KYT rules', icon: 'radar' }, { id: 'reserves', label: 'Reserves', icon: 'scale' }] },
+  { sec: 'Analytics', items: [{ id: 'activity-stats', label: 'Activity statistics', icon: 'pieChart' }, { id: 'wallet-stats', label: 'Wallet statistics', icon: 'walletStats' }] },
+  { sec: 'Products', items: [{ id: 'card-products', label: 'Card products', icon: 'cardProduct' }, { id: 'iban-products', label: 'IBAN products', icon: 'ibanProduct' }, { id: 'level-presets', label: 'Level presets', icon: 'levels' }] },
+  { sec: 'Settings', items: [{ id: 'currencies', label: 'Currencies', icon: 'coins' }, { id: 'markets', label: 'Markets', icon: 'candles' }, { id: 'countries', label: 'Country lists', icon: 'globe' }, { id: 'sources', label: 'Sources', icon: 'folder' }] },
+  { sec: 'Admin', items: [{ id: 'admins', label: 'Administrators', icon: 'userCog' }, { id: 'roles', label: 'Roles', icon: 'key' }, { id: 'logs', label: 'Logs', icon: 'logs' }] },
 ];
 const NAV_FLAT = NAV.flatMap(g => g.items);
 
@@ -931,7 +1078,7 @@ function topbarActions() {
     <button class="btn btn-ghost tb-hide-sm" data-act="toast" data-msg="Report exported">${icon('download', 15)}Export</button>`;
   if (S.route === 'users' && !S.userId) return `
     <button class="tool-btn solid" id="displayBtn" data-act="display"></button>
-    <button class="btn btn-ghost" data-act="export" data-tip="Export CSV">${icon('download', 15)}<span class="tb-lbl">Export</span></button>
+    <button class="btn btn-ghost" data-act="export">${icon('download', 15)}<span class="tb-lbl">Export</span>${icon('chevDown', 13)}</button>
     <button class="btn btn-primary" data-act="new-user">${icon('plus', 15, 2)}<span class="tb-lbl">New user</span></button>`;
   if (S.route === 'users' && byId(S.userId)) {
     const l = navList(), i = l.findIndex(x => x.id === S.userId);
@@ -1043,28 +1190,65 @@ function openDatePicker(anchor, current, onApply, opts = {}) {
   const res = resolveRange(current), custom = current.key === 'custom';
   DP = { onApply, cur: current, presets: Object.keys(RANGE_PRESETS).filter(k => !(opts.noAll && k === 'all')),
     a: current.key === 'all' ? null : res.from, b: current.key === 'all' ? null : res.to, custom };
-  DP.view = new Date((DP.b || NOW).getFullYear(), (DP.b || NOW).getMonth(), 1);
-  openPop(anchor, dpHTML(), { width: 540, keep: opts.keep, align: opts.align, kind: 'dp', anchorSel: opts.anchorSel });
+  DP.view = new Date((DP.b || NOW).getFullYear(), (DP.b || NOW).getMonth(), 1); DP.mode = 'days';
+  openPop(anchor, dpHTML(), { width: 584, keep: opts.keep, align: opts.align, kind: 'dp', anchorSel: opts.anchorSel });
 }
-function dpHTML() {
-  const v = DP.view, y = v.getFullYear(), m = v.getMonth(), lead = (new Date(y, m, 1).getDay() + 6) % 7, days = new Date(y, m + 1, 0).getDate();
-  const a = DP.a && sod(DP.a), b = DP.b && sod(DP.b), atNow = y === NOW.getFullYear() && m === NOW.getMonth();
+// Typed dates: DD.MM.YYYY (also accepts YYYY-MM-DD). Future dates are not allowed.
+const fmtIn = d => d ? `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}` : '';
+function parseIn(v) {
+  let m = v.trim().match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{4})$/), d, mo, y;
+  if (m) [, d, mo, y] = m; else if ((m = v.trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/))) [, y, mo, d] = m; else return null;
+  const t = new Date(+y, +mo - 1, +d);
+  return t.getMonth() === +mo - 1 && t.getDate() === +d && t <= NOW ? t : null;
+}
+// Calendar body has three zoom levels: days → months (click the month) → years (click the year)
+function dpBody() {
+  const v = DP.view, y = v.getFullYear(), m = v.getMonth(), ny = NOW.getFullYear(), nm = NOW.getMonth();
+  const head = (title, prevOff, nextOff) => `<div class="dp-h"><button class="ghost-ic" data-act="dp-nav" data-d="-1" ${prevOff ? 'disabled' : ''} aria-label="Previous">${icon('chevLeft', 16)}</button>${title}<button class="ghost-ic" data-act="dp-nav" data-d="1" ${nextOff ? 'disabled' : ''} aria-label="Next">${icon('chevRight', 16)}</button></div>`;
+  if (DP.mode === 'years') {
+    const start = DP.yStart;
+    return head(`<b>${start} – ${start + 11}</b>`, false, start + 11 >= ny) + `<div class="dp-grid m">${Array.from({ length: 12 }, (_, i) => start + i).map(yr =>
+      `<button class="dp-mo ${yr === y ? 'on' : ''} ${yr === ny ? 'today' : ''}" data-act="dp-year" data-y="${yr}" ${yr > ny ? 'disabled' : ''}>${yr}</button>`).join('')}</div>`;
+  }
+  if (DP.mode === 'months') {
+    return head(`<button class="dp-tbtn" data-act="dp-mode" data-v="years">${y}</button>`, false, y >= ny) + `<div class="dp-grid m">${Array.from({ length: 12 }, (_, i) =>
+      `<button class="dp-mo ${i === m ? 'on' : ''} ${y === ny && i === nm ? 'today' : ''}" data-act="dp-month" data-m="${i}" ${y > ny || (y === ny && i > nm) ? 'disabled' : ''}>${new Date(y, i, 1).toLocaleDateString('en-GB', { month: 'short' })}</button>`).join('')}</div>`;
+  }
+  const lead = (new Date(y, m, 1).getDay() + 6) % 7, days = new Date(y, m + 1, 0).getDate();
+  const a = DP.a && sod(DP.a), b = DP.b && sod(DP.b);
   const cells = Array.from({ length: lead }, () => '<span></span>').concat(Array.from({ length: days }, (_, i) => {
     const d = new Date(y, m, i + 1), t = d.getTime(), fut = d > NOW;
     const cls = [sameDay(d, NOW) && 'today', a && t === a.getTime() && 'start', b && t === b.getTime() && 'end', a && b && t > a && t < b && 'in'].filter(Boolean).join(' ');
     return `<button class="dp-day ${cls}" data-act="dp-day" data-ts="${t}" ${fut ? 'disabled' : ''}>${i + 1}</button>`;
   }));
-  const sum = DP.a ? (DP.b ? fmtRange(DP.a, DP.b) : `${fmtDay(DP.a)} – …`) : 'Pick a start date';
+  return head(`<button class="dp-tbtn" data-act="dp-mode" data-v="months">${v.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</button>`, false, y === ny && m === nm)
+    + `<div class="dp-grid">${['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(w => `<span class="dp-w">${w}</span>`).join('')}${cells.join('')}</div>`;
+}
+function dpHTML() {
   return `<div class="dp">
     <div class="dp-presets">${DP.presets.map(k => `<button class="pi ${!DP.custom && DP.cur.key === k ? 'on' : ''}" data-act="dp-preset" data-k="${k}"><span class="pl">${RANGE_PRESETS[k].label}</span>${!DP.custom && DP.cur.key === k ? `<span class="chk">${icon('check', 14, 2)}</span>` : ''}</button>`).join('')}</div>
     <div class="dp-cal">
-      <div class="dp-h"><button class="ghost-ic" data-act="dp-nav" data-d="-1" aria-label="Previous month">${icon('chevLeft', 16)}</button><b>${v.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</b><button class="ghost-ic" data-act="dp-nav" data-d="1" ${atNow ? 'disabled' : ''} aria-label="Next month">${icon('chevRight', 16)}</button></div>
-      <div class="dp-grid">${['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(w => `<span class="dp-w">${w}</span>`).join('')}${cells.join('')}</div>
-      <div class="dp-f"><span class="dp-sum">${sum}</span><button class="btn btn-ghost btn-sm" data-act="dp-cancel">Cancel</button><button class="btn btn-dark btn-sm" data-act="dp-apply" ${DP.a ? '' : 'disabled'}>Apply</button></div>
+      <div class="dp-body" id="dpBody">${dpBody()}</div>
+      <div class="dp-f"><div class="dp-in"><input class="inp" id="dpFrom" placeholder="DD.MM.YYYY" title="From" value="${fmtIn(DP.a)}" autocomplete="off" inputmode="numeric"><span class="dp-dash">–</span><input class="inp" id="dpTo" placeholder="DD.MM.YYYY" title="To" value="${fmtIn(DP.b)}" autocomplete="off" inputmode="numeric"></div><button class="btn btn-ghost btn-sm" data-act="dp-cancel">Cancel</button><button class="btn btn-dark btn-sm" data-act="dp-apply" ${DP.a ? '' : 'disabled'}>Apply</button></div>
     </div>
   </div>`;
 }
-const dpRefresh = () => { pop.innerHTML = dpHTML(); };
+// refresh the calendar + summary only, so typed text in the From/To fields keeps focus
+function dpSoft() {
+  $('#dpBody').innerHTML = dpBody(); $('#pop [data-act="dp-apply"]').disabled = !DP.a;
+  const f = $('#dpFrom'), t = $('#dpTo');
+  if (document.activeElement !== f) f.value = fmtIn(DP.a);
+  if (document.activeElement !== t) t.value = fmtIn(DP.b);
+}
+function dpTyped(el) {
+  const d = parseIn(el.value), from = el.id === 'dpFrom';
+  el.classList.toggle('err', !!el.value.trim() && !d && el.value.trim().length >= 8);
+  if (!d) return;
+  if (from) DP.a = d; else DP.b = d;
+  if (!DP.a) DP.a = d;
+  if (DP.b && sod(DP.b) < sod(DP.a)) [DP.a, DP.b] = [DP.b, DP.a];
+  DP.custom = true; DP.mode = 'days'; DP.view = new Date(d.getFullYear(), d.getMonth(), 1); dpSoft();
+}
 function dpCommit(r) { const fn = DP.onApply; closePop(); DP = null; fn(r); }
 // live preview of the range while choosing the end date
 document.addEventListener('mouseover', e => {
@@ -1147,7 +1331,7 @@ function renderDashboard() {
         <div class="big"><b>${M.fmt(sum(cur.cur))}</b>${deltaPill(pct(sum(cur.cur), sum(cur.prev)))}</div>
         <div class="chart" id="mainChart"></div>
       </div>
-      <div class="card span-4 fill">
+      <div class="card span-4">
         <div class="card-h"><span class="card-t">Onboarding funnel</span><span class="card-tag">All time</span></div>
         <div class="barlist">${funnel.map(([l, v], i) => `<div class="bl" data-tt="${l}|${fmtInt(v)}|${(v / funnel[0][1] * 100).toFixed(1)}% of sign-ups${i ? ` · ${(v / funnel[i - 1][1] * 100).toFixed(0)}% from ${funnel[i - 1][0].toLowerCase()}` : ''}"><i style="width:${v / funnel[0][1] * 100}%"></i><span>${l}</span><span><span class="num">${fmtInt(v)}</span><span class="bl-p">${i ? (v / funnel[i - 1][1] * 100).toFixed(0) + '%' : '100%'}</span></span></div>`).join('')}</div>
       </div>
@@ -1283,7 +1467,7 @@ function getList() {
 }
 
 function renderUsersPage() {
-  $('#main').innerHTML = `<div class="page">
+  $('#main').innerHTML = `<div class="page fit">
     <section class="ustats" id="uStats"></section>
     <div class="toolbar">
       <label class="search">${icon('search', 15)}<input id="uSearch" placeholder="Search name, email, ID…" value="${esc(S.search)}" autocomplete="off"><kbd>/</kbd></label>
@@ -1448,7 +1632,14 @@ function bcardHTML(u, by) {
 function renderFloat() {
   const el = $('#bulk');
   if (S.route === 'users' && S.userId) {
-    const n = Object.keys(S.draft).length;
+    const n = Object.keys(S.draft).length, tn = S.userTab === 'transactions' && S.tx?.view === 'agg' ? S.tx.sel.size : 0;
+    if (!n && tn) {
+      const total = txFiltered(ud(byId(S.userId))).length;
+      el.innerHTML = `<span class="bk-n"><b>${tn}</b>selected</span>${tn < total ? `<button class="bk-link" data-act="tx-sel-all">Select all ${fmtInt(total)}</button>` : ''}<span class="sep"></span>
+        <button data-act="tx-copy">${icon('copy', 15)}Copy</button><button data-act="tx-export-sel">${icon('download', 15)}Export</button><span class="sep"></span>
+        <button class="bk-x" data-act="tx-sel-clear" title="Clear selection">${icon('x', 15)}</button>`;
+      el.classList.add('show'); return;
+    }
     if (!n) { el.classList.remove('show'); return; }
     el.innerHTML = `<span class="bk-n"><b>${n}</b>unsaved change${n > 1 ? 's' : ''}</span><span class="sep"></span><button data-act="u-discard">Discard</button><button class="bk-save" data-act="u-save">${icon('check', 15, 2)}Save changes</button>`;
     el.classList.add('show'); return;
@@ -1502,12 +1693,12 @@ const SOURCES = { APP: 'App', API: 'API', ADMIN: 'Admin', PARTNER: 'Partner' };
 const IBAN_STATUS = { ACTIVE: { label: 'Active', tone: 'success' }, PENDING: { label: 'Pending', tone: 'warning' }, CLOSED: { label: 'Closed', tone: 'neutral' } };
 const CC_STATUS = { APPROVED: { label: 'Approved', tone: 'success' }, ACCESS_REQUESTED: { label: 'Access requested', tone: 'info' }, NOT_ALL_FORM_SUBMITTED: { label: 'Forms incomplete', tone: 'warning' } };
 const FORM_TYPES = {
-  SOURCE_OF_FUNDS: { title: 'Source of funds', desc: 'Origin of funds for deposits above €10,000' },
-  PROOF_OF_ADDRESS: { title: 'Proof of address', desc: 'Utility bill or bank statement under 3 months old' },
-  EDD: { title: 'Enhanced due diligence', desc: 'Extended questionnaire for high-risk profiles' },
-  TAX_RESIDENCY: { title: 'Tax residency', desc: 'Self-certification of tax residence (CRS)' },
+  SOURCE_OF_FUNDS: { id: 3, version: 2, title: 'Source of funds', desc: 'Origin of funds for deposits above €10,000', created: new Date('2026-03-04T10:00:00') },
+  PROOF_OF_ADDRESS: { id: 4, version: 1, title: 'Proof of address', desc: 'Utility bill or bank statement under 3 months old', created: new Date('2026-02-11T10:00:00') },
+  EDD: { id: 6, version: 3, title: 'Enhanced due diligence', desc: 'Extended questionnaire for high-risk profiles', created: new Date('2026-05-20T10:00:00') },
+  TAX_RESIDENCY: { id: 7, version: 1, title: 'Tax residency', desc: 'Self-certification of tax residence (CRS)', created: new Date('2026-06-02T10:00:00') },
 };
-const FORM_STATUS = { REQUESTED: { label: 'Requested', tone: 'warning' }, SUBMITTED: { label: 'Submitted', tone: 'info' }, APPROVED: { label: 'Approved', tone: 'success' } };
+const FORM_STATUS = { REQUESTED: { label: 'Requested', tone: 'warning' }, SUBMITTED: { label: 'Submitted', tone: 'info' }, APPROVED: { label: 'Approved', tone: 'success' }, REJECTED: { label: 'Rejected', tone: 'error' } };
 const DOC_TYPES = { PASSPORT: 'Passport', ID_CARD: 'ID card', PROOF_OF_ADDRESS: 'Proof of address', SELFIE: 'Selfie', BANK_STATEMENT: 'Bank statement' };
 const ADDR = { DEU: ['Berlin', 'Torstraße 112', '10119'], ESP: ['Madrid', 'Calle Mayor 8', '28013'], FRA: ['Paris', 'Rue de Rivoli 45', '75001'], ITA: ['Milan', 'Via Torino 21', '20123'], NLD: ['Amsterdam', 'Keizersgracht 120', '1015 CX'], POL: ['Warsaw', 'ul. Marszałkowska 10', '00-590'], PRT: ['Lisbon', 'Rua Augusta 50', '1100-053'], AUT: ['Vienna', 'Mariahilfer Str. 3', '1060'], LTU: ['Vilnius', 'Gedimino pr. 9', '01103'], CYP: ['Limassol', 'Makariou Ave 17', '3036'], IRL: ['Dublin', 'Grafton St 4', 'D02 K068'], GBR: ['London', '221 Baker St', 'NW1 6XE'], CHE: ['Zurich', 'Bahnhofstrasse 7', '8001'], ARE: ['Dubai', 'Sheikh Zayed Rd 1', '00000'], UKR: ['Kyiv', 'Khreshchatyk 22', '01001'], GEO: ['Tbilisi', 'Rustaveli Ave 14', '0108'], ARM: ['Yerevan', 'Abovyan St 5', '0001'], TUR: ['Istanbul', 'İstiklal Cd. 33', '34433'] };
 const MERCHANTS = ['Lidl', 'Uber', 'Spotify', 'Amazon', 'Zara', 'Bolt', 'Apple', 'IKEA'];
@@ -1543,6 +1734,9 @@ function ud(u) {
     ext: `${hx(8)}-${hx(4)}-${hx(4)}`, crypto: 'USDT', display: 'EUR', provider: 'Wallester', last4: String(1000 + Math.floor(r() * 9000)),
     exp: `${String(1 + Math.floor(r() * 12)).padStart(2, '0')}/${29 + Math.floor(r() * 3)}`, balance: Math.round(r() * 80000) / 100,
     emboss: (u.name || '').toUpperCase(), frozen: i > 0 && r() < .3,
+    holder: 600000 + u.id * 3 + i, token: hx(24), line4: r() < .3 ? 'NS CARDS' : '', bin: '4' + hx(5, '0123456789'),
+    templateId: i === 1 ? 7 : 5, design: i === 1 ? 'BLACK_METAL' : 'ORANGE_V2', activated: i !== 1 || r() < .7, lastItem: 900000 + u.id * 7 + i,
+    created: at(.3 + i * .1), updated: at(.8),
   }));
 
   const held = wallets.filter(x => x.amt > 0).map(x => x.c);
@@ -1575,7 +1769,10 @@ function ud(u) {
     creditco: approved
       ? { id: 'CC-' + hx(6).toUpperCase(), email: u.email, status: 'APPROVED', kycStatus: 'VERIFIED', remark: '', created: at(.2), updated: u.updated, docs: [{ type: 'PASSPORT', name: 'passport.pdf', size: '1.2 MB', date: at(.2) }] }
       : { id: null, email: null, status: 'NOT_ALL_FORM_SUBMITTED', kycStatus: null, remark: null, created: null, updated: null, docs: [] },
-    forms: approved && r() < .4 ? [{ id: 900 + u.id % 100, type: 'SOURCE_OF_FUNDS', status: 'SUBMITTED', date: at(.5) }] : [],
+    forms: approved ? Object.keys(FORM_TYPES).filter(() => r() < .35).map((type, i) => {
+      const status = pk(['REQUESTED', 'SUBMITTED', 'APPROVED', 'REJECTED']);
+      return { id: 900 + u.id % 100 * 4 + i, type, status, date: at(.4 + i * .1), updated: at(.7 + i * .05), reason: status === 'REJECTED' ? pk(['Document unreadable', 'Name does not match KYC', 'Document expired']) : '' };
+    }) : [],
   };
   UD.set(u.id, D);
   return D;
@@ -1592,13 +1789,25 @@ const dash = '<span class="faint">—</span>';
 const copyVal = (v, shown = v) => `<button class="copy num" data-act="copy" data-copy="${esc(v)}">${esc(shown)}${icon('copy', 12)}</button>`;
 const emptyBlock = (ic, t, p, btn = '') => `<div class="empty sm"><div class="em-ic">${icon(ic, 20)}</div><h3>${t}</h3><p>${p}</p>${btn}</div>`;
 const tabCount = n => n ? ` <span class="tab-n">${n}</span>` : '';
-// Data table inside a card. heads: 'Label' or 'Label|r' (right) / '|c' (centre) / '|w' (shrink). rows: arrays of cells, or { cls, cells }.
+// Data table inside a card. heads: 'Label' or 'Label|r' (right) / '|c' (centre) / '|w' (shrink) / '|a' (row actions: shown on hover, pinned right). rows: arrays of cells, or { cls, cells }.
 function dtable(heads, rows, empty = '') {
   if (!rows.length) return empty;
   const H = heads.map(h => { const k = h.lastIndexOf('|'); return k < 0 ? { l: h, al: '' } : { l: h.slice(0, k), al: h.slice(k + 1) }; });
   return `<div class="hs-wrap"><div class="dt-wrap hs"><table class="dt"><thead><tr>${H.map(h => `<th class="${h.al}">${h.l}</th>`).join('')}</tr></thead>
-    <tbody>${rows.map(r => { const cells = Array.isArray(r) ? r : r.cells; return `<tr class="${r.cls || ''}">${cells.map((c, i) => `<td class="${H[i].al}">${c}</td>`).join('')}</tr>`; }).join('')}</tbody></table></div></div>`;
+    <tbody>${rows.map(r => { const cells = Array.isArray(r) ? r : r.cells; return `<tr class="${r.cls || ''}">${cells.map((c, i) => (H[i].al === 'a' ? `<td class="act"><div class="row-actions">${c}</div></td>` : `<td class="${H[i].al}">${c}</td>`)).join('')}</tr>`; }).join('')}</tbody></table></div></div>`;
 }
+/* Column chooser for user-page tables: TCOLS[table] = [{ k, l, al, on, cell(row) }]; each table remembers its visible columns */
+const tVisible = t => { const saved = (S.tcols ||= store.get('nsc.tcols', {}))[t]; return TCOLS[t].filter(c => saved ? saved.includes(c.k) : c.on); };
+function ctable(t, rows, empty, o = {}) {
+  const cols = tVisible(t);
+  const heads = [...(o.pre ? [o.pre.head] : []), ...cols.map(c => c.l + (c.al ? '|' + c.al : '')), ...(o.post ? ['|a'] : [])];
+  return dtable(heads, rows.map((r, i) => {
+    const cells = [...(o.pre ? [o.pre.cell(r, i)] : []), ...cols.map(c => c.cell(r, i)), ...(o.post ? [o.post(r, i)] : [])];
+    return o.rowCls ? { cls: o.rowCls(r), cells } : cells;
+  }), empty);
+}
+const colsBtn = t => `<button class="icon-btn sm" data-act="tcols" data-t="${t}" data-tip="Columns">${icon('columns', 15)}</button>`;
+const tcolsPop = t => { const vis = new Set(tVisible(t).map(c => c.k)); return `<div class="pop-sec"><div class="pop-lbl">Columns<button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="tcols-reset" data-t="${t}">Reset columns</button></div><div class="pills">${TCOLS[t].map(c => `<button class="pill ${vis.has(c.k) ? 'on' : ''}" data-act="tcol" data-t="${t}" data-k="${c.k}">${c.l}</button>`).join('')}</div></div>`; };
 const tcard = (title, acts, body, tools = '') => `<div class="card flush"><div class="card-h"><span class="card-t">${title}</span>${acts ? `<div class="ch-act">${acts}</div>` : ''}</div>${tools ? `<div class="card-tools">${tools}</div>` : ''}${body}</div>`;
 
 function eventsOf(u) {
@@ -1640,13 +1849,13 @@ function renderUserPage() {
       ${over ? `<aside class="up-side">
         <div class="card">
           <div class="card-h"><span class="card-t">Balance</span><button class="link-btn" data-act="u-tab" data-v="wallets" style="height:auto;display:flex;align-items:center;gap:2px">Wallets ${icon('chevRight', 14)}</button></div>
-          <div class="w-total"><b>${fmtEur(u.balance, 2)}</b></div>
+          <div class="card-b pad"><div class="w-total"><b>${fmtEur(u.balance, 2)}</b></div>
           ${ws.length ? `<div class="stack" style="height:8px;margin:12px 0 10px">${ws.map(w => `<i style="width:${eurOf(w) / u.balance * 100}%;background:${ASSET[w.c].col}" data-tt="${w.c}|${fmtEur(eurOf(w))}|${(eurOf(w) / u.balance * 100).toFixed(0)}%"></i>`).join('')}</div>
-          <div class="legend">${ws.map(w => `<span><i class="sw" style="background:${ASSET[w.c].col}"></i>${w.c}</span>`).join('')}</div>` : '<div class="faint" style="font-size:13px">No deposits yet</div>'}
+          <div class="legend">${ws.map(w => `<span><i class="sw" style="background:${ASSET[w.c].col}"></i>${w.c}</span>`).join('')}</div>` : '<div class="faint" style="font-size:13px">No deposits yet</div>'}</div>
         </div>
         <div class="card">
           <div class="card-h"><span class="card-t">Recent activity</span><button class="link-btn" data-act="u-tab" data-v="transactions" style="height:auto;display:flex;align-items:center;gap:2px">Transactions ${icon('chevRight', 14)}</button></div>
-          ${timeline(eventsOf(u).slice(0, 4))}
+          <div class="card-b pad">${timeline(eventsOf(u).slice(0, 4))}</div>
         </div>
       </aside>` : ''}
     </div>
@@ -1660,19 +1869,19 @@ function userTab(u, d, D) {
   const ver = (l, ok, v, extra = '') => `<div class="kv-r"><span class="ver-l"><span class="ver-ic ${ok ? 'ok' : 'no'}">${icon(ok ? 'check' : 'minus', 12, 2.5)}</span><span style="color:var(--ink)">${l}</span></span><span style="display:flex;align-items:center;gap:8px">${extra}${v}</span></div>`;
   switch (S.userTab) {
     case 'overview': return `
-      <div class="card"><div class="card-h"><span class="card-t">Profile</span></div><div class="kv2">
+      <div class="card"><div class="card-h"><span class="card-t">Profile</span></div><div class="kv2 card-b">
         ${kv('Status', selBtn('status', d.status))}${kv('Level', selBtn('level', d.level))}
         ${kv('Risk level', selBtn('risk', d.risk))}${kv('Residency', selBtn('country', d.country))}
-        ${kv('Type', `<b>${TYPE[d.type].label}</b>`)}${kv('Company', `<a class="lnk" href="#/companies">${d.company}</a>`)}
+        ${kv('Type', `<b>${TYPE[d.type].label}</b>`)}${kv('Company', `<a class="lnk" href="#/companies">${companyOf(d).name} #${d.companyId}</a>`)}
         ${kv('Language', `<b>${d.lang}</b>`)}${kv('Invited by', u.invitedBy ? `<span class="num">#${u.invitedBy}</span>` : dash)}
       </div></div>
-      <div class="card"><div class="card-h"><span class="card-t">Verification</span><button class="link-btn" data-act="u-tab" data-v="verification" style="height:auto;display:flex;align-items:center;gap:2px">Details ${icon('chevRight', 14)}</button></div><div class="kv2">
+      <div class="card"><div class="card-h"><span class="card-t">Verification</span><button class="link-btn" data-act="u-tab" data-v="verification" style="height:auto;display:flex;align-items:center;gap:2px">Details ${icon('chevRight', 14)}</button></div><div class="kv2 card-b">
         ${ver('Email', d.emailVerified, `<span class="${d.emailVerified ? '' : 'faint'}">${d.emailVerified ? 'Verified' : 'Not verified'}</span>`, d.emailVerified ? '' : `<button class="link-btn" data-act="toast" data-msg="Verification email sent">Resend</button>`)}
         ${ver('KYC', d.kyc === 'approved', badge(KYC[d.kyc]))}
         ${ver('Identity (IDV)', d.idv, `<span class="${d.idv ? '' : 'faint'}">${d.idv ? 'Passed' : 'Not started'}</span>`)}
         ${ver('Two-factor auth', d.twofa, `<span class="${d.twofa ? '' : 'faint'}">${d.twofa ? 'Enabled' : 'Disabled'}</span>`, d.twofa ? `<button class="link-btn" data-act="reset-2fa" data-id="${u.id}">Reset</button>` : '')}
       </div></div>
-      <div class="card"><div class="card-h"><span class="card-t">Account</span></div><div class="kv2">
+      <div class="card"><div class="card-h"><span class="card-t">Account</span></div><div class="kv2 card-b">
         ${kv('Unique ID', copyVal(u.uid))}${kv('Referral code', copyVal(u.referral))}
         ${kv('Created', `<span>${fmtDateTime(u.created)}</span>`)}${kv('Updated', `<span>${fmtDateTime(u.updated)}</span>`)}
         ${kv('Cards', `<span class="num">${D.cards.length}</span>`)}${kv('Temporary password', `<button class="link-btn" style="margin-right:-6px" data-act="toast" data-msg="Temporary password issued">Issue</button>`)}
@@ -1710,6 +1919,59 @@ function walletsTab(u, D) {
   return tcard(`Wallets <span class="ct">${fmtEur(u.balance, 2)}</span>`, `<button class="btn btn-ghost btn-sm" data-act="adj-open">${icon('sliders', 14)}Adjust balance</button>`, `<div class="wlist">${rows}</div>`);
 }
 
+const txType = h => `<span class="txt">${icon(TX[h.type].icon, 14)}${TX[h.type].label}</span>`;
+const txCur = h => `<span class="ctry">${assetIc(h.c, 20)}${h.c}</span>`;
+const txAmt = h => `<span class="num ${h.amount > 0 ? 'pos' : ''}">${fmtAmt(h.amount, h.c, true)}</span>`;
+const numM = v => `<span class="num muted">${v}</span>`, muted = v => v ? `<span class="muted">${esc(v)}</span>` : dash;
+const TCOLS = {
+  txw: [
+    { k: 'created', l: 'Created', on: 1, cell: h => fmtDateTime(h.created) }, { k: 'id', l: 'ID', cell: h => numM(h.id) },
+    { k: 'type', l: 'Type', on: 1, cell: txType }, { k: 'cur', l: 'Currency', on: 1, cell: txCur }, { k: 'amount', l: 'Amount', al: 'r', on: 1, cell: txAmt },
+    { k: 'before', l: 'Balance before', al: 'r', on: 1, cell: h => numM(fmtAmt(h.before, h.c)) }, { k: 'details', l: 'Details', cell: h => muted(h.details) },
+    { k: 'updated', l: 'Updated', al: 'r', on: 1, cell: h => muted(rel(h.updated)) },
+  ],
+  txa: [
+    { k: 'opDate', l: 'Operation date', on: 1, cell: h => fmtDateTime(h.opDate) }, { k: 'id', l: 'ID', cell: h => numM(h.id) },
+    { k: 'userId', l: 'User ID', cell: () => numM(S.userId) }, { k: 'userName', l: 'User name', cell: () => muted(byId(S.userId).name) },
+    { k: 'type', l: 'Type', on: 1, cell: txType }, { k: 'cur', l: 'Currency', on: 1, cell: txCur }, { k: 'amount', l: 'Amount', al: 'r', on: 1, cell: txAmt },
+    { k: 'commission', l: 'Commission', al: 'r', on: 1, cell: h => h.commission ? numM(fmtAmt(h.commission, h.c)) : dash },
+    { k: 'details', l: 'Details', on: 1, cell: h => muted(h.details) }, { k: 'source', l: 'Source', on: 1, cell: h => SOURCES[h.source] },
+    { k: 'ref', l: 'Referral', on: 1, cell: h => h.ref ? `<span class="num">${h.ref}</span>` : dash },
+    { k: 'created', l: 'Created', cell: h => fmtDateTime(h.created) }, { k: 'updated', l: 'Updated', al: 'r', cell: h => muted(rel(h.updated)) },
+  ],
+  cards: [
+    { k: 'card', l: 'Card', on: 1, cell: c => `<span class="ctry"><span class="mini-card ${c.physical ? 'alt' : ''}">${LOGO_SIGN(9, '#fff')}</span>•••• ${c.last4}</span>` },
+    { k: 'id', l: 'ID', on: 1, cell: c => numM(c.id) }, { k: 'userId', l: 'User ID', cell: () => numM(S.userId) },
+    { k: 'holder', l: 'Cardholder ID', on: 1, cell: c => numM(c.holder) }, { k: 'token', l: 'Public token', cell: c => copyVal(c.token, c.token.slice(0, 10) + '…') },
+    { k: 'product', l: 'Product', on: 1, cell: c => `<div>${c.product}</div><div class="code">ID ${c.productId}</div>` }, { k: 'provider', l: 'Provider', cell: c => c.provider },
+    { k: 'crypto', l: 'Crypto currency', on: 1, cell: c => c.crypto }, { k: 'cur', l: 'Currency', on: 1, cell: c => c.display },
+    { k: 'balance', l: 'Balance', al: 'r', on: 1, cell: c => `<span class="num">${fmtAmt(c.balance, 'EUR')}</span>` },
+    { k: 'emboss', l: 'Emboss name', cell: c => muted(c.emboss) }, { k: 'line4', l: 'Fourth line text', cell: c => muted(c.line4) },
+    { k: 'exp', l: 'Expiry', on: 1, cell: c => `<span class="num">${c.exp}</span>` }, { k: 'masked', l: 'Masked number', cell: c => `<span class="num">${c.bin}•• •••• ${c.last4}</span>` },
+    { k: 'type', l: 'Card type', on: 1, cell: c => c.physical ? 'Physical' : 'Virtual' }, { k: 'template', l: 'Template ID', cell: c => numM(c.templateId) },
+    { k: 'design', l: 'Design code', cell: c => muted(c.design) }, { k: 'activated', l: 'Activated', al: 'c', on: 1, cell: c => yes(c.activated) },
+    { k: 'status', l: 'Status', on: 1, cell: c => badge(c.frozen ? { label: 'Frozen', tone: 'info' } : { label: 'Active', tone: 'success' }) },
+    { k: 'lastItem', l: 'Last item ID', cell: c => numM(c.lastItem) },
+    { k: 'created', l: 'Created', on: 1, cell: c => muted(fmtDateTime(c.created)) }, { k: 'updated', l: 'Updated', cell: c => muted(rel(c.updated)) },
+  ],
+  iban: [
+    { k: 'iban', l: 'IBAN', on: 1, cell: b => copyVal(b.iban.replace(/ /g, ''), b.iban) }, { k: 'id', l: 'ID', cell: b => numM(b.id) },
+    { k: 'email', l: 'Email', cell: () => muted(byId(S.userId).email) }, { k: 'product', l: 'Product', on: 1, cell: b => b.productName },
+    { k: 'productId', l: 'Product ID', cell: b => numM(b.productId) }, { k: 'provider', l: 'Provider', on: 1, cell: b => b.provider },
+    { k: 'source', l: 'Source', on: 1, cell: b => SOURCES[b.source] }, { k: 'status', l: 'Status', on: 1, cell: b => badge(IBAN_STATUS[b.status]) },
+    { k: 'currency', l: 'Currency', cell: b => b.currency }, { k: 'ext', l: 'External ID', on: 1, cell: b => copyVal(b.ext) },
+  ],
+  forms: [
+    { k: 'rid', l: 'Request ID', on: 1, cell: f => numM(f.id) }, { k: 'status', l: 'Status', on: 1, cell: f => badge(FORM_STATUS[f.status]) },
+    { k: 'reason', l: 'Reject reason', cell: f => muted(f.reason) }, { k: 'requested', l: 'Requested', on: 1, cell: f => muted(rel(f.date)) },
+    { k: 'rupdated', l: 'Request updated', cell: f => muted(rel(f.updated)) }, { k: 'fid', l: 'Form ID', on: 1, cell: f => numM(FORM_TYPES[f.type].id) },
+    { k: 'title', l: 'Title', on: 1, cell: f => FORM_TYPES[f.type].title }, { k: 'desc', l: 'Description', on: 1, cell: f => muted(FORM_TYPES[f.type].desc) },
+    { k: 'version', l: 'Version', cell: f => numM('v' + FORM_TYPES[f.type].version) }, { k: 'type', l: 'Type', on: 1, cell: f => `<span class="code">${f.type}</span>` },
+    { k: 'fstatus', l: 'Form status', cell: () => badge({ label: 'Active', tone: 'success' }) }, { k: 'fcreated', l: 'Form created', cell: f => muted(fmtDay(FORM_TYPES[f.type].created)) },
+    { k: 'email', l: 'User email', cell: () => muted(byId(S.userId).email) },
+  ],
+};
+
 /* Transactions — wallet history and aggregated history share filters */
 function txFiltered(D) {
   const f = S.tx, { from, to } = resolveRange(f.range), ref = f.ref.trim().toLowerCase();
@@ -1720,14 +1982,15 @@ function txTab(u, D) {
   const f = S.tx, agg = f.view === 'agg';
   const opts = (o, v, all) => `<option value="">${all}</option>` + Object.entries(o).map(([k, l]) => `<option value="${k}" ${v === k ? 'selected' : ''}>${l}</option>`).join('');
   const tools = `
+    <div class="seg">${[['wallet', 'Wallet history'], ['agg', 'Aggregated']].map(([k, l]) => `<button class="${f.view === k ? 'on' : ''}" data-act="tx-view" data-v="${k}">${l}</button>`).join('')}</div>
     ${dpButton(f.range, 'tx-range')}
-    <select class="sel" data-tx="cur">${opts(Object.fromEntries(ASSETS.map(a => [a.c, a.c])), f.cur, 'All currencies')}</select>
-    <select class="sel" data-tx="type">${opts(Object.fromEntries(Object.entries(TX).map(([k, t]) => [k, t.label])), f.type, 'All types')}</select>
-    ${agg ? `<select class="sel" data-tx="source">${opts(SOURCES, f.source, 'All sources')}</select><input class="inp" data-tx="ref" placeholder="Referral ID" value="${esc(f.ref)}" autocomplete="off">` : ''}`;
-  const acts = `${agg ? `<button class="btn btn-ghost btn-sm" data-act="tx-copy" ${f.sel.size ? '' : 'disabled'}>${icon('copy', 14)}Copy${f.sel.size ? ` ${f.sel.size}` : ''}</button>` : ''}
-    <button class="btn btn-ghost btn-sm" data-act="tx-export">${icon('download', 14)}Export${icon('chevDown', 13)}</button>`;
+    <select class="fsel" data-tx="cur">${opts(Object.fromEntries(ASSETS.map(a => [a.c, a.c])), f.cur, 'All currencies')}</select>
+    <select class="fsel" data-tx="type">${opts(Object.fromEntries(Object.entries(TX).map(([k, t]) => [k, t.label])), f.type, 'All types')}</select>
+    ${agg ? `<select class="fsel" data-tx="source">${opts(SOURCES, f.source, 'All sources')}</select><input class="inp" data-tx="ref" placeholder="Referral ID" value="${esc(f.ref)}" autocomplete="off">` : ''}`;
+  const acts = `
+    <button class="btn btn-ghost btn-sm" data-act="tx-export">${icon('download', 14)}Export${icon('chevDown', 13)}</button>${colsBtn(agg ? 'txa' : 'txw')}`;
   return `<div class="card flush">
-    <div class="card-h"><div class="seg">${[['wallet', 'Wallet history'], ['agg', 'Aggregated']].map(([k, l]) => `<button class="${f.view === k ? 'on' : ''}" data-act="tx-view" data-v="${k}">${l}</button>`).join('')}</div><div class="ch-act">${acts}</div></div>
+    <div class="card-h"><span class="card-t">Transactions</span><div class="ch-act">${acts}</div></div>
     <div class="card-tools">${tools}</div>
     <div id="txBody">${txBody(D)}</div>
   </div>`;
@@ -1737,43 +2000,27 @@ function txBody(D) {
   f.page = Math.min(f.page, pages);
   if (!list.length) return D.history.length ? emptyBlock('search', 'No transactions match', 'Try a wider date range or clear a filter.') : emptyBlock('arrows', 'No transactions yet', 'Deposits, exchanges and card spend will show up here.');
   const start = (f.page - 1) * per, rows = list.slice(start, start + per);
-  const type = h => `<span class="txt">${icon(TX[h.type].icon, 14)}${TX[h.type].label}</span>`;
-  const cur = h => `<span class="ctry">${assetIc(h.c, 20)}${h.c}</span>`;
-  const amt = h => `<span class="num ${h.amount > 0 ? 'pos' : ''}">${fmtAmt(h.amount, h.c, true)}</span>`;
-  let table;
-  if (f.view === 'agg') {
-    const all = rows.every(h => f.sel.has(h.id)), some = rows.some(h => f.sel.has(h.id));
-    table = dtable([`<button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="tx-sel-page" aria-label="Select page">${icon('check', 11, 3)}</button>|w`, 'Operation date', 'Type', 'Currency', 'Amount|r', 'Commission|r', 'Details', 'Source', 'Referral'],
-      rows.map(h => ({ cls: f.sel.has(h.id) ? 'sel' : '', cells: [`<button class="cb ${f.sel.has(h.id) ? 'on' : ''}" data-act="tx-sel" data-id="${h.id}" aria-label="Select">${icon('check', 11, 3)}</button>`,
-        fmtDateTime(h.opDate), type(h), cur(h), amt(h), h.commission ? `<span class="num muted">${fmtAmt(h.commission, h.c)}</span>` : dash, `<span class="muted">${esc(h.details)}</span>`, SOURCES[h.source], h.ref ? `<span class="num">${h.ref}</span>` : dash] })));
-  } else {
-    table = dtable(['Created', 'Type', 'Currency', 'Amount|r', 'Balance before|r', 'Updated|r'],
-      rows.map(h => [fmtDateTime(h.created), type(h), cur(h), amt(h), `<span class="num muted">${fmtAmt(h.before, h.c)}</span>`, `<span class="muted">${rel(h.updated)}</span>`]));
-  }
+  const all = rows.every(h => f.sel.has(h.id)), some = rows.some(h => f.sel.has(h.id));
+  const table = f.view === 'agg'
+    ? ctable('txa', rows, '', { rowCls: h => f.sel.has(h.id) ? 'sel' : '',
+        pre: { head: `<button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="tx-sel-page" aria-label="Select page">${icon('check', 11, 3)}</button>|w`, cell: h => `<button class="cb ${f.sel.has(h.id) ? 'on' : ''}" data-act="tx-sel" data-id="${h.id}" aria-label="Select">${icon('check', 11, 3)}</button>` } })
+    : ctable('txw', rows, '');
   return table + pagerHTML(list.length, pages, start, rows.length, { page: f.page, act: 'tx-page', per: false });
 }
 const refreshTx = () => { const el = $('#txBody'); if (el) el.innerHTML = txBody(ud(byId(S.userId))); };
 
 /* Cards */
 function cardsTab(u, D) {
-  return tcard('Cards', D.cards.length ? `<button class="btn btn-ghost btn-sm" data-act="cards-update">${icon('refresh', 14)}Update balances</button>` : '',
-    dtable(['Card', 'Product', 'Provider', 'Currency', 'Balance|r', 'Emboss name', 'Status', '|w'], D.cards.map((c, i) => [
-      `<span class="ctry"><span class="mini-card ${c.physical ? 'alt' : ''}">${LOGO_SIGN(9, '#fff')}</span><span><div>•••• ${c.last4}</div><div class="code">${c.physical ? 'Physical' : 'Virtual'} · exp ${c.exp}</div></span></span>`,
-      `<div>${c.product}</div><div class="code">Product ${c.productId} · ext ${copyVal(c.ext, c.ext.slice(0, 8) + '…')}</div>`,
-      c.provider, `<span class="muted">${c.crypto} → ${c.display}</span>`, `<span class="num">${fmtAmt(c.balance, 'EUR')}</span>`, c.emboss ? `<span class="muted">${esc(c.emboss)}</span>` : dash,
-      badge(c.frozen ? { label: 'Frozen', tone: 'info' } : { label: 'Active', tone: 'success' }),
-      `<button class="ghost-ic" data-act="card-more" data-i="${i}" data-tip="More">${icon('more', 15)}</button>`]),
-      emptyBlock('card', 'No cards', u.kyc === 'approved' ? 'This user hasn’t ordered a card yet.' : 'Cards are available after KYC approval.')));
+  return tcard('Cards', (D.cards.length ? `<button class="btn btn-ghost btn-sm" data-act="cards-update">${icon('refresh', 14)}Update balances</button>` : '') + colsBtn('cards'),
+    ctable('cards', D.cards, emptyBlock('card', 'No cards', u.kyc === 'approved' ? 'This user hasn’t ordered a card yet.' : 'Cards are available after KYC approval.'),
+      { post: (c, i) => `<button class="ghost-ic" data-act="card-more" data-i="${i}" data-tip="More">${icon('more', 15)}</button>` }));
 }
 
 /* IBAN */
 function ibanTab(u, D) {
   const ok = u.kyc === 'approved';
-  return tcard('IBAN accounts', '',
-    dtable(['IBAN', 'Product', 'Provider', 'Source', 'Status', 'External ID'], D.ibans.map(b => [
-      copyVal(b.iban.replace(/ /g, ''), b.iban), `<div>${b.productName}</div><div class="code">Product ${b.productId} · ${b.currency}</div>`,
-      b.provider, SOURCES[b.source], badge(IBAN_STATUS[b.status]), copyVal(b.ext)]),
-      emptyBlock('bank', 'No IBAN accounts', ok ? 'Issue a EUR account for this user.' : 'IBAN accounts are available after KYC approval.', ok ? `<button class="btn btn-dark btn-sm" data-act="iban-issue">${icon('plus', 14)}Issue IBAN</button>` : '')));
+  return tcard('IBAN accounts', colsBtn('iban'), ctable('iban', D.ibans,
+    emptyBlock('bank', 'No IBAN accounts', ok ? 'Issue a EUR account for this user.' : 'IBAN accounts are available after KYC approval.', ok ? `<button class="btn btn-dark btn-sm" data-act="iban-issue">${icon('plus', 14)}Issue IBAN</button>` : '')));
 }
 
 /* Fees & limits — readable versions of the per-operation JSON */
@@ -1784,16 +2031,16 @@ const editBtn = (act, i) => `<button class="ghost-ic" data-act="${act}" data-i="
 const opCell = (op, extra = '') => `<div style="display:flex;align-items:center;gap:8px">${opLabel(op)}${extra}</div><div class="code">${op}</div>`;
 function feesTab(u, D) {
   const lim = v => v ? `<span class="num">${fmtInt(v)}</span>` : '<span class="num faint">0</span>';
-  return tcard('Fees', '<span class="code">App users vs API clients</span>', dtable(['Operation', 'App fee', 'API fee', '|w'],
+  return tcard('Fees', '<span class="code">App users vs API clients</span>', dtable(['Operation', 'App fee', 'API fee', '|a'],
       D.fees.map((f, i) => [opCell(f.op), feeStr(f.user), feeStr(f.api), editBtn('fee-edit', i)])))
-    + tcard('Limits', '', dtable(['Operation', 'Daily|r', 'Monthly|r', 'Yearly|r', 'Currency', '|w'],
+    + tcard('Limits', '', dtable(['Operation', 'Daily|r', 'Monthly|r', 'Yearly|r', 'Currency', '|a'],
       D.limits.map((l, i) => [opCell(l.op, !l.day && !l.month && !l.year ? badge({ label: 'Blocked', tone: 'error' }) : ''), lim(l.day), lim(l.month), lim(l.year), l.cur, editBtn('limit-edit', i)])));
 }
 
 /* Addresses */
 function addrTab(u, D) {
   return tcard('Addresses', `<button class="btn btn-ghost btn-sm" data-act="addr-add">${icon('plus', 14)}Add address</button>`,
-    dtable(['ID', 'Country', 'City', 'Address', 'Post code', '|w'], D.addresses.map((a, i) => [`<span class="num muted">${a.id}</span>`,
+    dtable(['ID', 'Country', 'City', 'Address', 'Post code', '|a'], D.addresses.map((a, i) => [`<span class="num muted">${a.id}</span>`,
       `<span class="ctry"><span class="flag">${flag(COUNTRIES[a.country].cc)}</span>${COUNTRIES[a.country].name}</span>`, esc(a.city), esc(a.street), `<span class="num">${esc(a.zip)}</span>`,
       `<button class="ghost-ic" data-act="addr-rm" data-i="${i}" data-tip="Remove">${icon('trash', 15)}</button>`]),
       emptyBlock('mapPin', 'No addresses', 'Add the user’s residential address.')));
@@ -1802,25 +2049,25 @@ function addrTab(u, D) {
 /* Verification — KYC provider records, CreditCo and requested forms */
 function verifTab(u, D) {
   const C = D.creditco, kv = (l, v) => `<div class="kv-r"><span>${l}</span>${v || dash}</div>`;
-  const kyc = tcard('KYC', '', dtable(['ID', 'Provider', 'Status', 'IDV|c', 'KYC verified|c', 'Downloaded|c', 'Default|c', 'Created', 'Updated', '|w'], D.kyc.map((k, i) => [
+  const kyc = tcard('KYC', '', dtable(['ID', 'Provider', 'Status', 'IDV|c', 'KYC verified|c', 'Downloaded|c', 'Default|c', 'Created', 'Updated', '|a'], D.kyc.map((k, i) => [
     `<span class="num muted">${k.id}</span>`, k.provider,
-    `<select class="sel sm" data-kyc="${i}">${Object.entries(KYC).map(([v, o]) => `<option value="${v}" ${u.kyc === v ? 'selected' : ''}>${o.label}</option>`).join('')}</select>`,
+    `<select class="fsel sm" data-kyc="${i}">${Object.entries(KYC).map(([v, o]) => `<option value="${v}" ${u.kyc === v ? 'selected' : ''}>${o.label}</option>`).join('')}</select>`,
     yes(u.idv), yes(u.kyc === 'approved'), yes(k.downloaded), yes(k.def), `<span class="muted">${fmtDateTime(k.created)}</span>`, `<span class="muted">${fmtDateTime(k.updated)}</span>`,
     `<button class="btn btn-ghost btn-sm" data-act="toast" data-msg="Identity verification link sent">${icon('send', 14)}Resend</button>`])));
   const cc = `<div class="card">
     <div class="card-h"><span class="card-t">CreditCo</span><button class="btn btn-ghost btn-sm" data-act="cc-actions">Actions${icon('chevDown', 13)}</button></div>
-    <div class="kv2">${kv('ID', C.id && copyVal(C.id))}${kv('CreditCo email', C.email && esc(C.email))}${kv('Status', badge(CC_STATUS[C.status]))}${kv('KYC status', C.kycStatus)}
+    <div class="kv2 card-b">${kv('ID', C.id && copyVal(C.id))}${kv('CreditCo email', C.email && esc(C.email))}${kv('Status', badge(CC_STATUS[C.status]))}${kv('KYC status', C.kycStatus)}
       ${kv('KYC remark', C.remark)}${kv('Created', C.created && fmtDateTime(C.created))}${kv('Updated', C.updated && fmtDateTime(C.updated))}${kv('Documents', `<span class="num">${C.docs.length}</span>`)}</div>
     <div class="docs">
-      <div class="docs-h"><span class="sub-t">Documents</span><select class="sel sm" id="docType"><option value="">Document type</option>${Object.entries(DOC_TYPES).map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select></div>
+      <div class="docs-h"><span class="sub-t">Documents</span><select class="fsel sm" id="docType"><option value="">Document type</option>${Object.entries(DOC_TYPES).map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select></div>
       ${C.docs.map(x => `<div class="doc"><span class="doc-ic">${icon('file', 15)}</span><div style="flex:1;min-width:0"><div>${esc(x.name)}</div><div class="code">${DOC_TYPES[x.type]} · ${x.size} · ${rel(x.date)}</div></div></div>`).join('')}
       <label class="dropzone" id="dropzone"><input type="file" id="docFile" hidden accept=".pdf,.jpg,.jpeg,.png">${icon('upload', 18)}<div><b>Click to upload</b> or drag and drop</div><div class="code">PDF, JPG or PNG, up to 10 MB</div></label>
     </div>
   </div>`;
-  const forms = tcard('Forms', `<select class="sel sm" id="formType"><option value="">Form type</option>${Object.entries(FORM_TYPES).map(([k, f]) => `<option value="${k}">${f.title}</option>`).join('')}</select><button class="btn btn-dark btn-sm" data-act="form-request">Request</button>`,
-    dtable(['ID', 'Form', 'Description', 'Status', 'Requested|r'], D.forms.map(f => [`<span class="num muted">${f.id}</span>`,
-      `<div>${FORM_TYPES[f.type].title}</div><div class="code">${f.type}</div>`, `<span class="muted">${FORM_TYPES[f.type].desc}</span>`, badge(FORM_STATUS[f.status]), `<span class="muted">${rel(f.date)}</span>`]),
-      emptyBlock('file', 'No forms requested', 'Request a form to collect extra information from this user.')));
+  const fl = D.forms.filter(f => !S.formStatus || f.status === S.formStatus);
+  const forms = tcard('Forms', `<select class="fsel sm" id="formStatus"><option value="">All statuses</option>${Object.entries(FORM_STATUS).map(([k, o]) => `<option value="${k}" ${S.formStatus === k ? 'selected' : ''}>${o.label}</option>`).join('')}</select>
+      <select class="fsel sm" id="formType"><option value="">Form type</option>${Object.entries(FORM_TYPES).map(([k, f]) => `<option value="${k}">${f.title}</option>`).join('')}</select><button class="btn btn-dark btn-sm" data-act="form-request">Request</button>${colsBtn('forms')}`,
+    ctable('forms', fl, D.forms.length ? emptyBlock('search', 'No forms with this status', 'Pick another status to see more.') : emptyBlock('file', 'No forms requested', 'Request a form to collect extra information from this user.')));
   return kyc + cc + forms;
 }
 
@@ -1839,8 +2086,9 @@ function adjustModal(c) {
       <div class="adj-pane ${manual ? 'on' : ''}" data-pane="manual">
         <div class="field"><label>Wallet</label><select id="adjCur">${D.wallets.map(w => `<option value="${w.c}" ${w.c === c ? 'selected' : ''}>${w.c} · ${fmtAmt(w.amt, w.c)}</option>`).join('')}</select></div>
         <div class="field"><label>Direction</label><div class="seg" style="width:100%" id="adjDir"><button class="on" style="flex:1;justify-content:center" data-act="adj-dir" data-v="1">${icon('plus', 14)}Credit</button><button style="flex:1;justify-content:center" data-act="adj-dir" data-v="-1">${icon('minus', 14)}Debit</button></div></div>
-        <div class="field"><label>Amount</label><input id="adjAmt" type="number" min="0" step="any" placeholder="0"></div>
-        <div class="field"><label>Reason</label><input id="adjReason" placeholder="Shown in the audit log" autocomplete="off"></div>
+        <div class="field"><label>Amount, in the wallet's currency</label><input id="adjAmt" type="number" min="0" step="any" placeholder="0"></div>
+        <div class="field"><label>Fee</label><input id="adjFee" type="number" min="0" step="any" placeholder="0"></div>
+        <div class="field"><label>Note</label><input id="adjReason" placeholder="Shown in the audit log" autocomplete="off"></div>
       </div>
     </div>
     <div class="modal-f"><button class="btn btn-ghost btn-sm" data-act="modal-close">Cancel</button><button class="btn btn-primary btn-sm" data-act="adj-submit">Apply</button></div>
@@ -1861,11 +2109,12 @@ function adjSubmit() {
     pushTx(u, D, { type: 'BANK_DEPOSIT', c: 'EUR', amount: amt - fee, commission: fee, details: 'Manual bank deposit' });
     toast(`Deposited ${fmtEur(amt - fee, 2)} to EUR wallet`);
   } else {
-    const c = $('#adjCur').value, dir = +$('#adjDir .on').dataset.v, amt = +$('#adjAmt').value, w = D.wallets.find(x => x.c === c);
+    const c = $('#adjCur').value, dir = +$('#adjDir .on').dataset.v, amt = +$('#adjAmt').value, fee = +$('#adjFee').value || 0, w = D.wallets.find(x => x.c === c);
     if (!(amt > 0)) return bad('#adjAmt', 'Enter an amount');
-    if (dir < 0 && amt > w.amt) return bad('#adjAmt', `Only ${fmtAmt(w.amt, c)} available`);
-    pushTx(u, D, { type: 'ADJUSTMENT', c, amount: dir * amt, details: $('#adjReason').value.trim() || 'Admin correction' });
-    toast(`${dir > 0 ? 'Credited' : 'Debited'} ${fmtAmt(amt, c)}`);
+    if (fee < 0 || (dir > 0 && fee >= amt)) return bad('#adjFee', 'Fee must be less than the amount');
+    if (w.amt + dir * amt - fee < 0) return bad('#adjAmt', `Only ${fmtAmt(w.amt, c)} available`);
+    pushTx(u, D, { type: 'ADJUSTMENT', c, amount: dir * amt - fee, commission: fee, details: $('#adjReason').value.trim() || 'Admin correction' });
+    toast(`${dir > 0 ? 'Credited' : 'Debited'} ${fmtAmt(amt, c)}${fee ? ` · fee ${fmtAmt(fee, c)}` : ''}`);
   }
   closeModal(); renderUserPage(); renderTopbar();
 }
@@ -1873,7 +2122,7 @@ function fieldsModal(title, fields, saveAct) {
   openModal(`<div class="modal">
     <div class="modal-h">${title}<button class="icon-btn sm bare" data-act="modal-close">${icon('x', 17)}</button></div>
     <div class="modal-b">${fields.map(f => `<div class="field"><label>${f.label}</label>${f.options
-      ? `<select id="${f.id}">${f.options.map(([v, l]) => `<option value="${v}" ${v === f.value ? 'selected' : ''}>${l}</option>`).join('')}</select>`
+      ? `<select id="${f.id}">${f.options.map(([v, l, fl]) => `<option value="${v}" ${fl ? `data-flag="${fl}"` : ''} ${v === f.value ? 'selected' : ''}>${l}</option>`).join('')}</select>`
       : `<input id="${f.id}" value="${esc(f.value ?? '')}" placeholder="${f.ph || ''}" ${f.type ? `type="${f.type}" step="any" min="0"` : ''} autocomplete="off">`}${f.hint ? `<div class="hint" style="margin-top:6px">${f.hint}</div>` : ''}</div>`).join('')}</div>
     <div class="modal-f"><button class="btn btn-ghost btn-sm" data-act="modal-close">Cancel</button><button class="btn btn-primary btn-sm" data-act="${saveAct}">Save</button></div>
   </div>`, m => $('input,select', m)?.focus());
@@ -1902,6 +2151,7 @@ function positionPop() {
 }
 function reanchor() { if (popOpts.anchorSel) { const a = $(popOpts.anchorSel); if (a) { popAnchor = a; positionPop(); } } }
 function closePop() {
+  $$('.dd.open').forEach(b => b.classList.remove('open'));
   if (!pop.classList.contains('open')) return;
   pop.classList.remove('open'); popAnchor = null; popOpts = {};
   const before = S.filters.length; S.filters = S.filters.filter(f => f.values.length);
@@ -1909,6 +2159,21 @@ function closePop() {
 }
 document.addEventListener('mousedown', e => { if (pop.classList.contains('open') && !pop.contains(e.target) && !(popAnchor && popAnchor.contains(e.target))) closePop(); });
 const menuItems = items => `<div class="pop-list">${items.map(it => it === '-' ? '<div class="pop-sep"></div>' : `<button class="pi ${it.cls || ''}" data-act="${it.act}" ${Object.entries(it.data || {}).map(([k, v]) => `data-${k}="${v}"`).join(' ')}>${it.icon ? icon(it.icon, 15) : ''}${it.html || `<span class="pl">${it.label}</span>`}${it.on ? `<span class="chk">${icon('check', 15, 2)}</span>` : ''}</button>`).join('')}</div>`;
+
+/* Designed dropdowns: every native <select> is hidden and fronted by a button that opens our popover list.
+   Picking an option sets the select's value and fires its "change" event, so existing handlers keep working. */
+const ddLabel = sel => { const b = sel.nextElementSibling; if (!b?.classList.contains('dd')) return; const o = sel.options[sel.selectedIndex]; b.innerHTML = o ? (o.dataset.flag ? `<span class="flag">${o.dataset.flag}</span>` : '') + esc(o.text) : ''; b.classList.toggle('dd-ph', !sel.value); };
+function enhanceSelects(root) {
+  root.querySelectorAll?.('select:not([data-dd])').forEach(sel => {
+    sel.dataset.dd = '1';
+    const b = document.createElement('button'); b.type = 'button'; b.dataset.act = 'dd';
+    b.className = 'dd ' + (sel.classList.contains('fsel') ? [...sel.classList].join(' ') : 'dd-field');
+    sel.after(b); sel.hidden = true; ddLabel(sel);
+  });
+}
+const ddItems = (sel, q = '') => [...sel.options].filter(o => o.text.toLowerCase().includes(q.trim().toLowerCase()))
+  .map(o => `<button class="pi" data-act="dd-pick" data-v="${esc(o.value)}">${o.dataset.flag ? `<span class="flag">${o.dataset.flag}</span>` : ''}<span class="pl">${esc(o.text)}</span>${o.value === sel.value ? `<span class="chk">${icon('check', 14, 2)}</span>` : ''}</button>`).join('') || '<div class="pi faint">No matches</div>';
+new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => n.nodeType === 1 && enhanceSelects(n.tagName === 'SELECT' ? n.parentNode : n)))).observe(document.body, { childList: true, subtree: true });
 
 /* filter popovers */
 const fieldItems = (q = '') => Object.entries(FIELDS).filter(([, F]) => F.label.toLowerCase().includes(q.toLowerCase())).map(([k, F]) => `<button class="pi" data-act="pick-field" data-key="${k}">${icon(F.icon, 15)}<span class="pl">${F.label}</span>${S.filters.some(f => f.key === k) ? `<span class="dot" style="--tone:var(--brand)"></span>` : ''}${icon('chevRight', 14)}</button>`).join('') || '<div class="pi faint">No matches</div>';
@@ -1938,15 +2203,13 @@ function displayPop() {
   const groupOpts = S.view === 'board' ? ['status', 'kyc', 'risk', 'level'] : ['none', 'status', 'kyc', 'risk', 'level', 'country'];
   const gl = k => k === 'none' ? 'None' : FIELDS[k].label;
   const curGroup = S.view === 'board' && !FIELDS[S.groupBy]?.board ? 'kyc' : S.groupBy;
-  const sortCol = COLS.find(c => c.key === S.sort.key);
   return `
     <div class="pop-sec"><div class="pop-lbl">Layout</div>
       <div class="seg" style="width:100%">${[['table', 'Table'], ['list', 'List'], ['board', 'Board']].map(([k, l]) => `<button style="flex:1;justify-content:center" class="${S.view === k ? 'on' : ''}" data-act="layout" data-v="${k}">${icon(k, 14)}${l}</button>`).join('')}</div>
     </div>
     ${S.view !== 'table' ? `<div class="pop-sec"><div class="pop-lbl">Group by</div><div class="pills">${groupOpts.map(k => `<button class="pill ${curGroup === k ? 'on' : ''}" data-act="disp-group" data-v="${k}">${gl(k)}</button>`).join('')}</div></div>` : ''}
-    <div class="pop-sec"><div class="pop-row"><span>Order by</span><span style="display:flex;gap:6px"><button class="mini-sel" data-act="disp-sort" style="font-family:var(--font)">${sortCol.label}${icon('chevDown', 13)}</button><button class="icon-btn sm" data-act="disp-dir" title="Direction">${icon(S.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 14)}</button></span></div>
-    ${S.view !== 'board' ? `<div class="pop-row"><span>Density</span><div class="seg sm">${['comfortable', 'compact'].map(k => `<button class="${S.density === k ? 'on' : ''}" data-act="disp-density" data-v="${k}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('')}</div></div>` : ''}</div>
-    ${S.view === 'table' ? `<div class="pop-sec"><div class="pop-lbl">Columns<button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="reset-colw">Reset widths</button></div><div class="pills">${COLS.filter(c => !c.lock).map(c => `<button class="pill ${S.hidden.has(c.key) ? '' : 'on'}" data-act="disp-col" data-v="${c.key}">${c.label}</button>`).join('')}</div></div>` : ''}`;
+    ${S.view !== 'board' ? `<div class="pop-sec"><div class="pop-row"><span>Density</span><div class="seg sm">${['comfortable', 'compact'].map(k => `<button class="${S.density === k ? 'on' : ''}" data-act="disp-density" data-v="${k}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('')}</div></div></div>` : ''}
+    ${S.view === 'table' ? `<div class="pop-sec"><div class="pop-lbl">Columns<span style="display:flex;gap:12px"><button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="reset-cols">Reset columns</button><button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="reset-colw">Reset widths</button></span></div><div class="pills">${COLS.filter(c => !c.lock).map(c => `<button class="pill ${S.hidden.has(c.key) ? '' : 'on'}" data-act="disp-col" data-v="${c.key}">${c.label}</button>`).join('')}</div></div>` : ''}`;
 }
 const refreshDisplayPop = () => { if (popOpts.kind === 'display') { pop.innerHTML = displayPop(); positionPop(); } };
 
@@ -1972,9 +2235,9 @@ function newUserModal() {
   openModal(`<div class="modal">
     <div class="modal-h">New user<button class="icon-btn sm bare" data-act="modal-close">${icon('x', 17)}</button></div>
     <div class="modal-b">
-      <div class="field"><label>Email</label><input id="nuEmail" type="email" placeholder="name@company.com" autocomplete="off"></div>
-      <div class="field"><label>Type</label><div class="seg" style="width:100%" id="nuType"><button class="on" style="flex:1;justify-content:center" data-act="nu-type" data-v="individual">Individual</button><button style="flex:1;justify-content:center" data-act="nu-type" data-v="company">Company user</button></div></div>
-      <div class="field"><label>Company</label><select id="nuCompany">${COMPANIES.map(c => `<option>${c}</option>`).join('')}</select></div>
+      <div class="field"><label>Email</label><div style="display:flex;gap:8px"><input id="nuEmail" type="email" placeholder="name@company.com" autocomplete="off" style="flex:1"><button class="btn btn-ghost" style="height:40px;border-radius:10px" data-act="nu-gen">${icon('refresh', 14)}Generate</button></div></div>
+      <div class="field"><label>Company</label><select id="nuCompany" data-search>${COMPANIES.map(c => `<option value="${c.id}">${c.name} · #${c.id}</option>`).join('')}</select></div>
+      <div class="field"><label>Referral code</label><input id="nuRef" placeholder="Optional" autocomplete="off"></div>
     </div>
     <div class="modal-f"><button class="btn btn-ghost btn-sm" data-act="modal-close">Cancel</button><button class="btn btn-primary btn-sm" data-act="create-user">Create user</button></div>
   </div>`, m => $('#nuEmail', m).focus());
@@ -2011,9 +2274,22 @@ const ACT = {
   'toast': a => { closePop(); toast(a.dataset.msg); },
   'dash-range': a => openDatePicker(a, S.range, r => { S.range = r; renderTopbar(); renderDashboard(); }, { noAll: 1, align: 'right' }),
   'dp-preset': a => dpCommit({ key: a.dataset.k }),
-  'dp-nav': a => { DP.view = new Date(DP.view.getFullYear(), DP.view.getMonth() + +a.dataset.d, 1); dpRefresh(); },
-  'dp-day': a => { const d = new Date(+a.dataset.ts); if (!DP.a || DP.b) { DP.a = d; DP.b = null; } else if (d < sod(DP.a)) { DP.b = sod(DP.a); DP.a = d; } else DP.b = d; DP.custom = true; dpRefresh(); },
-  'dp-apply': () => { const b = DP.b || DP.a; dpCommit({ key: 'custom', from: sod(DP.a).getTime(), to: Math.min(NOW.getTime(), sod(b).getTime() + DAY - 1) }); },
+  'dp-nav': a => {
+    const d = +a.dataset.d, v = DP.view;
+    if (DP.mode === 'years') DP.yStart += 12 * d;
+    else DP.view = DP.mode === 'months' ? new Date(v.getFullYear() + d, v.getMonth(), 1) : new Date(v.getFullYear(), v.getMonth() + d, 1);
+    if (DP.view > NOW) DP.view = new Date(NOW.getFullYear(), NOW.getMonth(), 1);
+    dpSoft();
+  },
+  'dp-mode': a => { DP.mode = a.dataset.v; if (DP.mode === 'years') { const ny = NOW.getFullYear(); DP.yStart = ny - 11 - 12 * Math.floor((ny - DP.view.getFullYear()) / 12); } dpSoft(); },
+  'dp-month': a => { DP.view = new Date(DP.view.getFullYear(), +a.dataset.m, 1); DP.mode = 'days'; dpSoft(); },
+  'dp-year': a => { const y = +a.dataset.y, m = y === NOW.getFullYear() ? Math.min(DP.view.getMonth(), NOW.getMonth()) : DP.view.getMonth(); DP.view = new Date(y, m, 1); DP.mode = 'months'; dpSoft(); },
+  'dp-day': a => { const d = new Date(+a.dataset.ts); if (!DP.a || DP.b) { DP.a = d; DP.b = null; } else if (d < sod(DP.a)) { DP.b = sod(DP.a); DP.a = d; } else DP.b = d; DP.custom = true; dpSoft(); },
+  'dp-apply': () => {
+    for (const el of [$('#dpFrom'), $('#dpTo')]) if (el.value.trim() && !parseIn(el.value)) { el.classList.add('err'); el.focus(); return; }
+    if (!DP.a) return;
+    const b = DP.b || DP.a; dpCommit({ key: 'custom', from: sod(DP.a).getTime(), to: Math.min(NOW.getTime(), sod(b).getTime() + DAY - 1) });
+  },
   'dp-cancel': closePop,
   'metric': a => { S.metric = a.dataset.v; renderDashboard(); },
   'route': a => { closePop(); location.hash = '#/' + a.dataset.arg; },
@@ -2026,13 +2302,10 @@ const ACT = {
     filtersChanged();
   },
   'layout': a => { S.view = a.dataset.v; S.more = {}; renderLayoutSeg(); renderResults(); refreshDisplayPop(); },
-  'display': a => openPop(a, displayPop(), { align: 'right', width: 320, kind: 'display' }),
+  'display': a => openPop(a, displayPop(), { align: 'right', width: 380, kind: 'display' }),
   'disp-group': a => { S.groupBy = a.dataset.v; S.more = {}; renderResults(); refreshDisplayPop(); },
-  'disp-dir': () => { S.sort.dir = S.sort.dir === 'asc' ? 'desc' : 'asc'; renderStats(); renderResults(); refreshDisplayPop(); },
-  'disp-sort': a => openPop(a, menuItems(COLS.map(c => ({ act: 'set-sort', data: { key: c.key }, label: c.label, on: S.sort.key === c.key }))), { width: 200, keep: 1 }),
-  'set-sort': a => { const c = COLS.find(c => c.key === a.dataset.key); S.sort = { key: c.key, dir: c.dir }; renderStats(); renderResults(); openPop($('#displayBtn'), displayPop(), { align: 'right', width: 320, kind: 'display', keep: 1 }); },
   'disp-density': a => { S.density = a.dataset.v; store.set('nsc.density', S.density); renderResults(); refreshDisplayPop(); },
-  'disp-col': a => { const k = a.dataset.v; S.hidden.has(k) ? S.hidden.delete(k) : S.hidden.add(k); store.set('nsc.hidden', [...S.hidden]); renderResults(); refreshDisplayPop(); },
+  'disp-col': a => { const k = a.dataset.v; S.hidden.has(k) ? S.hidden.delete(k) : S.hidden.add(k); store.set('nsc.hidden2', [...S.hidden]); renderResults(); refreshDisplayPop(); },
   'sort': a => { const c = COLS.find(c => c.key === a.dataset.key); S.sort = S.sort.key === c.key ? { key: c.key, dir: S.sort.dir === 'asc' ? 'desc' : 'asc' } : { key: c.key, dir: c.dir }; renderStats(); renderResults(); },
 
   'add-filter': a => openPop(a, fieldsPop(), { width: 260, onMount: p => $('#popQ', p).focus() }),
@@ -2068,7 +2341,8 @@ const ACT = {
   'apply-bulk': a => { const { field, v } = a.dataset; S.selected.forEach(id => { const u = byId(id); u[field] = v; u.updated = NOW; }); closePop(); toast(`Updated ${S.selected.size} users`); afterDataChange(); },
   'bulk-export': () => exportCSV(USERS.filter(u => S.selected.has(u.id)), 'users-selected'),
   'bulk-block': () => { S.selected.forEach(id => byId(id).status = 'blocked'); toast(`Blocked ${S.selected.size} users`, 'ban'); S.selected.clear(); afterDataChange(); },
-  'export': () => exportCSV(S._list.length ? S._list : USERS),
+  'export': a => openPop(a, menuItems([{ act: 'export-do', data: { f: 'csv' }, icon: 'download', label: 'CSV' }, { act: 'export-do', data: { f: 'xlsx' }, icon: 'table', label: 'Excel (XLSX)' }]), { align: 'right', width: 190 }),
+  'export-do': a => { closePop(); const l = S._list.length ? S._list : USERS; a.dataset.f === 'csv' ? exportCSV(l) : toast(`XLSX export of ${fmtInt(l.length)} users started`, 'download'); },
 
   'u-step': a => stepUser(+a.dataset.d),
   'u-tab': a => { S.userTab = a.dataset.v; renderUserPage(); },
@@ -2084,14 +2358,18 @@ const ACT = {
   'reset-2fa': a => { closePop(); const u = byId(+a.dataset.id); u.twofa = false; delete S.draft.twofa; toast('2FA reset — user will re-enroll at next sign-in', 'lock'); afterDataChange(); },
 
   'new-user': newUserModal,
-  'nu-type': a => { $$('#nuType button').forEach(b => b.classList.toggle('on', b === a)); },
+  'nu-gen': () => { const el = $('#nuEmail'); el.value = `test-${Math.random().toString(36).slice(2, 8)}@ns.cards`; el.style.borderColor = ''; },
   'create-user': () => {
-    const email = $('#nuEmail').value.trim();
-    if (!/^\S+@\S+\.\S+$/.test(email)) { $('#nuEmail').style.borderColor = 'var(--error)'; $('#nuEmail').focus(); return; }
+    const bad = sel => { const el = $(sel); el.style.borderColor = 'var(--error)'; el.focus(); };
+    const email = $('#nuEmail').value.trim(), ref = $('#nuRef').value.trim(), co = COMPANIES.find(c => c.id === +$('#nuCompany').value) || COMPANIES[0];
+    if (!/^\S+@\S+\.\S+$/.test(email)) return bad('#nuEmail');
+    const inviter = ref ? USERS.find(u => u.referral === ref.toLowerCase()) : null;
+    if (ref && !inviter) { toast('Unknown referral code', 'alert'); return bad('#nuRef'); }
     const id = Math.max(...USERS.map(u => u.id)) + 1;
-    USERS.unshift({ id, uid: hex(6), name: '', email, country: null, status: 'active', kyc: 'new', risk: 'unknown', level: 'basic', type: $('#nuType .on').dataset.v, company: $('#nuCompany').value, balance: 0, cards: 0, twofa: false, emailVerified: false, idv: false, lang: 'EN', referral: hex(12).toLowerCase(), invitedBy: null, created: new Date(NOW), updated: new Date(NOW) });
+    USERS.unshift({ id, uid: hex(6), name: '', email, country: null, status: 'active', kyc: 'new', risk: 'unknown', riskPoints: null, level: 'basic', type: co.id === 47 ? 'individual' : 'company', companyId: co.id, source: 'ADMIN', tempPassword: false, balance: 0, cards: 0, twofa: false, emailVerified: false, idv: false, lang: 'EN', referral: hex(12).toLowerCase(), invitedBy: inviter ? inviter.id : null, created: new Date(NOW), updated: new Date(NOW) });
     closeModal(); toast('User created — invite sent', 'mail'); goUser(id);
   },
+
 
   // user page · wallets & balance
   'wallet-toggle': a => { S.openWallet = S.openWallet === a.dataset.c ? null : a.dataset.c; renderUserPage(); },
@@ -2106,6 +2384,13 @@ const ACT = {
   'tx-page': a => { S.tx.page = +a.dataset.p; refreshTx(); },
   'tx-sel': a => { const id = +a.dataset.id; S.tx.sel.has(id) ? S.tx.sel.delete(id) : S.tx.sel.add(id); renderUserPage(); },
   'tx-sel-page': () => { const D = ud(byId(S.userId)), l = txFiltered(D).slice((S.tx.page - 1) * 15, S.tx.page * 15), all = l.every(h => S.tx.sel.has(h.id)); l.forEach(h => all ? S.tx.sel.delete(h.id) : S.tx.sel.add(h.id)); renderUserPage(); },
+  'tx-sel-all': () => { txFiltered(ud(byId(S.userId))).forEach(h => S.tx.sel.add(h.id)); renderUserPage(); },
+  'tx-sel-clear': () => { S.tx.sel.clear(); renderUserPage(); },
+  'tx-export-sel': () => {
+    const u = byId(S.userId), rows = ud(u).history.filter(h => S.tx.sel.has(h.id));
+    downloadCSV(`transactions-${u.id}-selected`, ['id', 'operation_date', 'type', 'currency', 'amount', 'commission', 'details', 'source', 'referral'], rows.map(h => [h.id, h.opDate.toISOString(), h.type, h.c, h.amount, h.commission, h.details, h.source, h.ref]));
+    toast(`Exported ${rows.length} transaction${rows.length > 1 ? 's' : ''}`, 'download');
+  },
   'tx-copy': () => {
     const rows = ud(byId(S.userId)).history.filter(h => S.tx.sel.has(h.id));
     try { navigator.clipboard.writeText(rows.map(h => [fmtDateTime(h.opDate), TX[h.type].label, fmtAmt(h.amount, h.c, true), h.details, SOURCES[h.source]].join('\t')).join('\n')); } catch {}
@@ -2150,7 +2435,7 @@ const ACT = {
     Object.assign(l, { day: +$('#liDay').value || 0, month: +$('#liMonth').value || 0, year: +$('#liYear').value || 0, cur: $('#liCur').value });
     closeModal(); toast(`${opLabel(l.op)} limits updated`); renderUserPage();
   },
-  'addr-add': () => { const u = byId(S.userId); fieldsModal('Add address', [{ id: 'adCountry', label: 'Country', value: u.country || 'DEU', options: Object.entries(COUNTRIES).map(([k, c]) => [k, c.name]) }, { id: 'adCity', label: 'City' }, { id: 'adStreet', label: 'Address' }, { id: 'adZip', label: 'Post code' }], 'addr-save'); },
+  'addr-add': () => { const u = byId(S.userId); fieldsModal('Add address', [{ id: 'adCountry', label: 'Country', value: u.country || 'DEU', options: Object.entries(COUNTRIES).map(([k, c]) => [k, c.name, flag(c.cc)]) }, { id: 'adCity', label: 'City' }, { id: 'adStreet', label: 'Address' }, { id: 'adZip', label: 'Post code' }], 'addr-save'); },
   'addr-save': () => {
     const u = byId(S.userId), D = ud(u), city = $('#adCity').value.trim(), street = $('#adStreet').value.trim();
     if (!city || !street) { const el = $(city ? '#adStreet' : '#adCity'); el.style.borderColor = 'var(--error)'; el.focus(); return; }
@@ -2168,10 +2453,27 @@ const ACT = {
   'form-request': () => {
     const t = $('#formType').value, u = byId(S.userId), D = ud(u);
     if (!t) { toast('Choose a form type first', 'alert'); $('#formType').focus(); return; }
-    D.forms.unshift({ id: 900 + u.id % 100 + D.forms.length + 1, type: t, status: 'REQUESTED', date: new Date(NOW) });
+    D.forms.unshift({ id: 900 + u.id % 100 * 4 + D.forms.length + 10, type: t, status: 'REQUESTED', date: new Date(NOW), updated: new Date(NOW), reason: '' });
     toast(`${FORM_TYPES[t].title} form requested`, 'send'); renderUserPage();
   },
+  'reset-cols': () => { S.hidden = new Set(DEFAULT_HIDDEN); store.set('nsc.hidden2', DEFAULT_HIDDEN); renderResults(); refreshDisplayPop(); },
   'reset-colw': () => { S.colW = {}; store.set('nsc.colw', {}); renderResults(); toast('Column widths fitted to this page', 'columns'); },
+  'tcols': a => openPop(a, tcolsPop(a.dataset.t), { align: 'right', width: 360, kind: 'tcols', anchorSel: `[data-act="tcols"][data-t="${a.dataset.t}"]` }),
+  'tcol': a => {
+    const t = a.dataset.t, k = a.dataset.k, vis = tVisible(t).map(c => c.k);
+    const next = vis.includes(k) ? vis.filter(x => x !== k) : TCOLS[t].map(c => c.k).filter(x => x === k || vis.includes(x));
+    if (!next.length) return;
+    S.tcols[t] = next; store.set('nsc.tcols', S.tcols); renderUserPage(); pop.innerHTML = tcolsPop(t); reanchor();
+  },
+  'tcols-reset': a => { const t = a.dataset.t; delete S.tcols[t]; store.set('nsc.tcols', S.tcols); renderUserPage(); pop.innerHTML = tcolsPop(t); reanchor(); },
+  'dd': a => {
+    const sel = a.previousElementSibling, search = sel.options.length > 8 || 'search' in sel.dataset;
+    S._dd = sel; a.classList.add('open');
+    openPop(a, `${search ? `<div class="pop-search">${icon('search', 14)}<input id="ddQ" placeholder="Search…" autocomplete="off"></div>` : ''}<div class="pop-list" id="ddList">${ddItems(sel)}</div>`,
+      { width: Math.max(180, a.offsetWidth), kind: 'dd', onMount: p => { $('#ddQ', p)?.focus(); $('#ddList .chk', p)?.closest('.pi')?.scrollIntoView({ block: 'nearest' }); } });
+    if (!pop.classList.contains('open')) a.classList.remove('open');
+  },
+  'dd-pick': a => { const sel = S._dd; closePop(); if (!sel || sel.value === a.dataset.v) return; sel.value = a.dataset.v; ddLabel(sel); sel.dispatchEvent(new Event('change', { bubbles: true })); },
   'modal-close': closeModal,
 };
 
@@ -2187,6 +2489,7 @@ document.addEventListener('change', e => {
   if (t.dataset.tx && t.tagName === 'SELECT') { S.tx[t.dataset.tx] = t.value; S.tx.page = 1; S.tx.sel.clear(); renderUserPage(); }
   else if (t.dataset.kyc != null) { const u = byId(S.userId); u.kyc = t.value; u.idv = t.value === 'approved'; u.updated = new Date(NOW); toast(`KYC status set to ${KYC[t.value].label}`); renderUserPage(); }
   else if (t.id === 'docFile' && t.files[0]) uploadDoc(t.files[0]);
+  else if (t.id === 'formStatus') { S.formStatus = t.value; renderUserPage(); }
 });
 document.addEventListener('input', e => {
   const t = e.target;
@@ -2195,6 +2498,8 @@ document.addEventListener('input', e => {
   if (t.closest?.('.modal')) t.style.borderColor = '';
   if (t.id === 'uSearch') { S.search = t.value; S.page = 1; renderStats(); renderResults(); renderFloat(); }
   else if (t.id === 'popQ') $('#popFields').innerHTML = fieldItems(t.value);
+  else if (t.id === 'ddQ') $('#ddList').innerHTML = ddItems(S._dd, t.value);
+  else if (t.id === 'dpFrom' || t.id === 'dpTo') dpTyped(t);
   else if (t.id === 'popVQ') $('#popVals').innerHTML = valueItems(t.dataset.key, t.value);
 });
 document.addEventListener('keydown', e => {
@@ -2202,6 +2507,8 @@ document.addEventListener('keydown', e => {
   const mod = e.metaKey || e.ctrlKey;
   if (mod && e.key.toLowerCase() === 'b') { e.preventDefault(); toggleSidebar(); return; }
   if (e.key === 'Enter' && e.target.id === 'popQ') { const b = $('#popFields .pi[data-key]'); b && b.click(); }
+  if (e.key === 'Enter' && (e.target.id === 'dpFrom' || e.target.id === 'dpTo')) ACT['dp-apply']();
+  if (e.key === 'Enter' && e.target.id === 'ddQ') { const b = $('#ddList .pi[data-v]'); b && b.click(); }
   if (e.key === 'Enter' && e.target.id === 'nuEmail') ACT['create-user']();
   if (e.key === 'Escape') {
     if (pop.classList.contains('open')) closePop();
