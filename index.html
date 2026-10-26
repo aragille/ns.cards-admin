@@ -16,7 +16,9 @@
   • Users table columns → COLS
   • Filter fields       → FIELDS
   • Companies           → genCompanies(), CARD_PRODUCTS / IBAN_PRODUCTS, cd() for per-company tabs
-  Routes: #/dashboard, #/users, #/users/<id>, #/companies, #/companies/access, #/companies/<id> (other nav items show a placeholder)
+  • Other list pages    → page({...}) configs in PAGES (one template: tiles, filters, Display, record page)
+  • Dashboard pages     → DASHES (Staking dashboard, Reserves, Activity / Wallet statistics)
+  Routes: #/dashboard, #/users/<id>, #/companies[/access|/<id>], #/<page>, #/<page>/<id> for every PAGES entry
   Shortcuts: ⌘K command menu · ⌘B / [ toggle sidebar · "/" focus search · j / k next/prev user · Esc back/close
 -->
 <script>
@@ -132,8 +134,8 @@ a{color:inherit;text-decoration:none}
 .nav{display:flex;align-items:center;gap:11px;height:36px;padding:0 13px;border-radius:10px;color:var(--nav-ink);font-weight:500;width:100%;white-space:nowrap;overflow:hidden;transition:background .12s}
 .nav:hover{background:var(--hover)}
 .nav .i{color:var(--ink-3)}
-.nav.active{background:var(--brand-50);color:var(--brand)}
-.nav.active .i{color:var(--brand)}
+.nav.active,.nav.active:hover{background:var(--line);color:var(--ink)}
+.nav.active .i{color:var(--ink)}
 .nav .nb{margin-left:auto;font-family:var(--mono);font-size:11px;font-style:normal;color:var(--brand-700);background:var(--brand-100);padding:1px 6px;border-radius:6px}
 .sb-foot{padding:10px 12px;border-top:1px solid var(--line);flex:none}
 .me{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:10px;width:100%;white-space:nowrap;overflow:hidden}
@@ -225,7 +227,7 @@ h1 .count{font-family:var(--mono);font-size:14px;font-weight:400;color:var(--ink
 
 /* ───────────────────────── Users list ───────────────────────── */
 /* stat pre-filters share the segmented-control look: grey track, white raised selection */
-.ustats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding:3px;margin:20px 28px 0;background:var(--surface-2);border:1px solid var(--line);border-radius:14px}
+.ustats{display:grid;grid-template-columns:repeat(var(--n,5),minmax(0,1fr));gap:3px;padding:3px;margin:20px 28px 0;background:var(--surface-2);border:1px solid var(--line);border-radius:14px}
 .ust{padding:10px 13px 9px;text-align:left;min-width:0;background:transparent;border-radius:11px;transition:background .12s,box-shadow .12s,transform .08s}
 .ust:hover{background:var(--line)}
 .ust:active{transform:scale(.985)}
@@ -309,6 +311,10 @@ table.ut{min-width:100%;width:auto}
 table.ut.fixed{table-layout:fixed}
 .ut td{overflow:hidden;text-overflow:ellipsis}
 .ut .th-in{max-width:100%;overflow:hidden}
+.ut th.c,.ut td.c{text-align:center}
+.dgrid .card.flush>.card-h{padding:18px 20px 0;margin-bottom:12px}
+.flags{display:inline-flex;align-items:center;gap:3px}
+.flags .faint{font-size:12px;margin-left:3px}
 .col-rs{position:absolute;top:0;right:-5px;width:10px;height:100%;cursor:col-resize;z-index:3}
 .col-rs::after{content:"";position:absolute;left:4.5px;top:11px;bottom:11px;width:1px;background:var(--line-strong);opacity:0;transition:opacity .12s}
 th:hover .col-rs::after{opacity:1}
@@ -1237,6 +1243,7 @@ function renderSidebar() {
 function crumbs() {
   if (S.route === 'users' && S.userId) { const u = byId(S.userId); return [['Users', '#/users'], ['#' + S.userId]]; }
   if (S.route === 'companies' && S.coId) { const c = coById(S.coId); return [['Companies', '#/companies'], [c ? c.name : '#' + S.coId]]; }
+  if (PAGES[S.route] && S.recId) { const P = pg(), r = recOf(P); return [[P.title, '#/' + P.id], [r ? P.rec.title(r) : S.recId]]; }
   return [[NAV_FLAT.find(n => n.id === S.route).label]];
 }
 function topbarActions() {
@@ -1255,6 +1262,8 @@ function topbarActions() {
       <button class="icon-btn sm bare" data-act="copy" data-copy="https://admin.ns.cards/users/${S.userId}" data-tip="Copy link">${icon('link', 16)}</button>`;
   }
   if (S.route === 'companies') return coTopbar();
+  if (PAGES[S.route]) return pgTopbar();
+  if (DASHES[S.route]) return dashTopbar();
   return '';
 }
 function renderTopbar() {
@@ -1295,7 +1304,7 @@ function toggleSidebar() {
   const t = $('.sb-toggle'); t.innerHTML = icon(col ? 'panelOpen' : 'panelClose', 18); t.dataset.tip = `${col ? 'Expand' : 'Collapse'} sidebar  ⌘B`;
   closePop(); $('#tt').classList.remove('show'); $('#tt').dataset.for = '';
 }
-$('#sidebar').addEventListener('transitionend', e => { if (e.target.id === 'sidebar' && e.propertyName === 'width') { if (S.route === 'dashboard' && S._dash) drawMainChart(S._dash); refreshHints(); } });
+$('#sidebar').addEventListener('transitionend', e => { if (e.target.id === 'sidebar' && e.propertyName === 'width') { if (S.route === 'dashboard' && S._dash) drawMainChart(S._dash); if (DASHES[S.route]) drawCharts(); refreshHints(); } });
 
 /* ════════════════════════════ Router ════════════════════════════ */
 function route() {
@@ -1307,17 +1316,30 @@ function route() {
   const cid = r === 'companies' && sub && sub !== 'access' ? +sub : null;
   if (cid !== S.coId) { S.coDraft = {}; S.brandDraft = {}; S.coUserQ = ''; S.coUserPage = 1; S.curProv = ''; }
   if (!cid) S.coTab = 'overview';
+  if (r !== S.route && !S._keepFilters) resetLists();
+  S._keepFilters = false;
   S.route = r; S.userId = uid; S.coId = cid; S.coView = r === 'companies' && sub === 'access' ? 'access' : 'list';
+  S.recId = PAGES[r] && sub ? decodeURIComponent(sub) : null;
   closePop(); $('#app').classList.remove('mobile-open'); $('#tt').classList.remove('show');
   renderSidebar(); renderTopbar();
   $('#main').scrollTop = 0;
   if (r === 'dashboard') renderDashboard();
   else if (r === 'users') uid ? renderUserPage() : renderUsersPage();
   else if (r === 'companies') cid ? renderCompanyPage() : S.coView === 'access' ? renderAccess() : renderCompanies();
+  else if (PAGES[r]) S.recId ? renderRec() : renderPg();
+  else if (DASHES[r]) renderDashPage();
   else renderPlaceholder();
   renderFloat();
 }
 window.addEventListener('hashchange', route);
+// Moving to another sidebar page starts every list fresh: no filters, search, paging or selection (sort, columns and density stay).
+// Moving between a list and its own records keeps them, so Back and j / k work. Unsaved product-access changes are kept.
+function resetLists() {
+  Object.assign(S, { filters: [], search: '', page: 1 }); S.selected.clear();
+  Object.assign(S.co, { filters: [], search: '', page: 1 }); S.co.sel.clear();
+  Object.assign(S.mx, { kind: 'all', used: false, page: 1 });
+  Object.values(S.pg).forEach(st => { Object.assign(st, { filters: [], search: '', page: 1 }); st.sel.clear(); });
+}
 const goUser = (id, e) => { const url = '#/users/' + id; if (e && (e.metaKey || e.ctrlKey)) window.open(location.pathname + url, '_blank'); else location.hash = url; };
 
 function renderPlaceholder() {
@@ -1524,7 +1546,7 @@ function renderDashboard() {
           ['t-error', 'radar', 'Open KYT alerts', 'Transactions flagged by rules', 23, 'route', 'kyt'],
           ['t-warning', 'shieldCheck', 'KYC queue', 'Pending or in review', kycQueue, 'go-filter', 'kyc|pending,review'],
           ['t-error', 'alert', 'High-risk users', 'Risk level high', highRisk, 'go-filter', 'risk|high'],
-          ['t-info', 'check', 'Confirmations', 'Awaiting admin approval', 41, 'route', 'confirmations'],
+          ['t-info', 'check', 'Confirmations', 'Awaiting admin approval', confPending(), 'route', 'confirmations'],
         ].map(([t, ic, l, s, v, act, arg]) => `<button class="rk ${t}" data-act="${act}" data-arg="${arg}"><span class="rk-ic">${icon(ic, 16)}</span><span class="rk-l"><div>${l}</div><div>${s}</div></span><span class="rk-v">${v}</span><span class="rk-go">${icon('chevRight', 16)}</span></button>`).join('')}
       </div>
 
@@ -1566,37 +1588,43 @@ function smoothPath(pts) {
   return d;
 }
 function drawMainChart(d) {
-  const el = $('#mainChart'); if (!el) return;
   S._dash = d;
-  const M = METRICS[S.metric], cur = d[S.metric].cur, prev = d[S.metric].prev, n = cur.length;
+  const M = METRICS[S.metric];
+  drawSeries($('#mainChart'), { dates: d.dates, unit: d.unit, fmt: M.fmt, series: [{ l: M.label, data: d[S.metric].cur, col: 'var(--c1)', area: 1 }, { l: 'Previous', data: d[S.metric].prev, col: 'var(--prev)', dash: 1 }] });
+}
+// Line chart used by Overview and every dashboard page. spec: { dates, unit, fmt, series: [{ l, data, col, dash?, area? }] }
+let chartN = 0;
+function drawSeries(el, spec) {
+  if (!el) return;
+  const { dates, unit, fmt } = spec, L = spec.series, n = dates.length, gid = 'ag' + ++chartN;
   const W = el.clientWidth, H = el.clientHeight || 220, pl = 52, pr = 10, pt = 10, pb = 28;
-  const max = niceMax(Math.max(...cur, ...prev) * 1.05);
+  const max = niceMax(Math.max(...L.flatMap(s => s.data), 0) * 1.05 || 1);
   const x = i => pl + (n === 1 ? 0 : i * (W - pl - pr) / (n - 1)), y = v => pt + (1 - v / max) * (H - pt - pb);
-  const P = cur.map((v, i) => [x(i), y(v)]), Q = prev.map((v, i) => [x(i), y(v)]);
   const hh = dt => String(dt.getHours()).padStart(2, '0') + ':00';
-  const lbl = dt => d.unit === 'hour' ? hh(dt) : d.unit === 'month' ? dt.toLocaleDateString('en-GB', { month: 'short' }) : dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  const lbl = dt => unit === 'hour' ? hh(dt) : unit === 'month' ? dt.toLocaleDateString('en-GB', { month: 'short' }) : dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   const step = Math.max(1, Math.ceil(n / 6));
-  const grid = [0, .25, .5, .75, 1].map(f => `<line x1="${pl}" x2="${W - pr}" y1="${y(max * f)}" y2="${y(max * f)}" stroke="var(--line)" ${f ? 'stroke-dasharray="2 4"' : ''}/><text class="ax" x="${pl - 10}" y="${y(max * f) + 3.5}" text-anchor="end">${f ? M.fmt(max * f).replace('.00', '') : '0'}</text>`).join('');
-  const xl = d.dates.map((dt, i) => (i % step === 0 || i === n - 1) && !(i !== n - 1 && n - 1 - i < step / 2) ? `<text class="ax" x="${x(i)}" y="${H - 8}" text-anchor="${i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'}">${lbl(dt)}</text>` : '').join('');
-  const line = smoothPath(P);
-  el.innerHTML = `<svg width="${W}" height="${H}" role="img" aria-label="${M.label} over time">
-    <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--c1)" stop-opacity=".16"/><stop offset="1" stop-color="var(--c1)" stop-opacity="0"/></linearGradient></defs>
+  const grid = [0, .25, .5, .75, 1].map(f => `<line x1="${pl}" x2="${W - pr}" y1="${y(max * f)}" y2="${y(max * f)}" stroke="var(--line)" ${f ? 'stroke-dasharray="2 4"' : ''}/><text class="ax" x="${pl - 10}" y="${y(max * f) + 3.5}" text-anchor="end">${f ? fmt(max * f).replace('.00', '') : '0'}</text>`).join('');
+  const xl = dates.map((dt, i) => (i % step === 0 || i === n - 1) && !(i !== n - 1 && n - 1 - i < step / 2) ? `<text class="ax" x="${x(i)}" y="${H - 8}" text-anchor="${i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'}">${lbl(dt)}</text>` : '').join('');
+  const path = s => smoothPath(s.data.map((v, i) => [x(i), y(v)]));
+  const order = [...L.filter(s => s.dash), ...L.filter(s => !s.dash)];
+  el.innerHTML = `<svg width="${W}" height="${H}" role="img" aria-label="${esc(L[0].l)} over time">
+    <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${L[0].col}" stop-opacity=".16"/><stop offset="1" stop-color="${L[0].col}" stop-opacity="0"/></linearGradient></defs>
     ${grid}${xl}
-    <path d="${line}L${x(n - 1)} ${y(0)}L${x(0)} ${y(0)}Z" fill="url(#ag)"/>
-    <path d="${smoothPath(Q)}" fill="none" stroke="var(--prev)" stroke-width="1.5" stroke-dasharray="4 4"/>
-    <path d="${line}" fill="none" stroke="var(--c1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-    <g id="xh" style="display:none"><line id="xhl" y1="${pt}" y2="${H - pb}" stroke="var(--ink-3)" stroke-width="1"/><circle id="xhp" r="4" fill="var(--surface)" stroke="var(--prev)" stroke-width="1.5"/><circle id="xhc" r="4.5" fill="var(--c1)" stroke="var(--surface)" stroke-width="2"/></g>
-    <rect x="${pl}" y="0" width="${W - pl - pr}" height="${H}" fill="transparent" id="hit"/>
+    ${L.filter(s => s.area).map(s => `<path d="${path(s)}L${x(n - 1)} ${y(0)}L${x(0)} ${y(0)}Z" fill="url(#${gid})"/>`).join('')}
+    ${order.map(s => s.dash ? `<path d="${path(s)}" fill="none" stroke="${s.col}" stroke-width="1.5" stroke-dasharray="4 4"/>` : `<path d="${path(s)}" fill="none" stroke="${s.col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`).join('')}
+    <g class="xh" style="display:none"><line class="xhl" y1="${pt}" y2="${H - pb}" stroke="var(--ink-3)" stroke-width="1"/>
+      ${order.map(s => s.dash ? `<circle data-s="${L.indexOf(s)}" r="4" fill="var(--surface)" stroke="${s.col}" stroke-width="1.5"/>` : `<circle data-s="${L.indexOf(s)}" r="4.5" fill="${s.col}" stroke="var(--surface)" stroke-width="2"/>`).join('')}</g>
+    <rect x="${pl}" y="0" width="${W - pl - pr}" height="${H}" fill="transparent" class="hit"/>
   </svg>`;
-  const hit = $('#hit', el), xh = $('#xh', el), tt = $('#tt');
+  const hit = $('.hit', el), xh = $('.xh', el), tt = $('#tt');
   hit.addEventListener('mousemove', e => {
-    const r = hit.getBoundingClientRect(); const i = Math.max(0, Math.min(n - 1, Math.round((e.clientX - r.left) / r.width * (n - 1))));
-    xh.style.display = ''; $('#xhl', el).setAttribute('x1', x(i)); $('#xhl', el).setAttribute('x2', x(i));
-    $('#xhc', el).setAttribute('cx', x(i)); $('#xhc', el).setAttribute('cy', y(cur[i])); $('#xhp', el).setAttribute('cx', x(i)); $('#xhp', el).setAttribute('cy', y(prev[i]));
-    const dl = d.unit === 'hour' ? `${fmtDay(d.dates[i])}, ${hh(d.dates[i])}` : d.unit === 'month' ? d.dates[i].toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : d.dates[i].toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+    const r = hit.getBoundingClientRect(), i = Math.max(0, Math.min(n - 1, Math.round((e.clientX - r.left) / r.width * (n - 1))));
+    xh.style.display = ''; $('.xhl', el).setAttribute('x1', x(i)); $('.xhl', el).setAttribute('x2', x(i));
+    $$('circle', xh).forEach(c => { c.setAttribute('cx', x(i)); c.setAttribute('cy', y(L[+c.dataset.s].data[i])); });
+    const dl = unit === 'hour' ? `${fmtDay(dates[i])}, ${hh(dates[i])}` : unit === 'month' ? dates[i].toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : dates[i].toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
     tt.className = 'tt'; tt.dataset.src = 'chart';
-    tt.innerHTML = `<div class="tt-d">${dl}</div><div class="tt-r"><span><i class="sw" style="background:var(--c1)"></i>${M.label}</span><b>${M.fmt(cur[i])}</b></div><div class="tt-r"><span><i class="sw" style="background:var(--prev)"></i>Previous</span><span>${M.fmt(prev[i])}</span></div>`;
-    const sr = el.getBoundingClientRect(); placeTT(sr.left + x(i), sr.top + Math.min(y(cur[i]), y(prev[i])));
+    tt.innerHTML = `<div class="tt-d">${dl}</div>${L.map((s, j) => `<div class="tt-r"><span><i class="sw" style="background:${s.col}"></i>${s.l}</span>${j ? `<span>${fmt(s.data[i])}</span>` : `<b>${fmt(s.data[i])}</b>`}</div>`).join('')}`;
+    const sr = el.getBoundingClientRect(); placeTT(sr.left + x(i), sr.top + Math.min(...L.map(s => y(s.data[i]))));
   });
   hit.addEventListener('mouseleave', () => { xh.style.display = 'none'; tt.classList.remove('show'); });
 }
@@ -1628,7 +1656,7 @@ document.addEventListener('mousemove', e => {
   tt.innerHTML = `<div class="tt-d">${a}</div><div class="tt-r"><b>${b}</b></div>${c ? `<div class="tt-r"><span>${c}</span></div>` : ''}`;
   placeTT(e.clientX, e.clientY);
 });
-let rsz; window.addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(() => { if (S.route === 'dashboard' && S._dash) drawMainChart(S._dash); if (popAnchor) positionPop(); refreshHints(); }, 80); });
+let rsz; window.addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(() => { if (S.route === 'dashboard' && S._dash) drawMainChart(S._dash); if (DASHES[S.route]) drawCharts(); if (popAnchor) positionPop(); refreshHints(); }, 80); });
 
 /* ════════════════════════════ Users list ════════════════════════════ */
 const applyFilters = (list, filters, skip, F = FIELDS) => filters.reduce((l, f) => (f.key === skip || !f.values.length) ? l : l.filter(u => matchField(f.key, u, f.values, F)), list);
@@ -1636,6 +1664,7 @@ const searchFilter = (list, q) => { q = q.trim().toLowerCase(); return q ? list.
 // The filter bar (Filter button, chips, value popovers) is shared by the Users and Companies lists; fx() is the one on screen
 const fx = () => S.route === 'companies'
   ? { F: CO_FIELDS, items: COMPANIES, get list() { return S.co.filters; }, set list(v) { S.co.filters = v; }, search: l => coSearchFilter(l, S.co.search), changed: coFiltersChanged }
+  : PAGES[S.route] ? pgFx(PAGES[S.route])
   : { F: FIELDS, items: USERS, get list() { return S.filters; }, set list(v) { S.filters = v; }, search: l => searchFilter(l, S.search), changed: filtersChanged };
 function getList() {
   let list = searchFilter(applyFilters(USERS, S.filters), S.search);
@@ -1697,10 +1726,11 @@ function renderResults() {
   if (S.view === 'table') fitColumns();
 }
 
-/* List tables (Users, Companies): column widths are fitted once to the first page shown, saved, and after that only change when dragged —
+/* List tables (Users, Companies, every PAGES list): column widths are fitted once to the first page shown, saved, and after that only change when dragged —
    so filtering, searching, sorting or paging never makes columns jump. colCtx() is the list table on screen. */
 const colCtx = () => S.route === 'companies'
-  ? { cols: tVisible('companies').map(c => c.k), w: S.coColW, key: 'nsc.cocolw', sel: '#coResults table.ut', redraw: coResults }
+  ? { t: 'companies', cols: tVisible('companies').map(c => c.k), w: S.coColW, key: 'nsc.cocolw', sel: '#coResults table.ut', redraw: coResults }
+  : PAGES[S.route] ? { t: 'pg:' + S.route, cols: tVisible('pg:' + S.route).map(c => c.k), w: pgW(S.route), key: 'nsc.pgw.' + S.route, sel: '#pgResults table.ut', redraw: pgResults }
   : { cols: COLS.filter(c => !S.hidden.has(c.key)).map(c => c.key), w: S.colW, key: 'nsc.colw', sel: '#results table.ut', redraw: renderResults };
 const tableW = (X = colCtx()) => X.cols.reduce((s, k) => s + X.w[k], 0) + 44 + 84;
 function fitColumns() {
@@ -1815,6 +1845,8 @@ function bcardHTML(u, by) {
 function renderFloat() {
   const el = $('#bulk');
   if (S.route === 'companies') { coFloat(el); return; }
+  if (PAGES[S.route]) { pgFloat(el); return; }
+  if (DASHES[S.route]) { el.classList.remove('show'); return; }
   if (S.route === 'users' && S.userId) {
     const n = Object.keys(S.draft).length, tn = S.userTab === 'transactions' && S.tx?.view === 'agg' ? S.tx.sel.size : 0;
     if (!n && tn) {
@@ -2342,6 +2374,7 @@ function closePop() {
   if (before !== S.filters.length && S.route === 'users' && !S.userId) { renderChips(); renderStats(); }
   const cb = S.co.filters.length; S.co.filters = S.co.filters.filter(f => f.values.length);
   if (cb !== S.co.filters.length && S.route === 'companies' && $('#coStats')) { renderChips(); coStats(); }
+  if (PAGES[S.route] && !S.recId) { const st = pgS(S.route), n = st.filters.length; st.filters = st.filters.filter(f => f.values.length); if (n !== st.filters.length && $('#chips')) { renderChips(); pgStats(); } }
 }
 document.addEventListener('mousedown', e => { if (pop.classList.contains('open') && !pop.contains(e.target) && !(popAnchor && popAnchor.contains(e.target))) closePop(); });
 const menuItems = items => `<div class="pop-list">${items.map(it => it === '-' ? '<div class="pop-sep"></div>' : `<button class="pi ${it.cls || ''}" data-act="${it.act}" ${Object.entries(it.data || {}).map(([k, v]) => `data-${k}="${v}"`).join(' ')}>${it.icon ? icon(it.icon, 15) : ''}${it.html || `<span class="pl">${it.label}</span>`}${it.on ? `<span class="chk">${icon('check', 15, 2)}</span>` : ''}</button>`).join('')}</div>`;
@@ -2447,7 +2480,7 @@ function setDateFilter(key, r) {
 }
 function goFilter(key, values) {
   S.filters = [{ key, values }]; S.search = ''; S.page = 1; S.selected.clear();
-  if (location.hash === '#/users') refreshUsers(); else location.hash = '#/users';
+  if (location.hash === '#/users') refreshUsers(); else { S._keepFilters = true; location.hash = '#/users'; } // this link is meant to land on a filtered list
 }
 
 const ACT = {
@@ -2458,7 +2491,7 @@ const ACT = {
   'me': a => openPop(a, meMenu(), { width: 260, kind: 'me' }),
   'shortcuts': () => { closePop(); shortcutsModal(); },
   'toast': a => { closePop(); toast(a.dataset.msg); },
-  'dash-range': a => openDatePicker(a, S.range, r => { S.range = r; renderTopbar(); renderDashboard(); }, { noAll: 1, align: 'right' }),
+  'dash-range': a => openDatePicker(a, S.range, r => { S.range = r; renderTopbar(); S.route === 'dashboard' ? renderDashboard() : renderDashPage(); }, { noAll: 1, align: 'right' }),
   'dp-preset': a => dpCommit({ key: a.dataset.k }),
   'dp-nav': a => {
     const d = +a.dataset.d, v = DP.view;
@@ -2792,17 +2825,10 @@ function coTopbar() {
       <button class="icon-btn sm" data-act="co-step" data-d="1" ${i >= l.length - 1 ? 'disabled' : ''} data-tip="Next  j">${icon('chevDown', 16)}</button>
       <button class="icon-btn sm bare" data-act="copy" data-copy="https://admin.ns.cards/companies/${S.coId}" data-tip="Copy link">${icon('link', 16)}</button>`;
   }
-  return `${S.coView === 'list' ? `<button class="tool-btn solid" id="displayBtn" data-act="co-display">${icon('table', 15)}<span class="sl">Display</span>${icon('chevDown', 13)}</button>` : ''}
-    <button class="btn btn-ghost" data-act="co-export">${icon('download', 15)}<span class="tb-lbl">Export</span></button>
+  return `${S.coView === 'list' ? `<button class="tool-btn solid" id="displayBtn" data-act="ld-display">${icon('table', 15)}<span class="sl">Display</span>${icon('chevDown', 13)}</button>` : ''}
+    <button class="btn btn-ghost" data-act="co-export">${icon('download', 15)}<span class="tb-lbl">Export</span>${icon('chevDown', 13)}</button>
     <button class="btn btn-primary" data-act="co-new">${icon('plus', 15, 2)}<span class="tb-lbl">New company</span></button>`;
 }
-// Display popover: same look and settings as the Users one (density is shared between the two lists)
-function coDisplayPop() {
-  const vis = new Set(tVisible('companies').map(c => c.k));
-  return `<div class="pop-sec"><div class="pop-row"><span>Density</span><div class="seg sm">${['comfortable', 'compact'].map(k => `<button class="${S.density === k ? 'on' : ''}" data-act="co-density" data-v="${k}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('')}</div></div></div>
-    <div class="pop-sec"><div class="pop-lbl">Columns<span style="display:flex;gap:12px"><button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="co-cols-reset">Reset columns</button><button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="co-reset-colw">Reset widths</button></span></div><div class="pills">${TCOLS.companies.filter(c => !c.lock).map(c => `<button class="pill ${vis.has(c.k) ? 'on' : ''}" data-act="co-col" data-k="${c.k}">${c.l}</button>`).join('')}</div></div>`;
-}
-const refreshCoDisplay = () => { coResults(); if (popOpts.kind === 'codisplay') { pop.innerHTML = coDisplayPop(); positionPop(); } };
 function stepCo(d) {
   const l = S._coList.some(c => c.id === S.coId) ? S._coList : COMPANIES, nx = l[l.findIndex(c => c.id === S.coId) + d];
   if (nx) location.hash = '#/companies/' + nx.id;
@@ -3211,9 +3237,7 @@ function cpModal(i) {
     { id: 'cpFunded', label: 'Company funded', value: v.funded ? '1' : '0', options: yn }, { id: 'cpMaxF', label: 'Max funded cards per user', value: v.maxFunded, type: 'number' },
     { id: 'cpBuy', label: 'Purchase allowed', value: v.purchase ? '1' : '0', options: yn },
   ], 'cp-save');
-  const m = $('.modal', modal), b = $('.modal-b', m); m.style.width = 'min(620px,100%)';
-  Object.assign(b.style, { display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '14px' });
-  if (!a) b.firstElementChild.style.gridColumn = '1 / -1';
+  wideModal(!a);
 }
 function runImport(file) {
   const c = coById(S.coId), D = cd(c), sub = S.coSub.imports;
@@ -3255,15 +3279,6 @@ Object.assign(ACT, {
     else S.co.filters = [clone(t.filter)];
     coFiltersChanged();
   },
-  'co-display': a => openPop(a, coDisplayPop(), { align: 'right', width: 380, kind: 'codisplay' }),
-  'co-density': a => { S.density = a.dataset.v; store.set('nsc.density', S.density); refreshCoDisplay(); },
-  'co-col': a => {
-    const k = a.dataset.k, vis = tVisible('companies').map(c => c.k);
-    S.tcols.companies = vis.includes(k) ? vis.filter(x => x !== k) : TCOLS.companies.map(c => c.k).filter(x => x === k || vis.includes(x));
-    store.set('nsc.tcols', S.tcols); refreshCoDisplay();
-  },
-  'co-reset-colw': () => { S.coColW = {}; store.set('nsc.cocolw', {}); coResults(); toast('Column widths fitted to this page', 'columns'); },
-  'co-cols-reset': () => { delete S.tcols.companies; store.set('nsc.tcols', S.tcols); refreshCoDisplay(); },
   'co-sort': a => { const c = TCOLS.companies.find(x => x.k === a.dataset.k); S.co.sort = S.co.sort.k === c.k ? { k: c.k, dir: S.co.sort.dir === 'asc' ? 'desc' : 'asc' } : { k: c.k, dir: c.dir }; coResults(); },
   'co-page': a => { S.co.page = +a.dataset.p; coResults(); $('#coResults .tscroll') && ($('#coResults .tscroll').scrollTop = 0); },
   'co-clear-all': () => { S.co.filters = []; S.co.search = ''; $('#coSearch').value = ''; coFiltersChanged(); },
@@ -3286,7 +3301,10 @@ Object.assign(ACT, {
     ...IBAN_PRODUCTS.map(p => ({ act: 'co-bulk-grant-do', data: { k: 'i:' + p.id }, icon: 'bank', html: `<span class="pl">${esc(p.name)}</span><span class="pc">${p.provider}</span>` }))]), { width: 320 }),
   'co-bulk-grant-do': a => { const k = a.dataset.k; let n = 0; S.co.sel.forEach(id => setP(coById(id), k, true) && n++); closePop(); toast(n ? `${esc(pOf(k).name)} granted to ${n} compan${n > 1 ? 'ies' : 'y'}` : 'All selected companies already have it', 'cardProduct'); coStats(); coResults(); },
   'co-bulk-export': () => coCSV(COMPANIES.filter(c => S.co.sel.has(c.id)), 'companies-selected'),
-  'co-export': () => {
+  'co-export': a => exportMenu(a, 'co-export-do'),
+  'co-export-do': a => {
+    closePop();
+    if (a.dataset.f === 'xlsx') return toast(`XLSX export of ${fmtInt((S.coView === 'access' ? COMPANIES : S._coList).length)} companies started`, 'download');
     if (S.coView !== 'access') return coCSV(S._coList.length ? S._coList : COMPANIES, 'companies');
     const P = mxProducts(), L = mxCompanies();
     downloadCSV('company-product-access', ['company_id', 'company', ...P.map(x => x.p.name)], L.map(c => [c.id, c.name, ...P.map(x => mxOn(c, x.k) ? 1 : 0)]));
@@ -3441,9 +3459,1013 @@ Object.assign(ACT, {
   'cur-rm': a => { const D = cd(cur()), i = D.currencies.findIndex(x => x.id === +a.dataset.id), x = D.currencies.splice(i, 1)[0]; toast(`${x.c} removed`, 'trash'); renderCompanyPage(); },
 });
 
+/* ════════════════════════════ Pages: one template for every other list ════════════════════════════ */
+// Every remaining list page is a config in PAGES and renders through one template that mirrors Users / Companies:
+// stat tiles as filter shortcuts (operational pages only) · search · Filter button + chips (fx()) · Display popover · fixed,
+// resizable columns (colCtx()) · pinned checkbox column · hover row actions · bulk bar · CSV/XLSX export · a record page per row.
+// Dashboard-style pages are configs in DASHES and render through one KPI strip + cards template (renderDashPage()).
+//
+// Page config: { id, noun, nouns, icon, data(), live?, key?(r), search(r), searchPh, fields, tiles, cols, sort?,
+//   quick?(r) → {act, icon, tip, data?}, menu?(r) → menuItems, bulk?: [{icon, label, run(rows) → toast}],
+//   form?: { create?: false, newLabel?, fields(r|null), save(r|null) → false | true | newRecord },
+//   rec: { title(r), sub?(r), badges?(r), acts?(r), sections?(r), side?(r), events?(r) } }
+S.pg = {}; S.pgW = {}; S.recId = null; S._pgList = [];
+const PAGES = {}, DASHES = {};
+const pg = () => PAGES[S.route];
+const pgS = id => S.pg[id] ||= { search: '', filters: [], sort: { ...PAGES[id].sort }, page: 1, sel: new Set() };
+const pgW = id => S.pgW[id] ||= store.get('nsc.pgw.' + id, {});
+const pgData = P => P.live ? P.data() : (P._d ||= P.data());
+const pgKey = (P, r) => String(P.key ? P.key(r) : r.id);
+const pgRow = (rid, P = pg()) => pgData(P).find(r => pgKey(P, r) === rid);
+const recOf = (P = pg()) => pgRow(S.recId, P);
+const goRec = (id, e, P = pg()) => { const url = `#/${P.id}/${encodeURIComponent(id)}`; if (e && (e.metaKey || e.ctrlKey)) window.open(location.pathname + url, '_blank'); else location.hash = url; };
+const pgSearchF = (P, l, q) => { q = q.trim().toLowerCase(); return q ? l.filter(r => P.search(r).toLowerCase().includes(q)) : l; };
+const pgFx = P => { const st = pgS(P.id); return { F: P.fields, items: pgData(P), get list() { return st.filters; }, set list(v) { st.filters = v; }, search: l => pgSearchF(P, l, st.search), changed: pgFiltersChanged }; };
+const cap = s => s[0].toUpperCase() + s.slice(1);
+const plainText = h => { const d = document.createElement('div'); d.innerHTML = h; return d.textContent.replace(/\s+/g, ' ').trim(); };
+function page(P) {
+  P.title = NAV_FLAT.find(n => n.id === P.id).label;
+  P.cols.forEach(c => { c.val ||= r => r[c.k]; c.dir ||= 'asc'; });
+  P.fields ||= {}; P.sort ||= { k: P.cols[0].k, dir: P.cols[0].dir };
+  TCOLS['pg:' + P.id] = P.cols;
+  PAGES[P.id] = P;
+}
+function pgFiltersChanged() { const st = pgS(S.route); st.page = 1; st.sel.clear(); pgStats(); renderChips(); pgResults(); renderFloat(); reanchor(); }
+function pgList(P = pg()) {
+  const st = pgS(P.id), col = P.cols.find(c => c.k === st.sort.k) || P.cols[0], m = st.sort.dir === 'asc' ? 1 : -1;
+  return pgSearchF(P, applyFilters(pgData(P), st.filters, null, P.fields), st.search).sort((a, b) => { const x = col.val(a), y = col.val(b); return (x > y ? 1 : x < y ? -1 : 0) * m; });
+}
+function pgRefresh() { if (S.recId) renderRec(); else if (pg()) { pgStats(); pgResults(); renderFloat(); } renderTopbar(); }
+
+function renderPg() {
+  const P = pg(), st = pgS(P.id);
+  $('#main').innerHTML = `<div class="page fit">
+    ${P.tiles ? `<section class="ustats" id="pgStats" style="--n:${P.tiles.length}"></section>` : ''}
+    <div class="toolbar">
+      <label class="search">${icon('search', 15)}<input id="pgSearch" placeholder="${P.searchPh || 'Search…'}" value="${esc(st.search)}" autocomplete="off"><kbd>/</kbd></label>
+      ${Object.keys(P.fields).length ? `<button class="tool-btn" id="addFilter" data-act="add-filter">${icon('filter', 15)}Filter</button><div class="chips" id="chips"></div>` : ''}
+    </div>
+    <div class="results" id="pgResults"></div>
+  </div>`;
+  pgStats(); if ($('#chips')) renderChips(); pgResults(); renderFloat();
+}
+function pgStats() {
+  const P = pg(), el = $('#pgStats'); if (!el) return;
+  const st = pgS(P.id), L = pgData(P);
+  el.innerHTML = P.tiles.map(t => { const n = t.filter ? applyFilters(L, [t.filter], null, P.fields).length : L.length; return `<button class="ust ${tileOn(t, st.filters, st.search) ? 'on' : ''}" data-act="pg-tile" data-id="${t.id}">
+    <div class="ust-l">${t.label}</div><div class="ust-v"><b>${t.value ? t.value(L, n) : fmtInt(n)}</b><span>${t.sub ? t.sub(L, n) : ''}</span></div></button>`; }).join('');
+}
+function pgResults() {
+  const el = $('#pgResults'); if (!el) return;
+  const P = pg(), st = pgS(P.id), list = pgList(P), any = pgData(P).length; S._pgList = list;
+  if (!list.length) { el.innerHTML = `<div class="tcard"><div class="empty"><div class="em-ic">${icon(any ? 'search' : P.icon, 22)}</div><h3>${any ? `No ${P.nouns} match` : `No ${P.nouns} yet`}</h3><p>${any ? 'Try a different search or remove a filter.' : ''}</p>${any ? `<button class="btn btn-ghost btn-sm" data-act="pg-clear-all">Clear search and filters</button>` : ''}</div></div>`; return; }
+  const cols = tVisible('pg:' + P.id), W = pgW(P.id), fixed = cols.every(c => W[c.k]), per = 25, pages = Math.max(1, Math.ceil(list.length / per)); st.page = Math.min(st.page, pages);
+  const start = (st.page - 1) * per, rows = list.slice(start, start + per), keys = rows.map(r => pgKey(P, r));
+  const all = keys.every(k => st.sel.has(k)), some = keys.some(k => st.sel.has(k)), al = c => c.al === 'r' ? 'r' : c.al === 'c' ? 'c' : '';
+  el.innerHTML = `<div class="tcard ${S.density}"><div class="hs-wrap"><div class="tscroll hs"><table class="ut ${fixed ? 'fixed' : ''}" style="${fixed ? `width:${tableW()}px` : ''}">
+    <colgroup><col style="width:44px">${cols.map(c => `<col data-col="${c.k}" ${fixed ? `style="width:${W[c.k]}px"` : ''}>`).join('')}<col></colgroup>
+    <thead><tr><th class="cbcell"><button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="pg-sel-page" aria-label="Select page">${icon('check', 11, 3)}</button></th>
+    ${cols.map(c => { const on = st.sort.k === c.k; return `<th class="sortable ${on ? 'sorted' : ''} ${al(c)}" data-act="pg-sort" data-k="${c.k}" data-key="${c.k}"><span class="th-in">${c.l}<span class="srt">${icon(on && st.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 12, 2)}</span></span><span class="col-rs" data-rs="${c.k}" data-tip="Drag to resize · double-click to fit"></span></th>`; }).join('')}
+    <th class="act-h"></th></tr></thead>
+    <tbody>${rows.map((r, i) => { const k = esc(keys[i]), q = P.quick?.(r), on = st.sel.has(keys[i]); return `<tr data-rid="${k}" class="${on ? 'sel' : ''}">
+      <td class="cbcell"><button class="cb ${on ? 'on' : ''}" data-act="pg-sel" data-rid="${k}" aria-label="Select">${icon('check', 11, 3)}</button></td>
+      ${cols.map(c => `<td class="${al(c)}">${c.cell(r)}</td>`).join('')}
+      <td class="act"><div class="row-actions">${q ? `<button class="ghost-ic" data-act="${q.act}" data-rid="${k}" ${Object.entries(q.data || {}).map(([a, v]) => `data-${a}="${esc(v)}"`).join(' ')} data-tip="${q.tip}">${icon(q.icon, 15)}</button>` : ''}<button class="ghost-ic" data-act="pg-row-more" data-rid="${k}" data-tip="More">${icon('more', 15)}</button></div></td>
+    </tr>`; }).join('')}</tbody></table></div></div>${pagerHTML(list.length, pages, start, rows.length, { page: st.page, act: 'pg-page', per: false })}</div>`;
+  fitColumns();
+}
+function pgFloat(el) {
+  const P = pg(), st = pgS(P.id), n = st.sel.size;
+  if (S.recId || !n) { el.classList.remove('show'); return; }
+  el.innerHTML = `<span class="bk-n"><b>${n}</b>selected</span>
+    ${n < S._pgList.length ? `<button class="bk-link" data-act="pg-sel-all">Select all ${fmtInt(S._pgList.length)}</button>` : ''}
+    <span class="sep"></span>
+    ${(P.bulk || []).map((b, i) => `<button data-act="pg-bulk" data-i="${i}">${icon(b.icon, 15)}${b.label}</button>`).join('')}
+    <button data-act="pg-bulk-export">${icon('download', 15)}Export</button>
+    <span class="sep"></span>
+    <button class="bk-x" data-act="pg-sel-clear" title="Clear selection">${icon('x', 15)}</button>`;
+  el.classList.add('show');
+}
+function pgTopbar() {
+  const P = pg();
+  if (S.recId) {
+    const l = S._pgList.some(r => pgKey(P, r) === S.recId) ? S._pgList : pgList(P), i = l.findIndex(r => pgKey(P, r) === S.recId);
+    return `<span class="mono faint tb-hide-sm" style="margin-right:2px">${i + 1} / ${fmtInt(l.length)}</span>
+      <button class="icon-btn sm" data-act="rec-step" data-d="-1" ${i <= 0 ? 'disabled' : ''} data-tip="Previous  k">${icon('chevUp', 16)}</button>
+      <button class="icon-btn sm" data-act="rec-step" data-d="1" ${i < 0 || i >= l.length - 1 ? 'disabled' : ''} data-tip="Next  j">${icon('chevDown', 16)}</button>
+      <button class="icon-btn sm bare" data-act="copy" data-copy="https://admin.ns.cards/${P.id}/${encodeURIComponent(S.recId)}" data-tip="Copy link">${icon('link', 16)}</button>`;
+  }
+  return `<button class="tool-btn solid" id="displayBtn" data-act="ld-display">${icon('table', 15)}<span class="sl">Display</span>${icon('chevDown', 13)}</button>
+    <button class="btn btn-ghost" data-act="pg-export">${icon('download', 15)}<span class="tb-lbl">Export</span>${icon('chevDown', 13)}</button>
+    ${P.form && P.form.create !== false ? `<button class="btn btn-primary" data-act="pg-new">${icon('plus', 15, 2)}<span class="tb-lbl">${P.form.newLabel || 'New ' + P.noun}</span></button>` : ''}`;
+}
+function stepRec(d) {
+  const P = pg(), l = S._pgList.some(r => pgKey(P, r) === S.recId) ? S._pgList : pgList(P), nx = l[l.findIndex(r => pgKey(P, r) === S.recId) + d];
+  if (nx) location.hash = `#/${P.id}/${encodeURIComponent(pgKey(P, nx))}`;
+}
+const pgMenu = (P, r, rec) => [...(rec ? [] : [{ act: 'pg-open', data: { rid: esc(pgKey(P, r)) }, icon: P.icon, label: `Open ${P.noun}` }]),
+  ...(P.form && P.form.edit !== false ? [{ act: 'pg-edit', data: { rid: esc(pgKey(P, r)) }, icon: 'pencil', label: 'Edit' }] : []), ...(P.menu?.(r) || []),
+  { act: 'copy', data: { copy: esc(pgKey(P, r)) }, icon: 'hash', label: 'Copy ID' }];
+const pgEvents = (P, r) => P.rec.events ? P.rec.events(r) : [
+  r.updated && r.created && r.updated - r.created > 6e4 ? { ic: 'pencil', t: 'Last updated', s: fmtDateTime(r.updated), when: rel(r.updated) } : null,
+  r.created ? { ic: 'plus', t: 'Created', s: fmtDateTime(r.created), when: rel(r.created) } : null].filter(Boolean);
+
+// Record page: same header, Details card (every column, editable through the page form) and Activity side card on every page
+function renderRec() {
+  const P = pg(), r = recOf(P), main = $('#main');
+  if (!r) { main.innerHTML = `<div class="page"><div class="ph"><div class="empty"><div class="em-ic">${icon(P.icon, 22)}</div><h3>${cap(P.noun)} not found</h3><p>${esc(S.recId)} doesn’t exist.</p><a class="btn btn-dark btn-sm" href="#/${P.id}">Back to ${P.title}</a></div></div></div>`; return; }
+  const R = P.rec, scroll = main.scrollTop, k = esc(pgKey(P, r)), evs = pgEvents(P, r);
+  const kv = (l, v) => `<div class="kv-r"><span>${l}</span>${v || dash}</div>`;
+  main.innerHTML = `<div class="page">
+    <header class="page-head band up-head">
+      <div class="up-id"><div style="min-width:0">
+        <h1>${esc(R.title(r))}</h1>
+        ${R.sub ? `<div class="up-sub">${R.sub(r)}</div>` : ''}
+        ${R.badges ? `<div class="up-badges">${R.badges(r)}</div>` : ''}
+      </div></div>
+      <div class="ph-right">${R.acts ? R.acts(r) : ''}<button class="icon-btn" data-act="pg-rec-more" data-rid="${k}" data-tip="More">${icon('more', 16)}</button></div>
+    </header>
+    <div class="up-grid">
+      <div class="up-main">
+        <div class="card"><div class="card-h"><span class="card-t">Details</span>${P.form && P.form.edit !== false ? `<button class="btn btn-ghost btn-sm" data-act="pg-edit" data-rid="${k}">${icon('pencil', 14)}Edit</button>` : ''}</div>
+          <div class="kv2 card-b">${P.cols.filter(c => c.rec !== false).map(c => kv(c.l, `<span>${(c.kv || c.cell)(r)}</span>`)).join('')}</div></div>
+        ${R.sections ? R.sections(r) : ''}
+      </div>
+      <aside class="up-side">${R.side ? R.side(r) : ''}<div class="card"><div class="card-h"><span class="card-t">Activity</span></div><div class="card-b pad">${evs.length ? timeline(evs) : '<div class="faint" style="font-size:13px">No activity recorded</div>'}</div></div></aside>
+    </div>
+  </div>`;
+  main.scrollTop = scroll; renderFloat();
+}
+// Forms with more than five fields lay out in two columns
+function wideModal(first) {
+  const m = $('.modal', modal), b = $('.modal-b', m); if (!m || b.children.length <= 5) return;
+  m.style.width = 'min(620px,100%)'; Object.assign(b.style, { display: 'grid', gridTemplateColumns: '1fr 1fr', columnGap: '14px' });
+  if (first) b.firstElementChild.style.gridColumn = '1 / -1';
+}
+function pgForm(r) { const P = pg(); S._pgEdit = r; fieldsModal(r ? `Edit ${P.noun}` : P.form.newLabel || 'New ' + P.noun, P.form.fields(r), 'pg-form-save'); wideModal(); }
+const fv = id => $('#' + id).value.trim(), fnum = id => Math.max(0, +$('#' + id).value || 0);
+const exportMenu = (a, act) => openPop(a, menuItems([{ act, data: { f: 'csv' }, icon: 'download', label: 'CSV' }, { act, data: { f: 'xlsx' }, icon: 'table', label: 'Excel (XLSX)' }]), { align: 'right', width: 190 });
+function pgCSV(P, rows, name) {
+  downloadCSV(name, P.cols.map(c => c.l), rows.map(r => P.cols.map(c => plainText((c.kv || c.cell)(r)))));
+  toast(`Exported ${fmtInt(rows.length)} ${rows.length === 1 ? P.noun : P.nouns}`, 'download');
+}
+// Display popover for every list except Users (which also has layouts): density + columns + widths, shared look
+function listDisplayPop() {
+  const X = colCtx(), vis = new Set(X.cols), lnk = (act, l) => `<button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="${act}">${l}</button>`;
+  return `<div class="pop-sec"><div class="pop-row"><span>Density</span><div class="seg sm">${['comfortable', 'compact'].map(k => `<button class="${S.density === k ? 'on' : ''}" data-act="ld-density" data-v="${k}">${cap(k)}</button>`).join('')}</div></div></div>
+    <div class="pop-sec"><div class="pop-lbl">Columns<span style="display:flex;gap:12px">${lnk('ld-cols-reset', 'Reset columns')}${lnk('ld-reset-colw', 'Reset widths')}</span></div><div class="pills">${TCOLS[X.t].filter(c => !c.lock).map(c => `<button class="pill ${vis.has(c.k) ? 'on' : ''}" data-act="ld-col" data-k="${c.k}">${c.l}</button>`).join('')}</div></div>`;
+}
+const refreshLD = () => { colCtx().redraw(); if (popOpts.kind === 'ldisplay') { pop.innerHTML = listDisplayPop(); positionPop(); } };
+
+/* Building blocks for page configs */
+const dotCell = o => `<span class="stat"><i class="dot t-${o.tone || 'neutral'}"></i>${o.label}</span>`;
+const userLink = u => u ? `<a class="lnk" href="#/users/${u.id}">${esc(u.name || u.email)}</a>` : dash;
+const coLink = c => c ? `<a class="lnk" href="#/companies/${c.id}">${esc(c.name)}</a>` : dash;
+const recLink = (p, id, l) => `<a class="lnk" href="#/${p}/${encodeURIComponent(id)}">${esc(l)}</a>`;
+const fE = (label, icon, options, get, more = {}) => ({ label, icon, options, get, ...more });
+const fD = (label, get) => ({ label, icon: 'calendar', date: 1, options: {}, test: (r, v) => inRange(get(r), v[0]) });
+const optsOf = (o, f = v => v) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, typeof v === 'string' ? { label: v } : f(v)]));
+const tile = (id, label, filter, sub) => ({ id, label, filter, sub });
+const allTile = (label, sub) => ({ id: 'all', label, clear: 1, sub });
+const share = (L, n) => L.length ? `${Math.round(n / L.length * 100)}%` : '0%';
+const K = {
+  id: (l = 'ID', k = 'id') => ({ k, l, on: 1, dir: 'desc', cell: r => numM(esc(r[k])) }),
+  user: (k = 'uid') => ({ k: 'user', l: 'User', on: 1, val: r => { const u = byId(r[k]); return (u.name || '~' + u.email).toLowerCase(); }, cell: r => userCell(byId(r[k])), kv: r => userLink(byId(r[k])) }),
+  status: (E, k = 'status', l = 'Status') => ({ k, l, on: 1, val: r => Object.keys(E).indexOf(r[k]), cell: r => dotCell(E[r[k]]) }),
+  badge: (E, k, l, on = 1) => ({ k, l, on, val: r => Object.keys(E).indexOf(r[k]), cell: r => badge(E[r[k]]) }),
+  text: (k, l, on = 1) => ({ k, l, on, val: r => String(r[k] ?? '').toLowerCase(), cell: r => r[k] ? esc(r[k]) : dash }),
+  muted: (k, l, on = 1) => ({ k, l, on, val: r => String(r[k] ?? '').toLowerCase(), cell: r => muted(r[k]) }),
+  code: (k, l, on = 1) => ({ k, l, on, cell: r => r[k] ? `<span class="code">${esc(r[k])}</span>` : dash }),
+  copy: (k, l, on = 1) => ({ k, l, on, cell: r => r[k] ? copyVal(r[k]) : dash }),
+  num: (k, l, f = fmtInt, on = 1) => ({ k, l, al: 'r', on, dir: 'desc', val: r => r[k] || 0, cell: r => `<span class="num ${r[k] ? '' : 'zero'}">${f(r[k] || 0)}</span>` }),
+  eur: (k, l, on = 1) => K.num(k, l, v => fmtEur(v), on),
+  pct: (k, l, on = 1) => K.num(k, l, v => +(+v).toFixed(2) + '%', on),
+  amt: (k = 'amount', l = 'Amount', ck = 'c', on = 1) => ({ k, l, al: 'r', on, dir: 'desc', val: r => r[k] * (ASSET[r[ck]]?.rate || 1), cell: r => `<span class="num">${fmtAmt(r[k], r[ck])}</span>` }),
+  asset: (k = 'c', l = 'Currency') => ({ k, l, on: 1, cell: r => txCur({ c: r[k] }) }),
+  yes: (k, l, on = 1) => ({ k, l, al: 'c', on, dir: 'desc', val: r => +!!r[k], cell: r => yes(r[k]) }),
+  sw: (k, l, act) => ({ k, l, al: 'c', on: 1, dir: 'desc', val: r => +!!r[k], cell: r => `<button class="sw-t ${r[k] ? 'on' : ''}" data-act="${act}" data-rid="${esc(pgKey(pg(), r))}" data-tip="${r[k] ? 'Turn off' : 'Turn on'}" aria-label="${l}"></button>`, kv: r => r[k] ? 'On' : '<span class="faint">Off</span>' }),
+  date: (k = 'created', l = 'Created', on = 1) => ({ k, l, al: 'r', on, dir: 'desc', val: r => r[k] ? r[k].getTime() : 0, cell: r => r[k] ? `<span class="muted" title="${fmtDateTime(r[k])}">${rel(r[k])}</span>` : dash, kv: r => r[k] ? fmtDateTime(r[k]) : dash }),
+  when: (k, l, on = 1) => ({ k, l, on, dir: 'desc', val: r => r[k] ? r[k].getTime() : 0, cell: r => r[k] ? fmtDateTime(r[k]) : dash }),
+};
+const gen = seed => {
+  const r = rng(seed);
+  return { r, pk: a => a[Math.floor(r() * a.length)], int: (a, b) => a + Math.floor(r() * (b - a + 1)), hx: n => Array.from({ length: n }, () => '0123456789abcdef'[Math.floor(r() * 16)]).join(''),
+    wp: o => { const e = Object.entries(o); let x = r() * e.reduce((s, [, w]) => s + w, 0); for (const [k, w] of e) if ((x -= w) < 0) return k; return e[0][0]; },
+    ago: days => new Date(NOW.getTime() - r() * days * DAY) };
+};
+const ME = 'Super admin';
+const stamp = r => { r.updated = new Date(NOW); r.by = ME; };
+const navBadge = (id, n) => { NAV_FLAT.find(x => x.id === id).badge = n || null; renderSidebar(); };
+
+/* Dashboard template: KPI strip + 12-column card grid, charts drawn with drawSeries() */
+S._charts = [];
+function renderDashPage() {
+  const D = DASHES[S.route], d = dashData(S.range); S._charts = [];
+  const kpis = D.kpis(d);
+  $('#main').innerHTML = `<div class="page"><section class="kpis band">${kpis.map(k => `
+    <div class="kpi"><div class="kpi-l">${k.l}</div><div class="kpi-v">${k.v}</div><div class="kpi-f">${k.d != null ? deltaPill(k.d, k.unit) : `<span class="code">${k.note || ''}</span>`}${k.s ? spark(k.s) : ''}</div></div>`).join('')}
+    </section><div class="dgrid">${D.cards(d)}</div></div>`;
+  drawCharts();
+}
+const drawCharts = () => S._charts.forEach((spec, i) => drawSeries($('#ch' + i), spec));
+// spec: { dates, unit, fmt, series: [{ l, data, col, dash?, area? }] } — first series is the headline
+function chartCard(span, title, spec, tag = '') {
+  const i = S._charts.push(spec) - 1, [a, b] = spec.series, t = sum(a.data);
+  return `<div class="card span-${span} chart-card"><div class="card-h"><span class="card-t">${title}</span><div class="legend">${spec.series.map(s => `<span>${s.dash ? '<i class="lg-dash"></i>' : `<i class="lg-line" style="background:${s.col}"></i>`}${s.l}</span>`).join('')}${tag}</div></div>
+    <div class="big"><b>${spec.total ? spec.total : spec.fmt(spec.last ? a.data[a.data.length - 1] : t)}</b>${b && b.dash ? deltaPill(pct(spec.last ? a.data[a.data.length - 1] : t, spec.last ? b.data[b.data.length - 1] : sum(b.data))) : ''}</div>
+    <div class="chart" id="ch${i}"></div></div>`;
+}
+const dcard = (span, title, tag, body) => `<div class="card span-${span}"><div class="card-h"><span class="card-t">${title}</span>${tag}</div>${body}</div>`;
+const ctag = t => `<span class="card-tag">${t}</span>`;
+const barRows = (rows, fmt = fmtInt) => { const mx = Math.max(...rows.map(x => x[1]), 1), tot = sum(rows.map(x => x[1])) || 1; return `<div class="barlist">${rows.map(([l, v, tt]) => `<div class="bl" data-tt="${plainText(l)}|${fmt(v)}|${tt || (v / tot * 100).toFixed(1) + '% of total'}"><i style="width:${v / mx * 100}%"></i><span>${l}</span><span class="num">${fmt(v)}</span></div>`).join('')}</div>`; };
+const mixRows = (rows, fmt = fmtInt) => { const tot = sum(rows.map(x => x[1])) || 1; return `<div class="stack">${rows.map(([l, v, c]) => `<i style="width:${v / tot * 100}%;background:${c}" data-tt="${l}|${fmt(v)}|${(v / tot * 100).toFixed(0)}%"></i>`).join('')}</div>
+  <div class="lrows">${rows.map(([l, v, c]) => `<div class="lr"><i class="sw" style="background:${c}"></i><span class="lr-l">${l}</span><span class="lr-v">${fmt(v)}</span><span class="lr-p">${(v / tot * 100).toFixed(0)}%</span></div>`).join('')}</div>`; };
+const series = (d, base, seed, mult) => genSeries(d.dates, base * (d.unit === 'month' ? 30.4 : d.unit === 'hour' ? 1 / 24 : 1) * (mult || 1), hash((S.range.key || '') + seed), d.unit);
+const cumulative = a => a.reduce((o, v, i) => (o.push((o[i - 1] || 0) + v), o), []);
+
+/* ── Shared reference data for the pages ── */
+const ADMIN_NAMES = ['Super admin', 'Anna Kowalski', 'Lukas Weber', 'Mariam Hakobyan', 'Diego Santos', 'Elena Rossi', 'Tomas Petrauskas', 'Zeynep Kaya', 'Oskar Lindqvist', 'Clara Dubois', 'Arman Sargsyan', 'Nina Fischer', 'Hugo Laurent', 'Ieva Kazlauskas'];
+const REVIEWERS = ADMIN_NAMES.slice(1, 6);
+const AUsers = () => USERS.filter(u => u.kyc === 'approved');
+const youth = r => r.created ? NOW - r.created : 0;
+
+/* ── Customers · Confirmations ── */
+const CONF_TYPE = { WITHDRAW: { label: 'Crypto withdrawal', icon: 'arrowUp' }, BANK_WITHDRAW: { label: 'Bank withdrawal', icon: 'bank' }, EXCHANGE: { label: 'Large exchange', icon: 'arrows' }, CARD_ORDER: { label: 'Physical card order', icon: 'card' }, LIMIT: { label: 'Limit increase', icon: 'sliders' } };
+const CONF_STATUS = { PENDING: { label: 'Pending', tone: 'warning' }, APPROVED: { label: 'Approved', tone: 'success' }, REJECTED: { label: 'Rejected', tone: 'error' }, EXPIRED: { label: 'Expired', tone: 'neutral' } };
+const confPending = () => pgData(PAGES.confirmations).filter(r => r.status === 'PENDING').length;
+function confDecide(rows, ok) {
+  const open = rows.filter(r => r.status === 'PENDING');
+  open.forEach(r => { r.status = ok ? 'APPROVED' : 'REJECTED'; r.decided = new Date(NOW); r.by = ME; });
+  navBadge('confirmations', confPending());
+  return open.length ? `${open.length} request${open.length > 1 ? 's' : ''} ${ok ? 'approved' : 'rejected'}` : 'Nothing pending in the selection';
+}
+page({
+  id: 'confirmations', noun: 'request', nouns: 'requests', icon: 'shieldCheck', searchPh: 'Search user, request ID, destination…',
+  data: () => {
+    const g = gen(901), AU = AUsers();
+    return Array.from({ length: 128 }, (_, i) => {
+      const u = g.pk(AU), type = g.wp({ WITHDRAW: 40, BANK_WITHDRAW: 22, EXCHANGE: 16, CARD_ORDER: 12, LIMIT: 10 });
+      const c = ['BANK_WITHDRAW', 'CARD_ORDER', 'LIMIT'].includes(type) ? 'EUR' : g.pk(['USDT', 'BTC', 'ETH', 'USDC']);
+      const eur = type === 'CARD_ORDER' ? g.pk([25, 35, 50]) : type === 'LIMIT' ? g.pk([50000, 100000, 250000]) : Math.round(800 + Math.pow(g.r(), 2) * 48000);
+      const pending = i < 41, created = new Date(NOW.getTime() - (pending ? g.r() * 2 : 1 + i * .25 + g.r()) * DAY), status = pending ? 'PENDING' : g.wp({ APPROVED: 74, REJECTED: 18, EXPIRED: 8 });
+      const dest = { WITHDRAW: `${c === 'BTC' ? 'bc1q' : '0x'}${g.hx(6)}…${g.hx(4)}`, BANK_WITHDRAW: `LT${g.int(10, 99)} 3250 •••• ${g.int(1000, 9999)}`, EXCHANGE: `${c} → EUR`, CARD_ORDER: 'NS Physical EUR · DHL Express', LIMIT: 'Monthly withdrawal limit' }[type];
+      return { id: 9400 - i, uid: u.id, type, c, amount: eur / ASSET[c].rate, eur, dest, status, created, decided: pending ? null : new Date(created.getTime() + g.r() * 6 * 36e5), by: pending ? '' : g.pk(REVIEWERS) };
+    });
+  },
+  search: r => `${r.id} ${byId(r.uid).name} ${byId(r.uid).email} ${r.dest}`,
+  fields: {
+    status: fE('Status', 'activity', CONF_STATUS, r => r.status), type: fE('Type', 'layers', CONF_TYPE, r => r.type),
+    value: fE('Value', 'coins', { high: { label: '€10,000 and above' }, std: { label: 'Below €10,000' } }, r => r.eur >= 1e4 ? 'high' : 'std'),
+    asset: fE('Currency', 'coins', optsOf(Object.fromEntries(ASSETS.map(a => [a.c, a.c]))), r => r.c), created: fD('Requested', r => r.created),
+  },
+  tiles: [allTile('All requests', L => `${L.filter(r => r.status === 'PENDING').length} pending`), tile('pending', 'Pending', { key: 'status', values: ['PENDING'] }, L => { const o = L.filter(r => r.status === 'PENDING').sort((a, b) => a.created - b.created)[0]; return o ? `oldest ${rel(o.created)}` : 'All clear'; }),
+    tile('high', 'High value', { key: 'value', values: ['high'] }, () => '€10,000 and above'), tile('ok', 'Approved', { key: 'status', values: ['APPROVED'] }, share), tile('no', 'Rejected', { key: 'status', values: ['REJECTED'] }, share)],
+  cols: [K.id(), K.user(), { k: 'type', l: 'Type', on: 1, cell: r => `<span class="txt">${icon(CONF_TYPE[r.type].icon, 14)}${CONF_TYPE[r.type].label}</span>` },
+    { k: 'amount', l: 'Amount', al: 'r', on: 1, dir: 'desc', val: r => r.eur, cell: r => r.type === 'LIMIT' ? `<span class="num">${fmtEur(r.eur)}</span>` : `<span class="num">${fmtAmt(r.amount, r.c)}</span>${r.c !== 'EUR' ? `<div class="code">${fmtEur(r.eur)}</div>` : ''}` },
+    { k: 'dest', l: 'Destination', on: 1, cell: r => `<span class="num muted">${esc(r.dest)}</span>` },
+    { k: 'risk', l: 'User risk', on: 1, dir: 'desc', val: r => RISK[byId(r.uid).risk].n, cell: r => riskCell(byId(r.uid).risk) },
+    K.status(CONF_STATUS), K.date('created', 'Requested'), K.muted('by', 'Decided by', 0), K.date('decided', 'Decided', 0)],
+  sort: { k: 'created', dir: 'desc' },
+  quick: r => r.status === 'PENDING' ? { act: 'conf-ok', icon: 'check', tip: 'Approve' } : { act: 'open-user', icon: 'user', tip: 'Open user', data: { id: r.uid } },
+  menu: r => [...(r.status === 'PENDING' ? [{ act: 'conf-ok', data: { rid: r.id }, icon: 'check', label: 'Approve' }, { act: 'conf-no', data: { rid: r.id }, icon: 'ban', label: 'Reject' }] : []), { act: 'open-user', data: { id: r.uid }, icon: 'user', label: 'Open user' }],
+  bulk: [{ icon: 'check', label: 'Approve', run: rows => confDecide(rows, true) }, { icon: 'ban', label: 'Reject', run: rows => confDecide(rows, false) }],
+  rec: {
+    title: r => `${CONF_TYPE[r.type].label} #${r.id}`, sub: r => `${userLink(byId(r.uid))}<span class="faint">·</span><span>${fmtDateTime(r.created)}</span>`,
+    badges: r => badge(CONF_STATUS[r.status]) + `<span class="badge t-neutral">${riskIcon(byId(r.uid).risk)}${RISK[byId(r.uid).risk].label} risk</span>`,
+    acts: r => r.status === 'PENDING' ? `<button class="btn btn-dark" data-act="conf-ok" data-rid="${r.id}">${icon('check', 15, 2)}Approve</button><button class="btn btn-ghost" data-act="conf-no" data-rid="${r.id}">${icon('ban', 15)}Reject</button>` : '',
+    events: r => [r.decided && { ic: r.status === 'APPROVED' ? 'check' : 'ban', t: `${CONF_STATUS[r.status].label} by ${r.by}`, s: fmtDateTime(r.decided), when: rel(r.decided) }, { ic: 'send', t: 'Requested by user', s: fmtDateTime(r.created), when: rel(r.created) }].filter(Boolean),
+  },
+});
+
+/* ── Customers · Documents ── */
+const DOC_STATUS = { PENDING: { label: 'To review', tone: 'warning' }, APPROVED: { label: 'Approved', tone: 'success' }, REJECTED: { label: 'Rejected', tone: 'error' }, EXPIRED: { label: 'Expired', tone: 'neutral' } };
+const DOC_PROV = { SUMSUB: 'Sumsub', CREDITCO: 'CreditCo', ADMIN: 'Admin upload' };
+const docDecide = (rows, ok) => { const open = rows.filter(r => r.status === 'PENDING'); open.forEach(r => { r.status = ok ? 'APPROVED' : 'REJECTED'; r.reviewed = new Date(NOW); r.by = ME; r.reason = ok ? '' : 'Document unreadable'; }); return open.length ? `${open.length} document${open.length > 1 ? 's' : ''} ${ok ? 'approved' : 'rejected'}` : 'Nothing to review in the selection'; };
+page({
+  id: 'documents', noun: 'document', nouns: 'documents', icon: 'documents', searchPh: 'Search user, file name, ID…',
+  data: () => {
+    const g = gen(902), pool = USERS.filter(u => u.kyc !== 'new');
+    return Array.from({ length: 156 }, (_, i) => {
+      const u = g.pk(pool), type = g.pk(Object.keys(DOC_TYPES)), created = g.ago(i < 30 ? 3 : 120);
+      const status = ['pending', 'review'].includes(u.kyc) ? 'PENDING' : u.kyc === 'rejected' ? 'REJECTED' : g.wp({ APPROVED: 86, EXPIRED: 10, PENDING: 4 });
+      return { id: 77000 - i, uid: u.id, type, file: `${type.toLowerCase()}_${g.hx(6)}.${g.pk(['pdf', 'jpg', 'png'])}`, size: g.int(180, 4800) * 1e3, provider: g.wp({ SUMSUB: 70, CREDITCO: 20, ADMIN: 10 }),
+        status, created, reviewed: status === 'PENDING' ? null : new Date(created.getTime() + g.r() * DAY), by: status === 'PENDING' ? '' : g.pk(REVIEWERS), reason: status === 'REJECTED' ? g.pk(['Document unreadable', 'Name does not match KYC', 'Document expired']) : '' };
+    });
+  },
+  search: r => `${r.id} ${r.file} ${byId(r.uid).name} ${byId(r.uid).email}`,
+  fields: { status: fE('Status', 'activity', DOC_STATUS, r => r.status), type: fE('Document type', 'file', optsOf(DOC_TYPES), r => r.type), provider: fE('Provider', 'folder', optsOf(DOC_PROV), r => r.provider), created: fD('Uploaded', r => r.created) },
+  tiles: [allTile('All documents', L => `${L.filter(r => NOW - r.created < 7 * DAY).length} this week`), tile('pending', 'To review', { key: 'status', values: ['PENDING'] }, () => 'Awaiting compliance'),
+    tile('ok', 'Approved', { key: 'status', values: ['APPROVED'] }, share), tile('no', 'Rejected', { key: 'status', values: ['REJECTED'] }, share), tile('exp', 'Expired', { key: 'status', values: ['EXPIRED'] }, () => 'Need re-upload')],
+  cols: [K.id(), K.user(), { k: 'type', l: 'Document', on: 1, cell: r => `<span class="txt">${icon('file', 14)}${DOC_TYPES[r.type]}</span>` }, K.muted('file', 'File'),
+    { ...K.num('size', 'Size', fmtSize, 0) }, { k: 'provider', l: 'Provider', on: 1, cell: r => DOC_PROV[r.provider] }, K.status(DOC_STATUS), K.date('created', 'Uploaded'),
+    K.muted('by', 'Reviewed by', 0), K.date('reviewed', 'Reviewed', 0), K.muted('reason', 'Reject reason', 0)],
+  sort: { k: 'created', dir: 'desc' },
+  quick: () => ({ act: 'doc-dl', icon: 'download', tip: 'Download' }),
+  menu: r => [...(r.status === 'PENDING' ? [{ act: 'doc-ok', data: { rid: r.id }, icon: 'check', label: 'Approve' }, { act: 'doc-no', data: { rid: r.id }, icon: 'ban', label: 'Reject' }] : []), { act: 'doc-dl', data: { rid: r.id }, icon: 'download', label: 'Download' }, { act: 'open-user', data: { id: r.uid }, icon: 'user', label: 'Open user' }],
+  bulk: [{ icon: 'check', label: 'Approve', run: rows => docDecide(rows, true) }, { icon: 'ban', label: 'Reject', run: rows => docDecide(rows, false) }],
+  rec: {
+    title: r => `${DOC_TYPES[r.type]} #${r.id}`, sub: r => `${userLink(byId(r.uid))}<span class="faint">·</span><span>${esc(r.file)}</span>`, badges: r => badge(DOC_STATUS[r.status]),
+    acts: r => (r.status === 'PENDING' ? `<button class="btn btn-dark" data-act="doc-ok" data-rid="${r.id}">${icon('check', 15, 2)}Approve</button><button class="btn btn-ghost" data-act="doc-no" data-rid="${r.id}">${icon('ban', 15)}Reject</button>` : '') + `<button class="btn btn-ghost" data-act="doc-dl" data-rid="${r.id}">${icon('download', 15)}Download</button>`,
+    sections: r => tcard('File', '', `<div class="docs" style="border-top:0"><div class="doc"><span class="doc-ic">${icon('file', 15)}</span><div style="flex:1;min-width:0"><div>${esc(r.file)}</div><div class="code">${DOC_TYPES[r.type]} · ${fmtSize(r.size)} · ${DOC_PROV[r.provider]}</div></div><button class="btn btn-ghost btn-sm" data-act="doc-dl" data-rid="${r.id}">${icon('download', 14)}Download</button></div></div>`),
+    events: r => [r.reviewed && { ic: r.status === 'REJECTED' ? 'ban' : 'check', t: `${DOC_STATUS[r.status].label} by ${r.by}`, s: r.reason || fmtDateTime(r.reviewed), when: rel(r.reviewed) }, { ic: 'upload', t: `Uploaded via ${DOC_PROV[r.provider]}`, s: fmtDateTime(r.created), when: rel(r.created) }].filter(Boolean),
+  },
+});
+
+/* ── Customers · CreditCo KYC (the same records as the user page’s CreditCo card) ── */
+const CC_KYC = { VERIFIED: { label: 'Verified', tone: 'success' }, PENDING: { label: 'Pending', tone: 'warning' }, REJECTED: { label: 'Rejected', tone: 'error' }, NONE: { label: 'Not started', tone: 'neutral' } };
+const ccKyc = r => r.C.kycStatus || 'NONE';
+const ccFetch = rows => { rows.forEach(r => { r.C.updated = new Date(NOW); }); return `KYC status fetched for ${rows.length} applicant${rows.length > 1 ? 's' : ''}`; };
+page({
+  id: 'creditco', noun: 'applicant', nouns: 'applicants', icon: 'passport', live: 1, searchPh: 'Search user, CreditCo ID, email…',
+  data: () => USERS.filter(u => u.kyc !== 'new' && u.kyc !== 'rejected').map(u => { const C = ud(u).creditco; return C._row ||= { id: C.id || 'U' + u.id, uid: u.id, C }; }),
+  search: r => `${r.id} ${r.C.email || ''} ${byId(r.uid).name} ${byId(r.uid).email}`,
+  fields: { status: fE('Status', 'activity', CC_STATUS, r => r.C.status), kyc: fE('KYC status', 'shieldCheck', CC_KYC, ccKyc) },
+  tiles: [allTile('All applicants', L => `${L.filter(r => r.C.docs.length).length} with documents`), tile('ok', 'Approved', { key: 'status', values: ['APPROVED'] }, share),
+    tile('req', 'Access requested', { key: 'status', values: ['ACCESS_REQUESTED'] }, () => 'Waiting on CreditCo'), tile('inc', 'Forms incomplete', { key: 'status', values: ['NOT_ALL_FORM_SUBMITTED'] }, share), tile('ver', 'KYC verified', { key: 'kyc', values: ['VERIFIED'] }, share)],
+  cols: [{ k: 'id', l: 'CreditCo ID', on: 1, cell: r => r.C.id ? copyVal(r.C.id) : dash }, K.user(), { k: 'email', l: 'CreditCo email', on: 1, val: r => r.C.email || '', cell: r => muted(r.C.email) },
+    { k: 'status', l: 'Status', on: 1, val: r => r.C.status, cell: r => dotCell(CC_STATUS[r.C.status]) }, { k: 'kyc', l: 'KYC status', on: 1, val: ccKyc, cell: r => badge(CC_KYC[ccKyc(r)]) },
+    { k: 'docs', l: 'Documents', al: 'r', on: 1, dir: 'desc', val: r => r.C.docs.length, cell: r => `<span class="num ${r.C.docs.length ? '' : 'zero'}">${r.C.docs.length}</span>` },
+    { k: 'remark', l: 'KYC remark', val: r => r.C.remark || '', cell: r => muted(r.C.remark) },
+    { k: 'created', l: 'Created', al: 'r', on: 1, dir: 'desc', val: r => r.C.created?.getTime() || 0, cell: r => r.C.created ? `<span class="muted">${rel(r.C.created)}</span>` : dash, kv: r => r.C.created ? fmtDateTime(r.C.created) : dash },
+    { k: 'updated', l: 'Updated', al: 'r', dir: 'desc', val: r => r.C.updated?.getTime() || 0, cell: r => r.C.updated ? `<span class="muted">${rel(r.C.updated)}</span>` : dash, kv: r => r.C.updated ? fmtDateTime(r.C.updated) : dash }],
+  sort: { k: 'created', dir: 'desc' },
+  quick: () => ({ act: 'cc-fetch', icon: 'refresh', tip: 'Fetch KYC status' }),
+  menu: r => [...(r.C.status !== 'APPROVED' ? [{ act: 'cc-req', data: { rid: r.id }, icon: 'key', label: 'Request access' }] : []), { act: 'cc-fetch', data: { rid: r.id }, icon: 'refresh', label: 'Fetch KYC status' }, { act: 'open-user', data: { id: r.uid }, icon: 'user', label: 'Open user' }],
+  bulk: [{ icon: 'refresh', label: 'Fetch KYC status', run: ccFetch }],
+  rec: {
+    title: r => r.C.id || `CreditCo · ${byId(r.uid).name || byId(r.uid).email}`, sub: r => userLink(byId(r.uid)), badges: r => badge(CC_STATUS[r.C.status]) + badge(CC_KYC[ccKyc(r)], 'KYC '),
+    acts: r => `${r.C.status !== 'APPROVED' ? `<button class="btn btn-dark" data-act="cc-req" data-rid="${r.id}">${icon('key', 15)}Request access</button>` : ''}<button class="btn btn-ghost" data-act="cc-fetch" data-rid="${r.id}">${icon('refresh', 15)}Fetch KYC status</button>`,
+    sections: r => tcard(`Documents <span class="ct">${r.C.docs.length}</span>`, '', r.C.docs.length ? `<div class="docs" style="border-top:0">${r.C.docs.map(x => `<div class="doc"><span class="doc-ic">${icon('file', 15)}</span><div style="flex:1;min-width:0"><div>${esc(x.name)}</div><div class="code">${DOC_TYPES[x.type]} · ${x.size} · ${rel(x.date)}</div></div></div>`).join('')}</div>` : emptyBlock('file', 'No documents', 'Upload documents from the user’s Verification tab.')),
+    events: r => [r.C.updated && { ic: 'refresh', t: 'Status synced', s: fmtDateTime(r.C.updated), when: rel(r.C.updated) }, r.C.created && { ic: 'plus', t: 'Application created', s: fmtDateTime(r.C.created), when: rel(r.C.created) }].filter(Boolean),
+  },
+});
+
+/* ── Financial · Transactions (every user’s wallet history) ── */
+const TX_STATUS = { COMPLETED: { label: 'Completed', tone: 'success' }, PENDING: { label: 'Pending', tone: 'warning' }, FAILED: { label: 'Failed', tone: 'error' } };
+const txStatusOf = h => { const x = Math.abs(hash(String(h.id))) % 50; return x === 0 ? 'FAILED' : NOW - h.created < 6 * 36e5 && x < 25 ? 'PENDING' : 'COMPLETED'; };
+const allTx = () => USERS.flatMap(u => ud(u).history.map(h => (h.uid = u.id, h.status ||= txStatusOf(h), h)));
+const txFields = d => ({ type: fE('Type', 'arrows', optsOf(Object.fromEntries(Object.entries(TX).map(([k, t]) => [k, t.label]))), r => r.type), cur: fE('Currency', 'coins', optsOf(Object.fromEntries(ASSETS.map(a => [a.c, `${a.c} · ${a.n}`]))), r => r.c),
+  source: fE('Source', 'folder', optsOf(SOURCES), r => r.source), ...d });
+page({
+  id: 'transactions', noun: 'transaction', nouns: 'transactions', icon: 'arrows', live: 1, searchPh: 'Search ID, user, details, referral…',
+  data: allTx, search: r => `${r.id} ${byId(r.uid).name} ${byId(r.uid).email} ${r.details} ${r.ref}`,
+  fields: txFields({ status: fE('Status', 'activity', TX_STATUS, r => r.status), created: fD('Created', r => r.created) }),
+  tiles: [allTile('All transactions', L => `${L.filter(r => NOW - r.created < DAY).length} today`), tile('dep', 'Deposits', { key: 'type', values: ['BANK_DEPOSIT', 'DEPOSIT'] }, share),
+    tile('wd', 'Withdrawals', { key: 'type', values: ['WITHDRAW'] }, share), tile('card', 'Card spend', { key: 'type', values: ['CARD_PAYMENT'] }, share), tile('fail', 'Failed', { key: 'status', values: ['FAILED'] }, L => `${(L.filter(r => r.status === 'FAILED').length / L.length * 100).toFixed(1)}%`)],
+  cols: [K.id(), K.when('created', 'Created'), K.user(), { k: 'type', l: 'Type', on: 1, cell: txType }, { k: 'c', l: 'Currency', on: 1, cell: txCur },
+    { k: 'amount', l: 'Amount', al: 'r', on: 1, dir: 'desc', val: r => r.amount * ASSET[r.c].rate, cell: txAmt }, { k: 'commission', l: 'Commission', al: 'r', dir: 'desc', cell: r => r.commission ? numM(fmtAmt(r.commission, r.c)) : dash },
+    { k: 'before', l: 'Balance before', al: 'r', dir: 'desc', cell: r => numM(fmtAmt(r.before, r.c)) }, K.muted('details', 'Details'), { k: 'source', l: 'Source', on: 1, cell: r => SOURCES[r.source] },
+    K.status(TX_STATUS), { k: 'ref', l: 'Referral', cell: r => r.ref ? `<span class="num">${r.ref}</span>` : dash }],
+  sort: { k: 'created', dir: 'desc' },
+  quick: r => ({ act: 'open-user', icon: 'user', tip: 'Open user', data: { id: r.uid } }),
+  menu: r => [...(r.status === 'FAILED' ? [{ act: 'tx-retry', data: { rid: r.id }, icon: 'refresh', label: 'Retry' }] : []), { act: 'open-user', data: { id: r.uid }, icon: 'user', label: 'Open user' }],
+  rec: {
+    title: r => `${TX[r.type].label} #${r.id}`, sub: r => `${userLink(byId(r.uid))}<span class="faint">·</span><span class="num">${fmtAmt(r.amount, r.c, true)}</span>`, badges: r => badge(TX_STATUS[r.status]) + `<span class="badge t-neutral">${SOURCES[r.source]}</span>`,
+    acts: r => r.status === 'FAILED' ? `<button class="btn btn-dark" data-act="tx-retry" data-rid="${r.id}">${icon('refresh', 15)}Retry</button>` : '',
+    events: r => [r.status !== 'PENDING' && { ic: r.status === 'FAILED' ? 'alert' : 'check', t: TX_STATUS[r.status].label, s: fmtDateTime(r.updated), when: rel(r.updated) }, { ic: TX[r.type].icon, t: 'Created', s: fmtDateTime(r.created), when: rel(r.created) }].filter(Boolean),
+  },
+});
+
+/* ── Financial · Aggregated transactions (one row per user, type, currency and day) ── */
+page({
+  id: 'aggregated', noun: 'aggregate', nouns: 'aggregates', icon: 'aggTx', live: 1, searchPh: 'Search user, type…',
+  data: () => {
+    const m = new Map();
+    allTx().forEach(h => {
+      const day = sod(h.created), id = `${h.uid}-${h.type}-${h.c}-${day.getTime() / 1e5}`;
+      const a = m.get(id) || m.set(id, { id, uid: h.uid, type: h.type, c: h.c, day, count: 0, volume: 0, commission: 0, txs: [] }).get(id);
+      a.count++; a.volume += Math.abs(h.amount); a.commission += h.commission; a.txs.push(h);
+    });
+    return [...m.values()];
+  },
+  search: r => `${TX[r.type].label} ${byId(r.uid).name} ${byId(r.uid).email}`,
+  fields: (({ source, ...f }) => ({ ...f, day: fD('Date', r => r.day) }))(txFields({})),
+  tiles: [allTile('All aggregates', L => `${fmtInt(sum(L.map(r => r.count)))} operations`), tile('card', 'Card spend', { key: 'type', values: ['CARD_PAYMENT'] }, share), tile('ex', 'Exchanges', { key: 'type', values: ['EXCHANGE'] }, share),
+    tile('dep', 'Deposits', { key: 'type', values: ['BANK_DEPOSIT', 'DEPOSIT'] }, share), tile('wd', 'Withdrawals', { key: 'type', values: ['WITHDRAW'] }, share)],
+  cols: [{ k: 'day', l: 'Date', on: 1, dir: 'desc', val: r => r.day.getTime(), cell: r => fmtDay(r.day) }, K.user(), { k: 'type', l: 'Type', on: 1, cell: txType }, { k: 'c', l: 'Currency', on: 1, cell: txCur },
+    K.num('count', 'Operations'), K.amt('volume', 'Volume'), { ...K.amt('commission', 'Commission'), cell: r => r.commission ? numM(fmtAmt(r.commission, r.c)) : dash }],
+  sort: { k: 'day', dir: 'desc' },
+  quick: r => ({ act: 'open-user', icon: 'user', tip: 'Open user', data: { id: r.uid } }),
+  menu: r => [{ act: 'open-user', data: { id: r.uid }, icon: 'user', label: 'Open user' }],
+  rec: {
+    title: r => `${TX[r.type].label} · ${fmtDay(r.day)}`, sub: r => `${userLink(byId(r.uid))}<span class="faint">·</span><span class="num">${fmtAmt(r.volume, r.c)}</span>`, badges: r => `<span class="badge t-neutral">${r.count} operation${r.count > 1 ? 's' : ''}</span>`,
+    sections: r => tcard(`Operations <span class="ct">${r.count}</span>`, '', dtable(['ID', 'Time', 'Amount|r', 'Details', 'Status'], r.txs.map(h => [recLink('transactions', h.id, '#' + h.id), fmtDateTime(h.created), txAmt(h), muted(h.details), dotCell(TX_STATUS[h.status])]))),
+    events: r => r.txs.slice(0, 5).map(h => ({ ic: TX[h.type].icon, t: fmtAmt(h.amount, h.c, true), s: h.details, when: rel(h.created) })),
+  },
+});
+
+/* ── Financial · IBAN accounts (the same objects as each user’s IBAN tab) ── */
+const ibanClose = rows => { const n = rows.filter(b => b.status !== 'CLOSED').length; rows.forEach(b => { b.status = 'CLOSED'; b.updated = new Date(NOW); }); return `${n} account${n === 1 ? '' : 's'} closed`; };
+page({
+  id: 'iban', noun: 'IBAN account', nouns: 'IBAN accounts', icon: 'bank', live: 1, searchPh: 'Search IBAN, user, external ID…',
+  data: () => USERS.flatMap(u => ud(u).ibans.map(b => { if (!b.uid) { const r = rng(b.id); Object.assign(b, { uid: u.id, created: new Date(u.created.getTime() + (NOW - u.created) * (.2 + r() * .3)), balance: Math.round(r() * r() * 24000) }); } return b; })),
+  search: r => `${r.iban} ${r.ext} ${byId(r.uid).name} ${byId(r.uid).email}`,
+  fields: { status: fE('Status', 'activity', IBAN_STATUS, r => r.status), product: fE('Product', 'ibanProduct', Object.fromEntries(IBAN_PRODUCTS.map(p => [p.name, { label: p.name }])), r => r.productName),
+    provider: fE('Provider', 'bank', { 'Banking Circle': { label: 'Banking Circle' }, 'Clear Junction': { label: 'Clear Junction' } }, r => r.provider), source: fE('Source', 'folder', optsOf(SOURCES), r => r.source), created: fD('Opened', r => r.created) },
+  tiles: [allTile('All accounts', L => `${fmtEur(sum(L.map(b => b.balance)))} held`), tile('act', 'Active', { key: 'status', values: ['ACTIVE'] }, share), tile('pen', 'Pending', { key: 'status', values: ['PENDING'] }, () => 'With provider'), tile('cl', 'Closed', { key: 'status', values: ['CLOSED'] }, share)],
+  cols: [{ k: 'iban', l: 'IBAN', on: 1, cell: b => copyVal(b.iban.replace(/ /g, ''), b.iban) }, K.user(), K.text('productName', 'Product'), K.text('provider', 'Provider'), K.text('currency', 'Currency', 0),
+    K.status(IBAN_STATUS), K.eur('balance', 'Balance'), { k: 'source', l: 'Source', cell: b => SOURCES[b.source] }, { k: 'ext', l: 'External ID', cell: b => copyVal(b.ext) }, K.date('created', 'Opened')],
+  sort: { k: 'created', dir: 'desc' },
+  quick: b => ({ act: 'copy', icon: 'copy', tip: 'Copy IBAN', data: { copy: b.iban.replace(/ /g, '') } }),
+  menu: b => [...(b.status !== 'CLOSED' ? [{ act: 'iban-close', data: { rid: b.id }, icon: 'ban', label: 'Close account' }] : []), { act: 'open-user', data: { id: b.uid }, icon: 'user', label: 'Open user' }],
+  bulk: [{ icon: 'ban', label: 'Close', run: ibanClose }],
+  rec: { title: b => b.iban, sub: b => `${userLink(byId(b.uid))}<span class="faint">·</span><span>${esc(b.productName)}</span>`, badges: b => badge(IBAN_STATUS[b.status]) + `<span class="badge t-neutral">${b.provider}</span>`,
+    acts: b => b.status !== 'CLOSED' ? `<button class="btn btn-ghost" data-act="iban-close" data-rid="${b.id}">${icon('ban', 15)}Close account</button>` : '' },
+});
+
+/* ── Financial · Cards (the same objects as each user’s Cards tab) ── */
+const CARD_STATUS = { active: { label: 'Active', tone: 'success' }, frozen: { label: 'Frozen', tone: 'info' } };
+const cardFreeze = (rows, on) => { rows.forEach(c => c.frozen = on); return `${rows.length} card${rows.length > 1 ? 's' : ''} ${on ? 'frozen' : 'unfrozen'}`; };
+page({
+  id: 'cards', noun: 'card', nouns: 'cards', icon: 'card', live: 1, searchPh: 'Search last 4 digits, user, card ID…',
+  data: () => USERS.flatMap(u => ud(u).cards.map(c => (c.uid = u.id, c))),
+  search: c => `${c.id} ${c.last4} ${c.ext} ${byId(c.uid).name} ${byId(c.uid).email}`,
+  fields: { status: fE('Status', 'activity', CARD_STATUS, c => c.frozen ? 'frozen' : 'active'), kind: fE('Card type', 'card', { virtual: { label: 'Virtual' }, physical: { label: 'Physical' } }, c => c.physical ? 'physical' : 'virtual'),
+    product: fE('Product', 'cardProduct', { 'NS Virtual EUR': { label: 'NS Virtual EUR' }, 'NS Physical EUR': { label: 'NS Physical EUR' } }, c => c.product), created: fD('Issued', c => c.created) },
+  tiles: [allTile('All cards', L => `${fmtEur(sum(L.map(c => c.balance)))} on cards`), tile('act', 'Active', { key: 'status', values: ['active'] }, share), tile('frz', 'Frozen', { key: 'status', values: ['frozen'] }, share),
+    tile('vir', 'Virtual', { key: 'kind', values: ['virtual'] }, share), tile('phy', 'Physical', { key: 'kind', values: ['physical'] }, share)],
+  cols: [{ k: 'last4', l: 'Card', on: 1, cell: c => `<span class="ctry"><span class="mini-card ${c.physical ? 'alt' : ''}">${LOGO_SIGN(9, '#fff')}</span>•••• ${c.last4}</span>` }, K.id(), K.user(),
+    { k: 'product', l: 'Product', on: 1, cell: c => `<div>${c.product}</div><div class="code">ID ${c.productId}</div>` }, { k: 'physical', l: 'Type', on: 1, val: c => +c.physical, cell: c => c.physical ? 'Physical' : 'Virtual' },
+    K.text('provider', 'Provider', 0), { k: 'balance', l: 'Balance', al: 'r', on: 1, dir: 'desc', cell: c => `<span class="num">${fmtAmt(c.balance, 'EUR')}</span>` }, { k: 'exp', l: 'Expiry', on: 1, cell: c => `<span class="num">${c.exp}</span>` },
+    { k: 'frozen', l: 'Status', on: 1, val: c => +c.frozen, cell: c => dotCell(CARD_STATUS[c.frozen ? 'frozen' : 'active']) }, K.yes('activated', 'Activated', 0), K.date('created', 'Issued')],
+  sort: { k: 'created', dir: 'desc' },
+  quick: c => ({ act: 'card-tog', icon: c.frozen ? 'refresh' : 'lock', tip: c.frozen ? 'Unfreeze' : 'Freeze' }),
+  menu: c => [{ act: 'card-tog', data: { rid: c.id }, icon: c.frozen ? 'refresh' : 'lock', label: c.frozen ? 'Unfreeze card' : 'Freeze card' }, { act: 'copy', data: { copy: c.ext }, icon: 'copy', label: 'Copy external ID' }, { act: 'open-user', data: { id: c.uid }, icon: 'user', label: 'Open user' }],
+  bulk: [{ icon: 'lock', label: 'Freeze', run: rows => cardFreeze(rows, true) }, { icon: 'refresh', label: 'Unfreeze', run: rows => cardFreeze(rows, false) }],
+  rec: { title: c => `${c.product} •••• ${c.last4}`, sub: c => `${userLink(byId(c.uid))}<span class="faint">·</span><span class="num">${fmtAmt(c.balance, 'EUR')}</span>`, badges: c => badge(CARD_STATUS[c.frozen ? 'frozen' : 'active']) + `<span class="badge t-neutral">${c.physical ? 'Physical' : 'Virtual'}</span>`,
+    acts: c => `<button class="btn btn-ghost" data-act="card-tog" data-rid="${c.id}">${icon(c.frozen ? 'refresh' : 'lock', 15)}${c.frozen ? 'Unfreeze' : 'Freeze'}</button>` },
+});
+
+/* ── Financial · SBP top-up ── */
+const SBP_STATUS = { PENDING: { label: 'Awaiting payment', tone: 'warning' }, PAID: { label: 'Paid', tone: 'success' }, EXPIRED: { label: 'Expired', tone: 'neutral' }, FAILED: { label: 'Failed', tone: 'error' } };
+const sbpPaid = rows => { const o = rows.filter(r => r.status === 'PENDING'); o.forEach(r => { r.status = 'PAID'; r.paid = new Date(NOW); r.by = ME; }); return `${o.length} top-up${o.length === 1 ? '' : 's'} marked as paid`; };
+page({
+  id: 'sbp', noun: 'top-up', nouns: 'top-ups', icon: 'sbp', searchPh: 'Search reference, user, bank…',
+  data: () => {
+    const g = gen(903), AU = AUsers();
+    return Array.from({ length: 96 }, (_, i) => {
+      const rub = Math.round((2000 + Math.pow(g.r(), 2) * 148000) / 100) * 100, rate = +(97 + g.r() * 3).toFixed(2), pending = i < 9, created = new Date(NOW.getTime() - (pending ? g.r() * .05 : .1 + i * .4 + g.r()) * DAY);
+      const status = pending ? 'PENDING' : g.wp({ PAID: 80, EXPIRED: 12, FAILED: 8 });
+      return { id: 3300 - i, ref: 'SBP-' + g.hx(8).toUpperCase(), uid: g.pk(AU).id, rub, rate, usdt: rub / rate, bank: g.pk(['Sberbank', 'T-Bank', 'Alfa-Bank', 'VTB', 'Raiffeisen']), phone: `+7 9${g.int(10, 99)} ••• •• ${g.int(10, 99)}`,
+        status, created, paid: status === 'PAID' ? new Date(created.getTime() + g.r() * 9e5) : null };
+    });
+  },
+  search: r => `${r.id} ${r.ref} ${r.bank} ${byId(r.uid).name} ${byId(r.uid).email}`,
+  fields: { status: fE('Status', 'activity', SBP_STATUS, r => r.status), bank: fE('Bank', 'bank', optsOf({ Sberbank: 'Sberbank', 'T-Bank': 'T-Bank', 'Alfa-Bank': 'Alfa-Bank', VTB: 'VTB', Raiffeisen: 'Raiffeisen' }), r => r.bank), created: fD('Created', r => r.created) },
+  tiles: [allTile('All top-ups', L => `${fmtInt(sum(L.filter(r => r.status === 'PAID').map(r => r.rub)))} ₽ paid`), tile('pen', 'Awaiting payment', { key: 'status', values: ['PENDING'] }, () => 'QR valid 15 min'),
+    tile('paid', 'Paid', { key: 'status', values: ['PAID'] }, share), tile('exp', 'Expired', { key: 'status', values: ['EXPIRED'] }, share), tile('fail', 'Failed', { key: 'status', values: ['FAILED'] }, share)],
+  cols: [K.id(), K.user(), { k: 'rub', l: 'Amount', al: 'r', on: 1, dir: 'desc', cell: r => `<span class="num">${fmtInt(r.rub)} ₽</span>` }, { k: 'usdt', l: 'Credited', al: 'r', on: 1, dir: 'desc', cell: r => `<span class="num">${fmtAmt(r.usdt, 'USDT')}</span>` },
+    K.num('rate', 'Rate, ₽', v => v.toFixed(2), 0), K.text('bank', 'Bank'), K.muted('phone', 'Phone', 0), K.status(SBP_STATUS), K.date('created', 'Created'), K.code('ref', 'Reference', 0)],
+  sort: { k: 'created', dir: 'desc' },
+  quick: r => r.status === 'PENDING' ? { act: 'sbp-paid', icon: 'check', tip: 'Mark as paid' } : { act: 'open-user', icon: 'user', tip: 'Open user', data: { id: r.uid } },
+  menu: r => [...(r.status === 'PENDING' ? [{ act: 'sbp-paid', data: { rid: r.id }, icon: 'check', label: 'Mark as paid' }, { act: 'sbp-cancel', data: { rid: r.id }, icon: 'ban', label: 'Cancel request' }] : []), { act: 'open-user', data: { id: r.uid }, icon: 'user', label: 'Open user' }],
+  bulk: [{ icon: 'check', label: 'Mark as paid', run: sbpPaid }],
+  rec: { title: r => `SBP top-up #${r.id}`, sub: r => `${userLink(byId(r.uid))}<span class="faint">·</span><span class="num">${fmtInt(r.rub)} ₽ → ${fmtAmt(r.usdt, 'USDT')}</span>`, badges: r => badge(SBP_STATUS[r.status]),
+    acts: r => r.status === 'PENDING' ? `<button class="btn btn-dark" data-act="sbp-paid" data-rid="${r.id}">${icon('check', 15, 2)}Mark as paid</button><button class="btn btn-ghost" data-act="sbp-cancel" data-rid="${r.id}">${icon('ban', 15)}Cancel</button>` : '',
+    events: r => [r.paid && { ic: 'check', t: 'Paid', s: `${r.bank} · ${fmtDateTime(r.paid)}`, when: rel(r.paid) }, { ic: 'sbp', t: 'QR issued', s: r.ref, when: rel(r.created) }].filter(Boolean) },
+});
+
+/* ── Staking · Strategies, Stakes, Payout pools ── */
+const STRAT_STATUS = { ACTIVE: { label: 'Active', tone: 'success' }, PAUSED: { label: 'Paused', tone: 'warning' }, CLOSED: { label: 'Closed', tone: 'neutral' } };
+const STAKE_STATUS = { ACTIVE: { label: 'Active', tone: 'success' }, UNBONDING: { label: 'Unbonding', tone: 'info' }, COMPLETED: { label: 'Completed', tone: 'neutral' } };
+const POOL_STATUS = { SCHEDULED: { label: 'Scheduled', tone: 'info' }, PROCESSING: { label: 'Processing', tone: 'warning' }, PAID: { label: 'Paid', tone: 'success' }, FAILED: { label: 'Failed', tone: 'error' } };
+const STRATS = [
+  { id: 1, name: 'USDT Flexible', c: 'USDT', apy: 6.5, lock: 0, min: 50, cap: 5e6, status: 'ACTIVE' }, { id: 2, name: 'USDT 90-day lock', c: 'USDT', apy: 9.2, lock: 90, min: 500, cap: 3e6, status: 'ACTIVE' },
+  { id: 3, name: 'USDC Saver', c: 'USDC', apy: 5.8, lock: 0, min: 50, cap: 2e6, status: 'ACTIVE' }, { id: 4, name: 'ETH Liquid staking', c: 'ETH', apy: 3.6, lock: 0, min: .05, cap: 1500, status: 'ACTIVE' },
+  { id: 5, name: 'ETH 180-day vault', c: 'ETH', apy: 4.9, lock: 180, min: .5, cap: 800, status: 'PAUSED' }, { id: 6, name: 'BTC Yield vault', c: 'BTC', apy: 2.4, lock: 30, min: .005, cap: 60, status: 'ACTIVE' },
+  { id: 7, name: 'TRX Boost', c: 'TRX', apy: 11.5, lock: 14, min: 1000, cap: 2e7, status: 'ACTIVE' }, { id: 8, name: 'ZNX Rewards', c: 'ZNX', apy: 18, lock: 60, min: 100, cap: 5e6, status: 'CLOSED' },
+].map((s, i) => ({ ...s, created: new Date(NOW.getTime() - (400 - i * 40) * DAY), updated: new Date(NOW.getTime() - (20 + i * 3) * DAY) }));
+const stratOf = id => STRATS.find(s => s.id === id);
+const STAKES = (() => {
+  const g = gen(904), AU = AUsers();
+  return Array.from({ length: 220 }, (_, i) => {
+    const s = STRATS[+g.wp({ 0: 26, 1: 18, 2: 14, 3: 12, 4: 5, 5: 9, 6: 10, 7: 6 })], eur = 100 + Math.pow(g.r(), 2.2) * 30000, created = g.ago(s.id === 8 ? 300 : 260);
+    const ends = s.lock ? new Date(created.getTime() + s.lock * DAY) : null, amount = eur / ASSET[s.c].rate;
+    const status = ends && ends < NOW ? 'COMPLETED' : g.r() < .07 ? 'UNBONDING' : s.status === 'CLOSED' ? 'COMPLETED' : 'ACTIVE';
+    const days = ((ends && ends < NOW ? ends : NOW) - created) / DAY;
+    return { id: 61000 - i, uid: g.pk(AU).id, sid: s.id, c: s.c, amount, apy: s.apy, rewards: amount * s.apy / 100 * days / 365, status, created, ends };
+  });
+})();
+const stratStats = s => { const a = STAKES.filter(x => x.sid === s.id && x.status !== 'COMPLETED'); return { tvl: sum(a.map(x => x.amount)) * ASSET[s.c].rate, n: new Set(a.map(x => x.uid)).size, amt: sum(a.map(x => x.amount)) }; };
+const stratToggle = rows => { rows.forEach(s => { if (s.status !== 'CLOSED') { s.status = s.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE'; stamp(s); } }); return rows.length === 1 ? `${rows[0].name} ${rows[0].status === 'ACTIVE' ? 'resumed' : 'paused'}` : `${rows.length} strategies updated`; };
+const lockLbl = d => d ? `${d} days` : 'Flexible';
+page({
+  id: 'strategies', noun: 'strategy', nouns: 'strategies', icon: 'strategy', searchPh: 'Search strategy, asset…',
+  data: () => STRATS, search: s => `${s.name} ${s.c}`,
+  fields: { status: fE('Status', 'activity', STRAT_STATUS, s => s.status), asset: fE('Asset', 'coins', optsOf(Object.fromEntries(ASSETS.filter(a => !a.fiat).map(a => [a.c, a.c]))), s => s.c), term: fE('Term', 'calendar', { flex: { label: 'Flexible' }, lock: { label: 'Locked' } }, s => s.lock ? 'lock' : 'flex') },
+  cols: [K.id(), { k: 'name', l: 'Strategy', on: 1, lock: 1, val: s => s.name.toLowerCase(), cell: s => `<b style="font-weight:500">${esc(s.name)}</b>` }, K.asset(), K.pct('apy', 'APY'), { k: 'lock', l: 'Term', on: 1, cell: s => muted(lockLbl(s.lock)) },
+    { k: 'min', l: 'Min. stake', al: 'r', on: 1, cell: s => numM(fmtAmt(s.min, s.c)) }, { k: 'tvl', l: 'TVL', al: 'r', on: 1, dir: 'desc', val: s => stratStats(s).tvl, cell: s => `<span class="num">${fmtEur(stratStats(s).tvl)}</span>` },
+    { k: 'stakers', l: 'Stakers', al: 'r', on: 1, dir: 'desc', val: s => stratStats(s).n, cell: s => `<span class="num">${fmtInt(stratStats(s).n)}</span>` },
+    { k: 'cap', l: 'Capacity used', al: 'r', on: 1, dir: 'desc', val: s => stratStats(s).amt / s.cap, cell: s => `<span class="num">${(stratStats(s).amt / s.cap * 100).toFixed(1)}%</span>` }, K.status(STRAT_STATUS), K.date('updated', 'Updated', 0), K.date('created', 'Created', 0)],
+  sort: { k: 'tvl', dir: 'desc' },
+  quick: s => s.status !== 'CLOSED' ? { act: 'strat-tog', icon: s.status === 'ACTIVE' ? 'minus' : 'refresh', tip: s.status === 'ACTIVE' ? 'Pause' : 'Resume' } : null,
+  menu: s => s.status !== 'CLOSED' ? [{ act: 'strat-tog', data: { rid: s.id }, icon: s.status === 'ACTIVE' ? 'minus' : 'refresh', label: s.status === 'ACTIVE' ? 'Pause new stakes' : 'Resume' }] : [],
+  bulk: [{ icon: 'minus', label: 'Pause / resume', run: stratToggle }],
+  form: {
+    fields: s => [{ id: 'fsName', label: 'Name', value: s?.name, ph: 'e.g. USDT 30-day lock' }, { id: 'fsAsset', label: 'Asset', value: s?.c || 'USDT', options: ASSETS.filter(a => !a.fiat).map(a => [a.c, `${a.c} · ${a.n}`]) },
+      { id: 'fsApy', label: 'APY, %', value: s?.apy ?? 5, type: 'number' }, { id: 'fsLock', label: 'Lock period, days', value: s?.lock ?? 0, type: 'number', hint: '0 = flexible, withdraw any time.' },
+      { id: 'fsMin', label: 'Minimum stake', value: s?.min ?? 50, type: 'number' }, { id: 'fsCap', label: 'Capacity', value: s?.cap ?? 1e6, type: 'number' }, { id: 'fsStatus', label: 'Status', value: s?.status || 'ACTIVE', options: Object.entries(STRAT_STATUS).map(([k, o]) => [k, o.label]) }],
+    save: s => {
+      const name = fv('fsName'); if (!name) return coBad('#fsName'), false;
+      const v = { name, c: fv('fsAsset'), apy: fnum('fsApy'), lock: Math.round(fnum('fsLock')), min: fnum('fsMin'), cap: fnum('fsCap'), status: fv('fsStatus') };
+      if (s) { Object.assign(s, v); stamp(s); return true; }
+      return { id: Math.max(...STRATS.map(x => x.id)) + 1, ...v, created: new Date(NOW), updated: new Date(NOW) };
+    },
+  },
+  rec: {
+    title: s => s.name, sub: s => `<span>${s.c}</span><span class="faint">·</span><span>${s.apy}% APY</span><span class="faint">·</span><span>${lockLbl(s.lock)}</span>`, badges: s => badge(STRAT_STATUS[s.status]),
+    acts: s => s.status !== 'CLOSED' ? `<button class="btn btn-ghost" data-act="strat-tog" data-rid="${s.id}">${icon(s.status === 'ACTIVE' ? 'minus' : 'refresh', 15)}${s.status === 'ACTIVE' ? 'Pause' : 'Resume'}</button>` : '',
+    sections: s => { const L = STAKES.filter(x => x.sid === s.id).sort((a, b) => b.amount - a.amount).slice(0, 8); return tcard('Largest stakes', `<a class="link-btn" href="#/stakes" style="display:flex;align-items:center;gap:2px;height:auto">All stakes ${icon('chevRight', 14)}</a>`, dtable(['Stake', 'User', 'Amount|r', 'Status', 'Started|r'], L.map(x => [recLink('stakes', x.id, '#' + x.id), userLink(byId(x.uid)), `<span class="num">${fmtAmt(x.amount, x.c)}</span>`, dotCell(STAKE_STATUS[x.status]), muted(rel(x.created))]), emptyBlock('stakes', 'No stakes yet', 'Stakes appear here once users join this strategy.'))); },
+  },
+});
+const unstake = rows => { const o = rows.filter(x => x.status === 'ACTIVE'); o.forEach(x => { x.status = 'UNBONDING'; }); return `${o.length} stake${o.length === 1 ? '' : 's'} moved to unbonding`; };
+page({
+  id: 'stakes', noun: 'stake', nouns: 'stakes', icon: 'stakes', searchPh: 'Search stake ID, user, strategy…',
+  data: () => STAKES, search: x => `${x.id} ${stratOf(x.sid).name} ${byId(x.uid).name} ${byId(x.uid).email}`,
+  fields: { status: fE('Status', 'activity', STAKE_STATUS, x => x.status), strategy: fE('Strategy', 'strategy', Object.fromEntries(STRATS.map(s => [s.id, { label: s.name }])), x => String(x.sid)),
+    asset: fE('Asset', 'coins', optsOf(Object.fromEntries(ASSETS.filter(a => !a.fiat).map(a => [a.c, a.c]))), x => x.c), term: fE('Term', 'calendar', { flex: { label: 'Flexible' }, lock: { label: 'Locked' } }, x => x.ends ? 'lock' : 'flex'), created: fD('Started', x => x.created) },
+  tiles: [allTile('All stakes', L => `${fmtEur(sum(L.filter(x => x.status !== 'COMPLETED').map(x => x.amount * ASSET[x.c].rate)))} staked`), tile('act', 'Active', { key: 'status', values: ['ACTIVE'] }, share),
+    tile('unb', 'Unbonding', { key: 'status', values: ['UNBONDING'] }, () => 'Releasing funds'), tile('done', 'Completed', { key: 'status', values: ['COMPLETED'] }, share), tile('lock', 'Locked', { key: 'term', values: ['lock'] }, share)],
+  cols: [K.id(), K.user(), { k: 'sid', l: 'Strategy', on: 1, val: x => stratOf(x.sid).name, cell: x => esc(stratOf(x.sid).name), kv: x => recLink('strategies', x.sid, stratOf(x.sid).name) }, K.asset(), K.amt('amount', 'Amount'), K.pct('apy', 'APY'),
+    { ...K.amt('rewards', 'Rewards earned'), cell: x => `<span class="num pos">+${fmtAmt(x.rewards, x.c)}</span>` }, K.status(STAKE_STATUS), K.date('created', 'Started'),
+    { k: 'ends', l: 'Ends', al: 'r', on: 1, dir: 'desc', val: x => x.ends ? x.ends.getTime() : 9e15, cell: x => x.ends ? `<span class="muted">${fmtDay(x.ends)}</span>` : '<span class="faint">Flexible</span>' }],
+  sort: { k: 'created', dir: 'desc' },
+  quick: x => ({ act: 'open-user', icon: 'user', tip: 'Open user', data: { id: x.uid } }),
+  menu: x => [...(x.status === 'ACTIVE' ? [{ act: 'stake-un', data: { rid: x.id }, icon: 'minus', label: 'Force unstake' }] : []), { act: 'open-user', data: { id: x.uid }, icon: 'user', label: 'Open user' }],
+  bulk: [{ icon: 'minus', label: 'Force unstake', run: unstake }],
+  rec: { title: x => `Stake #${x.id}`, sub: x => `${userLink(byId(x.uid))}<span class="faint">·</span>${recLink('strategies', x.sid, stratOf(x.sid).name)}`, badges: x => badge(STAKE_STATUS[x.status]) + `<span class="badge t-neutral">${x.apy}% APY</span>`,
+    acts: x => x.status === 'ACTIVE' ? `<button class="btn btn-ghost" data-act="stake-un" data-rid="${x.id}">${icon('minus', 15)}Force unstake</button>` : '',
+    events: x => [x.ends && x.ends < NOW && { ic: 'check', t: 'Completed', s: fmtDateTime(x.ends), when: rel(x.ends) }, { ic: 'plus', t: `Staked ${fmtAmt(x.amount, x.c)}`, s: fmtDateTime(x.created), when: rel(x.created) }].filter(Boolean) },
+});
+const runPayout = rows => {
+  const o = rows.filter(p => ['SCHEDULED', 'FAILED'].includes(p.status)); o.forEach(p => { p.status = 'PROCESSING'; });
+  setTimeout(() => { o.forEach(p => { p.status = 'PAID'; p.paid = new Date(NOW); }); if (S.route === 'payout-pools') pgRefresh(); if (o.length) toast(`${o.length} payout${o.length > 1 ? 's' : ''} paid`, 'payout'); }, 1600);
+  return o.length ? `${o.length} payout${o.length > 1 ? 's' : ''} started` : 'Nothing to run in the selection';
+};
+page({
+  id: 'payout-pools', noun: 'payout pool', nouns: 'payout pools', icon: 'payout', searchPh: 'Search pool ID, strategy, period…',
+  data: () => {
+    const g = gen(905), act = STRATS.filter(s => s.status !== 'CLOSED');
+    return Array.from({ length: 42 }, (_, i) => {
+      const s = act[i % act.length], wk = 44 - Math.floor(i / act.length), at = new Date(NOW.getTime() + (3 - Math.floor(i / act.length) * 7 + i % act.length * .1) * DAY);
+      const status = at > NOW ? 'SCHEDULED' : i === act.length + 1 ? 'PROCESSING' : g.r() < .06 ? 'FAILED' : 'PAID', st = stratStats(s);
+      return { id: 880 - i, sid: s.id, c: s.c, period: `Week ${wk}, 2026`, rewards: st.amt * s.apy / 100 / 52 * (.9 + g.r() * .2), recipients: Math.max(1, Math.round(st.n * (.9 + g.r() * .1))), status, at, paid: status === 'PAID' ? new Date(at.getTime() + 36e5) : null };
+    });
+  },
+  search: p => `${p.id} ${stratOf(p.sid).name} ${p.period}`,
+  fields: { status: fE('Status', 'activity', POOL_STATUS, p => p.status), strategy: fE('Strategy', 'strategy', Object.fromEntries(STRATS.map(s => [s.id, { label: s.name }])), p => String(p.sid)), at: fD('Scheduled', p => p.at) },
+  tiles: [allTile('All pools', L => `${L.filter(p => p.status === 'PAID').length} paid`), tile('sch', 'Scheduled', { key: 'status', values: ['SCHEDULED'] }, L => { const n = L.filter(p => p.status === 'SCHEDULED').sort((a, b) => a.at - b.at)[0]; return n ? `next ${fmtDay(n.at, false)}` : 'None'; }),
+    tile('proc', 'Processing', { key: 'status', values: ['PROCESSING'] }, () => 'On-chain'), tile('paid', 'Paid', { key: 'status', values: ['PAID'] }, share), tile('fail', 'Failed', { key: 'status', values: ['FAILED'] }, () => 'Retry needed')],
+  cols: [K.id(), { k: 'sid', l: 'Strategy', on: 1, val: p => stratOf(p.sid).name, cell: p => esc(stratOf(p.sid).name), kv: p => recLink('strategies', p.sid, stratOf(p.sid).name) }, K.asset('c', 'Asset'), K.text('period', 'Period'),
+    { ...K.amt('rewards', 'Rewards') }, K.num('recipients', 'Recipients'), K.status(POOL_STATUS), K.when('at', 'Scheduled'), K.date('paid', 'Paid', 0)],
+  sort: { k: 'at', dir: 'desc' },
+  quick: p => ['SCHEDULED', 'FAILED'].includes(p.status) ? { act: 'pool-run', icon: 'send', tip: p.status === 'FAILED' ? 'Retry payout' : 'Run now' } : null,
+  menu: p => ['SCHEDULED', 'FAILED'].includes(p.status) ? [{ act: 'pool-run', data: { rid: p.id }, icon: 'send', label: p.status === 'FAILED' ? 'Retry payout' : 'Run now' }] : [],
+  bulk: [{ icon: 'send', label: 'Run now', run: runPayout }],
+  rec: { title: p => `${stratOf(p.sid).name} · ${p.period}`, sub: p => `<span class="num">${fmtAmt(p.rewards, p.c)}</span><span class="faint">·</span><span>${p.recipients} recipients</span>`, badges: p => badge(POOL_STATUS[p.status]),
+    acts: p => ['SCHEDULED', 'FAILED'].includes(p.status) ? `<button class="btn btn-dark" data-act="pool-run" data-rid="${p.id}">${icon('send', 15)}${p.status === 'FAILED' ? 'Retry payout' : 'Run now'}</button>` : '',
+    events: p => [p.paid && { ic: 'check', t: 'Paid out', s: fmtDateTime(p.paid), when: rel(p.paid) }, { ic: 'calendar', t: 'Scheduled', s: fmtDateTime(p.at), when: p.at < NOW ? rel(p.at) : 'upcoming' }].filter(Boolean) },
+});
+
+/* ── Risk · KYT rules ── */
+const KYT_ACTION = { BLOCK: { label: 'Block', tone: 'error' }, REVIEW: { label: 'Hold for review', tone: 'warning' }, ALERT: { label: 'Alert only', tone: 'info' } };
+const KYT_CAT = { SANCTIONS: 'Sanctions', MIXER: 'Mixer', DARKNET: 'Darknet market', SCAM: 'Scam / fraud', GAMBLING: 'Gambling', HIGH_RISK_EX: 'High-risk exchange', AMOUNT: 'Large amount', VELOCITY: 'Velocity' };
+const KYT_DIR = { IN: 'Incoming', OUT: 'Outgoing', BOTH: 'Both' };
+page({
+  id: 'kyt', noun: 'rule', nouns: 'rules', icon: 'radar', searchPh: 'Search rule, category, condition…',
+  data: () => [
+    ['Sanctioned address exposure', 'SANCTIONS', 'BOTH', 'Direct exposure > 0%', 'BLOCK', 3], ['Indirect sanctions exposure', 'SANCTIONS', 'IN', 'Indirect exposure ≥ 5%', 'REVIEW', 11],
+    ['Mixer inflow', 'MIXER', 'IN', 'Exposure ≥ 10%', 'REVIEW', 7], ['Mixer outflow', 'MIXER', 'OUT', 'Any exposure', 'BLOCK', 1], ['Darknet market funds', 'DARKNET', 'BOTH', 'Exposure ≥ 1%', 'BLOCK', 2],
+    ['Known scam addresses', 'SCAM', 'BOTH', 'Risk score ≥ 75', 'BLOCK', 5], ['Gambling deposits', 'GAMBLING', 'IN', 'Exposure ≥ 25%', 'ALERT', 38], ['High-risk exchange inflow', 'HIGH_RISK_EX', 'IN', 'Exposure ≥ 20%', 'REVIEW', 19],
+    ['Large single deposit', 'AMOUNT', 'IN', 'Amount ≥ €15,000', 'REVIEW', 26], ['Large single withdrawal', 'AMOUNT', 'OUT', 'Amount ≥ €10,000', 'REVIEW', 41], ['Rapid in-and-out', 'VELOCITY', 'BOTH', '≥ 80% out within 24 h of deposit', 'ALERT', 64],
+    ['Deposit structuring', 'VELOCITY', 'IN', '≥ 5 deposits just under €1,000 in 7 days', 'REVIEW', 9], ['New account large withdrawal', 'AMOUNT', 'OUT', 'Account < 7 days and amount ≥ €2,000', 'REVIEW', 14], ['Legacy ICO wallets', 'SCAM', 'IN', 'Cluster match', 'ALERT', 0],
+  ].map(([name, cat, dir, cond, action, hits], i) => ({ id: 101 + i, name, cat, dir, cond, action, hits, on: i !== 13, created: new Date(NOW.getTime() - (300 - i * 9) * DAY), updated: new Date(NOW.getTime() - (2 + i * 4) * DAY), by: REVIEWERS[i % 5] })),
+  search: k => `${k.name} ${KYT_CAT[k.cat]} ${k.cond}`,
+  fields: { on: fE('State', 'activity', { on: { label: 'Enabled', tone: 'success' }, off: { label: 'Disabled', tone: 'neutral' } }, k => k.on ? 'on' : 'off'), action: fE('Action', 'shieldCheck', KYT_ACTION, k => k.action), cat: fE('Category', 'radar', optsOf(KYT_CAT), k => k.cat), dir: fE('Direction', 'arrows', optsOf(KYT_DIR), k => k.dir) },
+  tiles: [allTile('All rules', L => `${sum(L.map(k => k.hits))} hits in 30 days`), tile('on', 'Enabled', { key: 'on', values: ['on'] }, share), tile('block', 'Blocking', { key: 'action', values: ['BLOCK'] }, () => 'Stop the transfer'),
+    tile('rev', 'Hold for review', { key: 'action', values: ['REVIEW'] }, () => 'Goes to Confirmations'), tile('off', 'Disabled', { key: 'on', values: ['off'] }, share)],
+  cols: [K.id(), { k: 'name', l: 'Rule', on: 1, lock: 1, val: k => k.name.toLowerCase(), cell: k => `<b style="font-weight:500">${esc(k.name)}</b>` }, { k: 'cat', l: 'Category', on: 1, cell: k => muted(KYT_CAT[k.cat]) },
+    { k: 'dir', l: 'Direction', on: 1, cell: k => KYT_DIR[k.dir] }, K.code('cond', 'Condition'), K.badge(KYT_ACTION, 'action', 'Action'), K.num('hits', 'Hits, 30 days'), K.sw('on', 'Enabled', 'kyt-tog'), K.date('updated', 'Updated'), K.muted('by', 'Updated by', 0)],
+  sort: { k: 'hits', dir: 'desc' },
+  quick: k => ({ act: 'kyt-tog', icon: k.on ? 'minus' : 'check', tip: k.on ? 'Disable' : 'Enable' }),
+  menu: k => [{ act: 'kyt-tog', data: { rid: k.id }, icon: k.on ? 'minus' : 'check', label: k.on ? 'Disable rule' : 'Enable rule' }],
+  bulk: [{ icon: 'check', label: 'Enable', run: rows => (rows.forEach(k => { k.on = true; stamp(k); }), `${rows.length} rule${rows.length > 1 ? 's' : ''} enabled`) }, { icon: 'minus', label: 'Disable', run: rows => (rows.forEach(k => { k.on = false; stamp(k); }), `${rows.length} rule${rows.length > 1 ? 's' : ''} disabled`) }],
+  form: {
+    fields: k => [{ id: 'fkName', label: 'Rule name', value: k?.name }, { id: 'fkCat', label: 'Category', value: k?.cat || 'AMOUNT', options: Object.entries(KYT_CAT) }, { id: 'fkDir', label: 'Direction', value: k?.dir || 'BOTH', options: Object.entries(KYT_DIR) },
+      { id: 'fkCond', label: 'Condition', value: k?.cond, ph: 'e.g. Amount ≥ €10,000' }, { id: 'fkAct', label: 'Action', value: k?.action || 'REVIEW', options: Object.entries(KYT_ACTION).map(([v, o]) => [v, o.label]) }, { id: 'fkOn', label: 'State', value: k ? (k.on ? '1' : '0') : '1', options: [['1', 'Enabled'], ['0', 'Disabled']] }],
+    save: k => {
+      const name = fv('fkName'), cond = fv('fkCond'); if (!name) return coBad('#fkName'), false; if (!cond) return coBad('#fkCond'), false;
+      const v = { name, cat: fv('fkCat'), dir: fv('fkDir'), cond, action: fv('fkAct'), on: fv('fkOn') === '1' };
+      if (k) { Object.assign(k, v); stamp(k); return true; }
+      return { id: Math.max(...pgData(PAGES.kyt).map(x => x.id)) + 1, ...v, hits: 0, created: new Date(NOW), updated: new Date(NOW), by: ME };
+    },
+  },
+  rec: {
+    title: k => k.name, sub: k => `<span>${KYT_CAT[k.cat]}</span><span class="faint">·</span><span>${KYT_DIR[k.dir]}</span><span class="faint">·</span><span class="code">${esc(k.cond)}</span>`, badges: k => badge(KYT_ACTION[k.action]) + badge(k.on ? { label: 'Enabled', tone: 'success' } : { label: 'Disabled', tone: 'neutral' }),
+    acts: k => `<button class="btn btn-ghost" data-act="kyt-tog" data-rid="${k.id}">${icon(k.on ? 'minus' : 'check', 15)}${k.on ? 'Disable' : 'Enable'}</button>`,
+    sections: k => { const g = gen(k.id), AU = AUsers(); const hits = Array.from({ length: Math.min(8, k.hits) }, () => ({ u: g.pk(AU), c: g.pk(['USDT', 'BTC', 'ETH']), eur: 200 + g.r() * 20000, score: g.int(40, 99), at: g.ago(30) })).sort((a, b) => b.at - a.at);
+      return tcard(`Recent hits <span class="ct">${k.hits} in 30 days</span>`, '', dtable(['User', 'Amount|r', 'Risk score|r', 'Outcome', 'When|r'], hits.map(h => [userLink(h.u), `<span class="num">${fmtEur(h.eur)}</span>`, `<span class="num">${h.score}</span>`, badge(KYT_ACTION[k.action]), muted(rel(h.at))]), emptyBlock('radar', 'No hits yet', 'Transactions that match this rule will show up here.'))); },
+  },
+});
+
+/* ── Products · Card products, IBAN products, Level presets (the catalogue the company pages assign from) ── */
+const PROD_STATUS = { ACTIVE: { label: 'Active', tone: 'success' }, DRAFT: { label: 'Draft', tone: 'neutral' }, RETIRED: { label: 'Retired', tone: 'warning' } };
+const CARD_PROVIDERS = ['Wallester', 'Finci', 'CreditCo', 'Mediabuy', 'Vertex', 'Gimbutis'];
+const prodCos = k => COMPANIES.filter(c => hasP(c, k));
+const prodSection = (k, empty) => { const L = prodCos(k); return tcard(`Companies <span class="ct">${L.length}</span>`, '', dtable(['Company', 'Source', 'Status', 'Users|r'], L.map(c => [coLink(c), srcTag(c.source), statusCell(c.status), `<span class="num">${fmtInt(coUsers(c).length)}</span>`]), emptyBlock('building', 'Not assigned yet', empty))); };
+page({
+  id: 'card-products', noun: 'card product', nouns: 'card products', icon: 'cardProduct', searchPh: 'Search name, provider, BIN…',
+  data: () => { const g = gen(906); CARD_PRODUCTS.forEach((p, i) => p.status || Object.assign(p, { issue: p.kind === 'physical' ? g.pk([25, 35, 50]) : g.pk([0, 5, 10]), monthly: p.kind === 'physical' ? 2.5 : g.pk([0, 1]), bin: (p.cur === 'USD' ? '5' : '4') + g.int(10000, 99999), status: i > 20 ? 'DRAFT' : g.r() < .1 ? 'RETIRED' : 'ACTIVE', issued: p.id === 11 || p.id === 12 ? USERS.reduce((s, u) => s + (u.cards ? 1 : 0), 0) * (p.id === 11 ? 1 : .4) | 0 : g.int(0, 900), created: new Date(NOW.getTime() - (520 - i * 15) * DAY), updated: new Date(NOW.getTime() - g.int(2, 90) * DAY) })); return CARD_PRODUCTS; },
+  search: p => `${p.id} ${p.name} ${p.provider} ${p.bin}`,
+  fields: { status: fE('Status', 'activity', PROD_STATUS, p => p.status), provider: fE('Provider', 'folder', optsOf(Object.fromEntries(CARD_PROVIDERS.map(x => [x, x]))), p => p.provider), kind: fE('Card type', 'card', { virtual: { label: 'Virtual' }, physical: { label: 'Physical' } }, p => p.kind), cur: fE('Currency', 'coins', { EUR: { label: 'EUR' }, USD: { label: 'USD' } }, p => p.cur) },
+  cols: [K.id(), { k: 'name', l: 'Name', on: 1, lock: 1, val: p => p.name.toLowerCase(), cell: p => `<b style="font-weight:500">${esc(p.name)}</b>` }, K.text('provider', 'Provider'), { k: 'kind', l: 'Card type', on: 1, cell: p => cap(p.kind) }, K.text('cur', 'Currency'),
+    { k: 'issue', l: 'Issue fee', al: 'r', on: 1, dir: 'desc', cell: p => p.issue ? `<span class="num">${money(p.issue, p.cur)}</span>` : '<span class="faint">Free</span>' }, { k: 'monthly', l: 'Monthly fee', al: 'r', on: 1, dir: 'desc', cell: p => p.monthly ? `<span class="num">${money(p.monthly, p.cur)}</span>` : '<span class="faint">Free</span>' },
+    { k: 'cos', l: 'Companies', al: 'r', on: 1, dir: 'desc', val: p => prodCos('c:' + p.id).length, cell: p => { const n = prodCos('c:' + p.id).length; return `<span class="num ${n ? '' : 'zero'}">${n}</span>`; } },
+    K.num('issued', 'Cards issued'), K.code('bin', 'BIN', 0), K.status(PROD_STATUS), K.date('updated', 'Updated', 0), K.date('created', 'Created', 0)],
+  sort: { k: 'id', dir: 'asc' },
+  menu: p => [{ act: 'route', data: { arg: 'companies/access' }, icon: 'table', label: 'Open product access' }],
+  form: {
+    fields: p => [{ id: 'fpName', label: 'Name', value: p?.name }, { id: 'fpProv', label: 'Provider', value: p?.provider || 'Wallester', options: CARD_PROVIDERS.map(x => [x, x]) },
+      { id: 'fpKind', label: 'Card type', value: p?.kind || 'virtual', options: [['virtual', 'Virtual'], ['physical', 'Physical']] }, { id: 'fpCur', label: 'Currency', value: p?.cur || 'EUR', options: [['EUR', 'EUR'], ['USD', 'USD']] },
+      { id: 'fpIssue', label: 'Issue fee', value: p?.issue ?? 0, type: 'number' }, { id: 'fpMonthly', label: 'Monthly fee', value: p?.monthly ?? 0, type: 'number' }, { id: 'fpBin', label: 'BIN', value: p?.bin, ph: '6 digits' },
+      { id: 'fpStatus', label: 'Status', value: p?.status || 'DRAFT', options: Object.entries(PROD_STATUS).map(([k, o]) => [k, o.label]) }],
+    save: p => {
+      const name = fv('fpName'); if (!name) return coBad('#fpName'), false;
+      const v = { name, provider: fv('fpProv'), kind: fv('fpKind'), cur: fv('fpCur'), issue: fnum('fpIssue'), monthly: fnum('fpMonthly'), bin: fv('fpBin'), status: fv('fpStatus') };
+      if (p) { Object.assign(p, v); stamp(p); return true; }
+      const n = { id: Math.max(...CARD_PRODUCTS.map(x => x.id)) + 1, ...v, issued: 0, created: new Date(NOW), updated: new Date(NOW) };
+      PROD_BY.c[n.id] = n; CO_FIELDS.product.options['c:' + n.id] = { label: n.name }; return n;
+    },
+  },
+  rec: { title: p => p.name, sub: p => `<span>${p.provider}</span><span class="faint">·</span><span>${cap(p.kind)} · ${p.cur}</span>`, badges: p => badge(PROD_STATUS[p.status]), sections: p => prodSection('c:' + p.id, 'Grant it to companies from Product access or a company’s Products tab.') },
+});
+page({
+  id: 'iban-products', noun: 'IBAN product', nouns: 'IBAN products', icon: 'ibanProduct', searchPh: 'Search name, provider…',
+  data: () => { IBAN_PRODUCTS.forEach((p, i) => p.status || Object.assign(p, { status: 'ACTIVE', accounts: USERS.reduce((s, u) => s + ud(u).ibans.filter(b => b.productId === p.id).length, 0) + i * 7, created: new Date(NOW.getTime() - (480 - i * 30) * DAY), updated: new Date(NOW.getTime() - (5 + i * 11) * DAY) })); return IBAN_PRODUCTS; },
+  search: p => `${p.id} ${p.name} ${p.provider} ${p.cur}`,
+  fields: { status: fE('Status', 'activity', PROD_STATUS, p => p.status), provider: fE('Provider', 'bank', { 'Banking Circle': { label: 'Banking Circle' }, 'Clear Junction': { label: 'Clear Junction' } }, p => p.provider), type: fE('Type', 'user', { Personal: { label: 'Personal' }, Business: { label: 'Business' } }, p => p.type) },
+  cols: [K.id(), { k: 'name', l: 'Name', on: 1, lock: 1, val: p => p.name.toLowerCase(), cell: p => `<b style="font-weight:500">${esc(p.name)}</b>` }, K.text('provider', 'Provider'), K.text('cur', 'Currency'), K.muted('type', 'Type'),
+    { k: 'price', l: 'Opening fee', al: 'r', on: 1, dir: 'desc', cell: p => p.price ? `<span class="num">${money(p.price, p.cur)}</span>` : '<span class="faint">Free</span>' }, { k: 'fee', l: 'Monthly fee', al: 'r', on: 1, dir: 'desc', cell: p => `<span class="num">${money(p.fee, p.cur)}</span>` },
+    { k: 'cos', l: 'Companies', al: 'r', on: 1, dir: 'desc', val: p => prodCos('i:' + p.id).length, cell: p => `<span class="num">${prodCos('i:' + p.id).length}</span>` }, K.num('accounts', 'Accounts'), K.status(PROD_STATUS), K.date('updated', 'Updated', 0)],
+  sort: { k: 'id', dir: 'asc' },
+  form: {
+    fields: p => [{ id: 'fiName', label: 'Name', value: p?.name }, { id: 'fiProv', label: 'Provider', value: p?.provider || 'Banking Circle', options: [['Banking Circle', 'Banking Circle'], ['Clear Junction', 'Clear Junction']] },
+      { id: 'fiCur', label: 'Currency', value: p?.cur || 'EUR', options: ['EUR', 'GBP', 'USD', 'CHF'].map(x => [x, x]) }, { id: 'fiType', label: 'Type', value: p?.type || 'Personal', options: [['Personal', 'Personal'], ['Business', 'Business']] },
+      { id: 'fiPrice', label: 'Opening fee', value: p?.price ?? 0, type: 'number' }, { id: 'fiFee', label: 'Monthly fee', value: p?.fee ?? 0, type: 'number' }, { id: 'fiStatus', label: 'Status', value: p?.status || 'DRAFT', options: Object.entries(PROD_STATUS).map(([k, o]) => [k, o.label]) }],
+    save: p => {
+      const name = fv('fiName'); if (!name) return coBad('#fiName'), false;
+      const v = { name, provider: fv('fiProv'), cur: fv('fiCur'), type: fv('fiType'), price: fnum('fiPrice'), fee: fnum('fiFee'), status: fv('fiStatus') };
+      if (p) { Object.assign(p, v); stamp(p); return true; }
+      const n = { id: Math.max(...IBAN_PRODUCTS.map(x => x.id)) + 1, ...v, accounts: 0, created: new Date(NOW), updated: new Date(NOW) };
+      PROD_BY.i[n.id] = n; CO_FIELDS.product.options['i:' + n.id] = { label: n.name + ' (IBAN)' }; return n;
+    },
+  },
+  rec: { title: p => p.name, sub: p => `<span>${p.provider}</span><span class="faint">·</span><span>${p.type} · ${p.cur}</span>`, badges: p => badge(PROD_STATUS[p.status]), sections: p => prodSection('i:' + p.id, 'Grant it to companies from Product access or a company’s Products tab.') },
+});
+page({
+  id: 'level-presets', noun: 'level preset', nouns: 'level presets', icon: 'levels', key: l => l.id, searchPh: 'Search level…',
+  data: () => [['basic', 'Email and phone', 1000, 5000, 500, 2500, 1.5, .5, 1], ['middle', 'ID document and selfie', 25000, 100000, 15000, 60000, 1, .4, 3], ['premium', 'ID, proof of address and source of funds', 250000, 1e6, 150000, 600000, .5, .25, 5]]
+    .map(([id, kyc, depDay, depMonth, wdDay, wdMonth, cardFee, exFee, cards], i) => ({ id, kyc, depDay, depMonth, wdDay, wdMonth, cardFee, exFee, cards, created: new Date(NOW.getTime() - 600 * DAY), updated: new Date(NOW.getTime() - (12 + i * 20) * DAY) })),
+  search: l => `${LEVEL[l.id].label} ${l.kyc}`,
+  cols: [{ k: 'id', l: 'Level', on: 1, lock: 1, val: l => Object.keys(LEVEL).indexOf(l.id), cell: l => badge(LEVEL[l.id]) }, K.muted('kyc', 'Requirements'), K.eur('depDay', 'Deposit / day'), K.eur('depMonth', 'Deposit / month'), K.eur('wdDay', 'Withdrawal / day'),
+    K.eur('wdMonth', 'Withdrawal / month'), K.pct('cardFee', 'Card top-up fee'), K.pct('exFee', 'Exchange fee'), K.num('cards', 'Max cards'),
+    { k: 'users', l: 'Users', al: 'r', on: 1, dir: 'desc', val: l => USERS.filter(u => u.level === l.id).length, cell: l => `<span class="num">${fmtInt(USERS.filter(u => u.level === l.id).length)}</span>` }, K.date('updated', 'Updated')],
+  sort: { k: 'id', dir: 'asc' },
+  menu: l => [{ act: 'go-filter', data: { arg: `level|${l.id}` }, icon: 'users', label: 'Show users on this level' }],
+  form: {
+    create: false,
+    fields: l => [['flDepDay', 'Deposit limit per day, €', 'depDay'], ['flDepMonth', 'Deposit limit per month, €', 'depMonth'], ['flWdDay', 'Withdrawal limit per day, €', 'wdDay'], ['flWdMonth', 'Withdrawal limit per month, €', 'wdMonth'],
+      ['flCard', 'Card top-up fee, %', 'cardFee'], ['flEx', 'Exchange fee, %', 'exFee'], ['flCards', 'Max cards per user', 'cards']].map(([id, label, k]) => ({ id, label, value: l[k], type: 'number' })).concat([{ id: 'flKyc', label: 'Requirements', value: l.kyc }]),
+    save: l => { Object.assign(l, { depDay: fnum('flDepDay'), depMonth: fnum('flDepMonth'), wdDay: fnum('flWdDay'), wdMonth: fnum('flWdMonth'), cardFee: fnum('flCard'), exFee: fnum('flEx'), cards: Math.round(fnum('flCards')), kyc: fv('flKyc') || l.kyc }); stamp(l); return true; },
+  },
+  rec: { title: l => `${LEVEL[l.id].label} level`, sub: l => `<span>${esc(l.kyc)}</span>`, badges: l => badge(LEVEL[l.id]),
+    acts: l => `<button class="btn btn-ghost" data-act="go-filter" data-arg="level|${l.id}">${icon('users', 15)}Show users</button>` },
+});
+
+/* ── Settings · Currencies, Markets, Country lists, Sources ── */
+const ON_OFF = { ACTIVE: { label: 'Active', tone: 'success' }, DISABLED: { label: 'Disabled', tone: 'neutral' } };
+page({
+  id: 'currencies', noun: 'currency', nouns: 'currencies', icon: 'coins', key: a => a.c, searchPh: 'Search code, name, network…',
+  data: () => { ASSETS.forEach((a, i) => a.status || Object.assign(a, { status: 'ACTIVE', dep: true, wd: a.c !== 'ZNX', minWd: a.fiat ? 10 : +(10 / a.rate).toPrecision(2), wdFee: a.fiat ? 1 : +(1.5 / a.rate).toPrecision(2), created: new Date(NOW.getTime() - (700 - i * 40) * DAY), updated: new Date(NOW.getTime() - (3 + i * 6) * DAY) })); return ASSETS; },
+  search: a => `${a.c} ${a.n} ${a.net}`,
+  fields: { status: fE('Status', 'activity', ON_OFF, a => a.status), type: fE('Type', 'coins', { crypto: { label: 'Crypto' }, fiat: { label: 'Fiat' } }, a => a.fiat ? 'fiat' : 'crypto') },
+  cols: [{ k: 'c', l: 'Currency', on: 1, lock: 1, cell: a => `<span class="ctry">${assetIc(a.c, 22)}<b style="font-weight:500">${a.c}</b></span>` }, K.text('n', 'Name'), K.muted('net', 'Network'), { k: 'fiat', l: 'Type', on: 1, val: a => +!!a.fiat, cell: a => a.fiat ? 'Fiat' : 'Crypto' },
+    { k: 'rate', l: 'Rate, €', al: 'r', on: 1, dir: 'desc', cell: a => `<span class="num">${fmtEur(a.rate, a.rate < 10 ? 4 : 2)}</span>` }, K.sw('dep', 'Deposits', 'cur-dep'), K.sw('wd', 'Withdrawals', 'cur-wd'),
+    { k: 'minWd', l: 'Min. withdrawal', al: 'r', on: 1, cell: a => numM(fmtAmt(a.minWd, a.c)) }, { k: 'wdFee', l: 'Withdrawal fee', al: 'r', on: 1, cell: a => numM(fmtAmt(a.wdFee, a.c)) }, K.num('dp', 'Decimals', fmtInt, 0), K.status(ON_OFF), K.date('updated', 'Updated', 0)],
+  sort: { k: 'c', dir: 'asc' },
+  form: {
+    fields: a => [...(a ? [] : [{ id: 'fcCode', label: 'Code', ph: 'e.g. SOL' }, { id: 'fcName', label: 'Name' }, { id: 'fcNet', label: 'Network', ph: 'e.g. Solana · SPL' }, { id: 'fcRate', label: 'Rate, €', value: 1, type: 'number' }]),
+      { id: 'fcMin', label: 'Minimum withdrawal', value: a?.minWd ?? 10, type: 'number' }, { id: 'fcFee', label: 'Withdrawal fee', value: a?.wdFee ?? 1, type: 'number' }, { id: 'fcStatus', label: 'Status', value: a?.status || 'ACTIVE', options: Object.entries(ON_OFF).map(([k, o]) => [k, o.label]) }],
+    save: a => {
+      if (a) { Object.assign(a, { minWd: fnum('fcMin'), wdFee: fnum('fcFee'), status: fv('fcStatus') }); stamp(a); return true; }
+      const c = fv('fcCode').toUpperCase(); if (!/^[A-Z0-9]{2,6}$/.test(c) || ASSET[c]) return coBad('#fcCode', ASSET[c] ? 'This currency already exists' : 'Use 2–6 letters or digits'), false;
+      const n = { c, n: fv('fcName') || c, s: c[0], col: '#9B9B98', rate: fnum('fcRate') || 1, net: fv('fcNet') || '—', dp: 6, status: fv('fcStatus'), dep: true, wd: true, minWd: fnum('fcMin'), wdFee: fnum('fcFee'), created: new Date(NOW), updated: new Date(NOW) };
+      ASSET[c] = n; return n;
+    },
+  },
+  rec: { title: a => `${a.c} · ${a.n}`, sub: a => `<span>${esc(a.net)}</span><span class="faint">·</span><span class="num">${fmtEur(a.rate, a.rate < 10 ? 4 : 2)}</span>`, badges: a => badge(ON_OFF[a.status]) + `<span class="badge t-neutral">${a.fiat ? 'Fiat' : 'Crypto'}</span>` },
+});
+const MKT_STATUS = { TRADING: { label: 'Trading', tone: 'success' }, HALTED: { label: 'Halted', tone: 'error' } };
+page({
+  id: 'markets', noun: 'market', nouns: 'markets', icon: 'candles', searchPh: 'Search pair…',
+  data: () => { const g = gen(907); return ['BTC/EUR', 'ETH/EUR', 'USDT/EUR', 'USDC/EUR', 'TRX/EUR', 'ZNX/EUR', 'BTC/USDT', 'ETH/USDT', 'TRX/USDT', 'ZNX/USDT', 'ETH/BTC'].map((id, i) => {
+    const [b, q] = id.split('/'); return { id, b, q, price: ASSET[b].rate / ASSET[q].rate, change: +((g.r() - .45) * 8).toFixed(2), vol: Math.round(Math.pow(g.r(), 2) * 4e6 + 2e4), spread: (PAIRS.find(p => p[0] === id) || [0, .5])[1], min: +(10 / ASSET[b].rate).toPrecision(2), status: id === 'ZNX/USDT' ? 'HALTED' : 'TRADING', created: new Date(NOW.getTime() - (500 - i * 20) * DAY), updated: new Date(NOW.getTime() - g.int(1, 30) * DAY) }; }); },
+  search: m => m.id,
+  fields: { status: fE('Status', 'activity', MKT_STATUS, m => m.status), quote: fE('Quote', 'coins', { EUR: { label: 'EUR' }, USDT: { label: 'USDT' }, BTC: { label: 'BTC' } }, m => m.q) },
+  cols: [{ k: 'id', l: 'Pair', on: 1, lock: 1, cell: m => `<span class="ctry">${assetIc(m.b, 22)}<b style="font-weight:500">${m.id}</b></span>` }, { k: 'price', l: 'Last price', al: 'r', on: 1, dir: 'desc', cell: m => `<span class="num">${(+m.price.toPrecision(6)).toLocaleString('en-US', { maximumFractionDigits: 6 })} ${m.q}</span>` },
+    { k: 'change', l: '24h change', al: 'r', on: 1, dir: 'desc', cell: m => deltaPill(m.change), kv: m => deltaPill(m.change) }, { k: 'vol', l: '24h volume', al: 'r', on: 1, dir: 'desc', cell: m => `<span class="num">€${compact(m.vol)}</span>` },
+    K.pct('spread', 'Spread'), { k: 'min', l: 'Min. order', al: 'r', on: 1, cell: m => numM(fmtAmt(m.min, m.b)) }, K.status(MKT_STATUS), K.date('updated', 'Updated', 0)],
+  sort: { k: 'vol', dir: 'desc' },
+  quick: m => ({ act: 'mkt-tog', icon: m.status === 'TRADING' ? 'minus' : 'refresh', tip: m.status === 'TRADING' ? 'Halt trading' : 'Resume trading' }),
+  menu: m => [{ act: 'mkt-tog', data: { rid: m.id }, icon: m.status === 'TRADING' ? 'minus' : 'refresh', label: m.status === 'TRADING' ? 'Halt trading' : 'Resume trading' }],
+  bulk: [{ icon: 'minus', label: 'Halt', run: rows => (rows.forEach(m => { m.status = 'HALTED'; stamp(m); }), `${rows.length} market${rows.length > 1 ? 's' : ''} halted`) }, { icon: 'refresh', label: 'Resume', run: rows => (rows.forEach(m => { m.status = 'TRADING'; stamp(m); }), `${rows.length} market${rows.length > 1 ? 's' : ''} resumed`) }],
+  form: {
+    fields: m => [...(m ? [] : [{ id: 'fmBase', label: 'Base', value: 'BTC', options: ASSETS.map(a => [a.c, a.c]) }, { id: 'fmQuote', label: 'Quote', value: 'EUR', options: [['EUR', 'EUR'], ['USDT', 'USDT'], ['BTC', 'BTC']] }]),
+      { id: 'fmSpread', label: 'Spread, %', value: m?.spread ?? .5, type: 'number' }, { id: 'fmMin', label: 'Minimum order', value: m?.min ?? 10, type: 'number' }, { id: 'fmStatus', label: 'Status', value: m?.status || 'TRADING', options: Object.entries(MKT_STATUS).map(([k, o]) => [k, o.label]) }],
+    save: m => {
+      const v = { spread: fnum('fmSpread'), min: fnum('fmMin'), status: fv('fmStatus') };
+      if (m) { Object.assign(m, v); stamp(m); return true; }
+      const b = fv('fmBase'), q = fv('fmQuote'), id = `${b}/${q}`; if (b === q || pgData(PAGES.markets).some(x => x.id === id)) return coBad('#fmBase', b === q ? 'Pick two different currencies' : `${id} already exists`), false;
+      return { id, b, q, price: ASSET[b].rate / ASSET[q].rate, change: 0, vol: 0, ...v, created: new Date(NOW), updated: new Date(NOW) };
+    },
+  },
+  rec: { title: m => m.id, sub: m => `<span class="num">${(+m.price.toPrecision(6)).toLocaleString('en-US', { maximumFractionDigits: 6 })} ${m.q}</span>${deltaPill(m.change)}`, badges: m => badge(MKT_STATUS[m.status]),
+    acts: m => `<button class="btn btn-ghost" data-act="mkt-tog" data-rid="${m.id}">${icon(m.status === 'TRADING' ? 'minus' : 'refresh', 15)}${m.status === 'TRADING' ? 'Halt trading' : 'Resume trading'}</button>` },
+});
+const LIST_TYPE = { ALLOW: { label: 'Allow list', tone: 'success' }, BLOCK: { label: 'Block list', tone: 'error' }, WATCH: { label: 'Watch list', tone: 'warning' } };
+const LIST_SCOPE = { REG: 'Registration', CARD: 'Card issuing', IBAN: 'IBAN accounts', ALL: 'All operations', EDD: 'Enhanced due diligence' };
+const WORLD = { ...COUNTRIES, RUS: { cc: 'RU', name: 'Russia' }, BLR: { cc: 'BY', name: 'Belarus' }, IRN: { cc: 'IR', name: 'Iran' }, PRK: { cc: 'KP', name: 'North Korea' }, SYR: { cc: 'SY', name: 'Syria' }, CUB: { cc: 'CU', name: 'Cuba' }, VEN: { cc: 'VE', name: 'Venezuela' }, MMR: { cc: 'MM', name: 'Myanmar' }, AFG: { cc: 'AF', name: 'Afghanistan' } };
+const EEA = Object.keys(COUNTRIES).filter(k => COUNTRIES[k].eea);
+page({
+  id: 'countries', noun: 'country list', nouns: 'country lists', icon: 'globe', searchPh: 'Search list or country…',
+  data: () => [['Residency allowed at sign-up', 'ALLOW', 'REG', [...EEA, 'GBR', 'CHE', 'ARE', 'UKR', 'GEO', 'ARM', 'TUR']], ['Sanctioned jurisdictions', 'BLOCK', 'ALL', ['RUS', 'BLR', 'IRN', 'PRK', 'SYR', 'CUB']],
+    ['Card issuing — EEA', 'ALLOW', 'CARD', [...EEA]], ['IBAN eligible residency', 'ALLOW', 'IBAN', [...EEA, 'GBR', 'CHE']], ['High-risk third countries', 'WATCH', 'EDD', ['VEN', 'MMR', 'AFG', 'ARE', 'TUR']], ['Enhanced checks on withdrawals', 'WATCH', 'EDD', ['UKR', 'GEO', 'ARM']]]
+    .map(([name, type, scope, list], i) => ({ id: 21 + i, name, type, scope, list, created: new Date(NOW.getTime() - (400 - i * 30) * DAY), updated: new Date(NOW.getTime() - (4 + i * 9) * DAY), by: REVIEWERS[i % 5] })),
+  search: l => `${l.name} ${l.list.map(k => WORLD[k].name).join(' ')}`,
+  fields: { type: fE('Type', 'layers', LIST_TYPE, l => l.type), scope: fE('Applies to', 'shieldCheck', optsOf(LIST_SCOPE), l => l.scope) },
+  cols: [K.id(), { k: 'name', l: 'List', on: 1, lock: 1, val: l => l.name.toLowerCase(), cell: l => `<b style="font-weight:500">${esc(l.name)}</b>` }, K.badge(LIST_TYPE, 'type', 'Type'), { k: 'scope', l: 'Applies to', on: 1, cell: l => muted(LIST_SCOPE[l.scope]) },
+    { k: 'n', l: 'Countries', al: 'r', on: 1, dir: 'desc', val: l => l.list.length, cell: l => `<span class="num">${l.list.length}</span>` },
+    { k: 'flags', l: 'Preview', on: 1, rec: false, val: l => l.list.join(), cell: l => `<span class="flags">${l.list.slice(0, 8).map(k => `<span class="flag" title="${WORLD[k].name}">${flag(WORLD[k].cc)}</span>`).join('')}${l.list.length > 8 ? `<span class="faint">+${l.list.length - 8}</span>` : ''}</span>` },
+    K.date('updated', 'Updated'), K.muted('by', 'Updated by', 0)],
+  sort: { k: 'id', dir: 'asc' },
+  form: {
+    fields: l => [{ id: 'fyName', label: 'Name', value: l?.name }, { id: 'fyType', label: 'Type', value: l?.type || 'ALLOW', options: Object.entries(LIST_TYPE).map(([k, o]) => [k, o.label]) }, { id: 'fyScope', label: 'Applies to', value: l?.scope || 'REG', options: Object.entries(LIST_SCOPE) }],
+    save: l => { const name = fv('fyName'); if (!name) return coBad('#fyName'), false; const v = { name, type: fv('fyType'), scope: fv('fyScope') }; if (l) { Object.assign(l, v); stamp(l); return true; }
+      return { id: Math.max(...pgData(PAGES.countries).map(x => x.id)) + 1, ...v, list: [], created: new Date(NOW), updated: new Date(NOW), by: ME }; },
+  },
+  rec: { title: l => l.name, sub: l => `<span>${LIST_SCOPE[l.scope]}</span><span class="faint">·</span><span>${l.list.length} countries</span>`, badges: l => badge(LIST_TYPE[l.type]),
+    sections: l => tcard(`Countries <span class="ct">${l.list.length}</span>`, `<button class="btn btn-dark btn-sm" data-act="cl-add" data-rid="${l.id}">${icon('plus', 14)}Add country</button>`,
+      dtable(['Country', 'Code', 'Region', '|a'], [...l.list].sort((a, b) => WORLD[a].name.localeCompare(WORLD[b].name)).map(k => [`<span class="ctry"><span class="flag">${flag(WORLD[k].cc)}</span>${WORLD[k].name}</span>`, `<span class="num muted">${k}</span>`, muted(COUNTRIES[k]?.eea ? 'EEA' : 'Non-EEA'), `<button class="ghost-ic" data-act="cl-rm" data-rid="${l.id}" data-c="${k}" data-tip="Remove">${icon('trash', 15)}</button>`]),
+      emptyBlock('globe', 'No countries yet', 'Add the countries this list applies to.'))) },
+});
+page({
+  id: 'sources', noun: 'source', nouns: 'sources', icon: 'folder', searchPh: 'Search code, name, domain…',
+  data: () => Object.entries(CO_SOURCES).map(([id, name], i) => ({ id, name, domain: { NSCARDS: 'wallet.ns.cards', FNT: 'app.fntcrypto.com', GUP: 'cards.gup.finance', IPAY: 'wallet.ipay.global' }[id] || '', support: `support@${id.toLowerCase()}.com`, status: 'ACTIVE', created: new Date(NOW.getTime() - (720 - i * 120) * DAY), updated: new Date(NOW.getTime() - (8 + i * 13) * DAY) })),
+  search: s => `${s.id} ${s.name} ${s.domain}`,
+  fields: { status: fE('Status', 'activity', ON_OFF, s => s.status) },
+  cols: [{ k: 'id', l: 'Code', on: 1, lock: 1, cell: s => srcTag(s.id) }, K.text('name', 'Name'), K.muted('domain', 'Domain'),
+    { k: 'cos', l: 'Companies', al: 'r', on: 1, dir: 'desc', val: s => COMPANIES.filter(c => c.source === s.id).length, cell: s => `<span class="num">${COMPANIES.filter(c => c.source === s.id).length}</span>` },
+    { k: 'users', l: 'Users', al: 'r', on: 1, dir: 'desc', val: s => sum(COMPANIES.filter(c => c.source === s.id).map(c => coUsers(c).length)), cell: s => `<span class="num">${fmtInt(sum(COMPANIES.filter(c => c.source === s.id).map(c => coUsers(c).length)))}</span>` },
+    K.muted('support', 'Support email', 0), K.status(ON_OFF), K.date('created', 'Created')],
+  sort: { k: 'cos', dir: 'desc' },
+  form: {
+    fields: s => [...(s ? [] : [{ id: 'fsoCode', label: 'Code', ph: 'e.g. ORBIT' }]), { id: 'fsoName', label: 'Name', value: s?.name }, { id: 'fsoDomain', label: 'Domain', value: s?.domain, ph: 'wallet.example.com' }, { id: 'fsoSupport', label: 'Support email', value: s?.support }, { id: 'fsoStatus', label: 'Status', value: s?.status || 'ACTIVE', options: Object.entries(ON_OFF).map(([k, o]) => [k, o.label]) }],
+    save: s => {
+      const name = fv('fsoName'); if (!name) return coBad('#fsoName'), false;
+      const v = { name, domain: fv('fsoDomain'), support: fv('fsoSupport'), status: fv('fsoStatus') };
+      if (s) { Object.assign(s, v); CO_SOURCES[s.id] = name; CO_FIELDS.source.options[s.id] = { label: name }; stamp(s); return true; }
+      const id = fv('fsoCode').toUpperCase(); if (!/^[A-Z0-9]{2,10}$/.test(id) || CO_SOURCES[id]) return coBad('#fsoCode', CO_SOURCES[id] ? 'This code already exists' : 'Use 2–10 letters or digits'), false;
+      CO_SOURCES[id] = name; CO_FIELDS.source.options[id] = { label: name }; return { id, ...v, created: new Date(NOW), updated: new Date(NOW) };
+    },
+  },
+  rec: { title: s => s.name, sub: s => `${srcTag(s.id)}<span class="faint">·</span><span>${esc(s.domain || 'No domain')}</span>`, badges: s => badge(ON_OFF[s.status]),
+    sections: s => { const L = COMPANIES.filter(c => c.source === s.id); return tcard(`Companies <span class="ct">${L.length}</span>`, '', dtable(['Company', 'Status', 'Products', 'Users|r'], L.map(c => [coLink(c), statusCell(c.status), prodCell(c), `<span class="num">${fmtInt(coUsers(c).length)}</span>`]), emptyBlock('building', 'No companies yet', 'Companies created with this source show up here.'))); } },
+});
+
+/* ── Admin · Administrators, Roles, Logs ── */
+const ADMIN_STATUS = { ACTIVE: { label: 'Active', tone: 'success' }, INVITED: { label: 'Invited', tone: 'info' }, DISABLED: { label: 'Disabled', tone: 'neutral' } };
+const PERM_GROUPS = [
+  ['Customers', [['users.view', 'View users'], ['users.edit', 'Edit users'], ['users.block', 'Block users'], ['users.impersonate', 'Login as user'], ['companies.manage', 'Manage companies'], ['kyc.review', 'Review KYC and documents']]],
+  ['Financial', [['tx.view', 'View transactions'], ['confirmations.decide', 'Approve confirmations'], ['balances.adjust', 'Adjust balances'], ['cards.manage', 'Freeze and manage cards'], ['iban.manage', 'Manage IBAN accounts']]],
+  ['Staking', [['staking.view', 'View staking'], ['staking.manage', 'Manage strategies and payouts']]],
+  ['Risk', [['kyt.manage', 'Edit KYT rules'], ['reserves.view', 'View reserves']]],
+  ['Settings', [['products.manage', 'Edit products and levels'], ['settings.manage', 'Edit currencies, markets and lists']]],
+  ['Admin', [['admins.manage', 'Manage administrators'], ['roles.manage', 'Manage roles'], ['logs.view', 'View audit logs']]],
+];
+const ALL_PERMS = PERM_GROUPS.flatMap(([, p]) => p.map(x => x[0]));
+const ROLES = [
+  [1, 'Super admin', 'Full access, including roles and administrators', ALL_PERMS],
+  [2, 'Compliance officer', 'KYC, documents, confirmations and KYT', ['users.view', 'users.edit', 'users.block', 'companies.manage', 'kyc.review', 'tx.view', 'confirmations.decide', 'kyt.manage', 'reserves.view', 'logs.view']],
+  [3, 'Support agent', 'Day-to-day user support', ['users.view', 'users.edit', 'users.impersonate', 'tx.view', 'cards.manage']],
+  [4, 'Finance', 'Balances, payouts, IBAN and reserves', ['users.view', 'tx.view', 'confirmations.decide', 'balances.adjust', 'iban.manage', 'staking.view', 'staking.manage', 'reserves.view']],
+  [5, 'Risk analyst', 'Monitoring and KYT rules', ['users.view', 'users.block', 'tx.view', 'kyt.manage', 'reserves.view', 'logs.view']],
+  [6, 'Read-only auditor', 'Can see everything, change nothing', ALL_PERMS.filter(p => /view$/.test(p))],
+].map(([id, name, desc, perms], i) => ({ id, name, desc, perms: new Set(perms), created: new Date(NOW.getTime() - (800 - i * 60) * DAY), updated: new Date(NOW.getTime() - (6 + i * 17) * DAY) }));
+const roleOf = id => ROLES.find(r => r.id === id);
+const ADMINS = (() => { const g = gen(908); return ADMIN_NAMES.map((name, i) => ({ id: 1 + i, name, email: i ? `${coSlug(name).replace('-', '.')}@ns.cards` : 'super_admin@ns.cards', role: i ? [2, 2, 3, 3, 3, 4, 4, 5, 6, 3, 2, 4, 5][i - 1] : 1,
+  twofa: i === 0 || g.r() < .8, status: i === 12 ? 'INVITED' : i === 13 ? 'DISABLED' : 'ACTIVE', lastActive: i === 12 ? null : new Date(NOW.getTime() - g.r() * (i === 13 ? 90 : 4) * DAY), ip: `${g.int(31, 213)}.${g.int(0, 255)}.${g.int(0, 255)}.${g.int(1, 254)}`, created: new Date(NOW.getTime() - (900 - i * 50) * DAY), updated: new Date(NOW.getTime() - g.int(1, 60) * DAY) })); })();
+page({
+  id: 'admins', noun: 'administrator', nouns: 'administrators', icon: 'userCog', searchPh: 'Search name, email…',
+  data: () => ADMINS, search: a => `${a.name} ${a.email}`,
+  fields: { status: fE('Status', 'activity', ADMIN_STATUS, a => a.status), role: fE('Role', 'key', Object.fromEntries(ROLES.map(r => [r.id, { label: r.name }])), a => String(a.role)), twofa: fE('2FA', 'lock', { on: { label: 'Enabled' }, off: { label: 'Disabled' } }, a => a.twofa ? 'on' : 'off') },
+  tiles: [allTile('All administrators', L => `${new Set(L.map(a => a.role)).size} roles in use`), tile('act', 'Active', { key: 'status', values: ['ACTIVE'] }, share), tile('inv', 'Invited', { key: 'status', values: ['INVITED'] }, () => 'Invite not accepted'),
+    tile('no2fa', 'Without 2FA', { key: 'twofa', values: ['off'] }, () => 'Ask them to enrol'), tile('dis', 'Disabled', { key: 'status', values: ['DISABLED'] }, share)],
+  cols: [{ k: 'name', l: 'Administrator', on: 1, lock: 1, val: a => a.name.toLowerCase(), cell: a => `<div class="ucell"><div style="min-width:0"><div class="un">${esc(a.name)}</div><div class="ue">${esc(a.email)}</div></div></div>`, kv: a => `<span>${esc(a.name)}</span>` },
+    K.id(), { k: 'email', l: 'Email', rec: true, cell: a => muted(a.email) }, { k: 'role', l: 'Role', on: 1, val: a => roleOf(a.role).name, cell: a => esc(roleOf(a.role).name), kv: a => recLink('roles', a.role, roleOf(a.role).name) },
+    K.yes('twofa', '2FA'), K.status(ADMIN_STATUS), K.date('lastActive', 'Last active'), K.code('ip', 'Last IP', 0), K.date('created', 'Added', 0)],
+  sort: { k: 'lastActive', dir: 'desc' },
+  menu: a => [...(a.twofa ? [{ act: 'adm-2fa', data: { rid: a.id }, icon: 'lock', label: 'Reset 2FA' }] : []), ...(a.status === 'INVITED' ? [{ act: 'adm-invite', data: { rid: a.id }, icon: 'send', label: 'Resend invite' }] : []),
+    ...(a.id !== 1 ? [{ act: 'adm-tog', data: { rid: a.id }, icon: a.status === 'DISABLED' ? 'refresh' : 'ban', label: a.status === 'DISABLED' ? 'Enable' : 'Disable' }] : [])],
+  bulk: [{ icon: 'ban', label: 'Disable', run: rows => { const o = rows.filter(a => a.id !== 1); o.forEach(a => { a.status = 'DISABLED'; stamp(a); }); return `${o.length} administrator${o.length === 1 ? '' : 's'} disabled`; } }],
+  form: {
+    newLabel: 'Invite administrator',
+    fields: a => [{ id: 'faName', label: 'Full name', value: a?.name }, { id: 'faEmail', label: 'Email', value: a?.email, ph: 'name@ns.cards' }, { id: 'faRole', label: 'Role', value: String(a?.role || 3), options: ROLES.map(r => [String(r.id), r.name]) }],
+    save: a => {
+      const name = fv('faName'), email = fv('faEmail'); if (!name) return coBad('#faName'), false; if (!/^\S+@\S+\.\S+$/.test(email)) return coBad('#faEmail'), false;
+      if (ADMINS.some(x => x !== a && x.email === email)) return coBad('#faEmail', 'This email already has an account'), false;
+      const v = { name, email, role: +fv('faRole') }; if (a) { Object.assign(a, v); stamp(a); return true; }
+      return { id: Math.max(...ADMINS.map(x => x.id)) + 1, ...v, twofa: false, status: 'INVITED', lastActive: null, ip: '', created: new Date(NOW), updated: new Date(NOW) };
+    },
+  },
+  rec: {
+    title: a => a.name, sub: a => `<span>${esc(a.email)}</span><span class="faint">·</span>${recLink('roles', a.role, roleOf(a.role).name)}`, badges: a => badge(ADMIN_STATUS[a.status]) + badge(a.twofa ? { label: '2FA on', tone: 'success' } : { label: '2FA off', tone: 'warning' }),
+    acts: a => a.id !== 1 ? `<button class="btn btn-ghost" data-act="adm-tog" data-rid="${a.id}">${icon(a.status === 'DISABLED' ? 'refresh' : 'ban', 15)}${a.status === 'DISABLED' ? 'Enable' : 'Disable'}</button>` : '',
+    sections: a => tcard(`Permissions <span class="ct">from ${esc(roleOf(a.role).name)}</span>`, `<a class="link-btn" href="#/roles/${a.role}" style="display:flex;align-items:center;gap:2px;height:auto">Edit role ${icon('chevRight', 14)}</a>`,
+      `<div class="card-b pad"><div class="pills">${PERM_GROUPS.flatMap(([, p]) => p).filter(([k]) => roleOf(a.role).perms.has(k)).map(([, l]) => `<span class="tag">${l}</span>`).join('')}</div></div>`),
+    events: a => pgData(PAGES.logs).filter(l => l.admin === a.name).slice(0, 6).map(l => ({ ic: LOG_GROUP[l.group].icon, t: l.label, s: l.entity, when: rel(l.at) })),
+  },
+});
+page({
+  id: 'roles', noun: 'role', nouns: 'roles', icon: 'key', searchPh: 'Search role…',
+  data: () => ROLES, search: r => `${r.name} ${r.desc}`,
+  cols: [K.id(), { k: 'name', l: 'Role', on: 1, lock: 1, val: r => r.name.toLowerCase(), cell: r => `<b style="font-weight:500">${esc(r.name)}</b>` }, K.muted('desc', 'Description'),
+    { k: 'admins', l: 'Administrators', al: 'r', on: 1, dir: 'desc', val: r => ADMINS.filter(a => a.role === r.id).length, cell: r => `<span class="num">${ADMINS.filter(a => a.role === r.id).length}</span>` },
+    { k: 'perms', l: 'Permissions', al: 'r', on: 1, dir: 'desc', val: r => r.perms.size, cell: r => `<span class="num">${r.perms.size} of ${ALL_PERMS.length}</span>` }, K.date('updated', 'Updated'), K.date('created', 'Created', 0)],
+  sort: { k: 'id', dir: 'asc' },
+  form: {
+    fields: r => [{ id: 'frName', label: 'Name', value: r?.name }, { id: 'frDesc', label: 'Description', value: r?.desc }],
+    save: r => { const name = fv('frName'); if (!name) return coBad('#frName'), false; const v = { name, desc: fv('frDesc') }; if (r) { Object.assign(r, v); stamp(r); return true; }
+      return { id: Math.max(...ROLES.map(x => x.id)) + 1, ...v, perms: new Set(ALL_PERMS.filter(p => /view$/.test(p))), created: new Date(NOW), updated: new Date(NOW) }; },
+  },
+  rec: {
+    title: r => r.name, sub: r => `<span>${esc(r.desc)}</span>`, badges: r => `<span class="badge t-neutral">${r.perms.size} of ${ALL_PERMS.length} permissions</span>${r.id === 1 ? badge({ label: 'Locked', tone: 'info' }) : ''}`,
+    sections: r => PERM_GROUPS.map(([g, ps]) => `<div class="card"><div class="card-h"><span class="card-t">${g} <span class="ct">${ps.filter(([k]) => r.perms.has(k)).length} of ${ps.length}</span></span></div><div class="card-b">${ps.map(([k, l]) => `<div class="kv-r"><span style="color:var(--ink)">${l}<span class="code" style="margin-left:8px">${k}</span></span><button class="sw-t ${r.perms.has(k) ? 'on' : ''}" data-act="role-perm" data-rid="${r.id}" data-p="${k}" ${r.id === 1 ? 'disabled' : ''} aria-label="${l}"></button></div>`).join('')}</div></div>`).join(''),
+    side: r => { const L = ADMINS.filter(a => a.role === r.id); return `<div class="card"><div class="card-h"><span class="card-t">Administrators <span class="ct">${L.length}</span></span></div><div class="card-b">${L.map(a => `<div class="kv-r">${recLink('admins', a.id, a.name)}${dotCell(ADMIN_STATUS[a.status])}</div>`).join('') || '<div class="faint" style="padding:12px 0;font-size:13px">Nobody has this role yet</div>'}</div></div>`; },
+  },
+});
+const LOG_GROUP = { AUTH: { label: 'Sign-in', icon: 'login' }, USERS: { label: 'Users', icon: 'users' }, COMPANIES: { label: 'Companies', icon: 'building' }, FINANCIAL: { label: 'Financial', icon: 'arrows' }, RISK: { label: 'Risk', icon: 'radar' }, SETTINGS: { label: 'Settings', icon: 'sliders' } };
+const LOG_RESULT = { SUCCESS: { label: 'Success', tone: 'success' }, DENIED: { label: 'Denied', tone: 'error' } };
+page({
+  id: 'logs', noun: 'event', nouns: 'events', icon: 'logs', searchPh: 'Search action, admin, entity, IP…',
+  data: () => {
+    const g = gen(909), acts = [['AUTH', 'auth.login', 'Signed in', null], ['AUTH', 'auth.2fa.reset', 'Reset 2FA', 'user'], ['USERS', 'user.block', 'Blocked user', 'user'], ['USERS', 'user.update', 'Updated user profile', 'user'], ['USERS', 'kyc.status.update', 'Changed KYC status', 'user'],
+      ['USERS', 'user.impersonate', 'Logged in as user', 'user'], ['COMPANIES', 'company.update', 'Updated company', 'company'], ['COMPANIES', 'company.product.grant', 'Granted product to company', 'company'], ['FINANCIAL', 'confirmation.approve', 'Approved confirmation', 'conf'],
+      ['FINANCIAL', 'balance.adjust', 'Adjusted balance', 'user'], ['FINANCIAL', 'card.freeze', 'Froze card', 'user'], ['RISK', 'kyt.rule.update', 'Updated KYT rule', 'kyt'], ['SETTINGS', 'currency.update', 'Updated currency', 'cur'], ['SETTINGS', 'market.halt', 'Halted market', 'mkt']];
+    const act = ADMINS.filter(a => a.status !== 'INVITED');
+    return Array.from({ length: 420 }, (_, i) => {
+      const [group, code, label, ent] = g.pk(acts), a = g.pk(act), u = g.pk(USERS), c = g.pk(COMPANIES), at = new Date(NOW.getTime() - (i * .033 + g.r() * .03) * DAY);
+      const entity = ent === 'user' ? `User #${u.id}` : ent === 'company' ? `Company #${c.id}` : ent === 'conf' ? `Confirmation #${g.int(9300, 9400)}` : ent === 'kyt' ? `KYT rule #${g.int(101, 114)}` : ent === 'cur' ? `Currency ${g.pk(ASSETS).c}` : ent === 'mkt' ? 'Market ZNX/USDT' : 'Admin panel';
+      const href = ent === 'user' ? `#/users/${u.id}` : ent === 'company' ? `#/companies/${c.id}` : '';
+      return { id: 500000 - i, at, admin: a.name, group, code, label, entity, href, ip: a.ip, result: g.r() < .04 ? 'DENIED' : 'SUCCESS' };
+    });
+  },
+  search: l => `${l.label} ${l.code} ${l.admin} ${l.entity} ${l.ip}`,
+  fields: { group: fE('Area', 'layers', LOG_GROUP, l => l.group), admin: fE('Administrator', 'userCog', Object.fromEntries(ADMIN_NAMES.map(n => [n, { label: n }])), l => l.admin), result: fE('Result', 'activity', LOG_RESULT, l => l.result), at: fD('Time', l => l.at) },
+  tiles: [allTile('All events', L => `${L.filter(l => NOW - l.at < DAY).length} in 24 hours`), tile('auth', 'Sign-ins', { key: 'group', values: ['AUTH'] }, share), tile('fin', 'Financial', { key: 'group', values: ['FINANCIAL'] }, share),
+    tile('set', 'Settings changes', { key: 'group', values: ['SETTINGS', 'RISK'] }, share), tile('den', 'Denied', { key: 'result', values: ['DENIED'] }, () => 'Missing permission')],
+  cols: [K.when('at', 'Time'), K.text('admin', 'Administrator'), { k: 'label', l: 'Action', on: 1, cell: l => `<span class="txt">${icon(LOG_GROUP[l.group].icon, 14)}${l.label}</span>` }, K.code('code', 'Event code'),
+    { k: 'entity', l: 'Entity', on: 1, cell: l => l.href ? `<a class="lnk" href="${l.href}">${esc(l.entity)}</a>` : muted(l.entity) }, K.code('ip', 'IP address', 0), K.status(LOG_RESULT, 'result', 'Result'), K.id('Event ID')],
+  sort: { k: 'at', dir: 'desc' },
+  menu: l => l.href ? [{ act: 'route', data: { arg: l.href.slice(2) }, icon: 'link', label: `Open ${l.entity}` }] : [],
+  rec: { title: l => l.label, sub: l => `<span>${esc(l.admin)}</span><span class="faint">·</span><span>${fmtDateTime(l.at)}</span>`, badges: l => badge(LOG_RESULT[l.result]) + `<span class="badge t-neutral">${LOG_GROUP[l.group].label}</span>`,
+    events: l => [{ ic: LOG_GROUP[l.group].icon, t: l.label, s: `${l.entity} · ${l.ip}`, when: rel(l.at) }] },
+});
+
+/* ── Dashboards: Staking dashboard, Reserves, Activity statistics, Wallet statistics ── */
+DASHES.staking = {
+  kpis: d => { const tvl = sum(STRATS.map(s => stratStats(s).tvl)), stakers = new Set(STAKES.filter(x => x.status !== 'COMPLETED').map(x => x.uid)).size, rw = series(d, 1400, 'srw');
+    return [{ l: 'Total value locked', v: fmtEur(tvl), d: 5.8, s: cumulative(series(d, 100, 'stvl')) }, { l: 'Active stakes', v: fmtInt(STAKES.filter(x => x.status === 'ACTIVE').length), d: 3.1, s: series(d, 9, 'sact') },
+      { l: 'Stakers', v: fmtInt(stakers), d: 2.4, s: series(d, 5, 'sst') }, { l: 'Rewards paid', v: fmtEur(sum(rw)), d: pct(sum(rw), sum(series(d, 1300, 'srwp'))), s: rw },
+      { l: 'Average APY', v: (sum(STRATS.filter(s => s.status === 'ACTIVE').map(s => s.apy * stratStats(s).tvl)) / tvl).toFixed(2) + '%', d: -.2, unit: 'pp' }]; },
+  cards: d => { const act = STRATS.map(s => [s, stratStats(s)]).filter(([, x]) => x.tvl).sort((a, b) => b[1].tvl - a[1].tvl), cols = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)', 'var(--c5)', 'var(--neutral)'];
+    const byAsset = Object.entries(act.reduce((o, [s, x]) => (o[s.c] = (o[s.c] || 0) + x.tvl, o), {})).sort((a, b) => b[1] - a[1]);
+    const next = pgData(PAGES['payout-pools']).filter(p => p.status === 'SCHEDULED').sort((a, b) => a.at - b.at).slice(0, 4);
+    const grow = cumulative(series(d, 1, 'tvl')), top = grow[grow.length - 1] || 1, tvl = sum(act.map(([, x]) => x.tvl)); // chart ends at today’s real TVL
+    const tvlS = grow.map(v => tvl * (.86 + .14 * v / top)), tvlP = tvlS.map((v, i) => v * (.93 + i / tvlS.length * .01));
+    return chartCard(8, 'Total value locked', { dates: d.dates, unit: d.unit, fmt: v => '€' + compact(v), last: 1, series: [{ l: 'This period', data: tvlS, col: 'var(--c1)', area: 1 }, { l: 'Previous', data: tvlP, col: 'var(--prev)', dash: 1 }] })
+      + dcard(4, 'TVL by strategy', ctag('Now'), barRows(act.map(([s, x]) => [esc(s.name), x.tvl]), v => '€' + compact(v)))
+      + dcard(4, 'Assets staked', ctag('Share of TVL'), mixRows(byAsset.map(([c, v], i) => [c, v, cols[i] || 'var(--neutral)']), v => '€' + compact(v)))
+      + dcard(4, 'Upcoming payouts', `<a class="link-btn" href="#/payout-pools" style="display:flex;align-items:center;gap:2px;height:auto">All ${icon('chevRight', 14)}</a>`, next.map(p => `<button class="rk t-info" data-act="route" data-arg="payout-pools/${p.id}"><span class="rk-ic">${icon('payout', 16)}</span><span class="rk-l"><div>${esc(stratOf(p.sid).name)}</div><div>${fmtDateTime(p.at)}</div></span><span class="rk-v">${fmtAmt(p.rewards, p.c)}</span><span class="rk-go">${icon('chevRight', 16)}</span></button>`).join('') || emptyBlock('payout', 'Nothing scheduled', ''))
+      + dcard(4, 'Largest stakes', `<a class="link-btn" href="#/stakes" style="display:flex;align-items:center;gap:2px;height:auto">All ${icon('chevRight', 14)}</a>`, [...STAKES].filter(x => x.status === 'ACTIVE').sort((a, b) => b.amount * ASSET[b.c].rate - a.amount * ASSET[a.c].rate).slice(0, 6).map(x => `<div class="su" data-act="route" data-arg="stakes/${x.id}"><div class="sm"><div>${esc(byId(x.uid).name || byId(x.uid).email)}</div><div>${esc(stratOf(x.sid).name)}</div></div><span class="num">${fmtEur(x.amount * ASSET[x.c].rate)}</span></div>`).join(''));
+  },
+};
+DASHES.reserves = {
+  range: false,
+  rows: () => ASSETS.map((a, i) => { const liab = sum(USERS.map(u => ud(u).wallets.find(w => w.c === a.c)?.amt || 0)) * a.rate * 40, cov = [104.2, 101.8, 100.6, 112.4, 99.2, 106, 103][i] || 102; return { a, liab, res: liab * cov / 100, cov }; }),
+  kpis: () => { const R = DASHES.reserves.rows(), L = sum(R.map(x => x.liab)), Rs = sum(R.map(x => x.res));
+    return [{ l: 'Reserves held', v: '€' + compact(Rs), d: 1.9 }, { l: 'Customer liabilities', v: '€' + compact(L), d: 2.3 }, { l: 'Coverage', v: (Rs / L * 100).toFixed(1) + '%', d: -.4, unit: 'pp' }, { l: 'Hot wallet share', v: '8.6%', note: 'Target ≤ 10%' }, { l: 'Last attestation', v: fmtDay(new Date(NOW.getTime() - 9 * DAY), false), note: 'Monthly · Armanino' }]; },
+  cards: () => { const R = DASHES.reserves.rows(), tone = p => p >= 102 ? ['success', 'Healthy'] : p >= 100 ? ['warning', 'Thin buffer'] : ['error', 'Under-backed'];
+    return `<div class="card span-8 flush"><div class="card-h"><span class="card-t">Coverage by asset</span><span class="card-tag">Snapshot · ${fmtDateTime(NOW)}</span></div>${dtable(['Asset', 'Liabilities|r', 'Reserves|r', 'Surplus|r', 'Coverage|r', 'Status'], R.map(x => { const [t, l] = tone(x.cov); return [`<span class="ctry">${assetIc(x.a.c, 22)}<b style="font-weight:500">${x.a.c}</b> <span class="muted">${x.a.n}</span></span>`, `<span class="num">${fmtEur(x.liab)}</span>`, `<span class="num">${fmtEur(x.res)}</span>`, `<span class="num ${x.res >= x.liab ? 'pos' : ''}">${x.res >= x.liab ? '+' : '−'}${fmtEur(Math.abs(x.res - x.liab))}</span>`, `<span class="num">${x.cov.toFixed(1)}%</span>`, dotCell({ label: l, tone: t })]; }))}</div>`
+      + dcard(4, 'Reserve coverage', ctag('Marker = 100%'), R.map(x => { const [t, l] = tone(x.cov); return `<div class="res"><div class="res-h"><span class="rn">${assetIc(x.a.c, 22)}${x.a.c}</span><span class="num res-v t-${t}"><i class="dot"></i>${x.cov.toFixed(1)}%</span></div><div class="meter t-${t}" data-tt="${x.a.c} · ${l}|${x.cov.toFixed(1)}% backed|Marker = 100% of liabilities"><i style="width:${Math.min(x.cov, 120) / 120 * 100}%"></i><span class="par" style="left:${100 / 120 * 100}%"></span></div></div>`; }).join(''))
+      + dcard(6, 'Where reserves are held', ctag('Share of reserves'), barRows([['Fireblocks · cold storage', 58.4], ['BitGo · custody', 21.2], ['Banking Circle · safeguarding', 11.8], ['Hot wallets', 8.6]], v => v.toFixed(1) + '%'))
+      + dcard(6, 'Attestations', ctag('Proof of reserves'), `<div class="card-b" style="padding:0">${timeline([0, 1, 2, 3].map(i => ({ ic: 'shieldCheck', t: `${new Date(NOW.getFullYear(), NOW.getMonth() - i, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })} attestation`, s: `Armanino · ${(103.6 - i * .7).toFixed(1)}% coverage`, when: rel(new Date(NOW.getTime() - (9 + i * 30) * DAY)) })))}</div>`);
+  },
+};
+DASHES['activity-stats'] = {
+  kpis: d => { const su = series(d, 118, 'su'), au = series(d, 6400, 'au'), tx = series(d, 3900, 'tx'), ky = series(d, 74, 'ky'), cp = series(d, 2100, 'cp');
+    return [{ l: 'Sign-ups', v: fmtInt(sum(su)), d: pct(sum(su), sum(series(d, 108, 'sup'))), s: su }, { l: 'Daily active users', v: fmtInt(au[au.length - 1]), d: 4.1, s: au }, { l: 'Transactions', v: fmtInt(sum(tx)), d: pct(sum(tx), sum(series(d, 3600, 'txp'))), s: tx },
+      { l: 'KYC approved', v: fmtInt(sum(ky)), d: pct(sum(ky), sum(series(d, 70, 'kyp'))), s: ky }, { l: 'Card payments', v: fmtInt(sum(cp)), d: pct(sum(cp), sum(series(d, 1950, 'cpp'))), s: cp }]; },
+  cards: d => chartCard(8, 'Sign-ups', { dates: d.dates, unit: d.unit, fmt: v => fmtInt(v), series: [{ l: 'This period', data: series(d, 118, 'su'), col: 'var(--c1)', area: 1 }, { l: 'Previous', data: series(d, 108, 'sup'), col: 'var(--prev)', dash: 1 }] })
+    + dcard(4, 'Onboarding funnel', ctag('This period'), barRows([['Signed up', 3540], ['Email verified', 2930], ['KYC started', 2301], ['KYC approved', 1854], ['Card issued', 1316]], fmtInt))
+    + chartCard(6, 'Daily active users', { dates: d.dates, unit: d.unit, fmt: v => fmtInt(v), last: 1, series: [{ l: 'Active users', data: series(d, 6400, 'au'), col: 'var(--c2)', area: 1 }] })
+    + chartCard(6, 'Transactions', { dates: d.dates, unit: d.unit, fmt: v => fmtInt(v), series: [{ l: 'Card payments', data: series(d, 2100, 'cp'), col: 'var(--c1)' }, { l: 'Exchanges', data: series(d, 900, 'ex'), col: 'var(--c2)' }, { l: 'Transfers', data: series(d, 700, 'tr'), col: 'var(--c3)' }] })
+    + dcard(4, 'Sign-ups by source', ctag('This period'), mixRows(Object.entries(SOURCES).map(([k, l], i) => [l, USERS.filter(u => u.source === k).length, ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'][i]])))
+    + dcard(4, 'Platforms', ctag('Sessions'), mixRows([['iOS', 46, 'var(--c1)'], ['Android', 38, 'var(--c2)'], ['Web', 16, 'var(--c3)']], v => v + '%'))
+    + dcard(4, 'Top countries', ctag('Sign-ups'), barRows(Object.entries(COUNTRIES).map(([k, c]) => [`<span class="flag">${flag(c.cc)}</span>${c.name}`, USERS.filter(u => u.country === k).length]).sort((a, b) => b[1] - a[1]).slice(0, 6))),
+};
+DASHES['wallet-stats'] = {
+  kpis: d => { const dep = series(d, 1.1e6, 'wd'), wd = series(d, .84e6, 'ww'), bal = sum(USERS.map(u => u.balance));
+    return [{ l: 'Customer balances', v: '€' + compact(bal * 40), d: 3.4, s: cumulative(series(d, 1, 'wb')) }, { l: 'Deposits', v: '€' + compact(sum(dep)), d: pct(sum(dep), sum(series(d, 1e6, 'wdp'))), s: dep },
+      { l: 'Withdrawals', v: '€' + compact(sum(wd)), d: pct(sum(wd), sum(series(d, .8e6, 'wwp'))), s: wd }, { l: 'Net inflow', v: '€' + compact(sum(dep) - sum(wd)), d: 6.2 }, { l: 'Funded wallets', v: fmtInt(USERS.filter(u => u.balance > 0).length * 40), d: 2.8 }]; },
+  cards: d => { const buckets = [['Under €100', u => u.balance < 100], ['€100 – €1,000', u => u.balance >= 100 && u.balance < 1e3], ['€1,000 – €10,000', u => u.balance >= 1e3 && u.balance < 1e4], ['€10,000 and above', u => u.balance >= 1e4]];
+    return chartCard(8, 'Deposits and withdrawals', { dates: d.dates, unit: d.unit, fmt: v => '€' + compact(v), series: [{ l: 'Deposits', data: series(d, 1.1e6, 'wd'), col: 'var(--c3)', area: 1 }, { l: 'Withdrawals', data: series(d, .84e6, 'ww'), col: 'var(--c5)' }] })
+      + dcard(4, 'Balances by asset', ctag('Now'), mixRows(ASSETS.map(a => [a.c, sum(USERS.map(u => { const w = ud(u).wallets.find(x => x.c === a.c); return w ? w.amt * a.rate : 0; })), a.col]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]), v => '€' + compact(v * 40)))
+      + dcard(4, 'Wallet size', ctag('Funded users'), barRows(buckets.map(([l, f]) => [l, USERS.filter(u => u.balance > 0 && f(u)).length])))
+      + dcard(4, 'Top holders', `<a class="link-btn" href="#/users" style="display:flex;align-items:center;gap:2px;height:auto">All ${icon('chevRight', 14)}</a>`, [...USERS].sort((a, b) => b.balance - a.balance).slice(0, 6).map(u => `<div class="su" data-uid="${u.id}"><div class="sm"><div>${esc(u.name || u.email)}</div><div>${esc(u.email)}</div></div><span class="num">${fmtEur(u.balance)}</span></div>`).join(''))
+      + dcard(4, 'Fees earned', ctag('This period'), barRows([['Exchange fees', 41200], ['Card top-up fees', 26800], ['Withdrawal fees', 14900], ['Monthly card fees', 9400], ['IBAN fees', 5100]], v => '€' + compact(v)));
+  },
+};
+function dashTopbar() {
+  const D = DASHES[S.route];
+  return `${D.range === false ? '' : dpButton(S.range, 'dash-range')}<button class="btn btn-ghost tb-hide-sm" data-act="toast" data-msg="Report exported">${icon('download', 15)}Export</button>`;
+}
+
+/* ── Actions for the pages ── */
+const rowsOf = a => { const P = pg(); return [pgRow(a.dataset.rid, P)].filter(Boolean); };
+const doRows = (fn, ic = 'check') => a => { closePop(); const msg = fn(rowsOf(a)); if (msg) toast(msg, ic); pgRefresh(); };
+Object.assign(ACT, {
+  'pg-tile': a => {
+    const P = pg(), st = pgS(P.id), t = P.tiles.find(t => t.id === a.dataset.id);
+    if (t.clear || tileOn(t, st.filters, st.search)) { st.filters = []; if (t.clear) { st.search = ''; $('#pgSearch').value = ''; } } else st.filters = [clone(t.filter)];
+    pgFiltersChanged();
+  },
+  'pg-sort': a => { const P = pg(), st = pgS(P.id), c = P.cols.find(x => x.k === a.dataset.k); st.sort = st.sort.k === c.k ? { k: c.k, dir: st.sort.dir === 'asc' ? 'desc' : 'asc' } : { k: c.k, dir: c.dir }; pgResults(); },
+  'pg-page': a => { pgS(S.route).page = +a.dataset.p; pgResults(); $('#pgResults .tscroll') && ($('#pgResults .tscroll').scrollTop = 0); },
+  'pg-clear-all': () => { const st = pgS(S.route); st.filters = []; st.search = ''; $('#pgSearch').value = ''; pgFiltersChanged(); },
+  'pg-sel': a => { const s = pgS(S.route).sel, k = a.dataset.rid; s.has(k) ? s.delete(k) : s.add(k); pgResults(); renderFloat(); },
+  'pg-sel-page': () => { const P = pg(), st = pgS(P.id), keys = S._pgList.slice((st.page - 1) * 25, st.page * 25).map(r => pgKey(P, r)), all = keys.every(k => st.sel.has(k)); keys.forEach(k => all ? st.sel.delete(k) : st.sel.add(k)); pgResults(); renderFloat(); },
+  'pg-sel-all': () => { const P = pg(); S._pgList.forEach(r => pgS(P.id).sel.add(pgKey(P, r))); pgResults(); renderFloat(); },
+  'pg-sel-clear': () => { pgS(S.route).sel.clear(); closePop(); pgResults(); renderFloat(); },
+  'pg-bulk': a => { const P = pg(), st = pgS(P.id), rows = pgData(P).filter(r => st.sel.has(pgKey(P, r))); toast(P.bulk[+a.dataset.i].run(rows)); st.sel.clear(); pgRefresh(); },
+  'pg-bulk-export': () => { const P = pg(), st = pgS(P.id); pgCSV(P, pgData(P).filter(r => st.sel.has(pgKey(P, r))), P.id + '-selected'); },
+  'pg-export': a => exportMenu(a, 'pg-export-do'),
+  'pg-export-do': a => { closePop(); const P = pg(), l = pgList(P); a.dataset.f === 'csv' ? pgCSV(P, l, P.id) : toast(`XLSX export of ${fmtInt(l.length)} ${P.nouns} started`, 'download'); },
+  'pg-open': (a, e) => { closePop(); goRec(a.dataset.rid, e); },
+  'pg-row-more': a => openPop(a, menuItems(pgMenu(pg(), pgRow(a.dataset.rid))), { align: 'right', width: 230 }),
+  'pg-rec-more': a => openPop(a, menuItems(pgMenu(pg(), pgRow(a.dataset.rid), true)), { align: 'right', width: 230 }),
+  'pg-new': () => pgForm(null),
+  'pg-edit': a => { closePop(); pgForm(pgRow(a.dataset.rid)); },
+  'pg-form-save': () => {
+    const P = pg(), r = S._pgEdit, res = P.form.save(r); if (!res) return;
+    closeModal(); toast(r ? `${cap(P.noun)} updated` : `${cap(P.noun)} created`, r ? 'check' : 'plus');
+    if (!r && res !== true) { pgData(P).unshift(res); goRec(pgKey(P, res)); } else pgRefresh();
+  },
+  'rec-step': a => stepRec(+a.dataset.d),
+  'ld-display': a => openPop(a, listDisplayPop(), { align: 'right', width: 380, kind: 'ldisplay' }),
+  'ld-density': a => { S.density = a.dataset.v; store.set('nsc.density', S.density); refreshLD(); },
+  'ld-col': a => { const X = colCtx(), k = a.dataset.k; S.tcols[X.t] = X.cols.includes(k) ? X.cols.filter(x => x !== k) : TCOLS[X.t].map(c => c.k).filter(x => x === k || X.cols.includes(x)); store.set('nsc.tcols', S.tcols); refreshLD(); },
+  'ld-cols-reset': () => { delete S.tcols[colCtx().t]; store.set('nsc.tcols', S.tcols); refreshLD(); },
+  'ld-reset-colw': () => { const X = colCtx(); Object.keys(X.w).forEach(k => delete X.w[k]); store.set(X.key, X.w); refreshLD(); toast('Column widths fitted to this page', 'columns'); },
+  // page-specific actions
+  'conf-ok': doRows(rows => confDecide(rows, true)), 'conf-no': doRows(rows => confDecide(rows, false), 'ban'),
+  'doc-ok': doRows(rows => docDecide(rows, true)), 'doc-no': doRows(rows => docDecide(rows, false), 'ban'), 'doc-dl': doRows(rows => `Downloading ${rows[0].file}`, 'download'),
+  'cc-fetch': doRows(rows => `CreditCo KYC status: ${CC_KYC[ccKyc(rows[0])].label.toLowerCase()}`, 'refresh'),
+  'cc-req': doRows(rows => { const C = rows[0].C; C.status = 'ACCESS_REQUESTED'; C.created ||= new Date(NOW); C.updated = new Date(NOW); return 'Access requested from CreditCo'; }, 'key'),
+  'tx-retry': doRows(rows => { rows[0].status = 'COMPLETED'; rows[0].updated = new Date(NOW); return `Transaction #${rows[0].id} completed on retry`; }, 'refresh'),
+  'iban-close': doRows(ibanClose, 'ban'),
+  'card-tog': doRows(rows => cardFreeze(rows, !rows[0].frozen), 'lock'),
+  'sbp-paid': doRows(sbpPaid), 'sbp-cancel': doRows(rows => { rows[0].status = 'EXPIRED'; return `Top-up #${rows[0].id} cancelled`; }, 'ban'),
+  'strat-tog': doRows(stratToggle), 'stake-un': doRows(unstake, 'minus'), 'pool-run': doRows(runPayout, 'send'),
+  'kyt-tog': doRows(rows => { const k = rows[0]; k.on = !k.on; stamp(k); return `${k.name} ${k.on ? 'enabled' : 'disabled'}`; }),
+  'cur-dep': doRows(rows => { const a = rows[0]; a.dep = !a.dep; stamp(a); return `${a.c} deposits ${a.dep ? 'enabled' : 'disabled'}`; }),
+  'cur-wd': doRows(rows => { const a = rows[0]; a.wd = !a.wd; stamp(a); return `${a.c} withdrawals ${a.wd ? 'enabled' : 'disabled'}`; }),
+  'mkt-tog': doRows(rows => { const m = rows[0]; m.status = m.status === 'TRADING' ? 'HALTED' : 'TRADING'; stamp(m); return `${m.id} ${m.status === 'HALTED' ? 'halted' : 'trading again'}`; }),
+  'cl-add': a => { const l = pgRow(a.dataset.rid), free = Object.keys(WORLD).filter(k => !l.list.includes(k)).sort((x, y) => WORLD[x].name.localeCompare(WORLD[y].name)); if (!free.length) return toast('Every country is already on this list', 'alert'); S._edit = l.id;
+    fieldsModal('Add country', [{ id: 'clC', label: 'Country', value: free[0], options: free.map(k => [k, WORLD[k].name, flag(WORLD[k].cc)]) }], 'cl-save'); },
+  'cl-save': () => { const l = pgRow(String(S._edit)), k = fv('clC'); l.list.push(k); stamp(l); closeModal(); toast(`${WORLD[k].name} added`, 'globe'); pgRefresh(); },
+  'cl-rm': a => { const l = pgRow(a.dataset.rid); l.list = l.list.filter(k => k !== a.dataset.c); stamp(l); toast(`${WORLD[a.dataset.c].name} removed`, 'trash'); pgRefresh(); },
+  'adm-2fa': doRows(rows => { rows[0].twofa = false; stamp(rows[0]); return `2FA reset for ${rows[0].name}`; }, 'lock'),
+  'adm-invite': doRows(rows => `Invite resent to ${rows[0].email}`, 'send'),
+  'adm-tog': doRows(rows => { const a = rows[0]; a.status = a.status === 'DISABLED' ? 'ACTIVE' : 'DISABLED'; stamp(a); return `${a.name} ${a.status === 'DISABLED' ? 'disabled' : 'enabled'}`; }, 'ban'),
+  'role-perm': a => { const r = pgRow(a.dataset.rid), p = a.dataset.p; r.perms.has(p) ? r.perms.delete(p) : r.perms.add(p); stamp(r); toast(`${r.name}: ${p} ${r.perms.has(p) ? 'granted' : 'removed'}`, 'key'); pgRefresh(); },
+});
+
 document.addEventListener('click', e => {
   const a = e.target.closest('[data-act]');
   if (a && !a.disabled) { e.preventDefault(); ACT[a.dataset.act] && ACT[a.dataset.act](a, e); return; }
+  if (e.target.closest('a[href]')) return; // a link inside a row opens itself, not the row
+  const rr = e.target.closest('tr[data-rid]');
+  if (rr && PAGES[S.route]) { goRec(rr.dataset.rid, e); return; }
   const r = e.target.closest('[data-uid]');
   if (r && !e.target.closest('.pop')) goUser(+r.dataset.uid, e);
   const rc = e.target.closest('[data-cid]');
@@ -3468,6 +4490,7 @@ document.addEventListener('input', e => {
   else if (t.id === 'ddQ') $('#ddList').innerHTML = ddItems(S._dd, t.value);
   else if (t.id === 'dpFrom' || t.id === 'dpTo') dpTyped(t);
   else if (t.id === 'popVQ') $('#popVals').innerHTML = valueItems(t.dataset.key, t.value);
+  else if (t.id === 'pgSearch') { const st = pgS(S.route); st.search = t.value; st.page = 1; pgStats(); pgResults(); renderFloat(); }
   else coInput(t);
 });
 document.addEventListener('keydown', e => {
@@ -3485,6 +4508,8 @@ document.addEventListener('keydown', e => {
     else if (S.route === 'users' && S.userId) location.hash = '#/users';
     else if (S.route === 'companies' && S.coId) location.hash = '#/companies';
     else if (S.route === 'companies' && S.co.sel.size) ACT['co-sel-clear']();
+    else if (PAGES[S.route] && S.recId) location.hash = '#/' + S.route;
+    else if (PAGES[S.route] && pgS(S.route).sel.size) ACT['pg-sel-clear']();
     else if (S.selected.size) ACT['sel-clear']();
     return;
   }
@@ -3495,6 +4520,8 @@ document.addEventListener('keydown', e => {
   if (S.userId && e.key === 'k') stepUser(-1);
   if (e.key === '/' && S.route === 'companies' && !S.coId) { e.preventDefault(); $('#coSearch')?.focus(); }
   if (S.coId && (e.key === 'j' || e.key === 'k')) stepCo(e.key === 'j' ? 1 : -1);
+  if (e.key === '/' && PAGES[S.route] && !S.recId) { e.preventDefault(); $('#pgSearch')?.focus(); }
+  if (S.recId && (e.key === 'j' || e.key === 'k')) stepRec(e.key === 'j' ? 1 : -1);
 });
 
 /* column resize */
