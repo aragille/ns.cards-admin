@@ -124,24 +124,29 @@ a{color:inherit;text-decoration:none}
 .app.collapsed .sb-head:hover .sb-toggle{opacity:1;pointer-events:auto}
 .app.collapsed .sb-head:hover .logo{opacity:0}
 .sb-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:2px 12px 12px}
-.sb-label{display:flex;align-items:center;justify-content:space-between;width:100%;font-family:var(--font);font-size:11px;font-weight:500;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);padding:18px 13px 6px;white-space:nowrap}
-.sb-label .i{opacity:0;transition:opacity .12s,transform .15s}
-/* collapsed: section titles fold away (height animates with the width) so every page icon is evenly spaced */
-.sb-label{max-height:44px;overflow:hidden;transition:opacity .16s ease,max-height .24s cubic-bezier(.2,.8,.2,1),padding .24s cubic-bezier(.2,.8,.2,1)}
-.app.collapsed .sb-label{max-height:0;padding-top:0;padding-bottom:0}
-.sb-label:hover{color:var(--ink-2)} .sb-label:hover .i{opacity:1}
-.sb-group.closed .sb-label .i{transform:rotate(-90deg);opacity:1}
-.sb-group.closed .sb-items{display:none}
-.app.collapsed .sb-group.closed .sb-items{display:block}
 .nav{display:flex;align-items:center;gap:11px;height:36px;padding:0 13px;border-radius:10px;color:var(--nav-ink);font-weight:500;width:100%;white-space:nowrap;overflow:hidden;transition:background .12s}
 .nav:hover{background:var(--nav-hover)}
 .nav .i{color:var(--ink-3)}
 .nav.active,.nav.active:hover{background:var(--nav-active);color:var(--ink)}
+/* section labels: small all-caps titles; collapsed they fold away (height animates with the width) so every icon is evenly spaced */
+.sb-label{display:flex;align-items:center;width:100%;font-size:11px;font-weight:500;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);padding:18px 13px 6px;white-space:nowrap;
+  max-height:44px;overflow:hidden;transition:opacity .16s ease,max-height .24s cubic-bezier(.2,.8,.2,1),padding .24s cubic-bezier(.2,.8,.2,1)}
+.app.collapsed .sb-label{max-height:0;padding-top:0;padding-bottom:0}
+/* sections fold from their title: the chevron shows on hover and stays (turned) while folded; a folded section with pending items gets a small brand dot */
+.sb-label .i{margin-left:auto;opacity:0;transition:opacity .12s,transform .15s}
+.sb-label:hover{color:var(--ink-2)} .sb-label:hover .i{opacity:1}
+.sb-dot{display:none;width:5px;height:5px;border-radius:50%;background:var(--brand);margin-left:6px;flex:none}
+.sb-sec.closed .sb-label .i{transform:rotate(-90deg);opacity:1}
+.sb-sec.closed .sb-dot{display:block}
+.sb-sec.closed .sb-items{display:none}
+.app.collapsed .sb-sec.closed .sb-items{display:block}
+.sb-scroll>.nav{margin-bottom:2px}
 .nav.active .i{color:var(--ink)}
 .nav .nb{margin-left:auto;font-family:var(--mono);font-size:11px;font-style:normal;color:var(--brand-700);background:var(--brand-100);padding:1px 6px;border-radius:6px}
 .sb-foot{padding:10px 12px;border-top:1px solid var(--line);flex:none}
 .me{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:10px;width:100%;white-space:nowrap;overflow:hidden}
 .me:hover{background:var(--hover)}
+.me-more{color:var(--ink-3)} .me:hover .me-more{color:var(--ink-2)}
 .me .em{font-size:13px;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:left}
 .me-av{width:28px;height:28px;border-radius:50%;background:var(--inv);color:var(--on-inv);font-size:11px;font-weight:600;display:grid;place-items:center;flex:none}
 .me-h{display:flex;align-items:center;gap:10px;padding:8px 10px 6px}
@@ -156,7 +161,6 @@ a{color:inherit;text-decoration:none}
 .crumbs .cur{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis}
 .crumb-sep{color:var(--line-strong)}
 .tb-ctx{display:flex;align-items:center;gap:8px}
-.tb-lead{margin-left:12px}
 .crumbs .count{font-family:var(--mono);font-size:12.5px;color:var(--ink-3);margin-left:-2px}
 .topbar .vsep{margin:0 4px}
 kbd{font-family:var(--mono);font-size:11px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:0 5px;line-height:18px}
@@ -792,11 +796,12 @@ body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
 }
 @media (max-width:900px){
   .topbar .dp-btn{max-width:150px}
-  .app.collapsed .sb-label{max-height:44px;padding:18px 13px 6px}
   .app{grid-template-columns:minmax(0,1fr)}
   .sidebar,.app.collapsed .sidebar{position:fixed;left:0;top:0;bottom:0;width:260px;transform:translateX(-100%);transition:transform .22s ease;box-shadow:var(--shadow-pop)}
   .app.mobile-open .sidebar{transform:none}
   .app.collapsed .fade{opacity:1;pointer-events:auto}
+  .app.collapsed .sb-label{max-height:44px;padding:18px 13px 6px}
+  .app.collapsed .sb-sec.closed .sb-items{display:none}
   .sb-toggle,.app.collapsed .sb-toggle{display:none}
   .menu-btn{display:grid}
   .topbar{padding:0 16px;gap:10px}
@@ -971,7 +976,7 @@ const SOLAR = {
   list: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M20 7H4m11 5H4m5 5H4"/>`,
   board: `<path fill="none" stroke="currentColor" stroke-width="1.5" d="M2.5 6.5c0-1.886 0-2.828.586-3.414S4.614 2.5 6.5 2.5s2.828 0 3.414.586s.586 1.528.586 3.414v11c0 1.886 0 2.828-.586 3.414S8.386 21.5 6.5 21.5s-2.828 0-3.414-.586S2.5 19.386 2.5 17.5zm11 9c0-1.886 0-2.828.586-3.414s1.528-.586 3.414-.586s2.828 0 3.414.586s.586 1.528.586 3.414v2c0 1.886 0 2.828-.586 3.414s-1.528.586-3.414.586s-2.828 0-3.414-.586s-.586-1.528-.586-3.414zm0-10c0-.932 0-1.398.152-1.765a2 2 0 0 1 1.083-1.083c.367-.152.833-.152 1.765-.152h2c.932 0 1.398 0 1.765.152a2 2 0 0 1 1.083 1.083c.152.367.152.833.152 1.765s0 1.398-.152 1.765a2 2 0 0 1-1.083 1.083c-.367.152-.833.152-1.765.152h-2c-.932 0-1.398 0-1.765-.152a2 2 0 0 1-1.083-1.083C13.5 6.898 13.5 6.432 13.5 5.5Z"/>`,
   download: `<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 15c0 2.828 0 4.243.879 5.121C4.757 21 6.172 21 9 21h6c2.828 0 4.243 0 5.121-.879C21 19.243 21 17.828 21 15M12 3v13m0 0l4-4.375M12 16l-4-4.375"/>`,
-  more: `<g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></g>`,
+  more: `<g fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></g>`, // solid dots, same weight as the 1.5 strokes (rings looked hollow)
   copy: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 11c0-2.828 0-4.243.879-5.121C7.757 5 9.172 5 12 5h3c2.828 0 4.243 0 5.121.879C21 6.757 21 8.172 21 11v5c0 2.828 0 4.243-.879 5.121C19.243 22 17.828 22 15 22h-3c-2.828 0-4.243 0-5.121-.879C6 20.243 6 18.828 6 16z"/><path d="M6 19a3 3 0 0 1-3-3v-6c0-3.771 0-5.657 1.172-6.828S7.229 2 11 2h4a3 3 0 0 1 3 3"/></g>`,
   login: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M8 16c0 2.828 0 4.243.879 5.121C9.757 22 11.172 22 14 22h1c2.828 0 4.243 0 5.121-.879C21 20.243 21 18.828 21 16V8c0-2.828 0-4.243-.879-5.121C19.243 2 17.828 2 15 2h-1c-2.828 0-4.243 0-5.121.879C8 3.757 8 5.172 8 8"/><path d="M8 19.5c-2.357 0-3.536 0-4.268-.732C3 18.035 3 16.857 3 14.5v-5c0-2.357 0-3.536.732-4.268S5.643 4.5 8 4.5"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 12h9m0 0l-2.5 2.5M15 12l-2.5-2.5"/></g>`,
   logout: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M8.002 7c.012-2.175.109-3.353.877-4.121C9.758 2 11.172 2 14 2h1c2.829 0 4.243 0 5.122.879C21 3.757 21 5.172 21 8v8c0 2.828 0 4.243-.878 5.121C19.242 22 17.829 22 15 22h-1c-2.828 0-4.242 0-5.121-.879c-.768-.768-.865-1.946-.877-4.121"/><path d="M8 19.5c-2.357 0-3.536 0-4.268-.732C3 18.035 3 16.857 3 14.5v-5c0-2.357 0-3.536.732-4.268S5.643 4.5 8 4.5"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12H6m0 0l2 2m-2-2l2-2"/></g>`,
@@ -1228,48 +1233,57 @@ const S = {
   filters: [], search: '', sort: { key: 'id', dir: 'desc' }, page: 1, perPage: 25,
   view: 'table', groupBy: 'kyc', density: store.get('nsc.density', 'comfortable'),
   hidden: new Set(store.get('nsc.hidden2', DEFAULT_HIDDEN)), selected: new Set(),
-  collapsed: new Set(), more: {}, colW: store.get('nsc.colw', {}), userTab: 'overview', draft: {}, _list: [],
-  navClosed: new Set(store.get('nsc.navClosed', [])),
+  navClosed: new Set(store.get('nsc.navClosed', [])), collapsed: new Set(), more: {}, colW: store.get('nsc.colw', {}), userTab: 'overview', draft: {}, _list: [],
 };
 
 /* ════════════════════════════ Shell ════════════════════════════ */
+// Sidebar: a few top-level items, then foldable sections under small all-caps labels. Every item has its own icon (all that shows when collapsed) and its label is also the page's header title.
 const NAV = [
-  { items: [{ id: 'dashboard', label: 'Overview', icon: 'dashboard' }] },
-  { sec: 'Customers', items: [{ id: 'users', label: 'Users', icon: 'users' }, { id: 'companies', label: 'Companies', icon: 'building' }, { id: 'confirmations', label: 'Confirmations', icon: 'shieldCheck', badge: 41 }, { id: 'documents', label: 'Documents', icon: 'documents' }, { id: 'creditco', label: 'CreditCo KYC', icon: 'passport' }] },
-  { sec: 'Financial', items: [{ id: 'transactions', label: 'Transactions', icon: 'arrows' }, { id: 'aggregated', label: 'Aggregated transactions', icon: 'aggTx' }, { id: 'iban', label: 'IBAN', icon: 'bank' }, { id: 'cards', label: 'Cards', icon: 'card' }, { id: 'sbp', label: 'SBP top-up', icon: 'sbp' }] },
-  { sec: 'Staking', items: [{ id: 'staking', label: 'Staking dashboard', icon: 'stakingDash' }, { id: 'stakes', label: 'Stakes', icon: 'stakes' }, { id: 'payout-pools', label: 'Payout pools', icon: 'payout' }, { id: 'strategies', label: 'Strategies', icon: 'strategy' }] },
-  { sec: 'Risk', items: [{ id: 'kyt', label: 'KYT rules', icon: 'radar' }, { id: 'reserves', label: 'Reserves', icon: 'scale' }] },
-  { sec: 'Analytics', items: [{ id: 'activity-stats', label: 'Activity statistics', icon: 'pieChart' }, { id: 'wallet-stats', label: 'Wallet statistics', icon: 'walletStats' }] },
-  { sec: 'Products', items: [{ id: 'card-products', label: 'Card products', icon: 'cardProduct' }, { id: 'iban-products', label: 'IBAN products', icon: 'ibanProduct' }, { id: 'level-presets', label: 'Level presets', icon: 'levels' }] },
-  { sec: 'Settings', items: [{ id: 'currencies', label: 'Currencies', icon: 'coins' }, { id: 'markets', label: 'Markets', icon: 'candles' }, { id: 'countries', label: 'Country lists', icon: 'globe' }, { id: 'sources', label: 'Sources', icon: 'folder' }] },
-  { sec: 'Admin', items: [{ id: 'admins', label: 'Administrators', icon: 'userCog' }, { id: 'roles', label: 'Roles', icon: 'key' }, { id: 'logs', label: 'Logs', icon: 'logs' }] },
+  { id: 'dashboard', label: 'Overview', icon: 'dashboard' },
+  { id: 'users', label: 'Users', icon: 'users' },
+  { label: 'Companies', items: [
+    { id: 'companies', label: 'All companies', icon: 'building', on: () => S.route === 'companies' && S.coView !== 'access' },
+    { id: 'companies', href: '#/companies/access', label: 'Product access', icon: 'table', on: () => S.route === 'companies' && S.coView === 'access' }] },
+  { label: 'Operations', items: [{ id: 'transactions', label: 'Transactions', icon: 'arrows' }, { id: 'aggregated', label: 'Aggregated transactions', icon: 'aggTx' }, { id: 'confirmations', label: 'Confirmations', icon: 'shieldCheck', badge: 41 }, { id: 'sbp', label: 'SBP top-ups', icon: 'sbp' }] },
+  { label: 'Cards & accounts', items: [{ id: 'cards', label: 'Cards', icon: 'card' }, { id: 'iban', label: 'IBAN accounts', icon: 'bank' }] },
+  { label: 'Compliance', items: [{ id: 'documents', label: 'Documents', icon: 'documents' }, { id: 'creditco', label: 'CreditCo KYC', icon: 'passport' }, { id: 'kyt', label: 'KYT rules', icon: 'radar' }] },
+  { label: 'Staking', items: [{ id: 'staking', label: 'Staking dashboard', icon: 'stakingDash' }, { id: 'stakes', label: 'Stakes', icon: 'stakes' }, { id: 'payout-pools', label: 'Payout pools', icon: 'payout' }, { id: 'strategies', label: 'Strategies', icon: 'strategy' }] },
+  { label: 'Products', items: [{ id: 'card-products', label: 'Card products', icon: 'cardProduct' }, { id: 'iban-products', label: 'IBAN products', icon: 'ibanProduct' }, { id: 'level-presets', label: 'Level presets', icon: 'levels' }] },
+  { label: 'Analytics', items: [{ id: 'activity-stats', label: 'Activity statistics', icon: 'pieChart' }, { id: 'wallet-stats', label: 'Wallet statistics', icon: 'walletStats' }, { id: 'reserves', label: 'Reserves', icon: 'scale' }] },
+  { label: 'Settings', items: [{ id: 'currencies', label: 'Currencies', icon: 'coins' }, { id: 'markets', label: 'Markets', icon: 'candles' }, { id: 'countries', label: 'Country lists', icon: 'globe' }, { id: 'sources', label: 'Sources', icon: 'folder' }] },
+  { label: 'Administration', items: [{ id: 'admins', label: 'Administrators', icon: 'userCog' }, { id: 'roles', label: 'Roles', icon: 'key' }, { id: 'logs', label: 'Audit logs', icon: 'logs' }] },
 ];
-const NAV_FLAT = NAV.flatMap(g => g.items);
+const NAV_FLAT = NAV.flatMap(n => n.items || [n]).filter((n, i, a) => a.findIndex(x => x.id === n.id) === i); // one entry per route
+const navTitle = id => NAV_FLAT.find(x => x.id === id).label;
+const navOn = it => it.on ? it.on() : S.route === it.id;
+const navLink = it => `<a class="nav ${navOn(it) ? 'active' : ''}" href="${it.href || '#/' + it.id}" data-tip="${it.label}" data-tip-collapsed>${icon(it.icon, 17)}<span class="fade">${it.label}</span>${it.badge ? `<em class="nb fade">${it.badge}</em>` : ''}</a>`;
 
 function renderSidebar() {
-  const col = $('#app').classList.contains('collapsed');
+  const col = $('#app').classList.contains('collapsed'), keep = $('#sidebar .sb-scroll')?.scrollTop || 0;
   $('#sidebar').innerHTML = `
     <div class="sb-head">
       <a class="logo" href="#/dashboard" aria-label="NS.CARDS home">${LOGO_SIGN(15)}${LOGO_WORD(13.5)}</a>
       <button class="sb-toggle" data-act="toggle-sidebar" data-tip="${col ? 'Expand' : 'Collapse'} sidebar  ⌘B">${icon(col ? 'panelOpen' : 'panelClose', 18)}</button>
     </div>
     <nav class="sb-scroll">
-      ${NAV.map(g => `<div class="sb-group ${g.sec && S.navClosed.has(g.sec) ? 'closed' : ''}">
-        ${g.sec ? `<button class="sb-label fade" data-act="toggle-navgroup" data-sec="${g.sec}">${g.sec}${icon('chevDown', 12)}</button>` : ''}
-        <div class="sb-items">${g.items.map(it => `<a class="nav ${S.route === it.id ? 'active' : ''}" href="#/${it.id}" data-tip="${it.label}" data-tip-collapsed>${icon(it.icon, 17)}<span class="fade">${it.label}</span>${it.badge ? `<em class="nb fade">${it.badge}</em>` : ''}</a>`).join('')}</div>
-      </div>`).join('')}
+      ${NAV.map(n => { if (!n.items) return navLink(n); const shut = S.navClosed.has(n.label), b = sum(n.items.map(it => it.badge || 0));
+        return `<div class="sb-sec ${shut ? 'closed' : ''}"><button class="sb-label fade" data-act="nav-sec" data-sec="${n.label}" aria-expanded="${!shut}"><span>${n.label}</span>${b ? `<i class="sb-dot" title="${b} pending"></i>` : ''}${icon('chevDown', 12)}</button><div class="sb-items">${n.items.map(navLink).join('')}</div></div>`; }).join('')}
     </nav>
     <div class="sb-foot">
-      <button class="me" data-act="me" data-tip="Account" data-tip-collapsed><span class="me-av">SA</span><span class="em fade">super_admin@ns.cards</span><span class="fade">${icon('chevsUD', 14)}</span></button>
+      <button class="me" data-act="me" data-tip="Account" data-tip-collapsed><span class="me-av">SA</span><span class="em fade">super_admin@ns.cards</span><span class="fade me-more">${icon('more', 14)}</span></button>
     </div>`;
+  // re-rendering resets the scroll: put it back, then nudge only if the current item is out of view
+  const box = $('#sidebar .sb-scroll'), cur = $('a.nav.active', box); box.scrollTop = keep;
+  if (cur) { const a = cur.getBoundingClientRect(), b = box.getBoundingClientRect(); if (a.top < b.top) box.scrollTop -= b.top - a.top + 8; else if (a.bottom > b.bottom) box.scrollTop += a.bottom - b.bottom + 8; }
 }
 
 // Header = page title (breadcrumb) + that page's actions
 function crumbs() {
   if (S.route === 'users' && S.userId) { const u = byId(S.userId); return [['Users', '#/users'], ['#' + S.userId]]; }
-  if (S.route === 'companies' && S.coId) { const c = coById(S.coId); return [['Companies', '#/companies'], [c ? c.name : '#' + S.coId]]; }
+  if (S.route === 'companies' && S.coId) { const c = coById(S.coId); return [[navTitle('companies'), '#/companies'], [c ? c.name : '#' + S.coId]]; }
   if (PAGES[S.route] && S.recId) { const P = pg(), r = recOf(P); return [[P.title, '#/' + P.id], [r ? P.rec.title(r) : S.recId]]; }
-  return [[NAV_FLAT.find(n => n.id === S.route).label]];
+  if (S.route === 'companies' && S.coView === 'access') return [['Product access']];
+  return [[navTitle(S.route)]];
 }
 function topbarActions() {
   if (S.route === 'dashboard') return `
@@ -1292,11 +1306,10 @@ function topbarActions() {
   return '';
 }
 function renderTopbar() {
-  const c = crumbs(), acts = topbarActions(), lead = S.route === 'companies' && !S.coId ? coSwitch() : '';
+  const c = crumbs(), acts = topbarActions();
   $('#topbar').innerHTML = `
     <button class="icon-btn menu-btn" data-act="mobile-menu" aria-label="Menu">${icon('menu', 18)}</button>
     <nav class="crumbs" aria-label="Breadcrumb">${c.map(([l, h], i) => (i ? '<span class="crumb-sep">/</span>' : '') + (h ? `<a href="${h}">${esc(l)}</a>` : `<span class="cur">${esc(l)}</span>`)).join('')}</nav>
-    ${lead ? `<div class="tb-ctx tb-lead">${lead}</div>` : ''}
     <div class="tb-sp"></div>
     ${acts ? `<div class="tb-ctx">${acts}</div>` : ''}`;
 }
@@ -1344,6 +1357,7 @@ function route() {
   if (r !== S.route && !S._keepFilters) resetLists();
   S._keepFilters = false;
   S.route = r; S.userId = uid; S.coId = cid; S.coView = r === 'companies' && sub === 'access' ? 'access' : 'list';
+  const sec = NAV.find(n => n.items?.some(navOn)); if (sec && S.navClosed.delete(sec.label)) store.set('nsc.navClosed', [...S.navClosed]); // never hide the current page
   S.recId = PAGES[r] && sub ? decodeURIComponent(sub) : null;
   closePop(); $('#app').classList.remove('mobile-open'); $('#tt').classList.remove('show');
   renderSidebar(); renderTopbar();
@@ -1353,7 +1367,6 @@ function route() {
   else if (r === 'companies') cid ? renderCompanyPage() : S.coView === 'access' ? renderAccess() : renderCompanies();
   else if (PAGES[r]) S.recId ? renderRec() : renderPg();
   else if (DASHES[r]) renderDashPage();
-  else renderPlaceholder();
   renderFloat();
 }
 window.addEventListener('hashchange', route);
@@ -1366,13 +1379,6 @@ function resetLists() {
   Object.values(S.pg).forEach(st => { Object.assign(st, { filters: [], search: '', page: 1 }); st.sel.clear(); });
 }
 const goUser = (id, e) => { const url = '#/users/' + id; if (e && (e.metaKey || e.ctrlKey)) window.open(location.pathname + url, '_blank'); else location.hash = url; };
-
-function renderPlaceholder() {
-  const it = NAV_FLAT.find(n => n.id === S.route);
-  $('#main').innerHTML = `<div class="page">
-    <div class="ph"><div class="empty"><div class="em-ic">${icon(it.icon, 22)}</div><h3>Not in this prototype yet</h3><p>Overview, Users and Companies are fully clickable.</p><a class="btn btn-dark btn-sm" href="#/users">Open Users</a></div></div>
-  </div>`;
-}
 
 /* ════════════════════════════ Date range picker ════════════════════════════ */
 // A range is { key } for a dynamic preset (re-evaluated against "now") or { key: 'custom', from, to } (ms timestamps).
@@ -2515,7 +2521,10 @@ function goFilter(key, values) {
 
 const ACT = {
   'toggle-sidebar': toggleSidebar,
-  'toggle-navgroup': a => { const s = a.dataset.sec; S.navClosed.has(s) ? S.navClosed.delete(s) : S.navClosed.add(s); store.set('nsc.navClosed', [...S.navClosed]); a.closest('.sb-group').classList.toggle('closed'); },
+  'nav-sec': a => {
+    const k = a.dataset.sec, shut = !S.navClosed.has(k); shut ? S.navClosed.add(k) : S.navClosed.delete(k); store.set('nsc.navClosed', [...S.navClosed]);
+    a.closest('.sb-sec').classList.toggle('closed', shut); a.setAttribute('aria-expanded', !shut);
+  },
   'mobile-menu': () => $('#app').classList.toggle('mobile-open'),
   'theme': a => { setTheme(a.dataset.v); if (popOpts.kind === 'me') { pop.innerHTML = meMenu(); positionPop(); } },
   'me': a => openPop(a, meMenu(), { width: 260, kind: 'me' }),
@@ -2844,7 +2853,6 @@ const bankRows = (D, l, i) => D.bank[l + '|' + i] ||= BANK_BASE.map(([op, provid
 const exRows = (D, l) => D.exfees[l] ||= EX_TIERS.map(([from, to, p]) => { const v = +(p * LVL_X[l]).toFixed(3); return { from, to, apiM: +(v * .8).toFixed(3), apiT: v, userM: v, userT: v }; });
 
 /* ── Topbar, floating bar ── */
-const coSwitch = () => `<div class="seg">${[['list', 'Companies', 'building'], ['access', 'Product access', 'table']].map(([k, l, ic]) => `<button class="${S.coView === k ? 'on' : ''}" data-act="route" data-arg="companies${k === 'access' ? '/access' : ''}">${icon(ic, 14)}<span class="sl">${l}</span></button>`).join('')}</div>`;
 function coTopbar() {
   if (S.coId) {
     const l = S._coList.some(c => c.id === S.coId) ? S._coList : COMPANIES, i = l.findIndex(c => c.id === S.coId);
@@ -3005,7 +3013,7 @@ function coSel(field, val) {
 }
 function renderCompanyPage() {
   const c = coById(S.coId), main = $('#main');
-  if (!c) { main.innerHTML = `<div class="page"><div class="ph"><div class="empty"><div class="em-ic">${icon('building', 22)}</div><h3>Company not found</h3><p>#${S.coId} doesn’t exist.</p><a class="btn btn-dark btn-sm" href="#/companies">Back to Companies</a></div></div></div>`; return; }
+  if (!c) { main.innerHTML = `<div class="page"><div class="ph"><div class="empty"><div class="em-ic">${icon('building', 22)}</div><h3>Company not found</h3><p>#${S.coId} doesn’t exist.</p><a class="btn btn-dark btn-sm" href="#/companies">Back to all companies</a></div></div></div>`; return; }
   const D = cd(c), d = { ...c, ...S.coDraft }, scroll = main.scrollTop, over = S.coTab === 'overview', nUsers = coUsers(c).length;
   const tabs = [['overview', 'Overview'], ['products', 'Products' + tabCount(c.cp.length + c.ip.length)], ['gifts', 'Gift codes' + tabCount(D.gifts.length)], ['users', 'Users' + tabCount(nUsers)],
     ['keys', 'API keys' + tabCount(D.keys.filter(k => k.status === 'ACTIVE').length)], ['directors', 'Directors' + tabCount(D.directors.length)], ['rates', 'Sell rates'], ['imports', 'Imports'], ['branding', 'Branding'], ['currencies', 'Currencies' + tabCount(D.currencies.length)]];
@@ -3516,7 +3524,7 @@ const pgFx = P => { const st = pgS(P.id); return { F: P.fields, items: pgData(P)
 const cap = s => s[0].toUpperCase() + s.slice(1);
 const plainText = h => { const d = document.createElement('div'); d.innerHTML = h; return d.textContent.replace(/\s+/g, ' ').trim(); };
 function page(P) {
-  P.title = NAV_FLAT.find(n => n.id === P.id).label;
+  P.title = navTitle(P.id);
   P.cols.forEach(c => { c.val ||= r => r[c.k]; c.dir ||= 'asc'; });
   P.fields ||= {}; P.sort ||= { k: P.cols[0].k, dir: P.cols[0].dir };
   TCOLS['pg:' + P.id] = P.cols;
