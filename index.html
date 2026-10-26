@@ -251,7 +251,8 @@ h1 .count{font-family:var(--mono);font-size:14px;font-weight:400;color:var(--ink
 .tool-btn:hover{background:var(--surface);color:var(--ink);border-style:solid}
 .tool-btn.solid{height:36px;border-style:solid;background:var(--surface);color:var(--ink)}
 .tool-btn.solid:hover{background:var(--hover)}
-.chips{display:contents}
+.chips{display:flex;flex-wrap:wrap;align-items:center;gap:8px;flex-basis:100%} /* applied filters: own row under search / Filter */
+.chips:empty{display:none}
 .chip{display:inline-flex;align-items:stretch;height:34px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface);font-size:13px;overflow:hidden;animation:pop-in .14s ease}
 .chip>*{display:flex;align-items:center;gap:6px;padding:0 9px;white-space:nowrap}
 .chip .cf{color:var(--ink-2)}
@@ -314,6 +315,27 @@ table.ut.fixed{table-layout:fixed}
 .ut td{overflow:hidden;text-overflow:ellipsis}
 .ut .th-in{max-width:100%;overflow:hidden}
 .ut th.c,.ut td.c{text-align:center}
+/* column reorder: dragged column fades, a brand line marks where it will land */
+.col-dragging{opacity:.35}
+/* header: grip dots appear on hover; a dashed brand line + tint marks where the dragged column lands */
+th[draggable="true"]::before{content:"";position:absolute;left:3px;top:50%;width:8px;height:13px;transform:translateY(-50%);opacity:0;transition:opacity .12s;pointer-events:none;
+  background-image:radial-gradient(circle,var(--ink-3) 1.15px,transparent 1.35px);background-size:4px 4.4px}
+th[draggable="true"]:hover::before{opacity:1}
+.dt th[draggable="true"]{position:relative}
+th.drop-l,th.drop-r{background-color:var(--brand-50)!important;background-image:linear-gradient(var(--brand) 55%,transparent 0);background-size:2px 6px;background-repeat:repeat-y}
+th.drop-l{background-position:left top} th.drop-r{background-position:right top}
+/* column chips in Display / Columns menus: grip to drag, solid = shown, dashed = hidden; a dashed slot opens where a dragged chip will land */
+.cchips{display:flex;flex-wrap:wrap;gap:6px}
+.cchip{display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 9px 0 5px;border-radius:9px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:12.5px;font-weight:500;cursor:grab;box-shadow:var(--shadow-sm);transition:border-color .12s,background .12s,color .12s,opacity .12s}
+.cchip:hover{border-color:var(--cb-border)}
+.cchip:active{cursor:grabbing}
+.cchip>.i:first-child{color:var(--ink-3)}
+.cchip:hover>.i:first-child{color:var(--ink-2)}
+.cchip>.i:last-child{color:var(--ink-2);margin-left:1px}
+.cchip.off{border-style:dashed;background:transparent;color:var(--ink-3);box-shadow:none}
+.cchip.off:hover{color:var(--ink);background:var(--surface)}
+.cchip.off>.i:last-child{color:var(--ink-3)}
+.cchip-slot{display:inline-block;height:30px;border-radius:9px;border:1.5px dashed var(--brand);background:var(--brand-50);flex:none}
 .dgrid .card.flush>.card-h{padding:18px 20px 0;margin-bottom:12px}
 .flags{display:inline-flex;align-items:center;gap:3px}
 .flags .faint{font-size:12px;margin-left:3px}
@@ -988,6 +1010,7 @@ const SOLAR = {
   ibanProduct: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19c-2.809 0-4.213 0-5.222-.674a4 4 0 0 1-1.104-1.104C2 16.213 2 14.81 2 12s0-4.213.674-5.222a4 4 0 0 1 1.104-1.104C4.787 5 6.19 5 9 5h6c2.809 0 4.213 0 5.222.674a4 4 0 0 1 1.104 1.104C22 7.787 22 9.19 22 12s0 4.213-.674 5.222a4 4 0 0 1-1.104 1.104C19.213 19 17.81 19 15 19z"/><path d="M12 9a3 3 0 1 1 0 6a3 3 0 0 1 0-6Z"/><path stroke-linecap="round" d="M5.5 15V9m13 6V9"/></g>`,
   sbp: `<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="M19 14v6m0 0l2-2m-2 2l-2-2"/><path d="M22 12c0-3.771 0-5.657-1.172-6.828S17.771 4 14 4h-4C6.229 4 4.343 4 3.172 5.172S2 8.229 2 12s0 5.657 1.172 6.828S6.229 20 10 20h4m-4-4H6m7 0h-.5M2 10h20"/></g>`,
   levels: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="M16 22v-9c0-1.414 0-2.121-.44-2.56C15.122 10 14.415 10 13 10h-2c-1.414 0-2.121 0-2.56.44C8 10.878 8 11.585 8 13v9m0 0c0-1.414 0-2.121-.44-2.56C7.122 19 6.415 19 5 19s-2.121 0-2.56.44C2 19.878 2 20.585 2 22m20 0v-3c0-1.414 0-2.121-.44-2.56C21.122 16 20.415 16 19 16s-2.121 0-2.56.44C16 16.878 16 17.585 16 19v3"/><path d="M11.146 3.023C11.526 2.34 11.716 2 12 2s.474.34.854 1.023l.098.176c.108.194.162.29.246.354c.085.064.19.088.4.135l.19.044c.738.167 1.107.25 1.195.532s-.164.577-.667 1.165l-.13.152c-.143.167-.215.25-.247.354s-.021.215 0 .438l.02.203c.076.785.114 1.178-.115 1.352c-.23.175-.576.015-1.267-.303l-.178-.082c-.197-.09-.295-.136-.399-.136s-.202.046-.399.136l-.178.082c-.691.318-1.037.478-1.267.303c-.23-.174-.191-.567-.115-1.352l.02-.203c.021-.223.032-.334 0-.438s-.104-.187-.247-.354l-.13-.152c-.503-.588-.755-.882-.667-1.165c.088-.282.457-.365 1.195-.532l.19-.044c.21-.047.315-.07.4-.135c.084-.064.138-.16.246-.354z"/></g>`,
+  grip: `<g fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></g>`,
   cardProduct: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12c0-3.771 0-5.657 1.172-6.828S6.229 4 10 4h4c3.771 0 5.657 0 6.828 1.172S22 8.229 22 12s0 5.657-1.172 6.828S17.771 20 14 20h-4c-3.771 0-5.657 0-6.828-1.172S2 15.771 2 12Z"/><path stroke-linecap="round" d="M10 16.5H6m2-3H6M2 10h20"/><path d="M14 15c0-.943 0-1.414.293-1.707S15.057 13 16 13s1.414 0 1.707.293S18 14.057 18 15s0 1.414-.293 1.707S16.943 17 16 17s-1.414 0-1.707-.293S14 15.943 14 15Z"/></g>`,
   panelClose: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828S6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172S22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828S17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172S2 16.771 2 13z"/><path stroke-linecap="round" d="M15 21V3"/></g>`,
   panelOpen: `<g transform="matrix(-1 0 0 1 24 0)"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828S6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172S22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828S17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172S2 16.771 2 13z"/><path stroke-linecap="round" d="M15 21V3"/></g></g>`,
@@ -1733,7 +1756,7 @@ function renderResults() {
 const colCtx = () => S.route === 'companies'
   ? { t: 'companies', cols: tVisible('companies').map(c => c.k), w: S.coColW, key: 'nsc.cocolw', sel: '#coResults table.ut', redraw: coResults }
   : PAGES[S.route] ? { t: 'pg:' + S.route, cols: tVisible('pg:' + S.route).map(c => c.k), w: pgW(S.route), key: 'nsc.pgw.' + S.route, sel: '#pgResults table.ut', redraw: pgResults }
-  : { cols: COLS.filter(c => !S.hidden.has(c.key)).map(c => c.key), w: S.colW, key: 'nsc.colw', sel: '#results table.ut', redraw: renderResults };
+  : { t: 'users', cols: usersCols().map(c => c.key), w: S.colW, key: 'nsc.colw', sel: '#results table.ut', redraw: renderResults };
 const tableW = (X = colCtx()) => X.cols.reduce((s, k) => s + X.w[k], 0) + 44 + 84;
 function fitColumns() {
   const X = colCtx(), t = $(X.sel); if (!t || t.classList.contains('fixed')) return;
@@ -1746,7 +1769,7 @@ function applyColW(t) {
   t.style.width = tableW(X) + 'px'; t.classList.add('fixed');
 }
 function tableHTML(list) {
-  const cols = COLS.filter(c => !S.hidden.has(c.key));
+  const cols = usersCols();
   const pages = Math.max(1, Math.ceil(list.length / S.perPage)); S.page = Math.min(S.page, pages);
   const start = (S.page - 1) * S.perPage, rows = list.slice(start, start + S.perPage);
   const all = rows.every(u => S.selected.has(u.id)), some = rows.some(u => S.selected.has(u.id));
@@ -1754,7 +1777,7 @@ function tableHTML(list) {
   return `<div class="tcard ${S.density}"><div class="hs-wrap"><div class="tscroll hs"><table class="ut ${fixed ? 'fixed' : ''}" style="${fixed ? `width:${tableW()}px` : ''}">
     <colgroup><col style="width:44px">${cols.map(c => `<col data-col="${c.key}" ${fixed ? `style="width:${S.colW[c.key]}px"` : ''}>`).join('')}<col></colgroup>
     <thead><tr><th class="cbcell"><button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="sel-page" aria-label="Select page">${icon('check', 11, 3)}</button></th>
-    ${cols.map(c => { const on = S.sort.key === c.key; return `<th class="sortable ${on ? 'sorted' : ''} ${c.right ? 'r' : ''}" data-act="sort" data-key="${c.key}"><span class="th-in">${c.label}<span class="srt">${icon(on && S.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 12, 2)}</span></span><span class="col-rs" data-rs="${c.key}" data-tip="Drag to resize · double-click to fit"></span></th>`; }).join('')}
+    ${cols.map(c => { const on = S.sort.key === c.key; return `<th class="sortable ${on ? 'sorted' : ''} ${c.right ? 'r' : ''}" data-act="sort" data-key="${c.key}" draggable="true" data-t="users" data-drag="${c.key}"><span class="th-in">${c.label}<span class="srt">${icon(on && S.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 12, 2)}</span></span><span class="col-rs" data-rs="${c.key}" data-tip="Drag to resize · double-click to fit"></span></th>`; }).join('')}
     <th class="act-h"></th></tr></thead>
     <tbody>${rows.map(u => `<tr data-uid="${u.id}" class="${S.selected.has(u.id) ? 'sel' : ''}">
       <td class="cbcell"><button class="cb ${S.selected.has(u.id) ? 'on' : ''}" data-act="sel" data-id="${u.id}" aria-label="Select">${icon('check', 11, 3)}</button></td>
@@ -2008,24 +2031,29 @@ const copyVal = (v, shown = v) => `<button class="copy num" data-act="copy" data
 const emptyBlock = (ic, t, p, btn = '') => `<div class="empty sm"><div class="em-ic">${icon(ic, 20)}</div><h3>${t}</h3><p>${p}</p>${btn}</div>`;
 const tabCount = n => n ? ` <span class="tab-n">${n}</span>` : '';
 // Data table inside a card. heads: 'Label' or 'Label|r' (right) / '|c' (centre) / '|w' (shrink) / '|a' (row actions: shown on hover, pinned right). rows: arrays of cells, or { cls, cells }.
-function dtable(heads, rows, empty = '') {
+// drag (optional) = { t, keys }: column keys aligned with heads (null for fixed columns) make those headers draggable to reorder
+function dtable(heads, rows, empty = '', drag) {
   if (!rows.length) return empty;
   const H = heads.map(h => { const k = h.lastIndexOf('|'); return k < 0 ? { l: h, al: '' } : { l: h.slice(0, k), al: h.slice(k + 1) }; });
-  return `<div class="hs-wrap"><div class="dt-wrap hs"><table class="dt"><thead><tr>${H.map(h => `<th class="${h.al}">${h.l}</th>`).join('')}</tr></thead>
+  return `<div class="hs-wrap"><div class="dt-wrap hs"><table class="dt"><thead><tr>${H.map((h, i) => `<th class="${h.al}" ${drag?.keys[i] ? `draggable="true" data-t="${drag.t}" data-drag="${drag.keys[i]}"` : ''}>${h.l}</th>`).join('')}</tr></thead>
     <tbody>${rows.map(r => { const cells = Array.isArray(r) ? r : r.cells; return `<tr class="${r.cls || ''}">${cells.map((c, i) => (H[i].al === 'a' ? `<td class="act"><div class="row-actions">${c}</div></td>` : `<td class="${H[i].al}">${c}</td>`)).join('')}</tr>`; }).join('')}</tbody></table></div></div>`;
 }
 /* Column chooser for user-page tables: TCOLS[table] = [{ k, l, al, on, cell(row) }]; each table remembers its visible columns */
-const tVisible = t => { const saved = (S.tcols ||= store.get('nsc.tcols', {}))[t]; return TCOLS[t].filter(c => c.lock || (saved ? saved.includes(c.k) : c.on)); };
+// Column order and visibility are stored apart, so a hidden column keeps its place: S.tord[table] = every column key in display order,
+// S.tcols[table] = the visible keys (missing = defaults from TCOLS). Users keeps the same pair in S.colOrder / S.hidden.
+const tOrder = t => { const all = TCOLS[t].map(c => c.k), o = ((S.tord ||= store.get('nsc.tord', {}))[t] || []).filter(k => all.includes(k)); return [...o, ...all.filter(k => !o.includes(k))]; };
+const tVisible = t => { const saved = (S.tcols ||= store.get('nsc.tcols', {}))[t]; return tOrder(t).map(k => TCOLS[t].find(c => c.k === k)).filter(c => c.lock || (saved ? saved.includes(c.k) : c.on)); };
+const withCol = (t, vis, k) => vis.includes(k) ? vis.filter(x => x !== k) : [...vis, k];
 function ctable(t, rows, empty, o = {}) {
   const cols = tVisible(t);
   const heads = [...(o.pre ? [o.pre.head] : []), ...cols.map(c => c.l + (c.al ? '|' + c.al : '')), ...(o.post ? ['|a'] : [])];
   return dtable(heads, rows.map((r, i) => {
     const cells = [...(o.pre ? [o.pre.cell(r, i)] : []), ...cols.map(c => c.cell(r, i)), ...(o.post ? [o.post(r, i)] : [])];
     return o.rowCls ? { cls: o.rowCls(r), cells } : cells;
-  }), empty);
+  }), empty, { t, keys: [...(o.pre ? [null] : []), ...cols.map(c => c.k), ...(o.post ? [null] : [])] });
 }
 const colsBtn = t => `<button class="icon-btn sm" data-act="tcols" data-t="${t}" data-tip="Columns">${icon('columns', 15)}</button>`;
-const tcolsPop = t => { const vis = new Set(tVisible(t).map(c => c.k)); return `<div class="pop-sec"><div class="pop-lbl">Columns<button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="tcols-reset" data-t="${t}">Reset columns</button></div><div class="pills">${TCOLS[t].filter(c => !c.lock).map(c => `<button class="pill ${vis.has(c.k) ? 'on' : ''}" data-act="tcol" data-t="${t}" data-k="${c.k}">${c.l}</button>`).join('')}</div></div>`; };
+const tcolsPop = t => `<div class="pop-sec"><div class="pop-lbl">Columns</div>${colChips(t, 'tcol')}</div>`;
 const tcard = (title, acts, body, tools = '') => `<div class="card flush"><div class="card-h"><span class="card-t">${title}</span>${acts ? `<div class="ch-act">${acts}</div>` : ''}</div>${tools ? `<div class="card-tools">${tools}</div>` : ''}${body}</div>`;
 
 function eventsOf(u) {
@@ -2430,7 +2458,7 @@ function displayPop() {
     </div>
     ${S.view !== 'table' ? `<div class="pop-sec"><div class="pop-lbl">Group by</div><div class="pills">${groupOpts.map(k => `<button class="pill ${curGroup === k ? 'on' : ''}" data-act="disp-group" data-v="${k}">${gl(k)}</button>`).join('')}</div></div>` : ''}
     ${S.view !== 'board' ? `<div class="pop-sec"><div class="pop-row"><span>Density</span><div class="seg sm">${['comfortable', 'compact'].map(k => `<button class="${S.density === k ? 'on' : ''}" data-act="disp-density" data-v="${k}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('')}</div></div></div>` : ''}
-    ${S.view === 'table' ? `<div class="pop-sec"><div class="pop-lbl">Columns<span style="display:flex;gap:12px"><button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="reset-cols">Reset columns</button><button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="reset-colw">Reset widths</button></span></div><div class="pills">${COLS.filter(c => !c.lock).map(c => `<button class="pill ${S.hidden.has(c.key) ? '' : 'on'}" data-act="disp-col" data-v="${c.key}">${c.label}</button>`).join('')}</div></div>` : ''}`;
+    ${S.view === 'table' ? `<div class="pop-sec"><div class="pop-lbl">Columns<span style="display:flex;gap:12px"><button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="reset-colw">Reset widths</button></span></div>${colChips('users', 'disp-col')}</div>` : ''}`;
 }
 const refreshDisplayPop = () => { if (popOpts.kind === 'display') { pop.innerHTML = displayPop(); positionPop(); } };
 
@@ -2677,16 +2705,14 @@ const ACT = {
     D.forms.unshift({ id: 900 + u.id % 100 * 4 + D.forms.length + 10, type: t, status: 'REQUESTED', date: new Date(NOW), updated: new Date(NOW), reason: '' });
     toast(`${FORM_TYPES[t].title} form requested`, 'send'); renderUserPage();
   },
-  'reset-cols': () => { S.hidden = new Set(DEFAULT_HIDDEN); store.set('nsc.hidden2', DEFAULT_HIDDEN); renderResults(); refreshDisplayPop(); },
   'reset-colw': () => { S.colW = {}; store.set('nsc.colw', {}); renderResults(); toast('Column widths fitted to this page', 'columns'); },
   'tcols': a => openPop(a, tcolsPop(a.dataset.t), { align: 'right', width: 360, kind: 'tcols', anchorSel: `[data-act="tcols"][data-t="${a.dataset.t}"]` }),
   'tcol': a => {
     const t = a.dataset.t, k = a.dataset.k, vis = tVisible(t).map(c => c.k);
-    const next = vis.includes(k) ? vis.filter(x => x !== k) : TCOLS[t].map(c => c.k).filter(x => x === k || vis.includes(x));
+    const next = withCol(t, vis, k);
     if (!next.length) return;
     S.tcols[t] = next; store.set('nsc.tcols', S.tcols); rerender(); pop.innerHTML = tcolsPop(t); reanchor();
   },
-  'tcols-reset': a => { const t = a.dataset.t; delete S.tcols[t]; store.set('nsc.tcols', S.tcols); rerender(); pop.innerHTML = tcolsPop(t); reanchor(); },
   'dd': a => {
     const sel = a.previousElementSibling, search = sel.options.length > 8 || 'search' in sel.dataset;
     S._dd = sel; a.classList.add('open');
@@ -2906,7 +2932,7 @@ function coResults() {
   el.innerHTML = `<div class="tcard ${S.density}"><div class="hs-wrap"><div class="tscroll hs"><table class="ut ${fixed ? 'fixed' : ''}" style="${fixed ? `width:${tableW()}px` : ''}">
     <colgroup><col style="width:44px">${cols.map(c => `<col data-col="${c.k}" ${fixed ? `style="width:${S.coColW[c.k]}px"` : ''}>`).join('')}<col></colgroup>
     <thead><tr><th class="cbcell"><button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="co-sel-page" aria-label="Select page">${icon('check', 11, 3)}</button></th>
-    ${cols.map(c => { const on = f.sort.k === c.k; return `<th class="sortable ${on ? 'sorted' : ''} ${c.al === 'r' ? 'r' : ''}" data-act="co-sort" data-k="${c.k}" data-key="${c.k}"><span class="th-in">${c.l}<span class="srt">${icon(on && f.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 12, 2)}</span></span><span class="col-rs" data-rs="${c.k}" data-tip="Drag to resize · double-click to fit"></span></th>`; }).join('')}
+    ${cols.map(c => { const on = f.sort.k === c.k; return `<th class="sortable ${on ? 'sorted' : ''} ${c.al === 'r' ? 'r' : ''}" data-act="co-sort" data-k="${c.k}" data-key="${c.k}" draggable="true" data-t="companies" data-drag="${c.k}"><span class="th-in">${c.l}<span class="srt">${icon(on && f.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 12, 2)}</span></span><span class="col-rs" data-rs="${c.k}" data-tip="Drag to resize · double-click to fit"></span></th>`; }).join('')}
     <th class="act-h"></th></tr></thead>
     <tbody>${rows.map(c => `<tr data-cid="${c.id}" class="${f.sel.has(c.id) ? 'sel' : ''}">
       <td class="cbcell"><button class="cb ${f.sel.has(c.id) ? 'on' : ''}" data-act="co-sel" data-id="${c.id}" aria-label="Select">${icon('check', 11, 3)}</button></td>
@@ -3257,7 +3283,11 @@ document.addEventListener('dragover', e => { const z = e.target.closest?.('#impZ
 document.addEventListener('dragleave', e => { const z = e.target.closest?.('#impZone'); if (z && !z.contains(e.relatedTarget)) z.classList.remove('over'); });
 document.addEventListener('drop', e => { const z = e.target.closest?.('#impZone'); if (!z) return; e.preventDefault(); const f = e.dataTransfer.files[0]; f && runImport(f); });
 
-function rerender() { if (S.route === 'companies') S.coId ? renderCompanyPage() : renderCompanies(); else renderUserPage(); }
+function rerender() {
+  if (S.route === 'users') S.userId ? renderUserPage() : renderResults();
+  else if (S.route === 'companies') S.coId ? renderCompanyPage() : coResults();
+  else if (PAGES[S.route]) S.recId ? renderRec() : pgResults();
+}
 function coChange(t) {
   if (t.dataset.rate) { S.rate[t.dataset.rate] = t.value; renderCompanyPage(); }
   else if (t.dataset.curprov) { S.curProv = t.value; renderCompanyPage(); }
@@ -3527,7 +3557,7 @@ function pgResults() {
   el.innerHTML = `<div class="tcard ${S.density}"><div class="hs-wrap"><div class="tscroll hs"><table class="ut ${fixed ? 'fixed' : ''}" style="${fixed ? `width:${tableW()}px` : ''}">
     <colgroup><col style="width:44px">${cols.map(c => `<col data-col="${c.k}" ${fixed ? `style="width:${W[c.k]}px"` : ''}>`).join('')}<col></colgroup>
     <thead><tr><th class="cbcell"><button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="pg-sel-page" aria-label="Select page">${icon('check', 11, 3)}</button></th>
-    ${cols.map(c => { const on = st.sort.k === c.k; return `<th class="sortable ${on ? 'sorted' : ''} ${al(c)}" data-act="pg-sort" data-k="${c.k}" data-key="${c.k}"><span class="th-in">${c.l}<span class="srt">${icon(on && st.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 12, 2)}</span></span><span class="col-rs" data-rs="${c.k}" data-tip="Drag to resize · double-click to fit"></span></th>`; }).join('')}
+    ${cols.map(c => { const on = st.sort.k === c.k; return `<th class="sortable ${on ? 'sorted' : ''} ${al(c)}" data-act="pg-sort" data-k="${c.k}" data-key="${c.k}" draggable="true" data-t="pg:${P.id}" data-drag="${c.k}"><span class="th-in">${c.l}<span class="srt">${icon(on && st.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 12, 2)}</span></span><span class="col-rs" data-rs="${c.k}" data-tip="Drag to resize · double-click to fit"></span></th>`; }).join('')}
     <th class="act-h"></th></tr></thead>
     <tbody>${rows.map((r, i) => { const k = esc(keys[i]), q = P.quick?.(r), on = st.sel.has(keys[i]); return `<tr data-rid="${k}" class="${on ? 'sel' : ''}">
       <td class="cbcell"><button class="cb ${on ? 'on' : ''}" data-act="pg-sel" data-rid="${k}" aria-label="Select">${icon('check', 11, 3)}</button></td>
@@ -3615,7 +3645,7 @@ function pgCSV(P, rows, name) {
 function listDisplayPop() {
   const X = colCtx(), vis = new Set(X.cols), lnk = (act, l) => `<button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="${act}">${l}</button>`;
   return `<div class="pop-sec"><div class="pop-row"><span>Density</span><div class="seg sm">${['comfortable', 'compact'].map(k => `<button class="${S.density === k ? 'on' : ''}" data-act="ld-density" data-v="${k}">${cap(k)}</button>`).join('')}</div></div></div>
-    <div class="pop-sec"><div class="pop-lbl">Columns<span style="display:flex;gap:12px">${lnk('ld-cols-reset', 'Reset columns')}${lnk('ld-reset-colw', 'Reset widths')}</span></div><div class="pills">${TCOLS[X.t].filter(c => !c.lock).map(c => `<button class="pill ${vis.has(c.k) ? 'on' : ''}" data-act="ld-col" data-k="${c.k}">${c.l}</button>`).join('')}</div></div>`;
+    <div class="pop-sec"><div class="pop-lbl">Columns<span style="display:flex;gap:12px">${lnk('ld-reset-colw', 'Reset widths')}</span></div>${colChips(X.t, 'ld-col')}</div>`;
 }
 const refreshLD = () => { colCtx().redraw(); if (popOpts.kind === 'ldisplay') { pop.innerHTML = listDisplayPop(); positionPop(); } };
 
@@ -4435,8 +4465,7 @@ Object.assign(ACT, {
   'rec-step': a => stepRec(+a.dataset.d),
   'ld-display': a => openPop(a, listDisplayPop(), { align: 'right', width: 380, kind: 'ldisplay' }),
   'ld-density': a => { S.density = a.dataset.v; store.set('nsc.density', S.density); refreshLD(); },
-  'ld-col': a => { const X = colCtx(), k = a.dataset.k; S.tcols[X.t] = X.cols.includes(k) ? X.cols.filter(x => x !== k) : TCOLS[X.t].map(c => c.k).filter(x => x === k || X.cols.includes(x)); store.set('nsc.tcols', S.tcols); refreshLD(); },
-  'ld-cols-reset': () => { delete S.tcols[colCtx().t]; store.set('nsc.tcols', S.tcols); refreshLD(); },
+  'ld-col': a => { const X = colCtx(); S.tcols[X.t] = withCol(X.t, X.cols, a.dataset.k); store.set('nsc.tcols', S.tcols); refreshLD(); },
   'ld-reset-colw': () => { const X = colCtx(); Object.keys(X.w).forEach(k => delete X.w[k]); store.set(X.key, X.w); refreshLD(); toast('Column widths fitted to this page', 'columns'); },
   // page-specific actions
   'conf-ok': doRows(rows => confDecide(rows, true)), 'conf-no': doRows(rows => confDecide(rows, false), 'ban'),
@@ -4525,6 +4554,56 @@ document.addEventListener('keydown', e => {
   if (e.key === '/' && PAGES[S.route] && !S.recId) { e.preventDefault(); $('#pgSearch')?.focus(); }
   if (S.recId && (e.key === 'j' || e.key === 'k')) stepRec(e.key === 'j' ? 1 : -1);
 });
+
+/* column reorder: drag a column header — or a column chip in the Display / Columns menu — onto another column.
+   Works on every table with a column chooser (Users, Companies, every PAGES list, record-page tables); the order is saved per table. */
+S.colOrder = store.get('nsc.colorder', null);
+function usersOrder() { const all = COLS.map(c => c.key), o = (S.colOrder || []).filter(k => all.includes(k)); return [...o, ...all.filter(k => !o.includes(k))]; }
+function usersCols() { return usersOrder().map(k => COLS.find(c => c.key === k)).filter(c => !S.hidden.has(c.key)); }
+// Chips for a Columns menu, in column order: click to show or hide, drag (shown or hidden) to reorder
+function colChips(t, act) {
+  const items = t === 'users'
+    ? usersOrder().map(k => COLS.find(c => c.key === k)).filter(c => !c.lock).map(c => ({ k: c.key, l: c.label, on: !S.hidden.has(c.key) }))
+    : (vis => tOrder(t).map(k => TCOLS[t].find(c => c.k === k)).filter(c => !c.lock).map(c => ({ k: c.k, l: c.l, on: vis.includes(c) })))(tVisible(t));
+  return `<div class="cchips">${items.map(c => `<button class="cchip ${c.on ? '' : 'off'}" data-act="${act}" data-t="${t}" data-k="${c.k}" data-v="${c.k}" draggable="true" data-drag="${c.k}" title="${c.on ? 'Shown' : 'Hidden'} · click to ${c.on ? 'hide' : 'show'}">${icon('grip', 13)}<span>${c.l}</span>${icon(c.on ? 'check' : 'plus', 12, 2.2)}</button>`).join('')}</div>`;
+}
+function moveCol(t, k, target, after) {
+  const order = t === 'users' ? usersOrder() : tOrder(t), o = order.filter(x => x !== k);
+  o.splice(o.indexOf(target) + (after ? 1 : 0), 0, k);
+  if (t === 'users') { S.colOrder = o; store.set('nsc.colorder', o); } else { S.tord[t] = o; store.set('nsc.tord', S.tord); }
+  rerender();
+  if (popOpts.kind === 'display') { pop.innerHTML = displayPop(); positionPop(); }
+  else if (popOpts.kind === 'ldisplay') { pop.innerHTML = listDisplayPop(); positionPop(); }
+  else if (popOpts.kind === 'tcols') { pop.innerHTML = tcolsPop(t); reanchor(); }
+}
+let colDrag = null, slot = null;
+const dropAfter = (el, e) => { const r = el.getBoundingClientRect(); return e.clientX > r.left + r.width / 2; };
+const clearDrop = keep => $$('th.drop-l,th.drop-r').forEach(x => x !== keep && x.classList.remove('drop-l', 'drop-r'));
+document.addEventListener('dragstart', e => {
+  const h = e.target.closest?.('[data-drag]'); if (!h) return;
+  colDrag = { t: h.dataset.t, k: h.dataset.drag, w: h.offsetWidth }; $('#tt').classList.remove('show');
+  e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', h.dataset.drag);
+  setTimeout(() => h.classList.add('col-dragging')); // after the browser has taken the drag image
+});
+document.addEventListener('dragover', e => {
+  if (!colDrag) return;
+  if (e.target.closest?.('.cchip-slot')) { e.preventDefault(); return; }
+  const h = e.target.closest?.('[data-drag]');
+  if (!h || h.dataset.t !== colDrag.t || h.dataset.drag === colDrag.k) { clearDrop(); if (slot?.parentNode && e.target.closest?.('.cchips')) e.preventDefault(); return; }
+  e.preventDefault(); const after = dropAfter(h, e);
+  if (h.classList.contains('cchip')) { // open a dashed slot where the chip will land
+    slot ||= Object.assign(document.createElement('span'), { className: 'cchip-slot' });
+    slot.style.width = colDrag.w + 'px'; slot.dataset.target = h.dataset.drag; slot.dataset.after = after ? '1' : '';
+    const ref = after ? h.nextSibling : h; if (slot.parentNode !== h.parentNode || slot.nextSibling !== ref) h.parentNode.insertBefore(slot, ref);
+  } else { clearDrop(h); h.classList.toggle('drop-r', after); h.classList.toggle('drop-l', !after); }
+});
+document.addEventListener('drop', e => {
+  if (!colDrag) return;
+  const d = colDrag, h = e.target.closest?.('th[data-drag]');
+  if (slot?.parentNode && slot.dataset.target) { e.preventDefault(); moveCol(d.t, d.k, slot.dataset.target, !!slot.dataset.after); }
+  else if (h && h.dataset.t === d.t && h.dataset.drag !== d.k) { e.preventDefault(); moveCol(d.t, d.k, h.dataset.drag, dropAfter(h, e)); }
+});
+document.addEventListener('dragend', () => { clearDrop(); slot?.remove(); slot = null; $$('.col-dragging').forEach(x => x.classList.remove('col-dragging')); colDrag = null; });
 
 /* column resize */
 let RS = null;
