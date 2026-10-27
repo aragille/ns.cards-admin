@@ -121,6 +121,7 @@ a{color:inherit;text-decoration:none}
 .logo{display:flex;align-items:center;gap:5.6px;color:var(--ink);transition:opacity .15s}
 .sb-toggle{position:absolute;right:14px;top:20px;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:var(--ink-2);transition:opacity .15s,right .24s cubic-bezier(.2,.8,.2,1)}
 .sb-toggle:hover{background:var(--hover);color:var(--ink)}
+.sb-toggle{opacity:0} .sb-head:hover .sb-toggle,.sb-toggle:focus-visible{opacity:1}
 .app.collapsed .sb-toggle{right:17px;opacity:0;pointer-events:none}
 .app.collapsed .sb-head:hover .sb-toggle{opacity:1;pointer-events:auto}
 .app.collapsed .sb-head:hover .logo{opacity:0}
@@ -161,10 +162,9 @@ a{color:inherit;text-decoration:none}
 .nav-fly.active.open{background:var(--nav-active)}
 .fly-h{padding:6px 10px 6px;font-size:11px;font-weight:500;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3)}
 .pop .nav{height:34px}
-.me-nav{padding:6px 4px 8px}
-.me-nav .pop-lbl{padding:0 6px;margin-bottom:6px}
-.me-nav .seg{display:flex;width:100%}
-.me-nav .seg button{flex:1;justify-content:center}
+.me-row{padding:0 2px 0 10px}
+.pi .pv{color:var(--ink-3);font-size:13px}
+.pi .pv+.i{color:var(--ink-3)}
 .sb-foot{padding:10px 12px;border-top:1px solid var(--line);flex:none}
 .me{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:10px;width:100%;white-space:nowrap;overflow:hidden}
 .me:hover{background:var(--hover)}
@@ -683,7 +683,7 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .spark{width:86px;height:30px;flex:none}
 .dgrid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;padding:24px 28px 32px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow-sm);min-width:0}
-.span-8{grid-column:span 8}.span-4{grid-column:span 4}.span-6{grid-column:span 6}.span-12{grid-column:span 12}
+.span-8{grid-column:span 8}.span-4{grid-column:span 4}.span-3{grid-column:span 3}.span-5{grid-column:span 5}.span-7{grid-column:span 7}.span-6{grid-column:span 6}.span-12{grid-column:span 12}
 .card-h{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;min-height:28px}
 .card-t{font-weight:600;font-size:14px;letter-spacing:-.01em}
 .card-tag{font-family:var(--font);font-size:11px;font-weight:500;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3)}
@@ -722,6 +722,31 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .rk-v{font-family:var(--mono);font-size:15px;font-weight:500}
 .rk-go{color:var(--ink-3);transition:transform .12s,color .12s}
 .res{padding:9px 0}
+/* Overview */
+.ov-stat{display:flex;align-items:center;gap:14px;padding:14px 16px!important;color:inherit}
+.ov-stat>.i{margin-left:auto;color:var(--ink-3);transition:transform .12s,color .12s}
+.ov-stat:hover>.i{color:var(--ink);transform:translateX(2px)}
+.os-ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--neutral-bg);color:var(--ink);flex:none}
+.os-l{display:flex;flex-direction:column;gap:2px;font-size:12.5px;color:var(--ink-2)}
+.os-l b{font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.dgrid .card.ov>.card-h{min-height:52px;padding:0 20px;margin-bottom:0;border-bottom:1px solid var(--line)} /* beats .dgrid .card.flush>.card-h: title centred in the header bar */
+.ovr{display:grid;grid-template-columns:32px minmax(0,1fr) auto 72px 16px;align-items:center;gap:12px;width:100%;height:44px;padding:0 16px 0 20px;border-bottom:1px solid var(--line-soft);text-align:left;font-size:13.5px}
+.ovr:last-child{border-bottom:0}
+.ovr:hover{background:var(--row-hover)}
+.ovr .os-ic{width:28px;height:28px;border-radius:8px}
+.ovr-l{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ovr-o{font-size:12.5px;color:var(--ink-3);white-space:nowrap}
+.ovr-n{justify-self:end;font-family:var(--mono);font-size:13px;font-weight:500;color:var(--brand-700);background:var(--brand-100);padding:0 7px;line-height:20px;border-radius:var(--r-tag)}
+.ovr.clear .ovr-n{font-family:var(--font);font-weight:400;color:var(--ink-3);background:none;padding:0}
+.ovr>.i{color:var(--ink-3)}
+.ovr:hover>.i{color:var(--ink)}
+.ovw{display:flex;align-items:center;justify-content:space-between;height:44px;padding:0 20px;border-bottom:1px solid var(--line-soft)}
+.ovw:last-child{border-bottom:0}
+.ovw b{font-size:14px;font-weight:600}
+.ov-more{display:flex;align-items:center;gap:2px;height:auto;padding:0}
+.ovl{display:grid;grid-template-columns:96px 160px minmax(0,1fr) auto;gap:12px;align-items:center;height:42px;padding:0 20px;border-bottom:1px solid var(--line-soft);font-size:13px}
+.ovl:last-child{border-bottom:0}
+.ovl-a{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* finance monitors: headroom bar (threshold mark in the middle) and the per-kind dashboard cards */
 .mon-m{display:inline-flex;align-items:center;gap:8px}
 .mon-m .meter{width:72px;overflow:visible}
@@ -859,7 +884,7 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
   .kpi:nth-of-type(3){border-right:0}
   .kpi:nth-of-type(n+4){border-top:1px solid var(--line)}
   .ustats{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .span-8,.span-4,.span-6{grid-column:span 12}
+  .span-8,.span-4,.span-6,.span-3,.span-5,.span-7{grid-column:span 12}
   .up-grid{grid-template-columns:minmax(0,1fr)}
   .lmeta .hide-md{display:none}
 }
@@ -1338,7 +1363,7 @@ const COLS = [
 
 /* ════════════════════════════ State ════════════════════════════ */
 const S = {
-  route: 'dashboard', userId: null, range: { key: '30d' }, metric: 'volume',
+  route: 'dashboard', userId: null, range: { key: '30d' },
   filters: [], search: '', sort: { key: 'id', dir: 'desc' }, page: 1,
   view: 'table', groupBy: 'kyc',
   hidden: new Set(store.get('nsc.hidden3', DEFAULT_HIDDEN)), selected: new Set(),
@@ -1370,7 +1395,7 @@ const NAV = [
     { id: 'companies', label: 'Company list', icon: 'building', on: () => S.route === 'companies' && S.coView !== 'access', attn: () => COMPANIES.filter(c => !c.cp.length && !c.ip.length).length, why: 'not set up' },
     { id: 'companies', href: '#/companies/access', label: 'Product access', icon: 'table', on: () => S.route === 'companies' && S.coView === 'access' }] },
   { label: 'Products', icon: 'cardProduct', items: [{ id: 'card-products', label: 'Cards', icon: 'cardProduct' },
-    { id: 'card-orders', label: 'Card orders', icon: 'send', attn: waiting('card-orders', 'status', ['NEW']), why: 'new' }, { id: 'iban-products', label: 'IBAN accounts', icon: 'ibanProduct' }] },
+    { id: 'card-orders', label: 'Card orders', icon: 'send', attn: waiting('card-orders', 'status', ['NEW', 'FAILED']), why: 'new or failed' }, { id: 'iban-products', label: 'IBAN accounts', icon: 'ibanProduct' }] },
   { label: 'Operations', icon: 'arrows', items: [{ id: 'transactions', label: 'External transactions', icon: 'arrows', attn: waiting('transactions', 'status', ['PENDING', 'FAILED']), why: 'pending or failed' },
     { id: 'movements', label: 'Fund movements', icon: 'aggTx' }, { id: 'confirmations', label: 'Operation confirmations', icon: 'shieldCheck', attn: waiting('confirmations', 'status', ['PENDING']), why: 'pending' },
     { id: 'sbp', label: 'SBP links', icon: 'sbp', attn: waiting('sbp', 'status', ['PENDING']), why: 'awaiting payment' }] },
@@ -1386,18 +1411,32 @@ const NAV = [
 ];
 const NAV_FLAT = NAV.flatMap(n => n.items || [n]).filter((n, i, a) => a.findIndex(x => x.id === n.id) === i); // one entry per route
 const navTitle = id => NAV_FLAT.find(x => x.id === id).label;
+/* Interface language. The shell (sidebar, page titles, tabs, profile menu, Overview) follows it; page content stays English in the prototype. */
+const RU = {
+  Overview: 'Обзор', Users: 'Пользователи', Companies: 'Компании', 'Company list': 'Список компаний', 'Product access': 'Доступ к продуктам', Products: 'Продукты', Cards: 'Карты', 'Card orders': 'Заказы карт', 'IBAN accounts': 'Счета IBAN',
+  Operations: 'Операции', 'External transactions': 'Внешние транзакции', 'Fund movements': 'Движения средств', 'Operation confirmations': 'Подтверждения операций', 'SBP links': 'Ссылки СБП',
+  Compliance: 'Проверки', Documents: 'Документы', 'KYC checks': 'Проверки KYC', 'KYT rules': 'Правила KYT', Finance: 'Финансы', 'Wallet statistics': 'Статистика кошельков', 'Operation statistics': 'Статистика операций', Reserves: 'Резервы',
+  'Reference data': 'Справочники', Currencies: 'Валюты', Networks: 'Сети', Markets: 'Рынки', 'Country lists': 'Списки стран', Administration: 'Администрирование', Administrators: 'Администраторы', Roles: 'Роли', Sources: 'Источники',
+  'Verification templates': 'Шаблоны верификации', 'Audit log': 'Журнал действий',
+  Navigation: 'Навигация', Theme: 'Тема', Light: 'Светлая', Dark: 'Тёмная', Language: 'Язык', Classic: 'Классика', Focus: 'Фокус', Flyout: 'Панель', 'Profile settings': 'Настройки профиля', 'Keyboard shortcuts': 'Горячие клавиши', 'Help & docs': 'Помощь', 'Sign out': 'Выйти',
+  'Issued cards': 'Выпущенные карты', 'Needs attention': 'Требуют внимания', 'Documents to review': 'Документы на проверке',
+  'Card issue errors': 'Ошибки выпуска карт', 'Transaction checks': 'Проверки транзакций', 'All clear': 'Всё разобрано', 'Finance monitors': 'Finance Monitors', 'Wallet funds': 'Средства в кошельках', 
+  'Provider reserves': 'Резервы провайдеров', 'Recent changes': 'Последние изменения', 'Full log': 'Весь журнал',
+};
+S.lang = store.get('nsc.lang', 'en') === 'ru' ? 'ru' : 'en';
+const t = s => S.lang === 'ru' && RU[s] || s;
 // A menu item with tabs (Finance monitors) stands for several pages; those pages have `tab` set and show as tabs on the page, not in the sidebar
 const tabHost = id => NAV_FLAT.find(x => x.tabs?.some(([t]) => t === id));
 const navShown = items => items.filter(it => !it.tab);
 function pageTabs() {
   const host = tabHost(S.route); if (!host) return '';
   return `<nav class="tabs band">${host.tabs.map(([id, l]) => { const n = id === host.id ? 0 : navAttn(NAV_FLAT.find(x => x.id === id));
-    return `<a class="tab ${S.route === id ? 'on' : ''}" href="#/${id}">${l}${n ? `<em class="tab-att" data-tip="${fmtInt(n)} need attention">${n}</em>` : ''}</a>`; }).join('')}</nav>`;
+    return `<a class="tab ${S.route === id ? 'on' : ''}" href="#/${id}">${t(l)}${n ? `<em class="tab-att" data-tip="${fmtInt(n)} need attention">${n}</em>` : ''}</a>`; }).join('')}</nav>`;
 }
 const navOn = it => it.on ? it.on() : S.route === it.id;
 const navAttn = it => it.attn ? it.attn() : 0;
 const navDot = it => { const n = navAttn(it); return n ? `<em class="nb" data-tip="${fmtInt(n)} ${it.why}">${fmtInt(n)}</em><i class="ndot ndot-c"></i>` : ''; };
-const navLink = (it, fly) => { const n = navAttn(it); return `<a class="nav ${navOn(it) ? 'active' : ''}" href="${it.href || '#/' + it.id}" ${fly ? '' : `data-tip="${it.label}${n ? ` · ${fmtInt(n)} ${it.why}` : ''}" data-tip-collapsed`}>${icon(it.icon, 17)}<span class="${fly ? '' : 'fade'}">${it.label}</span>${navDot(it)}</a>`; };
+const navLink = (it, fly) => { const n = navAttn(it); return `<a class="nav ${navOn(it) ? 'active' : ''}" href="${it.href || '#/' + it.id}" ${fly ? '' : `data-tip="${t(it.label)}${n ? ` · ${fmtInt(n)} ${it.why}` : ''}" data-tip-collapsed`}>${icon(it.icon, 17)}<span class="${fly ? '' : 'fade'}">${t(it.label)}</span>${navDot(it)}</a>`; };
 const curSec = () => NAV.find(n => n.items?.some(navOn));
 
 /* Navigation variants, switched from the profile menu to compare them:
@@ -1411,16 +1450,16 @@ function navSection(n) {
   if (S.navV === 'fly') {
     const cur = navShown(n.items).find(navOn);
     const row = cur || n; // inside a section, its row shows the current page instead of the section
-    return `<button class="nav nav-fly ${cur ? 'active' : ''}" data-act="nav-fly" data-sec="${n.label}" data-tip="${row.label}" data-tip-collapsed>${icon(row.icon, 17)}<span class="fade">${row.label}</span>${dot ? '<i class="ndot"></i>' : ''}<span class="fade nf-chev">${icon('chevRight', 14)}</span></button>`;
+    return `<button class="nav nav-fly ${cur ? 'active' : ''}" data-act="nav-fly" data-sec="${n.label}" data-tip="${t(row.label)}" data-tip-collapsed>${icon(row.icon, 17)}<span class="fade">${t(row.label)}</span>${dot ? '<i class="ndot"></i>' : ''}<span class="fade nf-chev">${icon('chevRight', 14)}</span></button>`;
   }
   const shut = secShut(n);
-  return `<div class="sb-sec ${shut ? 'closed' : ''}"><button class="sb-label fade" data-act="nav-sec" data-sec="${n.label}" aria-expanded="${!shut}"><span>${n.label}</span>${dot ? `<i class="sb-dot" data-tip="Something here needs a look"></i>` : ''}${icon('chevDown', 12)}</button><div class="sb-items">${navShown(n.items).map(it => navLink(it)).join('')}</div></div>`;
+  return `<div class="sb-sec ${shut ? 'closed' : ''}"><button class="sb-label fade" data-act="nav-sec" data-sec="${n.label}" aria-expanded="${!shut}"><span>${t(n.label)}</span>${dot ? `<i class="sb-dot" data-tip="Something here needs a look"></i>` : ''}${icon('chevDown', 12)}</button><div class="sb-items">${navShown(n.items).map(it => navLink(it)).join('')}</div></div>`;
 }
 // Flyout panel for one section: its pages, opened on hover or click
 function openFly(row) {
   const n = NAV.find(x => x.label === row.dataset.sec);
   $$('.nav-fly.open').forEach(x => x.classList.remove('open')); row.classList.add('open');
-  openPop(row, `<div class="fly-h">${n.label}</div>${navShown(n.items).map(it => navLink(it, true)).join('')}`, { kind: 'fly', side: 1, keep: 1, width: 236, onClose: () => row.classList.remove('open') });
+  openPop(row, `<div class="fly-h">${t(n.label)}</div>${navShown(n.items).map(it => navLink(it, true)).join('')}`, { kind: 'fly', side: 1, keep: 1, width: 236, onClose: () => row.classList.remove('open') });
 }
 let flyT = 0;
 document.addEventListener('mouseover', e => {
@@ -1458,9 +1497,7 @@ function crumbs() {
   return host ? [[host.label]] : [[navTitle(S.route)]];
 }
 function topbarActions() {
-  if (S.route === 'dashboard') return `
-    ${dpButton(S.range, 'dash-range')}
-    <button class="btn btn-ghost tb-hide-sm" data-act="toast" data-msg="Report exported">${icon('download', 15)}Export</button>`;
+  if (S.route === 'dashboard') return `<a class="btn btn-ghost" href="#/logs">${icon('logs', 15)}${t('Audit log')}${icon('chevRight', 14)}</a>`;
   if (S.route === 'users' && !S.userId) return `
     <button class="tool-btn solid" id="displayBtn" data-act="display"></button>
     <button class="btn btn-ghost" data-act="export">${icon('download', 15)}<span class="tb-lbl">Export</span>${icon('chevDown', 13)}</button>
@@ -1485,19 +1522,27 @@ function renderTopbar() {
   const c = crumbs(), acts = topbarActions();
   $('#topbar').innerHTML = `
     <button class="icon-btn menu-btn" data-act="mobile-menu" aria-label="Menu">${icon('menu', 18)}</button>
-    <nav class="crumbs" aria-label="Breadcrumb">${c.map(([l, h, id], i) => (i ? '<span class="crumb-sep">/</span>' : '') + (h ? `<a href="${h}">${esc(l)}</a>` : `<span class="cur">${esc(l)}</span>`) + (id ? `<span class="count">${id}</span>` : '')).join('')}</nav>
+    <nav class="crumbs" aria-label="Breadcrumb">${c.map(([l, h, id], i) => (i ? '<span class="crumb-sep">/</span>' : '') + (h ? `<a href="${h}">${esc(t(l))}</a>` : `<span class="cur">${esc(t(l))}</span>`) + (id ? `<span class="count">${id}</span>` : '')).join('')}</nav>
     <div class="tb-sp"></div>
     ${acts ? `<div class="tb-ctx">${acts}</div>` : ''}`;
 }
-function meMenu() {
+// Profile menu. Language and Navigation open their choices inside the menu (a back arrow returns), so no list floats outside it.
+const ME_PICK = {
+  lang: () => ['Language', [['en', 'English'], ['ru', 'Русский']], S.lang, 'lang'],
+  navv: () => ['Navigation', Object.entries(NAV_V).map(([k, [l]]) => [k, t(l)]), S.navV, 'nav-v'],
+};
+function meMenu(view) {
   const dark = document.documentElement.dataset.theme === 'dark';
+  if (ME_PICK[view]) { const [title, opts, cur, act] = ME_PICK[view]();
+    return `<div class="pop-head"><button class="ghost-ic" data-act="me-view" data-v="" aria-label="Back">${icon('chevLeft', 15)}</button>${t(title)}</div>`
+      + menuItems(opts.map(([v, label]) => ({ act, data: { v }, label, on: cur === v }))); }
+  const row = (v, ic, l, val) => ({ act: 'me-view', data: { v }, icon: ic, html: `<span class="pl">${t(l)}</span><span class="pv">${val}</span>${icon('chevRight', 14)}` });
   return `<div class="me-h"><span class="me-av">SA</span><div style="min-width:0"><div class="me-n">Super admin</div><div class="me-e">super_admin@ns.cards</div></div></div>
     <div class="pop-sep"></div>
-    <div class="me-nav"><div class="pop-lbl">Navigation</div><div class="seg sm">${Object.entries(NAV_V).map(([k, [l, tip]]) => `<button class="${S.navV === k ? 'on' : ''}" data-act="nav-v" data-v="${k}" data-tip="${tip}">${l}</button>`).join('')}</div></div>
+    <div class="pop-row me-row"><span>${t('Theme')}</span><div class="seg sm"><button class="${dark ? '' : 'on'}" data-act="theme" data-v="light">${icon('sun', 14)}${t('Light')}</button><button class="${dark ? 'on' : ''}" data-act="theme" data-v="dark">${icon('moon', 13)}${t('Dark')}</button></div></div>
+    ${menuItems([row('lang', 'globe', 'Language', S.lang === 'ru' ? 'Русский' : 'English'), row('navv', 'panelClose', 'Navigation', t(NAV_V[S.navV][0]))])}
     <div class="pop-sep"></div>
-    <div class="pop-row" style="padding:0 2px 0 10px"><span>Theme</span><div class="seg sm"><button class="${dark ? '' : 'on'}" data-act="theme" data-v="light">${icon('sun', 14)}Light</button><button class="${dark ? 'on' : ''}" data-act="theme" data-v="dark">${icon('moon', 13)}Dark</button></div></div>
-    <div class="pop-sep"></div>
-    ${menuItems([{ act: 'toast', data: { msg: 'Profile settings' }, icon: 'user', label: 'Profile settings' }, { act: 'shortcuts', icon: 'keyboard', label: 'Keyboard shortcuts' }, { act: 'toast', data: { msg: 'Docs would open here' }, icon: 'help', label: 'Help & docs' }, '-', { act: 'toast', data: { msg: 'Signed out (prototype)' }, icon: 'logout', label: 'Sign out' }])}`;
+    ${menuItems([{ act: 'toast', data: { msg: t('Profile settings') }, icon: 'user', label: t('Profile settings') }, { act: 'shortcuts', icon: 'keyboard', label: t('Keyboard shortcuts') }, { act: 'toast', data: { msg: 'Docs would open here' }, icon: 'help', label: t('Help & docs') }, '-', { act: 'toast', data: { msg: 'Signed out (prototype)' }, icon: 'logout', label: t('Sign out') }])}`;
 }
 function shortcutsModal() {
   const k = (...ks) => ks.map(x => `<kbd>${x}</kbd>`).join('');
@@ -1520,7 +1565,7 @@ function toggleSidebar() {
   const t = $('.sb-toggle'); t.innerHTML = icon(col ? 'panelOpen' : 'panelClose', 18); t.dataset.tip = `${col ? 'Expand' : 'Collapse'} sidebar  ⌘B`;
   closePop(); $('#tt').classList.remove('show'); $('#tt').dataset.for = '';
 }
-$('#sidebar').addEventListener('transitionend', e => { if (e.target.id === 'sidebar' && e.propertyName === 'width') { if (S.route === 'dashboard' && S._dash) drawMainChart(S._dash); if (DASHES[S.route]) drawCharts(); if ($('#chips')) renderChips(); refreshHints(); } });
+$('#sidebar').addEventListener('transitionend', e => { if (e.target.id === 'sidebar' && e.propertyName === 'width') { if (DASHES[S.route]) drawCharts(); if ($('#chips')) renderChips(); refreshHints(); } });
 
 /* ════════════════════════════ Router ════════════════════════════ */
 function route() {
@@ -1704,87 +1749,31 @@ function spark(data) {
   return `<svg class="spark" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true"><path d="${line}" fill="none" stroke="var(--ink)" stroke-width="1.5" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg>`;
 }
 
+// Overview: the totals an operator checks first, every queue that waits on a decision, funds per currency and the latest admin actions
 function renderDashboard() {
-  const d = dashData(S.range);
-  const vol = sum(d.volume.cur), volP = sum(d.volume.prev), rev = sum(d.revenue.cur), revP = sum(d.revenue.prev), su = sum(d.signups.cur), suP = sum(d.signups.prev);
-  const active = Math.round(2500 + 19000 * (1 - Math.exp(-d.days / 45)));
-  const kpis = [
-    { l: 'Volume', v: '€' + compact(vol), d: pct(vol, volP), s: d.volume.cur },
-    { l: 'Revenue', v: '€' + compact(rev), d: pct(rev, revP), s: d.revenue.cur },
-    { l: 'New users', v: fmtInt(su), d: pct(su, suP), s: d.signups.cur },
-    { l: 'Active users', v: fmtInt(active), d: 4.1, s: d.signups.cur.map((v, i) => v + d.volume.cur[i] / 2e4) },
-    { l: 'KYC approval', v: '78.4%', d: -1.2, unit: 'pp', s: d.signups.prev },
-  ];
-  const M = METRICS[S.metric], cur = d[S.metric];
-
-  const funnel = [['Signed up', 26480], ['Email verified', 21930], ['KYC started', 17214], ['KYC approved', 13870], ['Card issued', 9840]];
-  const mix = [['Card spend', .42, 'var(--c1)'], ['Crypto exchange', .24, 'var(--c2)'], ['IBAN transfers', .18, 'var(--c3)'], ['Deposits', .10, 'var(--c4)'], ['Withdrawals', .06, 'var(--c5)']];
-  const top = Object.entries(COUNTRIES).map(([k, c]) => [k, c, Math.round(c.w / 100 * 26480 * (.92 + (hash(k) % 16) / 100))]).sort((a, b) => b[2] - a[2]).slice(0, 6);
-  const highRisk = USERS.filter(u => u.risk === 'high').length, kycQueue = USERS.filter(u => ['pending', 'review'].includes(u.kyc)).length;
-  const reserves = [['EUR', '€', 'var(--asset-eur)', 104.2], ['USDT', '₮', '#9FC600', 101.8], ['USDC', '$', '#42AAFF', 100.6], ['BTC', '₿', '#FC7C1A', 112.4], ['ETH', 'Ξ', '#B247FF', 99.2]];
-
-  $('#main').innerHTML = `<div class="page">
-    <section class="kpis band">${kpis.map(k => `
-      <div class="kpi"><div class="kpi-l">${k.l}</div><div class="kpi-v">${k.v}</div><div class="kpi-f">${deltaPill(k.d, k.unit)}${spark(k.s)}</div></div>`).join('')}
-    </section>
-    <div class="dgrid">
-      <div class="card span-8 chart-card">
-        <div class="card-h">
-          <div class="seg sm">${Object.entries(METRICS).map(([k, m]) => `<button class="${k === S.metric ? 'on' : ''}" data-act="metric" data-v="${k}">${m.label}</button>`).join('')}</div>
-          <div class="legend"><span><i class="lg-line"></i>This period</span><span><i class="lg-dash"></i>Previous</span></div>
-        </div>
-        <div class="big"><b>${M.fmt(sum(cur.cur))}</b>${deltaPill(pct(sum(cur.cur), sum(cur.prev)))}</div>
-        <div class="chart" id="mainChart"></div>
-      </div>
-      <div class="card span-4">
-        <div class="card-h"><span class="card-t">Onboarding funnel</span><span class="card-tag">All time</span></div>
-        <div class="barlist">${funnel.map(([l, v], i) => `<div class="bl" data-tt="${l}|${fmtInt(v)}|${(v / funnel[0][1] * 100).toFixed(1)}% of sign-ups${i ? ` · ${(v / funnel[i - 1][1] * 100).toFixed(0)}% from ${funnel[i - 1][0].toLowerCase()}` : ''}"><i style="width:${v / funnel[0][1] * 100}%"></i><span>${l}</span><span><span class="num">${fmtInt(v)}</span><span class="bl-p">${i ? (v / funnel[i - 1][1] * 100).toFixed(0) + '%' : '100%'}</span></span></div>`).join('')}</div>
-      </div>
-
-      <div class="card span-4">
-        <div class="card-h"><span class="card-t">Transaction mix</span><span class="card-tag">${esc(resolveRange(S.range).label)}</span></div>
-        <div class="stack">${mix.map(([l, p, c]) => `<i style="width:${p * 100}%;background:${c}" data-tt="${l}|€${compact(vol * p)}|${(p * 100).toFixed(0)}% of volume"></i>`).join('')}</div>
-        <div class="lrows">${mix.map(([l, p, c]) => `<div class="lr"><i class="sw" style="background:${c}"></i><span class="lr-l">${l}</span><span class="lr-v">€${compact(vol * p)}</span><span class="lr-p">${(p * 100).toFixed(0)}%</span></div>`).join('')}</div>
-      </div>
-      <div class="card span-4">
-        <div class="card-h"><span class="card-t">Top countries</span><span class="card-tag">Users</span></div>
-        <div class="barlist">${top.map(([k, c, n]) => `<div class="bl" data-tt="${c.name}|${fmtInt(n)} users|${(n / 26480 * 100).toFixed(1)}% of base"><i style="width:${n / top[0][2] * 100}%"></i><span><span class="flag">${flag(c.cc)}</span>${c.name}</span><span class="num">${fmtInt(n)}</span></div>`).join('')}</div>
-      </div>
-      <div class="card span-4">
-        <div class="card-h"><span class="card-t">Needs attention</span></div>
-        ${[
-          ['t-error', 'radar', 'Open KYT alerts', 'Transactions flagged by rules', 23, 'route', 'kyt'],
-          ['t-warning', 'shieldCheck', 'KYC queue', 'Pending or in review', kycQueue, 'go-filter', 'kyc|pending,review'],
-          ['t-error', 'alert', 'High-risk users', 'Risk level high', highRisk, 'go-filter', 'risk|high'],
-          ['t-info', 'check', 'Confirmations', 'Awaiting admin approval', confPending(), 'route', 'confirmations'],
-        ].map(([t, ic, l, s, v, act, arg]) => `<button class="rk ${t}" data-act="${act}" data-arg="${arg}"><span class="rk-ic">${icon(ic, 16)}</span><span class="rk-l"><div>${l}</div><div>${s}</div></span><span class="rk-v">${v}</span><span class="rk-go">${icon('chevRight', 16)}</span></button>`).join('')}
-      </div>
-
-      <div class="card span-4">
-        <div class="card-h"><span class="card-t">Reserve coverage</span><span class="card-tag">103.6% overall</span></div>
-        ${reserves.map(([a, sym, c, p]) => { const [tone, st] = p >= 102 ? ['success', 'Healthy'] : p >= 100 ? ['warning', 'Thin buffer'] : ['error', 'Under-backed']; return `<div class="res">
-          <div class="res-h"><span class="rn">${assetIc(a, 16)}${a}</span><span class="num res-v t-${tone}"><i class="dot"></i>${p.toFixed(1)}%</span></div>
-          <div class="meter t-${tone}" data-tt="${a} · ${st}|${p.toFixed(1)}% backed|Marker = 100% of liabilities"><i style="width:${Math.min(p, 120) / 120 * 100}%"></i><span class="par" style="left:${100 / 120 * 100}%"></span></div>
-        </div>`; }).join('')}
-      </div>
-      <div class="card span-4">
-        <div class="card-h"><span class="card-t">Cards</span><span class="card-tag">Issued</span></div>
-        <div class="big" style="margin:0 0 12px"><b>9,840</b>${deltaPill(6.3)}</div>
-        <div class="stack" style="height:10px;margin:0 0 12px"><i style="width:68%;background:var(--c1)" data-tt="Virtual|6,691|68%"></i><i style="width:32%;background:var(--c2)" data-tt="Physical|3,149|32%"></i></div>
-        <div class="legend"><span><i class="sw" style="background:var(--c1)"></i>Virtual 6,691</span><span><i class="sw" style="background:var(--c2)"></i>Physical 3,149</span></div>
-        <div class="mini-stats">
-          <div class="ms"><div class="kpi-l">Active</div><b>8,112</b></div>
-          <div class="ms"><div class="kpi-l">Frozen</div><b>412</b></div>
-          <div class="ms"><div class="kpi-l">Spend</div><b>€${compact(vol * .42)}</b></div>
-        </div>
-      </div>
-      <div class="card span-4">
-        <div class="card-h"><span class="card-t">Latest sign-ups</span><a class="link-btn" href="#/users" style="display:flex;align-items:center;gap:2px;height:auto">All ${icon('chevRight', 14)}</a></div>
-        ${USERS.slice(0, 6).map(u => `<div class="su" data-uid="${u.id}"><div class="sm"><div>${esc(u.name || u.email)}</div><div>${u.name ? esc(u.email) : 'No profile yet'}</div></div>${badge(KYC[u.kyc])}<span class="mono faint" style="width:56px;text-align:right">${rel(u.created)}</span></div>`).join('')}
-      </div>
+  const stats = [['Users', 'users', USERS.length, '#/users'], ['Companies', 'building', COMPANIES.length, '#/companies'],
+    ['Issued cards', 'card', sum(USERS.map(u => ud(u).cards.length)), '#/card-products'], ['Products', 'cardProduct', CARD_PRODUCTS.length + IBAN_PRODUCTS.length, '#/card-products']];
+  // every queue that waits on an admin: how many, and how long the oldest has waited; a row opens the list filtered to them
+  const queue = (id, l, ic, values) => { const P = PAGES[id], L = applyFilters(pgData(P), [{ key: 'status', values }], null, P.fields); return { id, l, ic, v: values.join(), n: L.length, oldest: L.length ? new Date(Math.min(...L.map(r => r.created))) : null }; };
+  const queues = [queue('documents', 'Documents to review', 'documents', ['PENDING']), queue('kyc-checks', 'KYC checks', 'idcard', ['PENDING']), queue('card-orders', 'Card issue errors', 'send', ['FAILED']),
+    queue('confirmations', 'Operation confirmations', 'shieldCheck', ['PENDING']), queue('transactions', 'Transaction checks', 'arrows', ['PENDING']), queue('sbp', 'SBP links', 'sbp', ['PENDING']),
+    { id: 'monitors', l: 'Finance monitors', ic: 'activity', v: '', n: monitorsDue().length, oldest: null }];
+  const funds = ASSETS.map(a => [a.c, sum(USERS.map(u => ud(u).wallets.find(w => w.c === a.c)?.amt || 0))]).filter(([, v]) => v > 0);
+  const log = pgData(PAGES.logs).slice(0, 8);
+  const go = (href, l) => `<a class="link-btn ov-more" href="${href}">${t(l)}${icon('chevRight', 14)}</a>`;
+  $('#main').innerHTML = `<div class="page"><div class="dgrid">
+    ${stats.map(([l, ic, n, href]) => `<a class="card span-3 ov-stat" href="${href}"><span class="os-ic">${icon(ic, 18)}</span><span class="os-l">${t(l)}<b>${fmtInt(n)}</b></span>${icon('chevRight', 16)}</a>`).join('')}
+    <div class="card span-7 flush ov"><div class="card-h"><span class="card-t">${t('Needs attention')}</span></div>
+      ${queues.map(q => `<button class="ovr ${q.n ? '' : 'clear'}" data-act="ov-queue" data-id="${q.id}" data-v="${q.v}"><span class="os-ic">${icon(q.ic, 16)}</span><span class="ovr-l">${t(q.l)}</span>
+        <span class="ovr-o">${q.oldest ? `${t('oldest')} ${rel(q.oldest)}` : ''}</span><span class="ovr-n">${q.n ? fmtInt(q.n) : t('All clear')}</span>${icon('chevRight', 16)}</button>`).join('')}
     </div>
-  </div>`;
-  drawMainChart(d);
+    <div class="card span-5 flush ov"><div class="card-h"><span class="card-t">${t('Wallet funds')}</span>${go('#/reserves', 'Provider reserves')}</div>
+      ${funds.map(([c, v]) => `<div class="ovw"><span class="ctry">${assetIc(c, 16)}${c}</span><b class="num">${fmtAmt(v, c)}</b></div>`).join('')}
+    </div>
+    <div class="card span-12 flush ov"><div class="card-h"><span class="card-t">${t('Recent changes')}</span>${go('#/logs', 'Full log')}</div>
+      ${log.map(l => `<div class="ovl"><span class="muted ovl-t" title="${fmtDateTime(l.at)}">${rel(l.at)}</span><span class="ovl-a">${esc(l.admin)}</span><span>${esc(l.label)}</span>${l.href ? `<a class="lnk muted" href="${l.href}">${esc(l.entity)}</a>` : `<span class="muted">${esc(l.entity || '')}</span>`}</div>`).join('')}
+    </div>
+  </div></div>`;
 }
 
 function niceMax(m) { const p = Math.pow(10, Math.floor(Math.log10(m))); const f = m / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; }
@@ -1797,12 +1786,7 @@ function smoothPath(pts) {
   }
   return d;
 }
-function drawMainChart(d) {
-  S._dash = d;
-  const M = METRICS[S.metric];
-  drawSeries($('#mainChart'), { dates: d.dates, unit: d.unit, fmt: M.fmt, series: [{ l: M.label, data: d[S.metric].cur, col: 'var(--c1)', area: 1 }, { l: 'Previous', data: d[S.metric].prev, col: 'var(--prev)', dash: 1 }] });
-}
-// Line chart used by Overview and every dashboard page. spec: { dates, unit, fmt, series: [{ l, data, col, dash?, area? }] }
+// Line chart used by every dashboard page. spec: { dates, unit, fmt, series: [{ l, data, col, dash?, area? }] }
 let chartN = 0;
 function drawSeries(el, spec) {
   if (!el) return;
@@ -1866,7 +1850,7 @@ document.addEventListener('mousemove', e => {
   tt.innerHTML = `<div class="tt-d">${a}</div><div class="tt-r"><b>${b}</b></div>${c ? `<div class="tt-r"><span>${c}</span></div>` : ''}`;
   placeTT(e.clientX, e.clientY);
 });
-let rsz; window.addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(() => { if (S.route === 'dashboard' && S._dash) drawMainChart(S._dash); if (DASHES[S.route]) drawCharts(); if ($('#chips')) renderChips(); if (popAnchor) positionPop(); refreshHints(); }, 80); });
+let rsz; window.addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(() => { if (DASHES[S.route]) drawCharts(); if ($('#chips')) renderChips(); if (popAnchor) positionPop(); refreshHints(); }, 80); });
 
 /* ════════════════════════════ Users list ════════════════════════════ */
 const applyFilters = (list, filters, skip, F = FIELDS) => filters.reduce((l, f) => (f.key === skip || !f.values.length) ? l : l.filter(u => matchField(f.key, u, f.values, F)), list);
@@ -2734,12 +2718,14 @@ const ACT = {
   },
   'mobile-menu': () => $('#app').classList.toggle('mobile-open'),
   'nav-fly': a => openFly(a),
-  'nav-v': a => { S.navV = a.dataset.v; store.set('nsc.navv', S.navV); S.navPeek.clear(); renderSidebar(); popAnchor = $('#sidebar .me'); pop.innerHTML = meMenu(); positionPop(); },
+  'lang': a => { S.lang = a.dataset.v; store.set('nsc.lang', S.lang); document.documentElement.lang = S.lang; route(); openPop($('#sidebar .me'), meMenu(), { width: 260, kind: 'me' }); },
+  'nav-v': a => { S.navV = a.dataset.v; store.set('nsc.navv', S.navV); S.navPeek.clear(); renderSidebar(); closePop(); openPop($('#sidebar .me'), meMenu(), { width: 260, kind: 'me' }); },
   'theme': a => { setTheme(a.dataset.v); if (popOpts.kind === 'me') { pop.innerHTML = meMenu(); positionPop(); } },
   'me': a => openPop(a, meMenu(), { width: 260, kind: 'me' }),
+  'me-view': a => { pop.innerHTML = meMenu(a.dataset.v); positionPop(); },
   'shortcuts': () => { closePop(); shortcutsModal(); },
   'toast': a => { closePop(); toast(a.dataset.msg); },
-  'dash-range': a => openDatePicker(a, S.range, r => { S.range = r; renderTopbar(); S.route === 'dashboard' ? renderDashboard() : renderDashPage(); }, { noAll: 1, align: 'right' }),
+  'dash-range': a => openDatePicker(a, S.range, r => { S.range = r; renderTopbar(); renderDashPage(); }, { noAll: 1, align: 'right' }),
   'dp-preset': a => dpCommit({ key: a.dataset.k }),
   'dp-nav': a => {
     const d = +a.dataset.d, v = DP.view;
@@ -2758,7 +2744,6 @@ const ACT = {
     const b = DP.b || DP.a; dpCommit({ key: 'custom', from: sod(DP.a).getTime(), to: Math.min(NOW.getTime(), sod(b).getTime() + DAY - 1) });
   },
   'dp-cancel': closePop,
-  'metric': a => { S.metric = a.dataset.v; renderDashboard(); },
   'route': a => { closePop(); location.hash = '#/' + a.dataset.arg; },
   'go-filter': a => { closePop(); const [k, v] = a.dataset.arg.split('|'); goFilter(k, v.split(',')); },
 
@@ -2936,7 +2921,7 @@ const ACT = {
       { width: Math.max(180, a.offsetWidth), kind: 'dd', onMount: p => { $('#ddQ', p)?.focus(); $('#ddList .chk', p)?.closest('.pi')?.scrollIntoView({ block: 'nearest' }); } });
     if (!pop.classList.contains('open')) a.classList.remove('open');
   },
-  'dd-pick': a => { const sel = S._dd; closePop(); if (!sel || sel.value === a.dataset.v) return; sel.value = a.dataset.v; ddLabel(sel); sel.dispatchEvent(new Event('change', { bubbles: true })); },
+  'dd-pick': a => { const sel = S._dd; closePop(); if (!sel || sel.value === a.dataset.v) return; sel.value = a.dataset.v; ddLabel(sel); sel.isConnected ? sel.dispatchEvent(new Event('change', { bubbles: true })) : onChange(sel); }, // a select from a popover is detached by now
   'modal-close': closeModal,
 };
 
@@ -3204,16 +3189,15 @@ function paProds() {
   const groups = [['c', 'Card products', 'card'], ['i', 'IBAN accounts', 'bank']].map(([g, l, ic]) => {
     const gx = xs.filter(x => x.g === g); if (!gx.length) return '';
     return `<section class="pa-g">
-      <div class="pa-gh">${icon(ic, 15)}<span>${l}</span><span class="pa-n">${gx.filter(x => mxOn(c, x.k)).length} of ${gx.length} on</span>${sw(state(gx), `data-act="pa-bulk" data-g="${g}"`, 'All ' + l.toLowerCase())}</div>
-      ${[...new Set(gx.map(x => x.p.provider))].map(pv => { const px = gx.filter(x => x.p.provider === pv), ps = state(px);
-        return `<div class="pa-ph"><span>${esc(pv)}</span>${px.length > 1 ? `<button class="link-btn" data-act="pa-bulk" data-g="${g}" data-p="${esc(pv)}">${ps === 'on' ? 'Turn all off' : 'Turn all on'}</button>` : ''}</div>
+      <div class="pa-gh">${icon(ic, 15)}<span>${l}</span><span class="pa-n">${gx.filter(x => mxOn(c, x.k)).length} of ${gx.length} on</span>${sw(state(gx), `data-act="pa-bulk" data-g="${g}"`, g === 'c' ? 'All cards' : 'All IBAN accounts')}</div>
+      ${[...new Set(gx.map(x => x.p.provider))].map(pv => { const px = gx.filter(x => x.p.provider === pv);
+        return `<div class="pa-ph"><span>${esc(pv)}</span></div>
         ${px.map(x => { const st = mxOn(c, x.k) ? 'on' : 'off', dirty = f.draft.has(c.id + '|' + x.k);
           return `<div class="pa-p ${dirty ? 'dirty' : ''}" data-act="pa-tog" data-k="${x.k}"><div class="pa-pn"><div>${esc(x.p.name)}</div><div class="code">${g === 'c' ? cap(x.p.kind) + ' card' : x.p.type + ' account'} · ${x.p.cur} · ID ${x.p.id}</div></div>
             ${sw(st, `data-act="pa-tog" data-k="${x.k}"`, x.p.name)}</div>`; }).join('')}`; }).join('')}
     </section>`;
   }).join('');
-  const allOn = state(xs) === 'on';
-  el.innerHTML = `<div class="pa-top">${head}<button class="btn btn-ghost btn-sm" data-act="pa-bulk" data-v="${allOn ? 0 : 1}" ${xs.length ? '' : 'disabled'}>${icon(allOn ? 'minus' : 'check', 14)}${allOn ? 'Turn all off' : 'Turn all on'}</button></div>
+  el.innerHTML = `<div class="pa-top">${head}</div>
     <div class="pa-tools">
       <label class="search">${icon('search', 14)}<input id="paQ" placeholder="Find product, provider or ID" value="${esc(f.pq)}" autocomplete="off"></label>
       <div class="seg sm">${[['all', 'All'], ['cards', 'Cards'], ['iban', 'IBAN']].map(([k, l]) => `<button class="${f.kind === k ? 'on' : ''}" data-act="mx-kind" data-v="${k}">${l}</button>`).join('')}</div>
@@ -3221,10 +3205,9 @@ function paProds() {
     <div class="pa-body">${groups || emptyBlock('search', 'No products match', 'Try another name, provider or ID.')}</div>`;
   $('.pa-body', el).scrollTop = keep; markHits($('.pa-body', el), f.pq);
 }
-// Switch a set of shown products for the open company: on unless every one already is (or as data-v says)
+// The group switch: turns every shown card (or IBAN) product on for the open company, unless all already are
 function paBulk(a) {
-  const { g, p, v } = a.dataset, xs = mxShown().filter(x => (!g || x.g === g) && (!p || x.p.provider === p)), c = mxCo();
-  const on = v != null ? v === '1' : !xs.every(x => mxOn(c, x.k));
+  const xs = mxShown().filter(x => x.g === a.dataset.g), c = mxCo(), on = !xs.every(x => mxOn(c, x.k));
   xs.forEach(x => mxSet(c, x.k, on)); refreshMx(); renderFloat();
 }
 
@@ -3578,6 +3561,8 @@ Object.assign(ACT, {
   'pa-pick': a => { S.mx.co = +a.dataset.id; refreshMx(); $('#paProds .pa-body').scrollTop = 0; },
   'pa-tog': a => { const k = a.dataset.k, c = mxCo(); mxSet(c, k, !mxOn(c, k)); refreshMx(); renderFloat(); },
   'pa-bulk': paBulk,
+  // Overview queue arrow: the list, filtered to what waits
+  'ov-queue': a => { const { id, v } = a.dataset; if (v) { Object.assign(pgS(id), { filters: [{ key: 'status', values: v.split(',') }], search: '', page: 1 }); S._keepFilters = true; } location.hash = '#/' + id; },
   'mx-discard': () => { S.mx.draft.clear(); refreshMx(); renderFloat(); },
   'mx-save': () => { let n = 0; S.mx.draft.forEach((v, key) => { const [id, k] = key.split('|'); setP(coById(+id), k, v) && n++; }); S.mx.draft.clear(); renderSidebar(); toast(`Product access saved · ${n} change${n === 1 ? '' : 's'}`); refreshMx(); renderFloat(); },
   // company page
@@ -4441,8 +4426,8 @@ function dashTopbar() {
 }
 
 /* ── Products · Card orders (physical cards on their way to the cardholder) ── */
-const ORDER_STATUS = { NEW: { label: 'New', tone: 'warning' }, PRODUCTION: { label: 'In production', tone: 'info' }, SHIPPED: { label: 'Shipped', tone: 'info' }, DELIVERED: { label: 'Delivered', tone: 'success' }, CANCELLED: { label: 'Cancelled', tone: 'neutral' } };
-const ORDER_NEXT = { NEW: 'PRODUCTION', PRODUCTION: 'SHIPPED', SHIPPED: 'DELIVERED' }, ORDER_STEP = { NEW: 'Send to production', PRODUCTION: 'Mark as shipped', SHIPPED: 'Mark as delivered' };
+const ORDER_STATUS = { NEW: { label: 'New', tone: 'warning' }, FAILED: { label: 'Issue failed', tone: 'error' }, PRODUCTION: { label: 'In production', tone: 'info' }, SHIPPED: { label: 'Shipped', tone: 'info' }, DELIVERED: { label: 'Delivered', tone: 'success' }, CANCELLED: { label: 'Cancelled', tone: 'neutral' } };
+const ORDER_NEXT = { NEW: 'PRODUCTION', FAILED: 'PRODUCTION', PRODUCTION: 'SHIPPED', SHIPPED: 'DELIVERED' }, ORDER_STEP = { NEW: 'Send to production', FAILED: 'Retry issue', PRODUCTION: 'Mark as shipped', SHIPPED: 'Mark as delivered' };
 const orderNext = rows => { const o = rows.filter(r => ORDER_NEXT[r.status]); o.forEach(r => { r.status = ORDER_NEXT[r.status]; if (r.status === 'SHIPPED') r.tracking ||= Math.random().toString(36).slice(2, 12).toUpperCase(); stamp(r); }); return `${o.length} order${o.length === 1 ? '' : 's'} moved to the next step`; };
 page({
   id: 'card-orders', noun: 'order', nouns: 'orders', icon: 'send', searchPh: 'Search order ID, user, tracking…',
@@ -4450,7 +4435,7 @@ page({
     const g = gen(911), AU = AUsers(), PHY = CARD_PRODUCTS.filter(p => p.kind === 'physical');
     return Array.from({ length: 140 }, (_, i) => {
       const fresh = i < 12, created = new Date(NOW.getTime() - (fresh ? g.r() * 1.5 : 1.5 + i * .45 + g.r()) * DAY), u = g.pk(AU);
-      const status = fresh ? 'NEW' : g.wp({ PRODUCTION: 10, SHIPPED: 18, DELIVERED: 64, CANCELLED: 8 });
+      const status = fresh ? 'NEW' : i < 14 ? 'FAILED' : g.wp({ PRODUCTION: 10, SHIPPED: 18, DELIVERED: 64, CANCELLED: 8 });
       return { id: 8800 - i, uid: u.id, pid: g.pk(PHY).id, country: u.country || 'DEU', courier: g.pk(['DHL Express', 'UPS', 'DPD', 'FedEx']), tracking: ['SHIPPED', 'DELIVERED'].includes(status) ? g.hx(10).toUpperCase() : '',
         fee: g.pk([0, 0, 15, 25]), status, created, updated: new Date(Math.min(NOW, created.getTime() + g.r() * 4 * DAY)) };
     });
@@ -4642,14 +4627,14 @@ document.addEventListener('click', e => {
   if (rc && !e.target.closest('.pop')) goCo(+rc.dataset.cid, e);
   if (e.target.closest('.nav') && innerWidth <= 900) $('#app').classList.remove('mobile-open');
 });
-document.addEventListener('change', e => {
-  const t = e.target;
+function onChange(t) {
   if (t.dataset.tx && t.tagName === 'SELECT') { S.tx[t.dataset.tx] = t.value; S.tx.page = 1; S.tx.sel.clear(); renderUserPage(); }
   else if (t.dataset.kyc != null) { const u = byId(S.userId); u.kyc = t.value; u.idv = t.value === 'approved'; u.updated = new Date(NOW); toast(`KYC status set to ${KYC[t.value].label}`); renderUserPage(); }
   else if (t.id === 'docFile' && t.files[0]) uploadDoc(t.files[0]);
   else if (t.id === 'formStatus') { S.formStatus = t.value; renderUserPage(); }
   else coChange(t);
-});
+}
+document.addEventListener('change', e => onChange(e.target));
 document.addEventListener('input', e => {
   const t = e.target;
   if (t.dataset.tx === 'ref') { S.tx.ref = t.value; S.tx.page = 1; refreshTx(); return; }
