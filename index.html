@@ -170,10 +170,12 @@ a{color:inherit;text-decoration:none}
 .app.collapsed .sidebar .ndot-c{display:block}
 /* flyout variant: one row per section, its pages open in a panel beside the sidebar */
 .v-fly>.nav,.v-tabs>.nav{margin-bottom:2px}
-.topbar.sec{height:auto;flex-direction:column;align-items:stretch;gap:0}
-.tb-row{height:64px;padding-top:8px;display:flex;align-items:center;gap:8px} /* title on the sidebar logo's line */
+.topbar.tbs{height:61px}
+.sidebar.tbs .sb-head{height:60px} .sidebar.tbs .sb-toggle{top:14px} /* logo on the header title's line (30px) */ /* Sections variant: 12px above and below the 36px controls on every page (+1px border) */
+.topbar.sec{height:auto;padding-top:12px;flex-direction:column;align-items:stretch;gap:0}
+.tb-row{height:36px;display:flex;align-items:center;gap:8px} /* title row, then 4px, then the tabs */
 .tb-title{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em;color:var(--ink);white-space:nowrap}
-.topbar .tb-tabs{padding:0;margin-left:-10px;height:44px;flex:none}
+.topbar .tb-tabs{padding:0;margin:4px 0 0 -10px;height:40px;flex:none}
 .tb-tabs .tab{height:100%}
 .nav-fly{text-align:left}
 .nav-fly .nf-chev{margin-left:auto;display:flex;color:var(--ink-3)}
@@ -559,9 +561,10 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .wrow .wa{text-align:right}
 .wrow.zero .wn>div:first-child,.wrow.zero .wa .num{color:var(--ink-3)}
 .wchev{color:var(--ink-3);transition:transform .15s} .wrow.open .wchev{transform:rotate(180deg)}
-.wdet{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:16px;align-items:center;padding:14px 20px 16px 64px;background:var(--row-hover);border-bottom:1px solid var(--line-soft)}
+.wdet{display:grid;grid-template-columns:repeat(2,minmax(0,1fr)) minmax(max-content,1fr) auto;gap:16px;align-items:start;padding:14px 20px 16px 48px;background:var(--row-hover);border-bottom:1px solid var(--line-soft)}
 .wdet .kl{font-size:12px;color:var(--ink-3);margin-bottom:4px}
-.wdet-act{display:flex;gap:8px}
+.wdet-act{display:flex;gap:8px;align-self:center}
+.wdet .copy{white-space:nowrap}
 .wlist>:last-child{border-bottom:0}
 .mini-card{width:36px;height:24px;border-radius:5px;background:linear-gradient(135deg,#2C2C2C,#111);color:#fff;display:grid;place-items:center;flex:none}
 .mini-card.alt{background:var(--card-alt);color:var(--card-alt-ink)}
@@ -1580,6 +1583,7 @@ document.addEventListener('mouseover', e => {
 });
 
 function renderSidebar() {
+  $('#sidebar').classList.toggle('tbs', S.navV === 'tabs');
   const col = $('#app').classList.contains('collapsed'), keep = $('#sidebar .sb-scroll')?.scrollTop || 0;
   $('#sidebar').innerHTML = `
     <div class="sb-head">
@@ -1633,7 +1637,7 @@ function renderTopbar() {
   const c = crumbs(), acts = topbarActions(), sec = S.navV === 'tabs' && curSec(), list = sec && c.length === 1;
   const path = sec && !list ? [[sec.label, '', '', 1], ...c] : c;
   const menu = `<button class="icon-btn menu-btn" data-act="mobile-menu" aria-label="Menu">${icon('menu', 18)}</button>`, ctx = acts ? `<div class="tb-ctx">${acts}</div>` : '';
-  $('#topbar').classList.toggle('sec', !!list);
+  $('#topbar').classList.toggle('sec', !!list); $('#topbar').classList.toggle('tbs', S.navV === 'tabs');
   $('#topbar').innerHTML = list ? `<div class="tb-row">${menu}<h1 class="tb-title">${esc(t(sec.label))}</h1><div class="tb-sp"></div>${ctx}</div>${secTabs(sec)}` : `${menu}
     <nav class="crumbs" aria-label="Breadcrumb">${path.map(([l, h, id, plain], i) => (i ? '<span class="crumb-sep">/</span>' : '') + (h ? `<a href="${h}">${esc(t(l))}</a>` : `<span class="${plain ? '' : 'cur'}">${esc(t(l))}</span>`) + (id ? `<span class="count">${id}</span>` : '')).join('')}</nav>
     <div class="tb-sp"></div>${ctx}`;
