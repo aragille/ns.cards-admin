@@ -9,7 +9,7 @@
   Icons: Solar "Linear" by 480 Design, CC BY 4.0 (SOLAR in <script>)
   ─────────────────────────────────────
   • Design tokens       → :root (light) and :root[data-theme="dark"] in <style>
-  • Logo / favicon      → SIGN_D / WORD_D in <script>
+  • Logo / favicon      → BRANDS in <script> (NS.Cards, Entry, Lemon Finance; picked in Prototype config)
   • Navigation          → NAV
   • Mock data           → genUsers(), dashData()
   • Users stat widgets  → STAT_TILES
@@ -24,6 +24,7 @@
 <script>
   try { document.documentElement.dataset.theme = JSON.parse(localStorage.getItem('nsc.theme')) || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
   catch (e) { document.documentElement.dataset.theme = 'light'; }
+  try { document.documentElement.dataset.brand = JSON.parse(localStorage.getItem('nsc.brand')) || 'ns'; } catch (e) {}
 </script>
 <link rel="icon" id="favicon" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,6 +35,8 @@
 :root{
   color-scheme:light;
   --hit:#FFC999; --brand:#FC7C1A; --brand-600:#EC6A0B; --brand-700:#FC7C1A; --brand-50:#FFF5EC; --brand-100:#FFE8D5; --brand-200:#FFDDBF;
+  --on-brand:#FFFFFF; --brand-line:#FC7C1A; --brand-glow:rgba(252,124,26,.35); --brand-edge:transparent; /* text on brand fills · brand strokes on surfaces */
+  --card-alt:linear-gradient(135deg,#FF9A4D,#E0600A); --card-alt-ink:#FFFFFF;
 
   --bg:#FAFAF9; --surface:#FFFFFF; --surface-2:#F5F5F4; --hover:#F4F4F2; --row-hover:#FBFBFA; --head-bg:#FCFCFB;
   --line:#EDEDEB; --line-soft:#F3F3F1; --line-strong:#E3E3E0; --cb-border:#CFCFCB; --prev:#D4D4D0; --scroll:#E4E4E1; --scroll-hover:#CFCFCB;
@@ -90,6 +93,15 @@
   --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);
   --shadow-pop:0 12px 32px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3);
 }
+/* White-label brands (Prototype config → Product). NS.Cards is the default above; light accents get dark ink and darker strokes */
+:root[data-brand="entry"]{--brand:#C2FB50; --brand-600:#B4EF3A; --brand-700:#4A7300; --brand-line:#6B9E00; --on-brand:#111111; --brand-glow:rgba(107,158,0,.25); --brand-edge:rgba(0,0,0,.06);
+  --brand-50:#F8FEE9; --brand-100:#EDFCCF; --brand-200:#E0FAAE; --hit:#E0FAAE; --card-alt:linear-gradient(135deg,#D6FD84,#B2EC34); --card-alt-ink:#111111}
+:root[data-brand="lemon"]{--brand:#FFF357; --brand-600:#F7E93A; --brand-700:#6E6200; --brand-line:#A39200; --on-brand:#111111; --brand-glow:rgba(163,146,0,.25); --brand-edge:rgba(0,0,0,.08);
+  --brand-50:#FFFDE8; --brand-100:#FFF9C4; --brand-200:#FFF39A; --hit:#FFF39A; --card-alt:linear-gradient(135deg,#FFF784,#F4E500); --card-alt-ink:#111111}
+:root[data-theme="dark"][data-brand="entry"]{--brand-600:#D2FC7A; --brand-700:#C2FB50; --brand-line:#C2FB50; --brand-glow:rgba(194,251,80,.2); --brand-edge:transparent;
+  --brand-50:rgba(194,251,80,.08); --brand-100:rgba(194,251,80,.15); --brand-200:rgba(194,251,80,.24); --hit:rgba(194,251,80,.36)}
+:root[data-theme="dark"][data-brand="lemon"]{--brand-600:#FFF77F; --brand-700:#FFF357; --brand-line:#FFF357; --brand-glow:rgba(255,243,87,.18); --brand-edge:transparent;
+  --brand-50:rgba(255,243,87,.08); --brand-100:rgba(255,243,87,.15); --brand-200:rgba(255,243,87,.24); --hit:rgba(255,243,87,.36)}
 
 /* ───────────────────────── Base ───────────────────────── */
 *{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--scroll) transparent}
@@ -108,7 +120,7 @@ a{color:inherit;text-decoration:none}
 .muted{color:var(--ink-2)} .faint{color:var(--ink-3)}
 .r{text-align:right}
 ::selection{background:var(--brand-100)}
-:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:6px}
+:focus-visible{outline:2px solid var(--brand-line);outline-offset:2px;border-radius:6px}
 
 /* ───────────────────────── Shell ───────────────────────── */
 /* Sidebar animates its own width; icons sit at fixed x so nothing jumps, labels only fade. */
@@ -119,6 +131,9 @@ a{color:inherit;text-decoration:none}
 .app.collapsed .fade{opacity:0;pointer-events:none}
 .sb-head{position:relative;height:72px;display:flex;align-items:center;padding:0 23px;flex:none}
 .logo{display:flex;align-items:center;gap:5.6px;color:var(--ink);transition:opacity .15s}
+.lg-entry{gap:7px;margin-left:-2px} .lg-lemon{position:relative}
+.lg-lemon .lm-mark{position:absolute;left:1px;opacity:0;transition:opacity .16s ease} .app.collapsed .lg-lemon .lm-mark{opacity:1}
+.lm-mark path,.lm-fruit{fill:currentColor} :root[data-theme="dark"] .lm-mark path,:root[data-theme="dark"] .lm-fruit{fill:#FFF357}
 .sb-toggle{position:absolute;right:14px;top:20px;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:var(--ink-2);transition:opacity .15s,right .24s cubic-bezier(.2,.8,.2,1)}
 .sb-toggle:hover{background:var(--hover);color:var(--ink)}
 .sb-toggle{opacity:0} .sb-head:hover .sb-toggle,.sb-toggle:focus-visible{opacity:1}
@@ -137,7 +152,7 @@ a{color:inherit;text-decoration:none}
 /* sections fold from their title: the chevron shows on hover and stays (turned) while folded; a folded section with pending items gets a small brand dot */
 .sb-label .i{margin-left:auto;opacity:0;transition:opacity .12s,transform .15s}
 .sb-label:hover{color:var(--ink-2)} .sb-label:hover .i{opacity:1}
-.sb-dot{display:none;width:5px;height:5px;border-radius:50%;background:var(--brand);margin-left:6px;flex:none}
+.sb-dot{display:none;width:5px;height:5px;border-radius:50%;background:var(--brand-line);margin-left:6px;flex:none}
 .sb-sec.closed .sb-label .i{transform:rotate(-90deg);opacity:1}
 .sb-sec.closed .sb-dot{display:block}
 .sb-sec.closed .sb-items{display:none}
@@ -146,7 +161,7 @@ a{color:inherit;text-decoration:none}
 .nav.active .i{color:var(--ink)}
 /* attention dot: something on that page waits on an admin; on the icon's corner while the sidebar is collapsed */
 .nav{position:relative}
-.ndot{width:6px;height:6px;border-radius:50%;background:var(--brand);margin-left:auto;flex:none}
+.ndot{width:6px;height:6px;border-radius:50%;background:var(--brand-line);margin-left:auto;flex:none}
 .app.collapsed .sidebar .ndot{position:absolute;left:28px;top:8px;margin:0;box-shadow:0 0 0 2px var(--surface)}
 .nav>span{min-width:0;overflow:hidden;text-overflow:ellipsis} /* long labels truncate so the count badge always shows */
 .nav .nb{margin-left:auto;font-family:var(--mono);font-size:11px;font-style:normal;line-height:18px;color:var(--brand-700);background:var(--brand-100);padding:0 6px;border-radius:var(--r-tag);flex:none;transition:opacity .16s}
@@ -197,7 +212,7 @@ kbd{font-family:var(--mono);font-size:11px;color:var(--ink-2);background:var(--s
 .icon-btn:hover:not(:disabled){background:var(--hover)}
 .icon-btn.sm{width:30px;height:30px;border-radius:9px}
 .icon-btn.bare{border-color:transparent;background:transparent}
-.icon-btn .dotn{position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;border-radius:9px;background:var(--brand);color:#fff;font-size:10.5px;font-weight:600;display:grid;place-items:center;border:2px solid var(--bg)}
+.icon-btn .dotn{position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;border-radius:9px;background:var(--brand);color:var(--on-brand);font-size:10.5px;font-weight:600;display:grid;place-items:center;border:2px solid var(--bg)}
 .menu-btn{display:none}
 main{flex:1;overflow:auto;min-height:0}
 .keys{display:flex;flex-direction:column}
@@ -216,7 +231,7 @@ h1 .count{font-family:var(--mono);font-size:14px;font-weight:400;color:var(--ink
 
 /* ───────────────────────── Controls ───────────────────────── */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 15px;border-radius:10px;font-weight:500;font-size:13.5px;white-space:nowrap;transition:background .12s,box-shadow .12s,border-color .12s}
-.btn-primary{background:var(--brand);color:#fff;box-shadow:inset 0 -1px 0 rgba(0,0,0,.12),0 1px 3px rgba(252,124,26,.35)}
+.btn-primary{background:var(--brand);color:var(--on-brand);box-shadow:inset 0 0 0 1px var(--brand-edge),inset 0 -1px 0 rgba(0,0,0,.12),0 1px 3px var(--brand-glow)}
 .btn-primary:hover{background:var(--brand-600)}
 .btn-dark{background:var(--inv);color:var(--on-inv)}
 .btn-dark:hover{background:var(--inv-hover)}
@@ -281,7 +296,7 @@ img.asset-ic{display:block;object-fit:cover}
 .toolbar .search{flex:0 1 300px;min-width:160px}
 .toolbar #addFilter{margin-left:auto;flex:none}
 .search{display:flex;align-items:center;gap:8px;height:34px;padding:0 8px 0 11px;width:300px;border-radius:10px;background:var(--surface);border:1px solid var(--line-strong);color:var(--ink-3);transition:border-color .12s,box-shadow .12s}
-.search:focus-within{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-100)}
+.search:focus-within{border-color:var(--brand-line);box-shadow:0 0 0 3px var(--brand-100)}
 .search input{border:0;outline:0;background:transparent;flex:1;min-width:0;color:var(--ink);font-size:13.5px}
 .search input::placeholder{color:var(--ink-3)}
 .tool-btn{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 11px;border-radius:10px;border:1px dashed var(--line-strong);background:transparent;color:var(--ink-2);font-weight:500;font-size:13px}
@@ -402,7 +417,7 @@ th[draggable="true"]:hover::before{opacity:1}
 .col-rs{position:absolute;top:0;right:-5px;width:10px;height:100%;cursor:col-resize;z-index:3}
 .col-rs::after{content:"";position:absolute;left:4.5px;top:11px;bottom:11px;width:1px;background:var(--line-strong);opacity:0;transition:opacity .12s}
 th:hover .col-rs::after{opacity:1}
-.col-rs:hover::after,.col-rs.on::after{opacity:1;top:0;bottom:0;left:4px;width:2px;background:var(--brand)}
+.col-rs:hover::after,.col-rs.on::after{opacity:1;top:0;bottom:0;left:4px;width:2px;background:var(--brand-line)}
 body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
 /* horizontal scroll hint */
 .hs-wrap{position:relative}
@@ -453,7 +468,7 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 /* board view */
 .board{display:flex;gap:12px;overflow-x:auto;align-items:flex-start;padding-bottom:6px}
 .col{flex:0 0 290px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-lg);display:flex;flex-direction:column;max-height:calc(100vh - 248px);transition:background .12s,border-color .12s}
-.col.over{background:var(--brand-50);border-color:var(--brand)}
+.col.over{background:var(--brand-50);border-color:var(--brand-line)}
 .col-h{display:flex;align-items:center;gap:8px;padding:12px 14px 10px;font-weight:600;font-size:13.5px}
 .col-h .mono{font-weight:400;color:var(--ink-3)}
 .col-b{padding:0 8px 8px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;min-height:60px}
@@ -480,7 +495,7 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .bulk button:hover{background:rgba(255,255,255,.1)}
 .bulk .bk-x{width:32px;padding:0;justify-content:center}
 .bulk .bk-link{color:#FFA45E}
-.bulk .bk-save{background:var(--brand);color:#fff}
+.bulk .bk-save{background:var(--brand);color:var(--on-brand)}
 .bulk .bk-save:hover{background:var(--brand-600)}
 
 /* ───────────────────────── User page ───────────────────────── */
@@ -494,7 +509,7 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .tab:hover{color:var(--ink)}
 .tab.on{color:var(--ink)}
 .tab-att{font-family:var(--mono);font-size:11px;font-style:normal;line-height:18px;color:var(--brand-700);background:var(--brand-100);padding:0 6px;border-radius:var(--r-tag)}
-.tab.on::after{content:"";position:absolute;left:8px;right:8px;bottom:-1px;height:2px;background:var(--brand);border-radius:2px}
+.tab.on::after{content:"";position:absolute;left:8px;right:8px;bottom:-1px;height:2px;background:var(--brand-line);border-radius:2px}
 .up-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;padding:24px 28px 96px;align-items:start}
 .up-main,.up-side{display:flex;flex-direction:column;gap:16px;min-width:0}
 .up-grid.single{grid-template-columns:minmax(0,1fr)}
@@ -535,8 +550,8 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .dd .flag{margin-right:8px}
 .dd-field{display:block;width:100%;max-width:none;height:40px;border-radius:10px;border:1px solid var(--line-strong);padding:0 36px 0 12px;font-size:14px;color:var(--ink);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B9B98' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center/14px}
 .dd:hover{border-color:var(--cb-border)}
-.dd.open,.dd:focus-visible{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-100);outline:0}
-.fsel:focus,.inp:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-100)}
+.dd.open,.dd:focus-visible{border-color:var(--brand-line);box-shadow:0 0 0 3px var(--brand-100);outline:0}
+.fsel:focus,.inp:focus{border-color:var(--brand-line);box-shadow:0 0 0 3px var(--brand-100)}
 .wrow{display:flex;align-items:center;gap:12px;height:62px;padding:0 20px;border-bottom:1px solid var(--line-soft);cursor:pointer}
 .wrow:hover{background:var(--row-hover)}
 .wrow .wn{flex:1;min-width:0}
@@ -548,15 +563,15 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .wdet .kl{font-size:12px;color:var(--ink-3);margin-bottom:4px}
 .wdet-act{display:flex;gap:8px}
 .wlist>:last-child{border-bottom:0}
-.mini-card{width:36px;height:24px;border-radius:5px;background:linear-gradient(135deg,#2C2C2C,#111);display:grid;place-items:center;flex:none}
-.mini-card.alt{background:linear-gradient(135deg,#FF9A4D,#E0600A)}
+.mini-card{width:36px;height:24px;border-radius:5px;background:linear-gradient(135deg,#2C2C2C,#111);color:#fff;display:grid;place-items:center;flex:none}
+.mini-card.alt{background:var(--card-alt);color:var(--card-alt-ink)}
 .docs{padding:16px 20px 20px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
 .docs-h{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .sub-t{font-weight:600;font-size:13.5px}
 .doc{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font-size:13.5px}
 .doc-ic{width:32px;height:32px;border-radius:9px;background:var(--surface-2);display:grid;place-items:center;color:var(--ink-2);flex:none}
 .dropzone{display:flex;flex-direction:column;align-items:center;gap:6px;padding:26px 16px;border:1.5px dashed var(--line-strong);border-radius:12px;color:var(--ink-2);font-size:13px;text-align:center;cursor:pointer;transition:background .12s,border-color .12s}
-.dropzone:hover{background:var(--row-hover)} .dropzone.over{border-color:var(--brand);background:var(--brand-50)}
+.dropzone:hover{background:var(--row-hover)} .dropzone.over{border-color:var(--brand-line);background:var(--brand-50)}
 .dropzone b{color:var(--ink);font-weight:500}
 .adj-pane{display:none;flex-direction:column;gap:14px} .adj-pane.on{display:flex}
 .hint{font-size:12.5px;color:var(--ink-2)}
@@ -615,7 +630,7 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .dp-grid.m{grid-template-columns:repeat(3,1fr);gap:6px;padding-top:6px}
 .dp-mo{height:52px;border-radius:10px;font-size:13px;text-align:center;color:var(--ink);font-variant-numeric:tabular-nums}
 .dp-mo:hover:not(:disabled){background:var(--hover)}
-.dp-mo.today{color:var(--brand);font-weight:600}
+.dp-mo.today{color:var(--brand-line);font-weight:600}
 .dp-mo.on,.dp-mo.on:hover{background:var(--inv);color:var(--on-inv)}
 .dp-in{flex:1;min-width:0;display:flex;align-items:center;gap:5px}
 .dp-in .inp{flex:none;width:92px;height:30px;padding:0 9px;font-size:12.5px;font-variant-numeric:tabular-nums}
@@ -625,7 +640,7 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .dp-w{height:28px;line-height:28px;text-align:center;font-size:11px;font-weight:500;color:var(--ink-3)}
 .dp-day{height:36px;border-radius:9px;font-size:13px;color:var(--ink);text-align:center;font-variant-numeric:tabular-nums}
 .dp-day:hover:not(:disabled){background:var(--hover)}
-.dp-day.today{font-weight:600;color:var(--brand)}
+.dp-day.today{font-weight:600;color:var(--brand-line)}
 .dp-day.in{background:var(--surface-2);border-radius:0}
 .dp-day.start,.dp-day.end,.dp-day.start:hover,.dp-day.end:hover{background:var(--inv);color:var(--on-inv)}
 .dp-f{display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
@@ -660,7 +675,7 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .tt .tt-r span:first-child{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.75)}
 .tt .sw{width:8px;height:8px;border-radius:2px;display:inline-block}
 
-.toasts{position:fixed;right:20px;bottom:20px;z-index:90;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.toasts{position:fixed;right:20px;bottom:76px;z-index:90;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
 .toast{display:flex;align-items:center;gap:9px;background:var(--float);color:#fff;padding:10px 14px;border-radius:12px;font-size:13px;box-shadow:var(--shadow-pop);animation:toast-in .2s cubic-bezier(.2,.8,.2,1)}
 .toast .i{color:var(--brand)}
 @keyframes toast-in{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
@@ -671,9 +686,31 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .modal-h{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 6px;font-weight:600;font-size:16px}
 .modal-b{padding:10px 20px 20px;display:flex;flex-direction:column;gap:14px}
 .modal-f{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--line);background:var(--head-bg)}
+/* Prototype config: floating button bottom-right, where support chat buttons usually sit */
+.pc-fab{position:fixed;right:20px;bottom:20px;z-index:70;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#FFFFFF;color:#111111;border:1px solid rgba(17,17,17,.08);box-shadow:0 6px 18px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.08);transition:transform .14s ease,box-shadow .14s ease}
+.pc-fab:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.16),0 1px 3px rgba(0,0,0,.08)}
+.modal.pc{width:min(620px,100%)} .pc .modal-b{gap:20px}
+.pc-lbl{font-size:13px;font-weight:600;margin-bottom:4px} .pc-sub{font-size:12.5px;color:var(--ink-2);margin-bottom:10px}
+.pc-brands{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.pc-brand{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;text-align:left;background:var(--surface);transition:border-color .12s,box-shadow .12s}
+.pc-brand:hover{border-color:var(--line-strong)}
+.pc-brand.on,.pc-nav.on{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.pc-logo{height:64px;display:grid;place-items:center;background:var(--surface-2);color:var(--ink);border-bottom:1px solid var(--line)}
+.pc-logo>span{display:flex;align-items:center;gap:6px}
+.pc-meta{display:flex;flex-direction:column;gap:3px;padding:10px 12px}
+.pc-n{font-size:13.5px;font-weight:500;display:block}
+.pc-c{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.pc-c i{width:12px;height:12px;border-radius:4px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.1)}
+.pc-navs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pc-nav{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:var(--r);text-align:left;transition:border-color .12s,box-shadow .12s}
+.pc-nav:hover{border-color:var(--line-strong)}
+.pc-d{display:block;font-size:12.5px;color:var(--ink-2);margin-top:2px}
+.pc-rad{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--cb-border);flex:none;margin-top:1px;display:grid;place-items:center}
+.pc-nav.on .pc-rad{border-color:var(--inv);background:var(--inv)} .pc-nav.on .pc-rad::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--on-inv)}
+@media (max-width:600px){.pc-brands,.pc-navs{grid-template-columns:minmax(0,1fr)}}
 .field label{display:block;font-size:12.5px;color:var(--ink-2);margin-bottom:6px;font-weight:500}
 .field input,.field select{width:100%;height:40px;border-radius:10px;border:1px solid var(--line-strong);padding:0 12px;outline:0;background:var(--surface)}
-.field input:focus,.field select:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-100)}
+.field input:focus,.field select:focus{border-color:var(--brand-line);box-shadow:0 0 0 3px var(--brand-100)}
 
 /* ───────────────────────── Dashboard ───────────────────────── */
 .kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
@@ -841,7 +878,7 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .pa-end{margin-left:auto;display:flex;align-items:center;gap:8px;flex:none}
 .pa-cnt{display:inline-grid;place-items:center;min-width:22px;height:18px;padding:0 6px;border-radius:var(--r-tag);background:var(--surface-2);font-family:var(--mono);font-size:11px;color:var(--ink-2)}
 .pa-cnt.zero{color:var(--ink-3)}
-.pa-dirty{width:6px;height:6px;border-radius:50%;background:var(--brand)}
+.pa-dirty{width:6px;height:6px;border-radius:50%;background:var(--brand-line)}
 .pa-top{display:flex;align-items:center;justify-content:space-between;gap:12px;height:56px;padding:0 14px 0 20px;border-bottom:1px solid var(--line);flex:none}
 .pa-tools{display:flex;align-items:center;gap:8px;padding:10px 14px 10px 20px;border-bottom:1px solid var(--line);flex:none}
 .pa-tools .search{flex:1;max-width:320px;height:30px}
@@ -967,6 +1004,7 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 <div class="tt" id="tt"></div>
 <div class="bulk" id="bulk"></div>
 <div class="toasts" id="toasts"></div>
+<button class="pc-fab" id="pcFab" data-act="proto-cfg" aria-label="Prototype config"></button>
 <div class="modal-wrap" id="modal"></div>
 
 <script>
@@ -1037,7 +1075,29 @@ const WORD_D = [
 const signPath = fill => `<path d="${SIGN_D}" fill-rule="evenodd" clip-rule="evenodd" fill="${fill}"/>`;
 const LOGO_SIGN = (h = 20, fill = 'currentColor', cls = '') => `<svg class="i ${cls}" width="${(h * 28.5 / 20).toFixed(1)}" height="${h}" viewBox="0 0 28.5 20" aria-hidden="true">${signPath(fill)}</svg>`;
 const LOGO_WORD = (h = 20) => `<svg class="i fade" width="${(h * 115 / 20).toFixed(1)}" height="${h}" viewBox="36.5 0 115 20" role="img" aria-label="NS.CARDS">${WORD_D.map(d => `<path d="${d}" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/>`).join('')}</svg>`;
-$('#favicon').href = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-6.1 -10.3 40.7 40.7"><style>path{fill:#111}@media (prefers-color-scheme:dark){path{fill:#fff}}</style><path d="${SIGN_D}" fill-rule="evenodd"/></svg>`);
+// White-label products (Prototype config → Product): logo, favicon and accent per client. Accent tokens live in CSS under :root[data-brand].
+const ENTRY_GLYPH = 'M8.9971 5.09863C8.9971 5.70196 9.4862 6.19727 10.0895 6.19727H10.6743C11.2706 6.19727 11.7539 6.68061 11.7539 7.27686C11.7539 7.8731 12.2373 8.35645 12.8335 8.35645H13.2572C13.8605 8.35645 14.3496 8.84554 14.3496 9.44886V10.2611C14.3496 10.8644 13.8605 11.3535 13.2572 11.3535H12.4889C11.8856 11.3535 11.3965 11.8426 11.3965 12.4459V12.9466C11.3965 13.55 10.9074 14.0391 10.3041 14.0391H9.9775C9.436 14.0391 8.9971 14.478 8.9971 15.0195C8.9971 15.561 8.5581 16 8.0166 16H7.0924C6.4891 16 6 15.5109 6 14.9076V14.0953C6 13.492 6.4891 13.0029 7.0924 13.0029H7.4189C7.9604 13.0029 8.3994 12.564 8.3994 12.0225C8.3994 11.481 8.8384 11.042 9.3799 11.042H10.4287C10.9389 11.042 11.3525 10.6284 11.3525 10.1182C11.3525 9.60795 10.9389 9.19434 10.4287 9.19434H9.8483C9.245 9.19434 8.7559 8.69903 8.7559 8.0957C8.7559 7.49238 8.2668 6.99707 7.6634 6.99707H7.0924C6.4891 6.99707 6 6.50798 6 5.90466V5.09242C6 4.48909 6.4891 4 7.0924 4H7.9047C8.508 4 8.9971 4.49531 8.9971 5.09863Z';
+const ENTRY_WORD = ["M53.3182 18C53.0924 18 52.8911 17.9812 52.7142 17.9435C52.5373 17.9097 52.415 17.8758 52.3472 17.8419L52.6859 16.6677C53.0096 16.7505 53.2956 16.7806 53.544 16.758C53.7924 16.7355 54.0126 16.6244 54.2045 16.425C54.4002 16.2293 54.579 15.9113 54.7408 15.4709L54.9892 14.7935L51.7827 6.07739H53.2279L55.6215 12.9871H55.7118L58.1053 6.07739H59.5505L55.8698 16.0129C55.7043 16.4607 55.4991 16.8314 55.2545 17.125C55.0099 17.4223 54.7257 17.6424 54.4021 17.7855C54.0822 17.9285 53.7209 18 53.3182 18Z", "M47.3955 14.7482V6.07726H48.6826V7.38694H48.7729C48.931 6.9579 49.217 6.60978 49.631 6.34258C50.045 6.07538 50.5117 5.94177 51.031 5.94177C51.1289 5.94177 51.2512 5.94366 51.398 5.94742C51.5447 5.95118 51.6558 5.95683 51.731 5.96435V7.31919C51.6859 7.3079 51.5824 7.29097 51.4205 7.26839C51.2625 7.24204 51.095 7.22887 50.9181 7.22887C50.4966 7.22887 50.1203 7.31731 49.7891 7.49419C49.4617 7.66731 49.202 7.90817 49.01 8.21677C48.8219 8.52161 48.7278 8.86973 48.7278 9.26113V14.7482H47.3955Z", "M46.5038 6.07742V7.20645H42.0103V6.07742H46.5038ZM43.3199 4H44.6522V12.2645C44.6522 12.6409 44.7068 12.9231 44.8159 13.1113C44.9288 13.2957 45.0718 13.4199 45.245 13.4839C45.4218 13.5441 45.6081 13.5742 45.8038 13.5742C45.9506 13.5742 46.071 13.5667 46.1651 13.5516C46.2592 13.5328 46.3345 13.5177 46.3909 13.5065L46.6619 14.7032C46.5716 14.7371 46.4455 14.771 46.2837 14.8048C46.1218 14.8425 45.9167 14.8613 45.6683 14.8613C45.292 14.8613 44.9232 14.7804 44.5619 14.6186C44.2044 14.4567 43.907 14.2102 43.6699 13.879C43.4366 13.5479 43.3199 13.1301 43.3199 12.6258V4Z", "M35.8782 9.53222V14.7483H34.5459V6.07738H35.833V7.43222H35.9459C36.1491 6.9919 36.4577 6.63813 36.8717 6.37093C37.2857 6.09996 37.8201 5.96448 38.475 5.96448C39.0621 5.96448 39.5758 6.08491 40.0161 6.32577C40.4564 6.56286 40.7989 6.92415 41.0435 7.40964C41.2882 7.89136 41.4105 8.50104 41.4105 9.23867V14.7483H40.0782V9.32899C40.0782 8.64781 39.9013 8.11717 39.5476 7.73706C39.1938 7.35319 38.7083 7.16125 38.0911 7.16125C37.6658 7.16125 37.2857 7.25346 36.9508 7.43786C36.6196 7.62227 36.358 7.89136 36.1661 8.24512C35.9741 8.59889 35.8782 9.02792 35.8782 9.53222Z", "M30.042 14.929C29.2065 14.929 28.4858 14.7446 27.8799 14.3758C27.2777 14.0032 26.8129 13.4838 26.4855 12.8177C26.1618 12.1478 26 11.3688 26 10.4806C26 9.59243 26.1618 8.80964 26.4855 8.13222C26.8129 7.45104 27.2683 6.92039 27.8516 6.54028C28.4387 6.15641 29.1237 5.96448 29.9065 5.96448C30.3581 5.96448 30.8041 6.03975 31.2444 6.19028C31.6847 6.34082 32.0855 6.58544 32.4468 6.92415C32.8081 7.2591 33.096 7.70319 33.3105 8.25641C33.5251 8.80964 33.6323 9.49082 33.6323 10.3V10.8645H26.9484V9.71286H32.2775C32.2775 9.22362 32.1796 8.78706 31.9839 8.40319C31.792 8.01932 31.5172 7.71636 31.1597 7.49432C30.806 7.27227 30.3882 7.16125 29.9065 7.16125C29.3758 7.16125 28.9167 7.29297 28.5291 7.55641C28.1452 7.81609 27.8497 8.1548 27.6428 8.57254C27.4358 8.99028 27.3323 9.43813 27.3323 9.91609V10.6838C27.3323 11.3387 27.4452 11.8938 27.671 12.3492C27.9006 12.8008 28.2186 13.1451 28.625 13.3822C29.0315 13.6156 29.5038 13.7322 30.042 13.7322C30.392 13.7322 30.7081 13.6833 30.9904 13.5854C31.2764 13.4838 31.5229 13.3333 31.7299 13.1338C31.9369 12.9306 32.0968 12.6785 32.2097 12.3774L33.4968 12.7387C33.3613 13.1752 33.1337 13.5591 32.8138 13.8903C32.4939 14.2177 32.0987 14.4736 31.6283 14.658C31.1578 14.8387 30.6291 14.929 30.042 14.929Z"];
+const LEMON_D = 'M19.2425 7.9796C19.2943 8.19762 19.3412 8.41991 19.3816 8.64654C19.4022 8.76189 19.4202 8.87681 19.4373 8.99105C19.4608 9.1042 19.4832 9.21869 19.5038 9.33413C19.7579 10.7581 19.7447 12.101 19.4641 13.3626C19.1834 14.6242 18.6882 15.7524 17.978 16.746C17.2579 17.7325 16.3543 18.5621 15.2677 19.2348C14.6028 19.6406 13.8868 19.9683 13.1212 20.2181C12.5251 20.918 11.6831 21.4606 11.6636 21.4732C11.65 21.4703 10.6318 21.2504 9.81947 20.785C9.09137 20.8018 8.37989 20.7436 7.68527 20.6101C6.43395 20.3615 5.30383 19.9008 4.29618 19.2275C3.28708 18.5458 2.43287 17.6625 1.73359 16.5787C1.03438 15.4949 0.55784 14.2409 0.303699 12.817C0.283206 12.7022 0.26452 12.5877 0.24757 12.4739C0.223922 12.3603 0.201737 12.2454 0.181034 12.1294C0.056376 11.431 -0.00380825 10.7518 0.000186475 10.0924L19.2425 7.9796ZM9.13219 0C9.14943 0.00371841 10.1651 0.223809 10.9758 0.688223C11.7041 0.671403 12.416 0.729059 13.1108 0.862604C14.362 1.11123 15.4914 1.57291 16.499 2.24615C17.508 2.92784 18.3627 3.81074 19.062 4.8945C19.3711 5.37361 19.6365 5.88616 19.8587 6.43177L1.2587 8.47452C1.28062 8.35255 1.30426 8.23111 1.33107 8.11063C1.61176 6.84912 2.10748 5.72123 2.81757 4.72769C3.53778 3.741 4.44154 2.9107 5.52836 2.23795C6.19317 1.83215 6.90891 1.50536 7.67439 1.25551C8.27174 0.554159 9.11589 0.0104698 9.13219 0Z';
+const LEMON_LOGO = ["M73.2734 7.9796C73.3252 8.19762 73.372 8.41991 73.4125 8.64654C73.4331 8.76189 73.4511 8.87681 73.4682 8.99105C73.4917 9.1042 73.5141 9.21869 73.5347 9.33413C73.7888 10.7581 73.7756 12.101 73.495 13.3626C73.2143 14.6242 72.7191 15.7524 72.0089 16.746C71.2888 17.7325 70.3852 18.5621 69.2986 19.2348C68.6337 19.6406 67.9177 19.9683 67.1521 20.2181C66.556 20.918 65.714 21.4606 65.6945 21.4732C65.6809 21.4703 64.6627 21.2504 63.8504 20.785C63.1223 20.8018 62.4108 20.7436 61.7162 20.6101C60.4648 20.3615 59.3347 19.9008 58.3271 19.2275C57.318 18.5458 56.4638 17.6625 55.7645 16.5787C55.0653 15.4949 54.5887 14.2409 54.3346 12.817C54.3141 12.7022 54.2954 12.5877 54.2785 12.4739C54.2548 12.3603 54.2326 12.2454 54.2119 12.1294C54.0873 11.431 54.0271 10.7518 54.0311 10.0924L73.2734 7.9796ZM63.1631 0C63.1803 0.00371841 64.196 0.223809 65.0067 0.688223C65.735 0.671403 66.4469 0.729059 67.1417 0.862604C68.3929 1.11123 69.5223 1.57291 70.5298 2.24615C71.5389 2.92784 72.3936 3.81074 73.0929 4.8945C73.402 5.37361 73.6674 5.88616 73.8896 6.43177L55.2896 8.47452C55.3115 8.35255 55.3352 8.23111 55.362 8.11063C55.6427 6.84912 56.1384 5.72123 56.8485 4.72769C57.5687 3.741 58.4724 2.9107 59.5593 2.23795C60.2241 1.83215 60.9398 1.50536 61.7053 1.25551C62.3026 0.554159 63.1468 0.0104698 63.1631 0Z", "M83.9554 38.2644V26.2789H91.9061V27.3808H85.1759V31.7715H91.228V32.8904H85.1759V37.1624H91.9061V38.2644H83.9554Z", "M73.3236 38.4C72.0917 38.4 71.0633 38.1401 70.2382 37.6202C69.4245 37.089 68.8199 36.36 68.4243 35.4333C68.0288 34.5066 67.831 33.4555 67.831 32.2801C67.831 31.1161 68.0344 30.0707 68.4413 29.1439C68.8481 28.2172 69.4584 27.4882 70.2722 26.957C71.0972 26.4146 72.1256 26.1433 73.3575 26.1433C74.1712 26.1433 74.8832 26.2676 75.4935 26.5163C76.1151 26.7536 76.6293 27.104 77.0362 27.5673C77.4544 28.0194 77.7482 28.5675 77.9177 29.2117H76.6802C76.4542 28.5901 76.0473 28.1098 75.4596 27.7708C74.8832 27.4204 74.1825 27.2452 73.3575 27.2452C72.3517 27.2452 71.5323 27.4769 70.8994 27.9403C70.2778 28.4037 69.8144 29.014 69.5093 29.7712C69.2154 30.5284 69.0685 31.3478 69.0685 32.2293C69.0685 33.156 69.2211 34.0037 69.5262 34.7722C69.8314 35.5407 70.3004 36.1566 70.9333 36.62C71.5662 37.0721 72.3743 37.2981 73.3575 37.2981C73.9 37.2981 74.4029 37.2246 74.8663 37.0777C75.3297 36.9195 75.7309 36.6934 76.0699 36.3996C76.409 36.1058 76.652 35.7498 76.7989 35.3316H78.1381C77.946 35.9758 77.6239 36.5296 77.1718 36.9929C76.7198 37.445 76.166 37.7954 75.5105 38.044C74.8663 38.2813 74.1373 38.4 73.3236 38.4Z", "M52.3502 38.2644V26.2789H53.9437L60.6908 36.6539V26.2789H61.9114V38.2644H60.3517L53.5707 27.9064V38.2644H52.3502Z", "M36.31 38.2644L40.8533 26.2789H42.5316L47.0749 38.2644H45.7356L44.7524 35.6198H38.6325L37.6493 38.2644H36.31ZM39.0394 34.5178H44.3286L41.684 27.4147L39.0394 34.5178Z", "M21.4734 38.2644V26.2789H23.067L29.8141 36.6539V26.2789H31.0346V38.2644H29.475L22.694 27.9064V38.2644H21.4734Z", "M13.6753 38.2644V26.2789H14.8958V38.2644H13.6753Z", "M0 38.2644V26.2789H7.95073V27.3808H1.22058V32.2123H7.05225V33.3142H1.22058V38.2644H0Z", "M76.2772 20.0201V1.84508H80.0252L88.4196 14.1415V1.84508H92.0905V20.0201H88.4452L79.9482 7.85208V20.0201H76.2772Z", "M32.3067 20.0201V1.84508H37.1842L42.036 10.6245L46.8364 1.84508H51.5342V20.0201H47.8633V6.74823L42.7034 15.9641H41.2145L35.9776 6.74823V20.0201H32.3067Z", "M15.8492 20.0201V1.84508H28.9414V5.25932H19.5201V9.36667H27.6065V12.6526H19.5201V16.6316H28.9414V20.0201H15.8492Z", "M0.0936452 20.0201V1.84508H3.76459V16.6316H12.9805V20.0201H0.0936452Z"]; // 93×39; first path is the lemon (the "O"), the rest is the lettering
+const svgPaths = ds => ds.map(d => `<path d="${d}" fill="currentColor"/>`).join('');
+const entryTile = h => `<svg class="i" width="${h}" height="${h}" viewBox="0 0 20 20" aria-hidden="true"><rect width="20" height="20" rx="4" fill="#C2FB50"/><path d="${ENTRY_GLYPH}" fill="#111"/></svg>`;
+const entryWord = h => `<svg class="i fade" width="${(h * 34 / 20).toFixed(1)}" height="${h}" viewBox="26 0 34 20" role="img" aria-label="Entry">${svgPaths(ENTRY_WORD)}</svg>`;
+const lemonMark = h => `<svg class="i lm-mark" width="${(h * 20 / 22).toFixed(1)}" height="${h}" viewBox="0 0 20 22" aria-hidden="true"><path d="${LEMON_D}"/></svg>`;
+const lemonLogo = (h, cls = '') => `<svg class="i ${cls}" width="${(h * 93 / 39).toFixed(1)}" height="${h}" viewBox="0 0 93 39" role="img" aria-label="Lemon Finance"><path class="lm-fruit" d="${LEMON_LOGO[0]}"/>${svgPaths(LEMON_LOGO.slice(1))}</svg>`;
+const favSvg = (vb, body) => 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}">${body}</svg>`);
+const BRANDS = {
+  ns: { name: 'NS.Cards', color: '#FC7C1A', side: () => LOGO_SIGN(15) + LOGO_WORD(13.5), auth: () => LOGO_SIGN(22) + LOGO_WORD(19), chip: () => LOGO_SIGN(14) + LOGO_WORD(12.5),
+    card: () => LOGO_SIGN(9), fav: () => favSvg('-6.1 -10.3 40.7 40.7', `<style>path{fill:#111}@media (prefers-color-scheme:dark){path{fill:#fff}}</style><path d="${SIGN_D}" fill-rule="evenodd"/>`) },
+  entry: { name: 'Entry', color: '#C2FB50', side: () => entryTile(24) + entryWord(24), auth: () => entryTile(32) + entryWord(32), chip: () => entryTile(22) + entryWord(22),
+    card: () => `<svg class="i" width="7.7" height="11" viewBox="6 4 8.4 12" aria-hidden="true"><path d="${ENTRY_GLYPH}" fill="currentColor"/></svg>`,
+    fav: () => favSvg('0 0 20 20', `<rect width="20" height="20" rx="4" fill="#C2FB50"/><path d="${ENTRY_GLYPH}" fill="#111"/>`) },
+  lemon: { name: 'Lemon Finance', color: '#FFF357', side: () => lemonMark(22) + lemonLogo(30, 'fade'), auth: () => lemonLogo(46), chip: () => lemonLogo(30),
+    card: () => `<svg class="i" width="10" height="11" viewBox="0 0 20 22" aria-hidden="true"><path d="${LEMON_D}" fill="currentColor"/></svg>`,
+    fav: () => favSvg('0 0 20 20', `<rect width="20" height="20" rx="5" fill="#FFF357"/><path d="${LEMON_D}" fill="#111" transform="translate(4 3.6) scale(.6)"/>`) },
+};
+const brand = () => BRANDS[S.brand];
+function applyBrand() { document.documentElement.dataset.brand = S.brand; document.title = brand().name + ' Admin'; $('#favicon').href = brand().fav(); }
 
 /* ════════════════════════════ Icons (lucide-style) ════════════════════════════ */
 const ICONS = {
@@ -1399,6 +1459,8 @@ const S = {
   hidden: new Set(store.get('nsc.hidden3', DEFAULT_HIDDEN)), selected: new Set(),
   navClosed: new Set(store.get('nsc.navClosed', [])), collapsed: new Set(), more: {}, colW: store.get('nsc.colw', {}), userTab: 'overview', draft: {}, _list: [],
 };
+S.brand = BRANDS[document.documentElement.dataset.brand] ? document.documentElement.dataset.brand : 'ns';
+applyBrand();
 
 /* ════════════════════════════ Shell ════════════════════════════ */
 // Sidebar: a few top-level items, then foldable sections under small all-caps labels. Every item has its own icon (all that shows when collapsed) and its label is also the page's header title.
@@ -1452,11 +1514,11 @@ const RU = {
   Compliance: 'Проверки', Documents: 'Документы', 'KYC checks': 'Проверки KYC', 'KYT rules': 'Правила KYT', Finance: 'Финансы', 'Wallet statistics': 'Статистика кошельков', 'Operation statistics': 'Статистика операций', Reserves: 'Резервы',
   'Reference data': 'Справочники', Currencies: 'Валюты', Networks: 'Сети', Markets: 'Рынки', 'Country lists': 'Списки стран', Administration: 'Администрирование', Administrators: 'Администраторы', Roles: 'Роли', Sources: 'Источники',
   'Verification templates': 'Шаблоны верификации', 'Audit log': 'Журнал действий',
-  Navigation: 'Навигация', Theme: 'Тема', Light: 'Светлая', Dark: 'Тёмная', Language: 'Язык', Classic: 'Классика', Focus: 'Фокус', Flyout: 'Панель', 'Profile settings': 'Настройки профиля', 'Keyboard shortcuts': 'Горячие клавиши', 'Help & docs': 'Помощь', 'Sign out': 'Выйти',
+  Navigation: 'Навигация', 'Prototype config': 'Настройки прототипа', 'White-label product': 'White-label продукт', 'The client the admin panel is branded for: logo, favicon and accent colour.': 'Клиент, под которого оформлена админ-панель: логотип, фавикон и акцентный цвет.', 'How the sidebar groups pages.': 'Как боковое меню группирует страницы.', 'Reset to defaults': 'Сбросить', Done: 'Готово', 'Prototype config applied': 'Настройки прототипа применены', Cancel: 'Отмена', Theme: 'Тема', Light: 'Светлая', Dark: 'Тёмная', Language: 'Язык', Classic: 'Классика', Focus: 'Фокус', Flyout: 'Панель', 'Profile settings': 'Настройки профиля', 'Keyboard shortcuts': 'Горячие клавиши', 'Help & docs': 'Помощь', 'Sign out': 'Выйти',
   'Issued cards': 'Выпущенные карты', 'Needs attention': 'Требуют внимания', 'Documents to review': 'Документы на проверке',
   'Card issue errors': 'Ошибки выпуска карт', 'Transaction checks': 'Проверки транзакций', 'All clear': 'Всё разобрано', 'Finance monitors': 'Finance Monitors', 'Wallet funds': 'Средства в кошельках', 
   'Provider reserves': 'Резервы провайдеров',
-  'Sign in': 'Войти', 'Create an account': 'Создать аккаунт', 'Create account': 'Создать аккаунт', 'Get access to the NS.Cards admin panel': 'Доступ к админ-панели NS.Cards', 'Welcome back to the NS.Cards admin panel': 'Вход в админ-панель NS.Cards',
+  'Sign in': 'Войти', 'Create an account': 'Создать аккаунт', 'Create account': 'Создать аккаунт', 'Get access to the {b} admin panel': 'Доступ к админ-панели {b}', 'Welcome back to the {b} admin panel': 'Вход в админ-панель {b}',
   'Full name': 'Имя и фамилия', 'Work email': 'Рабочая почта', Email: 'Почта', Password: 'Пароль', 'At least 8 characters': 'Не менее 8 символов', 'Forgot password?': 'Забыли пароль?', 'Password reset link sent': 'Ссылка для сброса пароля отправлена',
   'Already have an account?': 'Уже есть аккаунт?', 'New to the admin panel?': 'Впервые в админ-панели?', 'Prototype: any email and password work.': 'Прототип: подойдут любые почта и пароль.',
   'Show password': 'Показать пароль', 'Hide password': 'Скрыть пароль', 'Enter your name': 'Введите имя', 'Enter your email': 'Введите почту', 'Enter a valid email address': 'Введите корректную почту', 'Enter your password': 'Введите пароль', 'Use at least 8 characters': 'Не менее 8 символов',
@@ -1521,7 +1583,7 @@ function renderSidebar() {
   const col = $('#app').classList.contains('collapsed'), keep = $('#sidebar .sb-scroll')?.scrollTop || 0;
   $('#sidebar').innerHTML = `
     <div class="sb-head">
-      <a class="logo" href="#/dashboard" aria-label="NS.CARDS home">${LOGO_SIGN(15)}${LOGO_WORD(13.5)}</a>
+      <a class="logo lg-${S.brand}" href="#/dashboard" aria-label="${brand().name} home">${brand().side()}</a>
       <button class="sb-toggle" data-act="toggle-sidebar" data-tip="${col ? 'Expand' : 'Collapse'} sidebar  ⌘B">${icon(col ? 'panelOpen' : 'panelClose', 18)}</button>
     </div>
     <nav class="sb-scroll v-${S.navV}">
@@ -1576,10 +1638,9 @@ function renderTopbar() {
     <nav class="crumbs" aria-label="Breadcrumb">${path.map(([l, h, id, plain], i) => (i ? '<span class="crumb-sep">/</span>' : '') + (h ? `<a href="${h}">${esc(t(l))}</a>` : `<span class="${plain ? '' : 'cur'}">${esc(t(l))}</span>`) + (id ? `<span class="count">${id}</span>` : '')).join('')}</nav>
     <div class="tb-sp"></div>${ctx}`;
 }
-// Profile menu. Language and Navigation open their choices inside the menu (a back arrow returns), so no list floats outside it.
+// Profile menu. Language opens its choices inside the menu (a back arrow returns), so no list floats outside it.
 const ME_PICK = {
   lang: () => ['Language', [['en', 'English'], ['ru', 'Русский']], S.lang, 'lang'],
-  navv: () => ['Navigation', Object.entries(NAV_V).map(([k, [l]]) => [k, t(l)]), S.navV, 'nav-v'],
 };
 function meMenu(view) {
   const dark = document.documentElement.dataset.theme === 'dark';
@@ -1590,9 +1651,32 @@ function meMenu(view) {
   return `<div class="me-h"><span class="me-av">${meInitials()}</span><div style="min-width:0"><div class="me-n">${esc(S.me.name)}</div><div class="me-e">${esc(S.me.email)}</div></div></div>
     <div class="pop-sep"></div>
     <div class="pop-row me-row"><span>${t('Theme')}</span><div class="seg sm"><button class="${dark ? '' : 'on'}" data-act="theme" data-v="light">${icon('sun', 14)}${t('Light')}</button><button class="${dark ? 'on' : ''}" data-act="theme" data-v="dark">${icon('moon', 13)}${t('Dark')}</button></div></div>
-    ${menuItems([row('lang', 'globe', 'Language', S.lang === 'ru' ? 'Русский' : 'English'), row('navv', 'panelClose', 'Navigation', t(NAV_V[S.navV][0]))])}
+    ${menuItems([row('lang', 'globe', 'Language', S.lang === 'ru' ? 'Русский' : 'English')])}
     <div class="pop-sep"></div>
     ${menuItems([{ act: 'toast', data: { msg: t('Profile settings') }, icon: 'user', label: t('Profile settings') }, { act: 'shortcuts', icon: 'keyboard', label: t('Keyboard shortcuts') }, { act: 'toast', data: { msg: 'Docs would open here' }, icon: 'help', label: t('Help & docs') }, '-', { act: 'sign-out', icon: 'logout', label: t('Sign out') }])}`;
+}
+// Prototype config: knobs for exploring the prototype, not product settings. Each choice applies at once and is kept in this browser.
+function protoModal() {
+  const D = S.pcDraft ||= { brand: S.brand, navV: S.navV };
+  const opt = (k, on, act, body, cls) => `<button class="${cls} ${on ? 'on' : ''}" data-act="${act}" data-v="${k}" aria-pressed="${on}">${body}</button>`;
+  const html = `<div class="modal pc" role="dialog" aria-label="${t('Prototype config')}">
+    <div class="modal-h">${t('Prototype config')}<button class="icon-btn sm bare" data-act="modal-close" aria-label="${t('Close')}">${icon('x', 17)}</button></div>
+    <div class="modal-b">
+      <section><div class="pc-lbl">${t('White-label product')}</div><div class="pc-sub">${t('The client the admin panel is branded for: logo, favicon and accent colour.')}</div>
+        <div class="pc-brands">${Object.entries(BRANDS).map(([k, b]) => opt(k, k === D.brand, 'pc-pick-brand', `<span class="pc-logo"><span class="lg-${k}">${b.chip()}</span></span><span class="pc-meta"><span class="pc-n">${b.name}</span><span class="pc-c"><i style="background:${b.color}"></i>${b.color.slice(1)}</span></span>`, 'pc-brand')).join('')}</div></section>
+      <section><div class="pc-lbl">${t('Navigation')}</div><div class="pc-sub">${t('How the sidebar groups pages.')}</div>
+        <div class="pc-navs">${Object.entries(NAV_V).map(([k, [l, d]]) => opt(k, k === D.navV, 'pc-pick-nav', `<span class="pc-rad"></span><span><span class="pc-n">${t(l)}</span><span class="pc-d">${t(d)}</span></span>`, 'pc-nav')).join('')}</div></section>
+    </div>
+    <div class="modal-f"><button class="btn btn-ghost btn-sm" data-act="pc-defaults" style="margin-right:auto">${t('Reset to defaults')}</button><button class="btn btn-ghost btn-sm" data-act="modal-close">${t('Cancel')}</button><button class="btn btn-primary btn-sm" data-act="pc-done">${t('Done')}</button></div>
+  </div>`;
+  openModal(html);
+}
+// Picking only moves the selection; re-rendering the modal would replay its open animation
+function pcMark() { const D = S.pcDraft; $$('.pc-brand, .pc-nav', modal).forEach(b => { const on = b.dataset.v === (b.classList.contains('pc-brand') ? D.brand : D.navV); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); }); }
+function applyProto({ brand: b, navV: n }) {
+  S.brand = b; store.set('nsc.brand', b); applyBrand();
+  if (n !== S.navV) { S.navV = n; store.set('nsc.navv', n); S.navPeek.clear(); }
+  if (S.me) { renderSidebar(); renderTopbar(); rerender(); } else route();
 }
 function shortcutsModal() {
   const k = (...ks) => ks.map(x => `<kbd>${x}</kbd>`).join('');
@@ -2432,7 +2516,7 @@ const TCOLS = {
     { k: 'created', l: 'Created', cell: h => fmtDateTime(h.created) }, { k: 'updated', l: 'Updated', al: 'r', cell: h => muted(rel(h.updated)) },
   ],
   cards: [
-    { k: 'card', l: 'Card', on: 1, cell: c => `<span class="ctry"><span class="mini-card ${c.physical ? 'alt' : ''}">${LOGO_SIGN(9, '#fff')}</span>•••• ${c.last4}</span>` },
+    { k: 'card', l: 'Card', on: 1, cell: c => `<span class="ctry"><span class="mini-card ${c.physical ? 'alt' : ''}">${brand().card()}</span>•••• ${c.last4}</span>` },
     { k: 'id', l: 'ID', on: 1, cell: c => numM(c.id) }, { k: 'userId', l: 'User ID', cell: () => numM(S.userId) },
     { k: 'holder', l: 'Cardholder ID', on: 1, cell: c => numM(c.holder) }, { k: 'token', l: 'Public token', cell: c => copyVal(c.token, c.token.slice(0, 10) + '…') },
     { k: 'product', l: 'Product', on: 1, cell: c => esc(c.product) }, { k: 'provider', l: 'Provider', cell: c => c.provider },
@@ -2774,7 +2858,6 @@ const ACT = {
   'mobile-menu': () => $('#app').classList.toggle('mobile-open'),
   'nav-fly': a => openFly(a),
   'lang': a => { S.lang = a.dataset.v; store.set('nsc.lang', S.lang); document.documentElement.lang = S.lang; route(); openPop($('#sidebar .me'), meMenu(), { width: 260, kind: 'me' }); },
-  'nav-v': a => { S.navV = a.dataset.v; store.set('nsc.navv', S.navV); S.navPeek.clear(); renderSidebar(); closePop(); openPop($('#sidebar .me'), meMenu(), { width: 260, kind: 'me' }); },
   'theme': a => { setTheme(a.dataset.v); if (popOpts.kind === 'me') { pop.innerHTML = meMenu(); positionPop(); } },
   'me': a => openPop(a, meMenu(), { width: 260, kind: 'me' }),
   'me-view': a => { pop.innerHTML = meMenu(a.dataset.v); positionPop(); },
@@ -2980,6 +3063,11 @@ const ACT = {
   },
   'dd-pick': a => { const sel = S._dd; closePop(); if (!sel || sel.value === a.dataset.v) return; sel.value = a.dataset.v; ddLabel(sel); sel.isConnected ? sel.dispatchEvent(new Event('change', { bubbles: true })) : onChange(sel); }, // a select from a popover is detached by now
   'modal-close': closeModal,
+  'proto-cfg': () => { closePop(); S.pcDraft = null; protoModal(); },
+  'pc-pick-brand': a => { S.pcDraft.brand = a.dataset.v; pcMark(); },
+  'pc-pick-nav': a => { S.pcDraft.navV = a.dataset.v; pcMark(); },
+  'pc-defaults': () => { S.pcDraft = { brand: 'ns', navV: 'classic' }; pcMark(); },
+  'pc-done': () => { const d = S.pcDraft; closeModal(); if (d.brand !== S.brand || d.navV !== S.navV) { applyProto(d); toast(t('Prototype config applied'), 'sliders'); } },
 };
 
 /* ════════════════════════════ Companies ════════════════════════════ */
@@ -4145,7 +4233,7 @@ page({
     product: fE('Product', 'cardProduct', { 'NS Virtual EUR': { label: 'NS Virtual EUR' }, 'NS Physical EUR': { label: 'NS Physical EUR' } }, c => c.product), created: fD('Issued', c => c.created) },
   tiles: [allTile('All cards', L => `${fmtEur(sum(L.map(c => c.balance)))} on cards`), tile('act', 'Active', { key: 'status', values: ['active'] }, share), tile('frz', 'Frozen', { key: 'status', values: ['frozen'] }, share),
     tile('vir', 'Virtual', { key: 'kind', values: ['virtual'] }, share), tile('phy', 'Physical', { key: 'kind', values: ['physical'] }, share)],
-  cols: [{ k: 'last4', l: 'Card', on: 1, cell: c => `<span class="ctry"><span class="mini-card ${c.physical ? 'alt' : ''}">${LOGO_SIGN(9, '#fff')}</span>•••• ${c.last4}</span>` }, K.id(), K.user(),
+  cols: [{ k: 'last4', l: 'Card', on: 1, cell: c => `<span class="ctry"><span class="mini-card ${c.physical ? 'alt' : ''}">${brand().card()}</span>•••• ${c.last4}</span>` }, K.id(), K.user(),
     { k: 'product', l: 'Product', on: 1, cell: c => esc(c.product) }, { k: 'physical', l: 'Type', on: 1, val: c => +c.physical, cell: c => c.physical ? 'Physical' : 'Virtual' },
     K.text('provider', 'Provider', 0), { k: 'balance', l: 'Balance', al: 'r', on: 1, dir: 'desc', cell: c => `<span class="num">${fmtAmt(c.balance, 'EUR')}</span>` }, { k: 'exp', l: 'Expiry', on: 1, cell: c => `<span class="num">${c.exp}</span>` },
     { k: 'frozen', l: 'Status', on: 1, val: c => +c.frozen, cell: c => dotCell(CARD_STATUS[c.frozen ? 'frozen' : 'active']) }, K.yes('activated', 'Activated', 0), K.date('created', 'Issued')],
@@ -4876,7 +4964,7 @@ document.addEventListener('input', e => {
 document.addEventListener('keydown', e => {
   const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName);
   const mod = e.metaKey || e.ctrlKey;
-  if (!S.me) return; // the auth screen has no shortcuts
+  if (!S.me) { if (e.key === 'Escape') closeModal(); return; } // the auth screen has no shortcuts
   if (mod && e.key.toLowerCase() === 'b') { e.preventDefault(); toggleSidebar(); return; }
   if (e.key === 'Enter' && e.target.id === 'popQ') { const b = $('#popFields .pi[data-key]'); b && b.click(); }
   if (e.key === 'Enter' && (e.target.id === 'dpFrom' || e.target.id === 'dpTo')) ACT['dp-apply']();
@@ -5057,13 +5145,13 @@ function renderAuth(up) {
     ? `<div class="pw"><input id="${id}" type="password" autocomplete="${ac}" placeholder="${ph}"><button type="button" class="ghost-ic" data-act="au-eye" data-tip="${t('Show password')}" aria-label="${t('Show password')}">${icon('eye', 16)}</button></div>`
     : `<input id="${id}" type="${type}" autocomplete="${ac}" placeholder="${ph}" spellcheck="false">`}</div>`;
   $('#auth').innerHTML = `<div class="auth-box">
-    <div class="auth-logo">${LOGO_SIGN(22)}${LOGO_WORD(19)}</div>
+    <div class="auth-logo lg-${S.brand}">${brand().auth()}</div>
     <div class="auth-card">
       <h1>${t(up ? 'Create an account' : 'Sign in')}</h1>
-      <p class="auth-sub">${t(up ? 'Get access to the NS.Cards admin panel' : 'Welcome back to the NS.Cards admin panel')}</p>
+      <p class="auth-sub">${t(up ? 'Get access to the {b} admin panel' : 'Welcome back to the {b} admin panel').replace('{b}', brand().name)}</p>
       <form id="authForm" data-up="${up ? 1 : ''}" novalidate>
         ${up ? f('auName', 'Full name', 'text', 'name', 'Anna Kowalski') : ''}
-        ${f('auEmail', up ? 'Work email' : 'Email', 'email', 'username', 'name@ns.cards')}
+        ${f('auEmail', up ? 'Work email' : 'Email', 'email', 'username', 'name@company.com')}
         ${f('auPw', 'Password', 'password', up ? 'new-password' : 'current-password', up ? t('At least 8 characters') : '', up ? '' : `<button type="button" class="link-btn" data-act="toast" data-msg="${t('Password reset link sent')}">${t('Forgot password?')}</button>`)}
         <button class="btn btn-primary auth-go" type="submit">${t(up ? 'Create account' : 'Sign in')}</button>
       </form>
@@ -5094,6 +5182,7 @@ document.addEventListener('submit', e => {
 
 /* ════════════════════════════ Boot ════════════════════════════ */
 if (S.me) ME = S.me.name;
+$('#pcFab').innerHTML = icon('sliders', 20); $('#pcFab').dataset.tip = 'Prototype config';
 if (store.get('nsc.sidebar', 'open') === 'collapsed') $('#app').classList.add('collapsed');
 route();
 </script>
