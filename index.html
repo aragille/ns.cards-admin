@@ -183,7 +183,6 @@ a{color:inherit;text-decoration:none}
 .nav-fly.active.open{background:var(--nav-active)}
 .fly-h{padding:6px 10px 6px;font-size:11px;font-weight:500;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3)}
 .pop .nav{height:34px}
-.me-row{padding:0 2px 0 10px}
 .pi .pv{color:var(--ink-3);font-size:13px}
 .pi .pv+.i{color:var(--ink-3)}
 .sb-foot{padding:10px 12px;border-top:1px solid var(--line);flex:none}
@@ -191,10 +190,13 @@ a{color:inherit;text-decoration:none}
 .me:hover{background:var(--hover)}
 .me-more{color:var(--ink-3)} .me:hover .me-more{color:var(--ink-2)}
 .me .em{font-size:13px;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:left}
-.me-av{width:28px;height:28px;border-radius:50%;background:var(--inv);color:var(--on-inv);font-size:11px;font-weight:600;display:grid;place-items:center;flex:none}
-.me-h{display:flex;align-items:center;gap:10px;padding:8px 10px 6px}
+.me-av{width:28px;height:28px;border-radius:50%;background:var(--surface-2);color:var(--ink-3);box-shadow:inset 0 0 0 1px var(--line);display:grid;place-items:center;flex:none}
+.me-h{display:flex;align-items:center;gap:10px;padding:8px 6px 6px 10px}
 .me-h .me-n{font-weight:500;font-size:13.5px}
 .me-h .me-e{font-size:12px;color:var(--ink-3)}
+.me-h .me-n,.me-h .me-e{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.seg.ic button{width:26px;padding:0;justify-content:center}
+.me-theme{padding:0 4px 0 10px}
 
 .main-wrap{display:flex;flex-direction:column;min-width:0;height:100vh}
 .topbar{height:61px;flex:none;display:flex;align-items:center;gap:8px;padding:0 28px;border-bottom:1px solid var(--line);background:var(--bg)}
@@ -477,6 +479,7 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .bcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;box-shadow:var(--shadow-sm);cursor:grab;transition:box-shadow .12s,transform .12s,border-color .12s}
 .bcard:hover{border-color:var(--line-strong);box-shadow:var(--shadow)}
 .bcard.dragging{opacity:.45;transform:rotate(1.5deg)}
+.bcard.link{cursor:pointer}
 .bc-top{display:flex;align-items:center;gap:8px}
 .bc-name{font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bc-email{font-size:12.5px;color:var(--ink-2);margin:6px 0 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -537,6 +540,7 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .dt th.a{width:1%;padding:0!important}
 .dt th.r,.dt td.r{text-align:right} .dt th.c,.dt td.c{text-align:center} .dt th.w,.dt td.w{width:1%}
 .dt tbody tr{cursor:default}
+.dt.fx{table-layout:fixed} .dt.fx td,.dt.fx td>div{overflow:hidden;text-overflow:ellipsis}
 .card.flush .tfoot{border-top:1px solid var(--line)}
 .code{font-size:12px;color:var(--ink-3);font-weight:400}
 .code .copy{color:var(--ink-3)}
@@ -1602,7 +1606,7 @@ function renderSidebar() {
       ${NAV.map(n => n.items ? navSection(n) : navLink(n)).join('')}
     </nav>
     <div class="sb-foot">
-      <button class="me" data-act="me" data-tip="Account" data-tip-collapsed><span class="me-av">${meInitials()}</span><span class="em fade">${esc(S.me.email)}</span><span class="fade me-more">${icon('more', 14)}</span></button>
+      <button class="me" data-act="me" data-tip="Account" data-tip-collapsed><span class="me-av">${icon('user', 16)}</span><span class="em fade">${esc(S.me.email)}</span><span class="fade me-more">${icon('more', 14)}</span></button>
     </div>`;
   // re-rendering resets the scroll: put it back, then nudge only if the current item is out of view
   const box = $('#sidebar .sb-scroll'), cur = $('.nav.active', box); box.scrollTop = keep;
@@ -1650,7 +1654,7 @@ function renderTopbar() {
     <nav class="crumbs" aria-label="Breadcrumb">${path.map(([l, h, id, plain], i) => (i ? '<span class="crumb-sep">/</span>' : '') + (h ? `<a href="${h}">${esc(t(l))}</a>` : `<span class="${plain ? '' : 'cur'}">${esc(t(l))}</span>`) + (id ? `<span class="count">${id}</span>` : '')).join('')}</nav>
     <div class="tb-sp"></div>${ctx}`;
 }
-// Profile menu. Language opens its choices inside the menu (a back arrow returns), so no list floats outside it.
+// Profile menu. The theme switch has its own row, apart from the list. Language opens its choices inside the menu (a back arrow returns), so no list floats outside it.
 const ME_PICK = {
   lang: () => ['Language', [['en', 'English'], ['ru', 'Русский']], S.lang, 'lang'],
 };
@@ -1660,12 +1664,13 @@ function meMenu(view) {
     return `<div class="pop-head"><button class="ghost-ic" data-act="me-view" data-v="" aria-label="Back">${icon('chevLeft', 15)}</button>${t(title)}</div>`
       + menuItems(opts.map(([v, label]) => ({ act, data: { v }, label, on: cur === v }))); }
   const row = (v, ic, l, val) => ({ act: 'me-view', data: { v }, icon: ic, html: `<span class="pl">${t(l)}</span><span class="pv">${val}</span>${icon('chevRight', 14)}` });
-  return `<div class="me-h"><span class="me-av">${meInitials()}</span><div style="min-width:0"><div class="me-n">${esc(S.me.name)}</div><div class="me-e">${esc(S.me.email)}</div></div></div>
+  return `<div class="me-h"><span class="me-av">${icon('user', 16)}</span><div style="min-width:0"><div class="me-n">${esc(S.me.name)}</div><div class="me-e" title="${esc(S.me.email)}">${esc(S.me.email)}</div></div></div>
     <div class="pop-sep"></div>
-    <div class="pop-row me-row"><span>${t('Theme')}</span><div class="seg sm"><button class="${dark ? '' : 'on'}" data-act="theme" data-v="light">${icon('sun', 14)}${t('Light')}</button><button class="${dark ? 'on' : ''}" data-act="theme" data-v="dark">${icon('moon', 13)}${t('Dark')}</button></div></div>
-    ${menuItems([row('lang', 'globe', 'Language', S.lang === 'ru' ? 'Русский' : 'English')])}
+    ${menuItems([{ act: 'toast', data: { msg: t('Profile settings') }, icon: 'user', label: t('Profile settings') }, row('lang', 'globe', 'Language', S.lang === 'ru' ? 'Русский' : 'English'), { act: 'shortcuts', icon: 'keyboard', label: t('Keyboard shortcuts') }, { act: 'toast', data: { msg: 'Docs would open here' }, icon: 'help', label: t('Help & docs') }])}
     <div class="pop-sep"></div>
-    ${menuItems([{ act: 'toast', data: { msg: t('Profile settings') }, icon: 'user', label: t('Profile settings') }, { act: 'shortcuts', icon: 'keyboard', label: t('Keyboard shortcuts') }, { act: 'toast', data: { msg: 'Docs would open here' }, icon: 'help', label: t('Help & docs') }, '-', { act: 'sign-out', icon: 'logout', label: t('Sign out') }])}`;
+    <div class="pop-row me-theme"><span>${t('Theme')}</span><div class="seg sm ic" role="group" aria-label="${t('Theme')}"><button class="${dark ? '' : 'on'}" data-act="theme" data-v="light" aria-label="${t('Light')}" aria-pressed="${!dark}" data-tip="${t('Light')}">${icon('sun', 14)}</button><button class="${dark ? 'on' : ''}" data-act="theme" data-v="dark" aria-label="${t('Dark')}" aria-pressed="${dark}" data-tip="${t('Dark')}">${icon('moon', 13)}</button></div></div>
+    <div class="pop-sep"></div>
+    ${menuItems([{ act: 'sign-out', icon: 'logout', label: t('Sign out') }])}`;
 }
 // Prototype config: knobs for exploring the prototype, not product settings. Each choice applies at once and is kept in this browser.
 function protoModal() {
@@ -2381,10 +2386,17 @@ const emptyBlock = (ic, t, p, btn = '') => `<div class="empty sm"><div class="em
 const tabCount = n => n ? ` <span class="tab-n">${n}</span>` : '';
 // Data table inside a card. heads: 'Label' or 'Label|r' (right) / '|c' (centre) / '|w' (shrink) / '|a' (row actions: shown on hover, pinned right). rows: arrays of cells, or { cls, cells }.
 // drag (optional) = { t, keys }: column keys aligned with heads (null for fixed columns) make those headers draggable to reorder
+// Column widths come from what a column holds (an ID, a date, a status…), never from the rows, so switching records keeps every column in place.
+// Text columns (names, addresses…) get no width and share what is left; long values end in "…".
+const DT_W = [[/^(ID|#)$/, 100], [/ ID$/, 160], [/^(Created|Updated|Added|Expires|Expiry|Last used|Started|When|Requested|Request updated|Operation date|Date of birth)$/, 170],
+  [/^(Status|KYC|Outcome|Risk)$/, 160], [/^(Pair|Kind|Region|Source|Version|Frozen|Active|Default|Residency)$/, 120],
+  [/^(Currency|Crypto currency|Type|Card type|Role|Network)$/, 170], [/^(Code|Country|Nationality|City|Post code|Provider|Masked number)$/, 150]];
+const dtColW = h => h.al === 'a' ? 0 : DT_W.find(([re]) => re.test(h.l))?.[1] ?? (h.al === 'c' ? 110 : h.al === 'r' ? 130 : null);
 function dtable(heads, rows, empty = '', drag) {
   if (!rows.length) return empty;
   const H = heads.map(h => { const k = h.lastIndexOf('|'); return k < 0 ? { l: h, al: '' } : { l: h.slice(0, k), al: h.slice(k + 1) }; });
-  return `<div class="hs-wrap"><div class="dt-wrap hs"><table class="dt"><thead><tr>${H.map((h, i) => `<th class="${h.al}" ${drag?.keys[i] ? `draggable="true" data-t="${drag.t}" data-drag="${drag.keys[i]}"` : ''}>${h.l}</th>`).join('')}</tr></thead>
+  const W = H.map(dtColW), minW = W.reduce((s, w) => s + (w ?? 220), 0);
+  return `<div class="hs-wrap"><div class="dt-wrap hs"><table class="dt fx" style="min-width:${Math.max(720, minW)}px"><colgroup>${W.map(w => `<col${w == null ? '' : ` style="width:${w}px"`}>`).join('')}</colgroup><thead><tr>${H.map((h, i) => `<th class="${h.al}" ${drag?.keys[i] ? `draggable="true" data-t="${drag.t}" data-drag="${drag.keys[i]}"` : ''}>${h.l}</th>`).join('')}</tr></thead>
     <tbody>${rows.map(r => { const cells = Array.isArray(r) ? r : r.cells; return `<tr class="${r.cls || ''}">${cells.map((c, i) => (H[i].al === 'a' ? `<td class="act"><div class="row-actions">${c}</div></td>` : `<td class="${H[i].al}">${c}</td>`)).join('')}</tr>`; }).join('')}</tbody></table></div></div>`;
 }
 /* Column chooser for user-page tables: TCOLS[table] = [{ k, l, al, on, cell(row) }]; each table remembers its visible columns */
@@ -2935,9 +2947,9 @@ const ACT = {
   },
   'mobile-menu': () => $('#app').classList.toggle('mobile-open'),
   'nav-fly': a => openFly(a),
-  'lang': a => { S.lang = a.dataset.v; store.set('nsc.lang', S.lang); document.documentElement.lang = S.lang; route(); openPop($('#sidebar .me'), meMenu(), { width: 260, kind: 'me' }); },
+  'lang': a => { S.lang = a.dataset.v; store.set('nsc.lang', S.lang); document.documentElement.lang = S.lang; route(); openPop($('#sidebar .me'), meMenu(), { width: 280, kind: 'me' }); },
   'theme': a => { setTheme(a.dataset.v); if (popOpts.kind === 'me') { pop.innerHTML = meMenu(); positionPop(); } },
-  'me': a => openPop(a, meMenu(), { width: 260, kind: 'me' }),
+  'me': a => openPop(a, meMenu(), { width: 280, kind: 'me' }),
   'me-view': a => { pop.innerHTML = meMenu(a.dataset.v); positionPop(); },
   'shortcuts': () => { closePop(); shortcutsModal(); },
   'toast': a => { closePop(); toast(a.dataset.msg); },
@@ -3281,7 +3293,7 @@ function coTopbar() {
       <button class="icon-btn" data-act="co-more" data-tip="More">${icon('more', 16)}</button>
       <button class="btn btn-dark" data-act="co-new-user">${icon('plus', 15, 2)}<span class="tb-lbl">Create user</span></button>` : ''}`;
   }
-  return `${S.coView === 'list' ? `<button class="tool-btn solid" id="displayBtn" data-act="ld-display">${icon('table', 15)}<span class="sl">Display</span>${icon('chevDown', 13)}</button>` : ''}
+  return `${S.coView === 'list' ? `<button class="tool-btn solid" id="displayBtn" data-act="ld-display">${icon(lvView('companies'), 15)}<span class="sl">Display</span>${icon('chevDown', 13)}</button>` : ''}
     <button class="btn btn-ghost" data-act="co-export">${icon('download', 15)}<span class="tb-lbl">Export</span>${icon('chevDown', 13)}</button>
     <button class="btn btn-primary" data-act="co-new">${icon('plus', 15, 2)}<span class="tb-lbl">New company</span></button>`;
 }
@@ -3354,6 +3366,7 @@ function coResults() {
   const el = $('#coResults'); if (!el) return;
   const f = S.co, list = coList(); S._coList = list;
   if (!list.length) { el.innerHTML = `<div class="tcard"><div class="empty"><div class="em-ic">${icon('search', 22)}</div><h3>No companies match</h3><p>Try a different search or remove a filter.</p><button class="btn btn-ghost btn-sm" data-act="co-clear-all">Clear search and filters</button></div></div>`; return; }
+  if (lvView('companies') === 'board') { el.innerHTML = lboardHTML('companies', list, coCard); markHits(el, f.search); return; }
   const cols = tVisible('companies'), fixed = cols.every(c => S.coColW[c.k]), rows = loaded(list, f.page);
   const all = rows.every(c => f.sel.has(c.id)), some = rows.some(c => f.sel.has(c.id));
   el.innerHTML = `<div class="tcard compact"><div class="hs-wrap"><div class="tscroll hs" ${moreAttr(list, rows, 'co')}><table class="ut ${fixed ? 'fixed' : ''}" style="${fixed ? `width:${tableW()}px` : ''}">
@@ -3973,6 +3986,7 @@ function pgResults() {
   const el = $('#pgResults'); if (!el) return;
   const P = pg(), st = pgS(P.id), list = pgList(P), any = pgData(P).length; S._pgList = list;
   if (!list.length) { el.innerHTML = `<div class="tcard"><div class="empty"><div class="em-ic">${icon(any ? 'search' : P.icon, 22)}</div><h3>${any ? `No ${P.nouns} match` : `No ${P.nouns} yet`}</h3><p>${any ? 'Try a different search or remove a filter.' : ''}</p>${any ? `<button class="btn btn-ghost btn-sm" data-act="pg-clear-all">Clear search and filters</button>` : ''}</div></div>`; return; }
+  if (lvView('pg:' + P.id) === 'board') { el.innerHTML = lboardHTML('pg:' + P.id, list, pgCard(P)); markHits(el, st.search); return; }
   const cols = tVisible('pg:' + P.id), W = pgW(P.id), fixed = cols.every(c => W[c.k]), rows = loaded(list, st.page), keys = rows.map(r => pgKey(P, r));
   const all = keys.every(k => st.sel.has(k)), some = keys.some(k => st.sel.has(k)), al = c => c.al === 'r' ? 'r' : c.al === 'c' ? 'c' : '';
   el.innerHTML = `<div class="tcard compact"><div class="hs-wrap"><div class="tscroll hs" ${moreAttr(list, rows, 'pg')}><table class="ut ${fixed ? 'fixed' : ''}" style="${fixed ? `width:${tableW()}px` : ''}">
@@ -4008,7 +4022,7 @@ function pgTopbar() {
       <button class="icon-btn sm" data-act="rec-step" data-d="1" ${i < 0 || i >= l.length - 1 ? 'disabled' : ''} data-tip="Next  j">${icon('chevDown', 16)}</button>
       ${recOf(P) ? `<span class="tb-div"></span>${P.rec.acts ? P.rec.acts(recOf(P)) : ''}<button class="icon-btn" data-act="pg-rec-more" data-rid="${esc(S.recId)}" data-tip="More">${icon('more', 16)}</button>` : ''}`;
   }
-  return `<button class="tool-btn solid" id="displayBtn" data-act="ld-display">${icon('table', 15)}<span class="sl">Display</span>${icon('chevDown', 13)}</button>
+  return `<button class="tool-btn solid" id="displayBtn" data-act="ld-display">${icon(lvView('pg:' + P.id), 15)}<span class="sl">Display</span>${icon('chevDown', 13)}</button>
     <button class="btn btn-ghost" data-act="pg-export">${icon('download', 15)}<span class="tb-lbl">Export</span>${icon('chevDown', 13)}</button>
     ${P.form && P.form.create !== false ? `<button class="btn btn-primary" data-act="pg-new">${icon('plus', 15, 2)}<span class="tb-lbl">${P.form.newLabel || 'New ' + P.noun}</span></button>` : ''}`;
 }
@@ -4054,11 +4068,42 @@ function pgCSV(P, rows, name) {
   downloadCSV(name, P.cols.map(c => c.l), rows.map(r => P.cols.map(c => plainText((c.kv || c.cell)(r)))));
   toast(`Exported ${fmtInt(rows.length)} ${rows.length === 1 ? P.noun : P.nouns}`, 'download');
 }
-// Display popover for every list except Users (which also has layouts): columns + widths, shared look
+// Display popover for every list except Users: Table / Board layout, then columns + widths (table) or the field the board groups by
 function listDisplayPop() {
-  const X = colCtx(), vis = new Set(X.cols), lnk = (act, l) => `<button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="${act}">${l}</button>`;
-  return `<div class="pop-sec"><div class="pop-lbl">Columns<span style="display:flex;gap:12px">${lnk('ld-cols-reset', 'Reset columns')}${lnk('ld-reset-colw', 'Reset widths')}</span></div>${colChips(X.t, 'ld-col')}</div>`;
+  const X = colCtx(), F = fx().F, bf = boardFields(F), L = lvOf(X.t), lnk = (act, l) => `<button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="${act}">${l}</button>`;
+  return `${bf.length ? `<div class="pop-sec"><div class="pop-lbl">Layout</div>
+      <div class="seg" style="width:100%">${[['table', 'Table'], ['board', 'Board']].map(([k, l]) => `<button style="flex:1;justify-content:center" class="${L.view === k ? 'on' : ''}" data-act="ld-layout" data-v="${k}">${icon(k, 14)}${l}</button>`).join('')}</div></div>` : ''}
+    ${lvView(X.t) === 'board' ? `<div class="pop-sec"><div class="pop-lbl">Group by</div><div class="pills">${bf.map(k => `<button class="pill ${boardBy(X.t, F) === k ? 'on' : ''}" data-act="ld-group" data-v="${k}">${F[k].label}</button>`).join('')}</div></div>`
+    : `<div class="pop-sec"><div class="pop-lbl">Columns<span style="display:flex;gap:12px">${lnk('ld-cols-reset', 'Reset columns')}${lnk('ld-reset-colw', 'Reset widths')}</span></div>${colChips(X.t, 'ld-col')}</div>`}`;
 }
+/* Board layout for Companies and every PAGES list: one column per value of a short option field (Status unless picked otherwise), cards open the record.
+   Unlike the Users board, cards can't be dragged: these status changes go through their own actions and confirmations. Layout and grouping are kept per list. */
+S.lv = store.get('nsc.lview', {}); S.lbMore = {};
+const boardFields = F => Object.keys(F).filter(k => { const n = Object.keys(F[k].options || {}).length; return F[k].get && !F[k].date && n >= 2 && n <= 10; });
+const lvOf = t => S.lv[t] ||= { view: 'table' };
+const lvView = t => lvOf(t).view === 'board' && boardFields(fx().F).length ? 'board' : 'table';
+const boardBy = (t, F) => { const bf = boardFields(F), by = lvOf(t).by; return bf.includes(by) ? by : bf.includes('status') ? 'status' : bf[0]; };
+const optTag = (F, r) => { const o = F.options[F.get(r)]; return o ? `<span class="tag">${o.tone ? `<i class="dot t-${o.tone}"></i>` : ''}${esc(o.label)}</span>` : ''; };
+function lboardHTML(t, list, card) {
+  const X = fx(), by = boardBy(t, X.F), F = X.F[by], more = S.lbMore[t] ||= {};
+  let keys = Object.keys(F.options); const fl = X.list.find(f => f.key === by && f.values.length); if (fl) keys = keys.filter(k => fl.values.includes(k));
+  return `<div class="board">${keys.map(k => {
+    const items = list.filter(r => F.get(r) === k), lim = more[k] || 25, o = F.options[k];
+    return `<div class="col"><div class="col-h"><i class="dot t-${o.tone || 'neutral'}"></i>${esc(o.label)}<span class="mono">${items.length}</span></div>
+      <div class="col-b">${items.slice(0, lim).map(r => card(r, by)).join('')}
+        ${items.length > lim ? `<button class="more-btn" data-act="lb-more" data-g="${esc(k)}">Show ${items.length - lim} more</button>` : ''}
+        ${!items.length ? `<div class="col-empty">Nothing here</div>` : ''}</div></div>`;
+  }).join('')}</div>`;
+}
+const bcardTpl = ({ attr, title, id, sub, tags, num, when }) => `<div class="bcard link" ${attr}>
+    <div class="bc-top"><span class="bc-name">${title}</span>${id ? `<span class="mono faint" style="font-size:11.5px">#${id}</span>` : ''}</div>
+    ${sub ? `<div class="bc-email">${sub}</div>` : '<div style="height:10px"></div>'}
+    <div class="bc-tags">${tags}</div>
+    ${num || when ? `<div class="bc-foot"><span class="num">${num || ''}</span><span class="faint">${when ? rel(when) : ''}</span></div>` : ''}
+  </div>`;
+const pgCard = P => (r, by) => { const k = pgKey(P, r), title = P.rec.title(r), num = tVisible('pg:' + P.id).find(c => c.al === 'r'), sub = P.rec.sub ? plainText(P.rec.sub(r)) : '';
+  return bcardTpl({ attr: `data-rid="${esc(k)}"`, title: esc(title), id: title.includes(k) ? '' : esc(k), sub: esc(sub), tags: boardFields(P.fields).filter(f => f !== by).slice(0, 3).map(f => optTag(P.fields[f], r)).join(''), num: num?.cell(r), when: r.created || r.updated }); };
+const coCard = (c, by) => bcardTpl({ attr: `data-cid="${c.id}"`, title: esc(c.name), id: c.id, sub: esc(c.email), tags: boardFields(CO_FIELDS).filter(f => f !== by).slice(0, 3).map(f => optTag(CO_FIELDS[f], c)).join(''), num: `${fmtInt(coUsers(c).length)} users`, when: c.created });
 const refreshLD = () => { colCtx().redraw(); if (popOpts.kind === 'ldisplay') { pop.innerHTML = listDisplayPop(); positionPop(); } };
 
 /* Building blocks for page configs */
@@ -4974,6 +5019,9 @@ Object.assign(ACT, {
   },
   'rec-step': a => stepRec(+a.dataset.d),
   'ld-display': a => openPop(a, listDisplayPop(), { align: 'right', width: 380, kind: 'ldisplay' }),
+  'ld-layout': a => { const t = colCtx().t; lvOf(t).view = a.dataset.v; store.set('nsc.lview', S.lv); $('#displayBtn').innerHTML = `${icon(lvView(t), 15)}<span class="sl">Display</span>${icon('chevDown', 13)}`; refreshLD(); },
+  'ld-group': a => { const t = colCtx().t; lvOf(t).by = a.dataset.v; S.lbMore[t] = {}; store.set('nsc.lview', S.lv); refreshLD(); },
+  'lb-more': a => { const t = colCtx().t, m = S.lbMore[t] ||= {}; m[a.dataset.g] = (m[a.dataset.g] || 25) + 50; colCtx().redraw(); },
   'ld-col': a => { const X = colCtx(); S.tcols[X.t] = withCol(X.t, X.cols, a.dataset.k); store.set('nsc.tcols2', S.tcols); refreshLD(); },
   'ld-cols-reset': () => { resetTcols(colCtx().t); refreshLD(); toast('Columns reset to default', 'columns'); },
   'ld-reset-colw': () => { const X = colCtx(); Object.keys(X.w).forEach(k => delete X.w[k]); store.set(X.key, X.w); refreshLD(); toast('Column widths fitted to this page', 'columns'); },
@@ -5011,7 +5059,7 @@ document.addEventListener('click', e => {
   const a = e.target.closest('[data-act]');
   if (a && !a.disabled) { e.preventDefault(); const act = a.dataset.act, c = CONFIRM[act]?.(a); if (c) return askConfirm(c, () => ACT[act](a, e)); ACT[act] && ACT[act](a, e); return; }
   if (e.target.closest('a[href]')) return; // a link inside a row opens itself, not the row
-  const rr = e.target.closest('tr[data-rid]');
+  const rr = e.target.closest('tr[data-rid], .bcard[data-rid]');
   if (rr && PAGES[S.route]) { goRec(rr.dataset.rid, e); return; }
   const r = e.target.closest('[data-uid]');
   if (r && !e.target.closest('.pop')) goUser(+r.dataset.uid, e);
@@ -5210,7 +5258,6 @@ document.addEventListener('drop', e => {
    Prototype: any well-formed email with any password signs in; sign up only asks for a name and an 8+ character password.
    The session (name + email) lives in localStorage, so a reload keeps you signed in until Sign out. */
 S.me = store.get('nsc.me', { name: 'Super admin', email: 'super_admin@ns.cards' }) || null;
-const meInitials = () => S.me.name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
 const nameFromEmail = e => e.split('@')[0].split(/[._-]+/).filter(Boolean).map(w => w[0].toUpperCase() + w.slice(1)).join(' ') || e;
 // Signed out: every address shows the auth screen (the page asked for opens after sign in). Signed in: #/login and #/signup go to Overview.
 function authRoute() {
