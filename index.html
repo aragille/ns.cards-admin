@@ -129,12 +129,13 @@ a{color:inherit;text-decoration:none}
 .app.collapsed .sidebar{width:68px}
 .fade{transition:opacity .16s ease}
 .app.collapsed .fade{opacity:0;pointer-events:none}
-.sb-head{position:relative;height:72px;display:flex;align-items:center;padding:0 23px;flex:none}
+/* header rows: 12px above and below the 36px controls; the sidebar logo shares the topbar's 30px line */
+.sb-head{position:relative;height:60px;display:flex;align-items:center;padding:0 23px;flex:none}
 .logo{display:flex;align-items:center;gap:5.6px;color:var(--ink);transition:opacity .15s}
 .lg-entry{gap:7px;margin-left:-2px} .lg-lemon{position:relative}
 .lg-lemon .lm-mark{position:absolute;left:1px;opacity:0;transition:opacity .16s ease} .app.collapsed .lg-lemon .lm-mark{opacity:1}
 .lm-mark path,.lm-fruit{fill:currentColor} :root[data-theme="dark"] .lm-mark path,:root[data-theme="dark"] .lm-fruit{fill:#FFF357}
-.sb-toggle{position:absolute;right:14px;top:20px;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:var(--ink-2);transition:opacity .15s,right .24s cubic-bezier(.2,.8,.2,1)}
+.sb-toggle{position:absolute;right:14px;top:14px;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:var(--ink-2);transition:opacity .15s,right .24s cubic-bezier(.2,.8,.2,1)}
 .sb-toggle:hover{background:var(--hover);color:var(--ink)}
 .sb-toggle{opacity:0} .sb-head:hover .sb-toggle,.sb-toggle:focus-visible{opacity:1}
 .app.collapsed .sb-toggle{right:17px;opacity:0;pointer-events:none}
@@ -170,8 +171,6 @@ a{color:inherit;text-decoration:none}
 .app.collapsed .sidebar .ndot-c{display:block}
 /* flyout variant: one row per section, its pages open in a panel beside the sidebar */
 .v-fly>.nav,.v-tabs>.nav{margin-bottom:2px}
-.topbar.tbs{height:61px}
-.sidebar.tbs .sb-head{height:60px} .sidebar.tbs .sb-toggle{top:14px} /* logo on the header title's line (30px) */ /* Sections variant: 12px above and below the 36px controls on every page (+1px border) */
 .topbar.sec{height:auto;padding-top:12px;flex-direction:column;align-items:stretch;gap:0}
 .tb-row{height:36px;display:flex;align-items:center;gap:8px} /* title row, then 4px, then the tabs */
 .tb-title{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em;color:var(--ink);white-space:nowrap}
@@ -198,7 +197,7 @@ a{color:inherit;text-decoration:none}
 .me-h .me-e{font-size:12px;color:var(--ink-3)}
 
 .main-wrap{display:flex;flex-direction:column;min-width:0;height:100vh}
-.topbar{height:72px;flex:none;display:flex;align-items:center;gap:8px;padding:0 28px;border-bottom:1px solid var(--line);background:var(--bg)}
+.topbar{height:61px;flex:none;display:flex;align-items:center;gap:8px;padding:0 28px;border-bottom:1px solid var(--line);background:var(--bg)}
 .crumbs{display:flex;align-items:center;gap:10px;font-size:17px;letter-spacing:-.01em;flex:0 1 auto;overflow:hidden;padding:4px 8px;margin:0 -8px;color:var(--ink-2);min-width:0;white-space:nowrap}
 .crumbs a{padding:5px 7px;margin:0 -7px;border-radius:8px}
 .crumbs a:hover{background:var(--hover);color:var(--ink)}
@@ -238,6 +237,7 @@ h1 .count{font-family:var(--mono);font-size:14px;font-weight:400;color:var(--ink
 .btn-dark{background:var(--inv);color:var(--on-inv)}
 .btn-dark:hover{background:var(--inv-hover)}
 .btn-ghost{background:var(--surface);border:1px solid var(--line-strong)}
+.btn-danger{background:var(--error);color:#fff;box-shadow:inset 0 -1px 0 rgba(0,0,0,.12)} .btn-danger:hover{background:var(--error-ink)}
 .btn-ghost:hover{background:var(--hover)}
 .btn-sm{height:30px;padding:0 12px;font-size:13px;border-radius:9px} /* same radius as every 36px / 30px control (Display, icon buttons, inputs) */
 .link-btn{font-size:13px;color:var(--ink-2);font-weight:500;padding:0 6px;height:30px}
@@ -689,6 +689,14 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .modal-h{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 6px;font-weight:600;font-size:16px}
 .modal-b{padding:10px 20px 20px;display:flex;flex-direction:column;gap:14px}
 .modal-f{display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--line);background:var(--head-bg)}
+/* Confirmation step: sits above any open modal so a form behind it keeps its input */
+.cfm-wrap{z-index:78;padding-top:22vh}
+.modal.cfm{width:min(420px,100%)}
+.cfm-b{display:flex;gap:14px;padding:20px 20px 18px}
+.cfm-b h2{margin:2px 0 6px;font-size:15.5px;font-weight:600;letter-spacing:-.01em}
+.cfm-b p{margin:0;font-size:13.5px;line-height:1.5;color:var(--ink-2)}
+.cfm-ic{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--info-bg);color:var(--info-ink)}
+.cfm-ic.bad{background:var(--error-bg);color:var(--error-ink)}
 /* Prototype config: floating button bottom-right, where support chat buttons usually sit */
 .pc-fab{position:fixed;right:20px;bottom:20px;z-index:70;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#FFFFFF;color:#111111;border:1px solid rgba(17,17,17,.08);box-shadow:0 6px 18px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.08);transition:transform .14s ease,box-shadow .14s ease}
 .pc-fab:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.16),0 1px 3px rgba(0,0,0,.08)}
@@ -843,7 +851,7 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .ms{background:var(--surface-2);border-radius:12px;padding:12px}
 .ms .kpi-l{font-size:10px}
 .ms b{display:block;font-size:18px;font-weight:600;letter-spacing:-.02em;margin-top:6px}
-.ph{display:grid;place-items:center;min-height:calc(100vh - 72px - 140px)}
+.ph{display:grid;place-items:center;min-height:calc(100vh - 61px - 140px)}
 
 /* ───────────────────────── Companies ───────────────────────── */
 .src{display:inline-flex;align-items:center;height:22px;padding:0 7px;border-radius:var(--r-tag);border:1px solid var(--line-strong);background:var(--surface);font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--ink-2);white-space:nowrap}
@@ -1009,6 +1017,7 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 <div class="toasts" id="toasts"></div>
 <button class="pc-fab" id="pcFab" data-act="proto-cfg" aria-label="Prototype config"></button>
 <div class="modal-wrap" id="modal"></div>
+<div class="modal-wrap cfm-wrap" id="confirm"></div>
 
 <script>
 /* ════════════════════════════ Helpers ════════════════════════════ */
@@ -1583,7 +1592,6 @@ document.addEventListener('mouseover', e => {
 });
 
 function renderSidebar() {
-  $('#sidebar').classList.toggle('tbs', S.navV === 'tabs');
   const col = $('#app').classList.contains('collapsed'), keep = $('#sidebar .sb-scroll')?.scrollTop || 0;
   $('#sidebar').innerHTML = `
     <div class="sb-head">
@@ -1637,7 +1645,7 @@ function renderTopbar() {
   const c = crumbs(), acts = topbarActions(), sec = S.navV === 'tabs' && curSec(), list = sec && c.length === 1;
   const path = sec && !list ? [[sec.label, '', '', 1], ...c] : c;
   const menu = `<button class="icon-btn menu-btn" data-act="mobile-menu" aria-label="Menu">${icon('menu', 18)}</button>`, ctx = acts ? `<div class="tb-ctx">${acts}</div>` : '';
-  $('#topbar').classList.toggle('sec', !!list); $('#topbar').classList.toggle('tbs', S.navV === 'tabs');
+  $('#topbar').classList.toggle('sec', !!list);
   $('#topbar').innerHTML = list ? `<div class="tb-row">${menu}<h1 class="tb-title">${esc(t(sec.label))}</h1><div class="tb-sp"></div>${ctx}</div>${secTabs(sec)}` : `${menu}
     <nav class="crumbs" aria-label="Breadcrumb">${path.map(([l, h, id, plain], i) => (i ? '<span class="crumb-sep">/</span>' : '') + (h ? `<a href="${h}">${esc(t(l))}</a>` : `<span class="${plain ? '' : 'cur'}">${esc(t(l))}</span>`) + (id ? `<span class="count">${id}</span>` : '')).join('')}</nav>
     <div class="tb-sp"></div>${ctx}`;
@@ -2685,17 +2693,19 @@ function adjSubmit() {
     const amt = +$('#adjBankAmt').value, fee = +$('#adjBankFee').value || 0;
     if (!(amt > 0)) return bad('#adjBankAmt', 'Enter an amount');
     if (fee >= amt) return bad('#adjBankFee', 'Fee must be less than the amount');
-    pushTx(u, D, { type: 'BANK_DEPOSIT', c: 'EUR', amount: amt - fee, commission: fee, details: 'Manual bank deposit' });
-    toast(`Deposited ${fmtEur(amt - fee, 2)} to EUR wallet`);
+    return askConfirm({ title: `Deposit ${fmtEur(amt - fee, 2)} to ${esc(u.name || u.email)}?`, body: `${fmtEur(amt, 2)} bank deposit${fee ? ` minus a ${fmtEur(fee, 2)} fee` : ''} is credited to the EUR wallet and shows in their transactions.`, ok: 'Deposit', danger: false, ic: 'download' }, () => {
+      pushTx(u, D, { type: 'BANK_DEPOSIT', c: 'EUR', amount: amt - fee, commission: fee, details: 'Manual bank deposit' });
+      toast(`Deposited ${fmtEur(amt - fee, 2)} to EUR wallet`); closeModal(); renderUserPage(); renderTopbar(); });
   } else {
     const c = $('#adjCur').value, dir = +$('#adjDir .on').dataset.v, amt = +$('#adjAmt').value, fee = +$('#adjFee').value || 0, w = D.wallets.find(x => x.c === c);
     if (!(amt > 0)) return bad('#adjAmt', 'Enter an amount');
     if (fee < 0 || (dir > 0 && fee >= amt)) return bad('#adjFee', 'Fee must be less than the amount');
     if (w.amt + dir * amt - fee < 0) return bad('#adjAmt', `Only ${fmtAmt(w.amt, c)} available`);
-    pushTx(u, D, { type: 'ADJUSTMENT', c, amount: dir * amt - fee, commission: fee, details: $('#adjReason').value.trim() || 'Admin correction' });
-    toast(`${dir > 0 ? 'Credited' : 'Debited'} ${fmtAmt(amt, c)}${fee ? ` · fee ${fmtAmt(fee, c)}` : ''}`);
+    const why = $('#adjReason').value.trim() || 'Admin correction';
+    return askConfirm({ title: `${dir > 0 ? 'Credit' : 'Debit'} ${fmtAmt(amt, c)} ${dir > 0 ? 'to' : 'from'} ${esc(u.name || u.email)}?`, body: `The ${c} wallet goes from ${fmtAmt(w.amt, c)} to ${fmtAmt(w.amt + dir * amt - fee, c)}${fee ? `, including a ${fmtAmt(fee, c)} fee` : ''}. Reason: ${esc(why)}.`, ok: dir > 0 ? 'Credit' : 'Debit', danger: dir < 0, ic: 'sliders' }, () => {
+      pushTx(u, D, { type: 'ADJUSTMENT', c, amount: dir * amt - fee, commission: fee, details: why });
+      toast(`${dir > 0 ? 'Credited' : 'Debited'} ${fmtAmt(amt, c)}${fee ? ` · fee ${fmtAmt(fee, c)}` : ''}`); closeModal(); renderUserPage(); renderTopbar(); });
   }
-  closeModal(); renderUserPage(); renderTopbar();
 }
 function fieldsModal(title, fields, saveAct) {
   openModal(`<div class="modal">
@@ -2801,6 +2811,70 @@ const refreshDisplayPop = () => { if (popOpts.kind === 'display') { pop.innerHTM
 const modal = $('#modal');
 function openModal(html, onMount) { modal.innerHTML = html; modal.classList.add('open'); onMount && onMount(modal); }
 function closeModal() { modal.classList.remove('open'); modal.innerHTML = ''; }
+/* Confirmation step for actions that block, freeze, disable, delete, close or move money.
+   CONFIRM[act](el) returns the dialog text when that click needs one (or nothing: unblocking, unfreezing, enabling go straight through). */
+const cfm = $('#confirm'); let cfmRun = null;
+function askConfirm({ title, body, ok, danger = true, ic }, run) {
+  closePop(); cfmRun = run;
+  cfm.innerHTML = `<div class="modal cfm" role="alertdialog" aria-modal="true" aria-labelledby="cfmT" aria-describedby="cfmD">
+    <div class="cfm-b"><span class="cfm-ic ${danger ? 'bad' : ''}">${icon(ic || (danger ? 'alert' : 'help'), 19)}</span><div><h2 id="cfmT">${title}</h2><p id="cfmD">${body}</p></div></div>
+    <div class="modal-f"><button class="btn btn-ghost btn-sm" data-act="cfm-cancel">Cancel</button><button class="btn ${danger ? 'btn-danger' : 'btn-primary'} btn-sm" data-act="cfm-ok">${ok}</button></div></div>`;
+  cfm.classList.add('open'); $('[data-act=cfm-ok]', cfm).focus();
+}
+function closeConfirm() { cfm.classList.remove('open'); cfm.innerHTML = ''; cfmRun = null; }
+cfm.addEventListener('mousedown', e => { if (e.target === cfm) closeConfirm(); });
+const uName = a => { const u = byId(+a.dataset.id); return esc(u.name || u.email); };
+const pRow = a => rowsOf(a)[0], pName = (P, r) => esc(r.name || `${P.noun} #${pgKey(P, r)}`);
+const n_ = (n, one, many = one + 's') => `${fmtInt(n)} ${n === 1 ? one : many}`;
+const CONFIRM = {
+  // Users
+  'toggle-block': a => byId(+a.dataset.id).status !== 'blocked' && { title: `Block ${uName(a)}?`, body: 'They’re signed out and can’t sign in, pay or move funds until you unblock them.', ok: 'Block user', ic: 'ban' },
+  'bulk-block': () => ({ title: `Block ${n_(S.selected.size, 'user')}?`, body: 'They’re signed out and can’t sign in, pay or move funds until you unblock them.', ok: 'Block users', ic: 'ban' }),
+  'apply-bulk': a => a.dataset.field === 'status' && a.dataset.v !== 'active' && { title: `Set ${n_(S.selected.size, 'user')} to ${STATUS[a.dataset.v].label.toLowerCase()}?`, body: a.dataset.v === 'blocked' ? 'They’re signed out and can’t sign in, pay or move funds until you unblock them.' : 'They can’t use their accounts until you set them back to active.', ok: `Set to ${STATUS[a.dataset.v].label.toLowerCase()}`, ic: 'ban' },
+  'reset-2fa': a => ({ title: `Reset 2FA for ${uName(a)}?`, body: 'Their authenticator stops working and they have to set up two-factor authentication again at the next sign-in.', ok: 'Reset 2FA', ic: 'lock' }),
+  'impersonate': a => ({ title: `Log in as ${uName(a)}?`, body: 'You’ll act inside their account. Everything you do there is recorded in the audit log under your name.', ok: 'Log in as user', danger: false, ic: 'login' }),
+  'wallet-freeze': a => { const w = ud(byId(S.userId)).wallets.find(x => x.c === a.dataset.c); return !w.frozen && { title: `Freeze the ${w.c} wallet?`, body: `The user can’t send, exchange or withdraw ${w.c} until you unfreeze it. Its balance of ${fmtAmt(w.amt, w.c)} stays as it is.`, ok: 'Freeze wallet', ic: 'lock' }; },
+  'card-freeze': a => { const c = ud(byId(S.userId)).cards[+a.dataset.i]; return !c.frozen && { title: `Freeze card •• ${c.last4}?`, body: 'Payments and withdrawals with this card are declined until you unfreeze it.', ok: 'Freeze card', ic: 'lock' }; },
+  'addr-rm': a => { const x = ud(byId(S.userId)).addresses[+a.dataset.i]; return { title: 'Remove this address?', body: `${esc([x.street, x.city, x.zip].filter(v => v && v !== '—').join(', '))} is removed from the user’s profile.`, ok: 'Remove address', ic: 'trash' }; },
+  // Companies
+  'co-block': a => { const c = coById(+a.dataset.id); return c.status !== 'blocked' && { title: `Block ${esc(c.name)}?`, body: 'Its users can’t sign in or use their cards and accounts until you unblock the company.', ok: 'Block company', ic: 'ban' }; },
+  'co-bulk-status-do': a => a.dataset.v !== 'active' && { title: `Set ${n_(S.co.sel.size, 'company', 'companies')} to ${STATUS[a.dataset.v].label.toLowerCase()}?`, body: a.dataset.v === 'blocked' ? 'Their users can’t sign in or use their cards and accounts until you unblock them.' : 'They stop serving their users until you set them back to active.', ok: `Set to ${STATUS[a.dataset.v].label.toLowerCase()}`, ic: 'ban' },
+  'co-deactivate': () => cur().status !== 'inactive' && { title: `Deactivate ${esc(cur().name)}?`, body: 'The company stops serving its users until you activate it again.', ok: 'Deactivate', ic: 'ban' },
+  'cp-rm': a => ({ title: `Remove ${esc(PROD_BY.c[cur().cp[+a.dataset.i].pid].name)}?`, body: `${esc(cur().name)}’s users can no longer get this card product.`, ok: 'Remove product', ic: 'trash' }),
+  'ip-rm': a => ({ title: `Remove ${esc(PROD_BY.i[cur().ip[+a.dataset.i].pid].name)}?`, body: `${esc(cur().name)}’s users can no longer open accounts with this IBAN product.`, ok: 'Remove product', ic: 'trash' }),
+  'key-revoke': a => ({ title: `Revoke ${esc(cd(cur()).keys[+a.dataset.i].name)}?`, body: 'Requests signed with this key fail right away. A revoked key can’t be restored.', ok: 'Revoke key', ic: 'ban' }),
+  'dir-rm': a => ({ title: `Remove ${esc(cd(cur()).directors[+a.dataset.i].name)}?`, body: 'They’re removed from the company’s directors and beneficial owners.', ok: 'Remove', ic: 'trash' }),
+  'cur-rm': a => { const x = cd(cur()).currencies.find(y => y.id === +a.dataset.id); return { title: `Remove ${x.c}?`, body: `${esc(cur().name)}’s users can no longer hold or exchange ${x.c}.`, ok: 'Remove currency', ic: 'trash' }; },
+  // List pages (row menu, record header) — same actions as their bulk versions below
+  'tx-retry': a => ({ title: `Retry transaction #${pRow(a).id}?`, body: 'It’s sent to the provider again. Check that the first attempt didn’t go through, or the funds may move twice.', ok: 'Retry', danger: false, ic: 'refresh' }),
+  'iban-close': a => ({ title: `Close ${pName(pg(), pRow(a))}?`, body: 'The account stops receiving and sending payments. A closed account can’t be reopened.', ok: 'Close account', ic: 'ban' }),
+  'card-tog': a => !pRow(a).frozen && { title: `Freeze card •• ${pRow(a).last4}?`, body: 'Payments and withdrawals with this card are declined until you unfreeze it.', ok: 'Freeze card', ic: 'lock' },
+  'strat-tog': a => pRow(a).status === 'ACTIVE' && { title: `Pause ${esc(pRow(a).name)}?`, body: 'It takes no new stakes and stops accruing rewards until you resume it.', ok: 'Pause strategy', ic: 'minus' },
+  'stake-un': a => ({ title: `Force unstake #${pRow(a).id}?`, body: 'The stake moves to unbonding: rewards stop and the funds return to the user after the unbonding period.', ok: 'Force unstake', ic: 'minus' }),
+  'pool-run': a => ({ title: `Run payout for pool #${pRow(a).id} now?`, body: 'Rewards are paid out to the stakers right away instead of at the scheduled time.', ok: 'Run payout', danger: false, ic: 'send' }),
+  'sbp-paid': a => ({ title: `Mark SBP link #${pRow(a).id} as paid?`, body: 'The top-up is credited to the user’s wallet. Only do this once the payment has arrived.', ok: 'Mark as paid', danger: false, ic: 'check' }),
+  'sbp-cancel': a => ({ title: `Cancel SBP link #${pRow(a).id}?`, body: 'The link stops accepting payment. The user has to create a new one.', ok: 'Cancel link', ic: 'ban' }),
+  'conf-ok': a => ({ title: `Approve operation #${pRow(a).id}?`, body: 'The operation is carried out and the funds move as requested.', ok: 'Approve', danger: false, ic: 'check' }),
+  'conf-no': a => ({ title: `Reject operation #${pRow(a).id}?`, body: 'The operation is cancelled and the user is told it was rejected.', ok: 'Reject', ic: 'ban' }),
+  'doc-no': a => ({ title: 'Reject this document?', body: 'The user is asked to upload it again.', ok: 'Reject', ic: 'ban' }),
+  'chk-no': a => ({ title: `Reject check #${pRow(a).id}?`, body: 'The KYC check fails and the user can’t use verified features until they pass a new one.', ok: 'Reject', ic: 'ban' }),
+  'ord-cancel': a => ({ title: `Cancel order #${pRow(a).id}?`, body: 'The card won’t be produced or shipped. The user has to order again.', ok: 'Cancel order', ic: 'ban' }),
+  'kyt-tog': a => pRow(a).on && { title: `Disable ${esc(pRow(a).name)}?`, body: 'Transactions are no longer screened by this rule until you enable it again.', ok: 'Disable rule', ic: 'ban' },
+  'net-tog': a => pRow(a).status === 'ACTIVE' && { title: `Disable ${esc(pRow(a).name)}?`, body: 'Deposits and withdrawals on this network stop for every user until you enable it again.', ok: 'Disable network', ic: 'ban' },
+  'mkt-tog': a => pRow(a).status === 'TRADING' && { title: `Halt ${esc(pRow(a).id)}?`, body: 'Exchanges on this market stop for every user until you resume trading.', ok: 'Halt market', ic: 'minus' },
+  'cur-dep': a => pRow(a).dep && { title: `Disable ${pRow(a).c} deposits?`, body: `Users can’t deposit ${pRow(a).c} until you enable deposits again.`, ok: 'Disable deposits', ic: 'ban' },
+  'cur-wd': a => pRow(a).wd && { title: `Disable ${pRow(a).c} withdrawals?`, body: `Users can’t withdraw ${pRow(a).c} until you enable withdrawals again.`, ok: 'Disable withdrawals', ic: 'ban' },
+  'vt-tog': a => pRow(a).status === 'ACTIVE' && { title: `Disable ${esc(pRow(a).name)}?`, body: 'New verifications can’t use this template until you enable it again.', ok: 'Disable template', ic: 'ban' },
+  'mon-tog': a => pRow(a).on && { title: `Pause ${esc(pRow(a).name)}?`, body: 'It stops raising alerts until you resume it.', ok: 'Pause monitor', ic: 'minus' },
+  'adm-tog': a => pRow(a).status !== 'DISABLED' && { title: `Disable ${esc(pRow(a).name)}?`, body: 'They’re signed out and can’t sign in to the admin panel until you enable them again.', ok: 'Disable administrator', ic: 'ban' },
+  'adm-2fa': a => ({ title: `Reset 2FA for ${esc(pRow(a).name)}?`, body: 'They have to set up two-factor authentication again at the next sign-in.', ok: 'Reset 2FA', ic: 'lock' }),
+  'cl-rm': a => ({ title: `Remove ${esc(WORLD[a.dataset.c].name)}?`, body: `It’s taken off ${esc(pgRow(a.dataset.rid).name)}.`, ok: 'Remove country', ic: 'trash' }),
+  // Bulk bar on list pages: anything but the restoring ones (unfreeze, resume, enable) and harmless ones (fetch status, next step)
+  'pg-bulk': a => { const P = pg(), b = P.bulk[+a.dataset.i], n = pgS(P.id).sel.size;
+    if (/^(Unfreeze|Resume|Enable|Fetch KYC status|Move to next step|Pause \/ resume)$/.test(b.label)) return;
+    const bad = !/^(Approve|Mark as paid|Run now)$/.test(b.label);
+    return { title: `${b.label} ${n_(n, P.noun.toLowerCase(), P.nouns.toLowerCase())}?`, body: bad ? 'This applies to every selected item at once.' : 'This applies to every selected item at once and moves funds where it applies.', ok: `${b.label} ${fmtInt(n)}`, danger: bad, ic: b.icon }; },
+};
 modal.addEventListener('mousedown', e => { if (e.target === modal) closeModal(); });
 function toast(msg, ic = 'check') {
   const t = document.createElement('div'); t.className = 'toast'; t.innerHTML = `${icon(ic, 15, 2)}${msg}`;
@@ -3067,6 +3141,7 @@ const ACT = {
   },
   'dd-pick': a => { const sel = S._dd; closePop(); if (!sel || sel.value === a.dataset.v) return; sel.value = a.dataset.v; ddLabel(sel); sel.isConnected ? sel.dispatchEvent(new Event('change', { bubbles: true })) : onChange(sel); }, // a select from a popover is detached by now
   'modal-close': closeModal,
+  'cfm-ok': () => { const run = cfmRun; closeConfirm(); run && run(); }, 'cfm-cancel': closeConfirm,
   'proto-cfg': () => { closePop(); S.pcDraft = null; protoModal(); },
   'pc-pick-brand': a => { S.pcDraft.brand = a.dataset.v; pcMark(); },
   'pc-pick-nav': a => { S.pcDraft.navV = a.dataset.v; pcMark(); },
@@ -4934,7 +5009,7 @@ Object.assign(ACT, {
 
 document.addEventListener('click', e => {
   const a = e.target.closest('[data-act]');
-  if (a && !a.disabled) { e.preventDefault(); ACT[a.dataset.act] && ACT[a.dataset.act](a, e); return; }
+  if (a && !a.disabled) { e.preventDefault(); const act = a.dataset.act, c = CONFIRM[act]?.(a); if (c) return askConfirm(c, () => ACT[act](a, e)); ACT[act] && ACT[act](a, e); return; }
   if (e.target.closest('a[href]')) return; // a link inside a row opens itself, not the row
   const rr = e.target.closest('tr[data-rid]');
   if (rr && PAGES[S.route]) { goRec(rr.dataset.rid, e); return; }
@@ -4968,14 +5043,15 @@ document.addEventListener('input', e => {
 document.addEventListener('keydown', e => {
   const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName);
   const mod = e.metaKey || e.ctrlKey;
-  if (!S.me) { if (e.key === 'Escape') closeModal(); return; } // the auth screen has no shortcuts
+  if (!S.me) { if (e.key === 'Escape') cfm.classList.contains('open') ? closeConfirm() : closeModal(); return; } // the auth screen has no shortcuts
   if (mod && e.key.toLowerCase() === 'b') { e.preventDefault(); toggleSidebar(); return; }
   if (e.key === 'Enter' && e.target.id === 'popQ') { const b = $('#popFields .pi[data-key]'); b && b.click(); }
   if (e.key === 'Enter' && (e.target.id === 'dpFrom' || e.target.id === 'dpTo')) ACT['dp-apply']();
   if (e.key === 'Enter' && e.target.id === 'ddQ') { const b = $('#ddList .pi[data-v]'); b && b.click(); }
   if (e.key === 'Enter' && e.target.id === 'nuEmail') ACT['create-user']();
   if (e.key === 'Escape') {
-    if (pop.classList.contains('open')) closePop();
+    if (cfm.classList.contains('open')) closeConfirm();
+    else if (pop.classList.contains('open')) closePop();
     else if (modal.classList.contains('open')) closeModal();
     else if (typing) document.activeElement.blur();
     else if (S.route === 'users' && S.userId) location.hash = '#/users';
