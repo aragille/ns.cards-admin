@@ -154,7 +154,12 @@ a{color:inherit;text-decoration:none}
 .app.collapsed .sidebar .nb{opacity:0}
 .app.collapsed .sidebar .ndot-c{display:block}
 /* flyout variant: one row per section, its pages open in a panel beside the sidebar */
-.v-fly>.nav{margin-bottom:2px}
+.v-fly>.nav,.v-tabs>.nav{margin-bottom:2px}
+.topbar.sec{height:auto;flex-direction:column;align-items:stretch;gap:0}
+.tb-row{height:64px;padding-top:8px;display:flex;align-items:center;gap:8px} /* title on the sidebar logo's line */
+.tb-title{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em;color:var(--ink);white-space:nowrap}
+.topbar .tb-tabs{padding:0;margin-left:-10px;height:44px;flex:none}
+.tb-tabs .tab{height:100%}
 .nav-fly{text-align:left}
 .nav-fly .nf-chev{margin-left:auto;display:flex;color:var(--ink-3)}
 .nav-fly .ndot+.nf-chev{margin-left:8px}
@@ -176,7 +181,7 @@ a{color:inherit;text-decoration:none}
 .me-h .me-e{font-size:12px;color:var(--ink-3)}
 
 .main-wrap{display:flex;flex-direction:column;min-width:0;height:100vh}
-.topbar{height:72px;flex:none;display:flex;align-items:center;gap:8px;padding:0 20px 0 28px;border-bottom:1px solid var(--line);background:var(--bg)}
+.topbar{height:72px;flex:none;display:flex;align-items:center;gap:8px;padding:0 28px;border-bottom:1px solid var(--line);background:var(--bg)}
 .crumbs{display:flex;align-items:center;gap:10px;font-size:17px;letter-spacing:-.01em;flex:0 1 auto;overflow:hidden;padding:4px 8px;margin:0 -8px;color:var(--ink-2);min-width:0;white-space:nowrap}
 .crumbs a{padding:5px 7px;margin:0 -7px;border-radius:8px}
 .crumbs a:hover{background:var(--hover);color:var(--ink)}
@@ -403,7 +408,7 @@ body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
 .hs-wrap{position:relative}
 .hs-wrap::before,.hs-wrap::after{content:"";position:absolute;top:0;bottom:0;width:96px;z-index:4;pointer-events:none;opacity:0;transition:opacity .2s;backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px)}
 .hs-wrap::after{right:0;-webkit-mask-image:linear-gradient(to right,transparent,#000 70%);mask-image:linear-gradient(to right,transparent,#000 70%)}
-.hs-wrap::before{left:var(--hs-l,0px);-webkit-mask-image:linear-gradient(to left,transparent,#000 70%);mask-image:linear-gradient(to left,transparent,#000 70%)}
+.hs-wrap::before{left:calc(var(--hs-l,0px) - 1px);border-left:1px solid var(--line);-webkit-mask-image:linear-gradient(to left,transparent,#000 70%);mask-image:linear-gradient(to left,transparent,#000 70%)}
 .hs-wrap.hs-r::after,.hs-wrap.hs-l::before{opacity:1}
 .ucell .un{font-weight:500;line-height:1.25}
 .ucell .ue{color:var(--ink-2);font-size:12.5px;line-height:1.3}
@@ -724,18 +729,17 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .res{padding:9px 0}
 /* Overview */
 .ov-stat{display:flex;align-items:center;gap:14px;padding:14px 16px!important;color:inherit}
-.ov-stat>.i{margin-left:auto;color:var(--ink-3);transition:transform .12s,color .12s}
-.ov-stat:hover>.i{color:var(--ink);transform:translateX(2px)}
+.ov-stat>.i{margin-left:auto;color:var(--ink-3)}
+.ov-stat:hover>.i{color:var(--ink)}
 .os-ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--neutral-bg);color:var(--ink);flex:none}
 .os-l{display:flex;flex-direction:column;gap:2px;font-size:12.5px;color:var(--ink-2)}
 .os-l b{font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-.01em;font-variant-numeric:tabular-nums}
 .dgrid .card.ov>.card-h{min-height:52px;padding:0 20px;margin-bottom:0;border-bottom:1px solid var(--line)} /* beats .dgrid .card.flush>.card-h: title centred in the header bar */
-.ovr{display:grid;grid-template-columns:32px minmax(0,1fr) auto 72px 16px;align-items:center;gap:12px;width:100%;height:44px;padding:0 16px 0 20px;border-bottom:1px solid var(--line-soft);text-align:left;font-size:13.5px}
+.ovr{display:grid;grid-template-columns:32px minmax(0,1fr) 72px 16px;align-items:center;gap:12px;width:100%;height:44px;padding:0 16px 0 20px;border-bottom:1px solid var(--line-soft);text-align:left;font-size:13.5px}
 .ovr:last-child{border-bottom:0}
 .ovr:hover{background:var(--row-hover)}
 .ovr .os-ic{width:28px;height:28px;border-radius:8px}
 .ovr-l{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ovr-o{font-size:12.5px;color:var(--ink-3);white-space:nowrap}
 .ovr-n{justify-self:end;font-family:var(--mono);font-size:13px;font-weight:500;color:var(--brand-700);background:var(--brand-100);padding:0 7px;line-height:20px;border-radius:var(--r-tag)}
 .ovr.clear .ovr-n{font-family:var(--font);font-weight:400;color:var(--ink-3);background:none;padding:0}
 .ovr>.i{color:var(--ink-3)}
@@ -1389,19 +1393,22 @@ const monitorsDue = kind => monitorsOf(kind).filter(m => m.status === 'ALERT' ||
 // attn() counts what waits on an admin on that page (why says what): the item shows the count as a badge (a dot on its icon when the sidebar is collapsed), its section title a dot while folded.
 const waiting = (id, key, values) => () => { const P = PAGES[id]; return applyFilters(pgData(P), [{ key, values }], null, P.fields).length; };
 const NAV = [
-  { id: 'dashboard', label: 'Overview', icon: 'dashboard' },
-  { id: 'users', label: 'Users', icon: 'users', attn: () => USERS.filter(u => ['pending', 'review'].includes(u.kyc)).length, why: 'with KYC to review' },
-  { label: 'Companies', icon: 'building', items: [
+  { label: 'Clients', icon: 'users', items: [{ id: 'dashboard', label: 'Overview', icon: 'dashboard' },
+    { id: 'users', label: 'Users', icon: 'users', attn: () => USERS.filter(u => ['pending', 'review'].includes(u.kyc)).length, why: 'with KYC to review' },
     { id: 'companies', label: 'Company list', icon: 'building', on: () => S.route === 'companies' && S.coView !== 'access', attn: () => COMPANIES.filter(c => !c.cp.length && !c.ip.length).length, why: 'not set up' },
     { id: 'companies', href: '#/companies/access', label: 'Product access', icon: 'table', on: () => S.route === 'companies' && S.coView === 'access' }] },
-  { label: 'Products', icon: 'cardProduct', items: [{ id: 'card-products', label: 'Cards', icon: 'cardProduct' },
-    { id: 'card-orders', label: 'Card orders', icon: 'send', attn: waiting('card-orders', 'status', ['NEW', 'FAILED']), why: 'new or failed' }, { id: 'iban-products', label: 'IBAN accounts', icon: 'ibanProduct' }] },
+  // issued cards and accounts are the clients' own objects; Products below are the types they are issued from
+  { label: 'Cards & accounts', icon: 'card', items: [{ id: 'cards', label: 'Cards', icon: 'card' },
+    { id: 'card-orders', label: 'Card orders', icon: 'send', attn: waiting('card-orders', 'status', ['NEW', 'FAILED']), why: 'new or failed' }, { id: 'iban', label: 'IBAN accounts', icon: 'bank' }] },
+  { label: 'Products', icon: 'cardProduct', items: [{ id: 'card-products', label: 'Card products', icon: 'cardProduct' }, { id: 'iban-products', label: 'IBAN products', icon: 'ibanProduct' }] },
   { label: 'Operations', icon: 'arrows', items: [{ id: 'transactions', label: 'External transactions', icon: 'arrows', attn: waiting('transactions', 'status', ['PENDING', 'FAILED']), why: 'pending or failed' },
     { id: 'movements', label: 'Fund movements', icon: 'aggTx' }, { id: 'confirmations', label: 'Operation confirmations', icon: 'shieldCheck', attn: waiting('confirmations', 'status', ['PENDING']), why: 'pending' },
     { id: 'sbp', label: 'SBP links', icon: 'sbp', attn: waiting('sbp', 'status', ['PENDING']), why: 'awaiting payment' }] },
   { label: 'Compliance', icon: 'shieldCheck', items: [{ id: 'documents', label: 'Documents', icon: 'documents', attn: waiting('documents', 'status', ['PENDING']), why: 'to review' },
     { id: 'kyc-checks', label: 'KYC checks', icon: 'idcard', attn: waiting('kyc-checks', 'status', ['PENDING']), why: 'pending' },
     { id: 'creditco', label: 'CreditCo KYC', icon: 'passport', attn: waiting('creditco', 'status', ['ACCESS_REQUESTED', 'NOT_ALL_FORM_SUBMITTED']), why: 'to follow up' }, { id: 'kyt', label: 'KYT rules', icon: 'radar' }] },
+  { label: 'Staking', icon: 'stakingDash', items: [{ id: 'staking', label: 'Staking dashboard', icon: 'stakingDash' }, { id: 'stakes', label: 'Stakes', icon: 'stakes' },
+    { id: 'payout-pools', label: 'Payout pools', icon: 'payout', attn: waiting('payout-pools', 'status', ['FAILED']), why: 'failed' }, { id: 'strategies', label: 'Strategies', icon: 'strategy' }] },
   { label: 'Finance', icon: 'walletStats', items: [{ id: 'wallet-stats', label: 'Wallet statistics', icon: 'walletStats' }, { id: 'activity-stats', label: 'Operation statistics', icon: 'pieChart' }, { id: 'reserves', label: 'Reserves', icon: 'scale' },
     { id: 'monitors', label: 'Finance monitors', icon: 'activity', tabs: [['monitors', 'Dashboard'], ...Object.values(MON_KIND).map(m => [m.page, m.label])], on: () => tabHost(S.route)?.id === 'monitors', attn: () => monitorsDue().length, why: 'monitors need attention' },
     ...Object.entries(MON_KIND).map(([k, m]) => ({ id: m.page, label: m.label, icon: m.icon, tab: 'monitors', attn: () => monitorsDue(k).length, why: 'need attention' }))] },
@@ -1413,7 +1420,8 @@ const NAV_FLAT = NAV.flatMap(n => n.items || [n]).filter((n, i, a) => a.findInde
 const navTitle = id => NAV_FLAT.find(x => x.id === id).label;
 /* Interface language. The shell (sidebar, page titles, tabs, profile menu, Overview) follows it; page content stays English in the prototype. */
 const RU = {
-  Overview: 'Обзор', Users: 'Пользователи', Companies: 'Компании', 'Company list': 'Список компаний', 'Product access': 'Доступ к продуктам', Products: 'Продукты', Cards: 'Карты', 'Card orders': 'Заказы карт', 'IBAN accounts': 'Счета IBAN',
+  Clients: 'Клиенты', Overview: 'Обзор', Users: 'Пользователи', Companies: 'Компании', 'Company list': 'Список компаний', 'Product access': 'Доступ к продуктам', 'Cards & accounts': 'Карты и счета', Cards: 'Карты', 'Card orders': 'Заказы карт', 'IBAN accounts': 'Счета IBAN',
+  Products: 'Продукты', 'Card products': 'Карточные продукты', 'IBAN products': 'Продукты IBAN', Staking: 'Стейкинг', 'Staking dashboard': 'Дашборд стейкинга', Stakes: 'Стейки', 'Payout pools': 'Пулы выплат', Strategies: 'Стратегии', Sections: 'Разделы',
   Operations: 'Операции', 'External transactions': 'Внешние транзакции', 'Fund movements': 'Движения средств', 'Operation confirmations': 'Подтверждения операций', 'SBP links': 'Ссылки СБП',
   Compliance: 'Проверки', Documents: 'Документы', 'KYC checks': 'Проверки KYC', 'KYT rules': 'Правила KYT', Finance: 'Финансы', 'Wallet statistics': 'Статистика кошельков', 'Operation statistics': 'Статистика операций', Reserves: 'Резервы',
   'Reference data': 'Справочники', Currencies: 'Валюты', Networks: 'Сети', Markets: 'Рынки', 'Country lists': 'Списки стран', Administration: 'Администрирование', Administrators: 'Администраторы', Roles: 'Роли', Sources: 'Источники',
@@ -1441,12 +1449,21 @@ const curSec = () => NAV.find(n => n.items?.some(navOn));
 
 /* Navigation variants, switched from the profile menu to compare them:
    classic — sections fold only when you fold them (remembered) · focus — every section but the current page's is folded; you can peek into others until you move on
-   fly — each section is a single row that opens its pages in a panel beside the sidebar, so only about a dozen rows show at once */
-const NAV_V = { classic: ['Classic', 'Sections stay as you fold them'], focus: ['Focus', 'Only the current section stays open'], fly: ['Flyout', 'Sections open in a side panel'] };
+   fly — each section is a single row that opens its pages in a panel beside the sidebar, so only about a dozen rows show at once
+   tabs — the sidebar lists only the sections; a section's pages are tabs in the header, and the section reopens on the page you left it on */
+const NAV_V = { classic: ['Classic', 'Sections stay as you fold them'], focus: ['Focus', 'Only the current section stays open'], fly: ['Flyout', 'Sections open in a side panel'], tabs: ['Sections', 'Pages as tabs in the header'] };
 S.navV = NAV_V[store.get('nsc.navv', 'classic')] ? store.get('nsc.navv', 'classic') : 'classic'; S.navPeek = new Set();
+S.secLast = {};
+const navHref = it => it.href || '#/' + it.id;
+const secTabs = sec => `<nav class="tabs tb-tabs" aria-label="${t(sec.label)}">${navShown(sec.items).map(it => { const n = navAttn(it);
+  return `<a class="tab ${navOn(it) ? 'on' : ''}" href="${navHref(it)}">${t(it.label)}${n ? `<em class="tab-att" data-tip="${fmtInt(n)} ${it.why}">${fmtInt(n)}</em>` : ''}</a>`; }).join('')}</nav>`;
 const secShut = n => S.navV === 'focus' ? (n !== curSec()) !== S.navPeek.has(n.label) : S.navClosed.has(n.label);
 function navSection(n) {
   const dot = n.items.some(navAttn);
+  if (S.navV === 'tabs') {
+    const n0 = navShown(n.items).reduce((a, it) => a + navAttn(it), 0);
+    return `<a class="nav ${n === curSec() ? 'active' : ''}" href="${S.secLast[n.label] || navHref(n.items[0])}" data-tip="${t(n.label)}${n0 ? ` · ${fmtInt(n0)} need attention` : ''}" data-tip-collapsed>${icon(n.icon, 17)}<span class="fade">${t(n.label)}</span>${n0 ? `<em class="nb">${fmtInt(n0)}</em><i class="ndot ndot-c"></i>` : ''}</a>`;
+  }
   if (S.navV === 'fly') {
     const cur = navShown(n.items).find(navOn);
     const row = cur || n; // inside a section, its row shows the current page instead of the section
@@ -1507,7 +1524,6 @@ function topbarActions() {
     return `<span class="mono faint tb-hide-sm" style="margin-right:2px">${i + 1} / ${fmtInt(l.length)}</span>
       <button class="icon-btn sm" data-act="u-step" data-d="-1" ${i <= 0 ? 'disabled' : ''} data-tip="Previous  k">${icon('chevUp', 16)}</button>
       <button class="icon-btn sm" data-act="u-step" data-d="1" ${i >= l.length - 1 ? 'disabled' : ''} data-tip="Next  j">${icon('chevDown', 16)}</button>
-      <button class="icon-btn sm bare" data-act="copy" data-copy="https://admin.ns.cards/users/${S.userId}" data-tip="Copy link">${icon('link', 16)}</button>
       <span class="tb-div"></span>
       <button class="btn btn-ghost" data-act="toggle-block" data-id="${S.userId}">${icon(byId(S.userId).status === 'blocked' ? 'refresh' : 'ban', 15)}<span class="tb-lbl">${byId(S.userId).status === 'blocked' ? 'Unblock' : 'Block'}</span></button>
       <button class="icon-btn" data-act="u-more" data-tip="More">${icon('more', 16)}</button>
@@ -1518,13 +1534,16 @@ function topbarActions() {
   if (DASHES[S.route]) return dashTopbar();
   return '';
 }
+// Sections navigation: a list page's header is the section title with the page's actions, and the section's pages as tabs under them;
+// a record page keeps one row, its breadcrumb led by the section name (not a link — the list crumb goes back to the tab)
 function renderTopbar() {
-  const c = crumbs(), acts = topbarActions();
-  $('#topbar').innerHTML = `
-    <button class="icon-btn menu-btn" data-act="mobile-menu" aria-label="Menu">${icon('menu', 18)}</button>
-    <nav class="crumbs" aria-label="Breadcrumb">${c.map(([l, h, id], i) => (i ? '<span class="crumb-sep">/</span>' : '') + (h ? `<a href="${h}">${esc(t(l))}</a>` : `<span class="cur">${esc(t(l))}</span>`) + (id ? `<span class="count">${id}</span>` : '')).join('')}</nav>
-    <div class="tb-sp"></div>
-    ${acts ? `<div class="tb-ctx">${acts}</div>` : ''}`;
+  const c = crumbs(), acts = topbarActions(), sec = S.navV === 'tabs' && curSec(), list = sec && c.length === 1;
+  const path = sec && !list ? [[sec.label, '', '', 1], ...c] : c;
+  const menu = `<button class="icon-btn menu-btn" data-act="mobile-menu" aria-label="Menu">${icon('menu', 18)}</button>`, ctx = acts ? `<div class="tb-ctx">${acts}</div>` : '';
+  $('#topbar').classList.toggle('sec', !!list);
+  $('#topbar').innerHTML = list ? `<div class="tb-row">${menu}<h1 class="tb-title">${esc(t(sec.label))}</h1><div class="tb-sp"></div>${ctx}</div>${secTabs(sec)}` : `${menu}
+    <nav class="crumbs" aria-label="Breadcrumb">${path.map(([l, h, id, plain], i) => (i ? '<span class="crumb-sep">/</span>' : '') + (h ? `<a href="${h}">${esc(t(l))}</a>` : `<span class="${plain ? '' : 'cur'}">${esc(t(l))}</span>`) + (id ? `<span class="count">${id}</span>` : '')).join('')}</nav>
+    <div class="tb-sp"></div>${ctx}`;
 }
 // Profile menu. Language and Navigation open their choices inside the menu (a back arrow returns), so no list floats outside it.
 const ME_PICK = {
@@ -1581,6 +1600,7 @@ function route() {
   S._keepFilters = false;
   S.route = r; S.userId = uid; S.coId = cid; S.coView = r === 'companies' && sub === 'access' ? 'access' : 'list';
   const sec = curSec(); if (sec && S.navClosed.delete(sec.label)) store.set('nsc.navClosed', [...S.navClosed]); // never hide the current page
+  if (sec) S.secLast[sec.label] = '#/' + r + (S.coView === 'access' ? '/access' : ''); // a record reopens as its list
   S.navPeek.clear();
   S.recId = PAGES[r] && sub ? decodeURIComponent(sub) : null;
   closePop(); $('#app').classList.remove('mobile-open'); $('#tt').classList.remove('show');
@@ -1752,22 +1772,21 @@ function spark(data) {
 // Overview: the totals an operator checks first, every queue that waits on a decision, funds per currency and the latest admin actions
 function renderDashboard() {
   const stats = [['Users', 'users', USERS.length, '#/users'], ['Companies', 'building', COMPANIES.length, '#/companies'],
-    ['Issued cards', 'card', sum(USERS.map(u => ud(u).cards.length)), '#/card-products'], ['Products', 'cardProduct', CARD_PRODUCTS.length + IBAN_PRODUCTS.length, '#/card-products']];
-  // every queue that waits on an admin: how many, and how long the oldest has waited; a row opens the list filtered to them
-  const queue = (id, l, ic, values) => { const P = PAGES[id], L = applyFilters(pgData(P), [{ key: 'status', values }], null, P.fields); return { id, l, ic, v: values.join(), n: L.length, oldest: L.length ? new Date(Math.min(...L.map(r => r.created))) : null }; };
+    ['Issued cards', 'card', sum(USERS.map(u => ud(u).cards.length)), '#/cards'], ['Products', 'cardProduct', CARD_PRODUCTS.length + IBAN_PRODUCTS.length, '#/card-products']];
+  // every queue that waits on an admin and how many; a row opens the list filtered to them
+  const queue = (id, l, ic, values) => { const P = PAGES[id]; return { id, l, ic, v: values.join(), n: applyFilters(pgData(P), [{ key: 'status', values }], null, P.fields).length }; };
   const queues = [queue('documents', 'Documents to review', 'documents', ['PENDING']), queue('kyc-checks', 'KYC checks', 'idcard', ['PENDING']), queue('card-orders', 'Card issue errors', 'send', ['FAILED']),
     queue('confirmations', 'Operation confirmations', 'shieldCheck', ['PENDING']), queue('transactions', 'Transaction checks', 'arrows', ['PENDING']), queue('sbp', 'SBP links', 'sbp', ['PENDING']),
-    { id: 'monitors', l: 'Finance monitors', ic: 'activity', v: '', n: monitorsDue().length, oldest: null }];
+    { id: 'monitors', l: 'Finance monitors', ic: 'activity', v: '', n: monitorsDue().length }];
   const funds = ASSETS.map(a => [a.c, sum(USERS.map(u => ud(u).wallets.find(w => w.c === a.c)?.amt || 0))]).filter(([, v]) => v > 0);
   const log = pgData(PAGES.logs).slice(0, 8);
   const go = (href, l) => `<a class="link-btn ov-more" href="${href}">${t(l)}${icon('chevRight', 14)}</a>`;
   $('#main').innerHTML = `<div class="page"><div class="dgrid">
     ${stats.map(([l, ic, n, href]) => `<a class="card span-3 ov-stat" href="${href}"><span class="os-ic">${icon(ic, 18)}</span><span class="os-l">${t(l)}<b>${fmtInt(n)}</b></span>${icon('chevRight', 16)}</a>`).join('')}
-    <div class="card span-7 flush ov"><div class="card-h"><span class="card-t">${t('Needs attention')}</span></div>
-      ${queues.map(q => `<button class="ovr ${q.n ? '' : 'clear'}" data-act="ov-queue" data-id="${q.id}" data-v="${q.v}"><span class="os-ic">${icon(q.ic, 16)}</span><span class="ovr-l">${t(q.l)}</span>
-        <span class="ovr-o">${q.oldest ? `${t('oldest')} ${rel(q.oldest)}` : ''}</span><span class="ovr-n">${q.n ? fmtInt(q.n) : t('All clear')}</span>${icon('chevRight', 16)}</button>`).join('')}
+    <div class="card span-6 flush ov"><div class="card-h"><span class="card-t">${t('Needs attention')}</span></div>
+      ${queues.map(q => `<button class="ovr ${q.n ? '' : 'clear'}" data-act="ov-queue" data-id="${q.id}" data-v="${q.v}"><span class="os-ic">${icon(q.ic, 16)}</span><span class="ovr-l">${t(q.l)}</span><span class="ovr-n">${q.n ? fmtInt(q.n) : t('All clear')}</span>${icon('chevRight', 16)}</button>`).join('')}
     </div>
-    <div class="card span-5 flush ov"><div class="card-h"><span class="card-t">${t('Wallet funds')}</span>${go('#/reserves', 'Provider reserves')}</div>
+    <div class="card span-6 flush ov"><div class="card-h"><span class="card-t">${t('Wallet funds')}</span>${go('#/reserves', 'Provider reserves')}</div>
       ${funds.map(([c, v]) => `<div class="ovw"><span class="ctry">${assetIc(c, 16)}${c}</span><b class="num">${fmtAmt(v, c)}</b></div>`).join('')}
     </div>
     <div class="card span-12 flush ov"><div class="card-h"><span class="card-t">${t('Recent changes')}</span>${go('#/logs', 'Full log')}</div>
@@ -2224,7 +2243,7 @@ const fmtAmt = (v, c, signed) => {
   const a = ASSET[c] || { dp: 2 }, s = Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: a.fiat ? 2 : 0, maximumFractionDigits: a.dp });
   return (signed ? (v > 0 ? '+' : v < 0 ? '−' : '') : '') + s + ' ' + c;
 };
-const assetIc = (c, s = 28) => CUR_IMG[c] ? `<img class="asset-ic" src="${CUR_IMG[c]}" style="width:${s}px;height:${s}px" alt="">` // inline size: .asset-ic's own 34px would win over attributes
+const assetIc = (c, s = 16) => CUR_IMG[c] ? `<img class="asset-ic" src="${CUR_IMG[c]}" style="width:${s}px;height:${s}px" alt="">` // inline size: .asset-ic's own 34px would win over attributes
   : `<span class="asset-ic" style="width:${s}px;height:${s}px;font-size:${Math.round(s * .42)}px;background:${ASSET[c]?.col || 'var(--neutral)'}">${ASSET[c]?.s || { GBP: '£', CHF: '₣' }[c] || c[0]}</span>`;
 const curCell = c => `<span class="ctry">${assetIc(c, 16)}${c}</span>`; // a currency code with its icon, wherever a column holds one
 const yes = v => `<span class="ver-ic ${v ? 'ok' : 'no'}" style="margin:0 auto">${icon(v ? 'check' : 'minus', 12, 2.5)}</span>`;
@@ -2257,7 +2276,9 @@ function ctable(t, rows, empty, o = {}) {
   }), empty, { t, keys: [...(o.pre ? [null] : []), ...cols.map(c => c.k), ...(o.post ? [null] : [])] });
 }
 const colsBtn = t => `<button class="icon-btn sm" data-act="tcols" data-t="${t}" data-tip="Columns">${icon('columns', 15)}</button>`;
-const tcolsPop = t => `<div class="pop-sec"><div class="pop-lbl">Columns</div>${colChips(t, 'tcol')}</div>`;
+const tcolsPop = t => `<div class="pop-sec"><div class="pop-lbl">Columns<button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="tcols-reset" data-t="${t}">Reset columns</button></div>${colChips(t, 'tcol')}</div>`;
+// Reset columns: back to the table's default shown columns in their default order (widths have their own reset)
+const resetTcols = t => { delete (S.tcols ||= store.get('nsc.tcols2', {}))[t]; delete (S.tord ||= store.get('nsc.tord', {}))[t]; store.set('nsc.tcols2', S.tcols); store.set('nsc.tord', S.tord); };
 const tcard = (title, acts, body, tools = '') => `<div class="card flush"><div class="card-h"><span class="card-t">${title}</span>${acts ? `<div class="ch-act">${acts}</div>` : ''}</div>${tools ? `<div class="card-tools">${tools}</div>` : ''}${body}</div>`;
 
 function eventsOf(u) {
@@ -2340,7 +2361,7 @@ function walletsTab(u, D) {
   const rows = [...D.wallets].sort((x, y) => eurOf(y) - eurOf(x)).map(w => {
     const a = ASSET[w.c], open = S.openWallet === w.c;
     return `<div class="wrow ${w.amt ? '' : 'zero'} ${open ? 'open' : ''}" data-act="wallet-toggle" data-c="${w.c}">
-      ${assetIc(w.c, 32)}
+      ${assetIc(w.c, 16)}
       <div class="wn"><div>${a.n}${w.frozen ? ' <span class="badge t-info">Frozen</span>' : ''}</div><div class="code">${w.c} · ${a.net}</div></div>
       <div class="wa"><div class="num">${fmtAmt(w.amt, w.c)}</div><div class="code">${fmtEur(eurOf(w), 2)}</div></div>
       <span class="wchev">${icon('chevDown', 16)}</span>
@@ -2382,7 +2403,7 @@ const TCOLS = {
     { k: 'card', l: 'Card', on: 1, cell: c => `<span class="ctry"><span class="mini-card ${c.physical ? 'alt' : ''}">${LOGO_SIGN(9, '#fff')}</span>•••• ${c.last4}</span>` },
     { k: 'id', l: 'ID', on: 1, cell: c => numM(c.id) }, { k: 'userId', l: 'User ID', cell: () => numM(S.userId) },
     { k: 'holder', l: 'Cardholder ID', on: 1, cell: c => numM(c.holder) }, { k: 'token', l: 'Public token', cell: c => copyVal(c.token, c.token.slice(0, 10) + '…') },
-    { k: 'product', l: 'Product', on: 1, cell: c => `<div>${c.product}</div><div class="code">ID ${c.productId}</div>` }, { k: 'provider', l: 'Provider', cell: c => c.provider },
+    { k: 'product', l: 'Product', on: 1, cell: c => esc(c.product) }, { k: 'provider', l: 'Provider', cell: c => c.provider },
     { k: 'crypto', l: 'Crypto currency', on: 1, cell: c => curCell(c.crypto) }, { k: 'cur', l: 'Currency', on: 1, cell: c => curCell(c.display) },
     { k: 'balance', l: 'Balance', al: 'r', on: 1, cell: c => `<span class="num">${fmtAmt(c.balance, 'EUR')}</span>` },
     { k: 'emboss', l: 'Emboss name', cell: c => muted(c.emboss) }, { k: 'line4', l: 'Fourth line text', cell: c => muted(c.line4) },
@@ -2652,7 +2673,7 @@ function displayPop() {
       <div class="seg" style="width:100%">${[['table', 'Table'], ['list', 'List'], ['board', 'Board']].map(([k, l]) => `<button style="flex:1;justify-content:center" class="${S.view === k ? 'on' : ''}" data-act="layout" data-v="${k}">${icon(k, 14)}${l}</button>`).join('')}</div>
     </div>
     ${S.view !== 'table' ? `<div class="pop-sec"><div class="pop-lbl">Group by</div><div class="pills">${groupOpts.map(k => `<button class="pill ${curGroup === k ? 'on' : ''}" data-act="disp-group" data-v="${k}">${gl(k)}</button>`).join('')}</div></div>` : ''}
-    ${S.view === 'table' ? `<div class="pop-sec"><div class="pop-lbl">Columns<span style="display:flex;gap:12px"><button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="reset-colw">Reset widths</button></span></div>${colChips('users', 'disp-col')}</div>` : ''}`;
+    ${S.view === 'table' ? `<div class="pop-sec"><div class="pop-lbl">Columns<span style="display:flex;gap:12px"><button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="reset-cols">Reset columns</button><button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="reset-colw">Reset widths</button></span></div>${colChips('users', 'disp-col')}</div>` : ''}`;
 }
 const refreshDisplayPop = () => { if (popOpts.kind === 'display') { pop.innerHTML = displayPop(); positionPop(); } };
 
@@ -2906,6 +2927,8 @@ const ACT = {
     D.forms.unshift({ id: 900 + u.id % 100 * 4 + D.forms.length + 10, type: t, status: 'REQUESTED', date: new Date(NOW), updated: new Date(NOW), reason: '' });
     toast(`${FORM_TYPES[t].title} form requested`, 'send'); renderUserPage();
   },
+  'reset-cols': () => { S.hidden = new Set(DEFAULT_HIDDEN); store.set('nsc.hidden3', DEFAULT_HIDDEN); S.colOrder = null; store.set('nsc.colorder2', null); renderResults(); refreshDisplayPop(); toast('Columns reset to default', 'columns'); },
+  'tcols-reset': a => { resetTcols(a.dataset.t); rerender(); pop.innerHTML = tcolsPop(a.dataset.t); reanchor(); },
   'reset-colw': () => { S.colW = {}; store.set('nsc.colw', {}); renderResults(); toast('Column widths fitted to this page', 'columns'); },
   'tcols': a => openPop(a, tcolsPop(a.dataset.t), { align: 'right', width: 360, kind: 'tcols', anchorSel: `[data-act="tcols"][data-t="${a.dataset.t}"]` }),
   'tcol': a => {
@@ -3052,7 +3075,6 @@ function coTopbar() {
     return `<span class="mono faint tb-hide-sm" style="margin-right:2px">${i + 1} / ${fmtInt(l.length)}</span>
       <button class="icon-btn sm" data-act="co-step" data-d="-1" ${i <= 0 ? 'disabled' : ''} data-tip="Previous  k">${icon('chevUp', 16)}</button>
       <button class="icon-btn sm" data-act="co-step" data-d="1" ${i >= l.length - 1 ? 'disabled' : ''} data-tip="Next  j">${icon('chevDown', 16)}</button>
-      <button class="icon-btn sm bare" data-act="copy" data-copy="https://admin.ns.cards/companies/${S.coId}" data-tip="Copy link">${icon('link', 16)}</button>
       ${coById(S.coId) ? `<span class="tb-div"></span>
       <button class="btn btn-ghost" data-act="co-block" data-id="${S.coId}">${icon(coById(S.coId).status === 'blocked' ? 'refresh' : 'ban', 15)}<span class="tb-lbl">${coById(S.coId).status === 'blocked' ? 'Unblock' : 'Block'}</span></button>
       <button class="icon-btn" data-act="co-more" data-tip="More">${icon('more', 16)}</button>
@@ -3783,7 +3805,6 @@ function pgTopbar() {
     return `<span class="mono faint tb-hide-sm" style="margin-right:2px">${i + 1} / ${fmtInt(l.length)}</span>
       <button class="icon-btn sm" data-act="rec-step" data-d="-1" ${i <= 0 ? 'disabled' : ''} data-tip="Previous  k">${icon('chevUp', 16)}</button>
       <button class="icon-btn sm" data-act="rec-step" data-d="1" ${i < 0 || i >= l.length - 1 ? 'disabled' : ''} data-tip="Next  j">${icon('chevDown', 16)}</button>
-      <button class="icon-btn sm bare" data-act="copy" data-copy="https://admin.ns.cards/${P.id}/${encodeURIComponent(S.recId)}" data-tip="Copy link">${icon('link', 16)}</button>
       ${recOf(P) ? `<span class="tb-div"></span>${P.rec.acts ? P.rec.acts(recOf(P)) : ''}<button class="icon-btn" data-act="pg-rec-more" data-rid="${esc(S.recId)}" data-tip="More">${icon('more', 16)}</button>` : ''}`;
   }
   return `<button class="tool-btn solid" id="displayBtn" data-act="ld-display">${icon('table', 15)}<span class="sl">Display</span>${icon('chevDown', 13)}</button>
@@ -3835,7 +3856,7 @@ function pgCSV(P, rows, name) {
 // Display popover for every list except Users (which also has layouts): columns + widths, shared look
 function listDisplayPop() {
   const X = colCtx(), vis = new Set(X.cols), lnk = (act, l) => `<button class="link-btn" style="height:auto;padding:0;font-size:11px" data-act="${act}">${l}</button>`;
-  return `<div class="pop-sec"><div class="pop-lbl">Columns<span style="display:flex;gap:12px">${lnk('ld-reset-colw', 'Reset widths')}</span></div>${colChips(X.t, 'ld-col')}</div>`;
+  return `<div class="pop-sec"><div class="pop-lbl">Columns<span style="display:flex;gap:12px">${lnk('ld-cols-reset', 'Reset columns')}${lnk('ld-reset-colw', 'Reset widths')}</span></div>${colChips(X.t, 'ld-col')}</div>`;
 }
 const refreshLD = () => { colCtx().redraw(); if (popOpts.kind === 'ldisplay') { pop.innerHTML = listDisplayPop(); positionPop(); } };
 
@@ -4060,6 +4081,48 @@ page({
   quick: r => ({ act: 'open-user', icon: 'user', tip: 'Open user', data: { id: r.uid } }), menu: txMenu, rec: txRec,
 });
 
+/* ── Financial · IBAN accounts (the same objects as each user’s IBAN tab) ── */
+const ibanClose = rows => { const n = rows.filter(b => b.status !== 'CLOSED').length; rows.forEach(b => { b.status = 'CLOSED'; b.updated = new Date(NOW); }); return `${n} account${n === 1 ? '' : 's'} closed`; };
+page({
+  id: 'iban', noun: 'IBAN account', nouns: 'IBAN accounts', icon: 'bank', live: 1, searchPh: 'Search IBAN, user, external ID…',
+  data: () => USERS.flatMap(u => ud(u).ibans.map(b => { if (!b.uid) { const r = rng(b.id); Object.assign(b, { uid: u.id, created: new Date(u.created.getTime() + (NOW - u.created) * (.2 + r() * .3)), balance: Math.round(r() * r() * 24000) }); } return b; })),
+  search: r => `${r.iban} ${r.ext} ${byId(r.uid).name} ${byId(r.uid).email}`,
+  fields: { status: fE('Status', 'activity', IBAN_STATUS, r => r.status), product: fE('Product', 'ibanProduct', Object.fromEntries(IBAN_PRODUCTS.map(p => [p.name, { label: p.name }])), r => r.productName),
+    provider: fE('Provider', 'bank', { 'Banking Circle': { label: 'Banking Circle' }, 'Clear Junction': { label: 'Clear Junction' } }, r => r.provider), source: fE('Source', 'folder', optsOf(SOURCES), r => r.source), created: fD('Opened', r => r.created) },
+  tiles: [allTile('All accounts', L => `${fmtEur(sum(L.map(b => b.balance)))} held`), tile('act', 'Active', { key: 'status', values: ['ACTIVE'] }, share), tile('pen', 'Pending', { key: 'status', values: ['PENDING'] }, () => 'With provider'), tile('cl', 'Closed', { key: 'status', values: ['CLOSED'] }, share)],
+  cols: [{ k: 'iban', l: 'IBAN', on: 1, cell: b => copyVal(b.iban.replace(/ /g, ''), b.iban) }, K.user(), K.text('productName', 'Product'), K.text('provider', 'Provider'), { ...K.text('currency', 'Currency', 0), cell: b => curCell(b.currency) },
+    K.status(IBAN_STATUS), K.eur('balance', 'Balance'), { k: 'source', l: 'Source', cell: b => SOURCES[b.source] }, { k: 'ext', l: 'External ID', cell: b => copyVal(b.ext) }, K.date('created', 'Opened')],
+  sort: { k: 'created', dir: 'desc' },
+  quick: b => ({ act: 'copy', icon: 'copy', tip: 'Copy IBAN', data: { copy: b.iban.replace(/ /g, '') } }),
+  menu: b => [...(b.status !== 'CLOSED' ? [{ act: 'iban-close', data: { rid: b.id }, icon: 'ban', label: 'Close account' }] : []), { act: 'open-user', data: { id: b.uid }, icon: 'user', label: 'Open user' }],
+  bulk: [{ icon: 'ban', label: 'Close', run: ibanClose }],
+  rec: { title: b => b.iban, sub: b => `${userLink(byId(b.uid))}<span class="faint">·</span><span>${esc(b.productName)}</span>`, badges: b => badge(IBAN_STATUS[b.status]) + `<span class="badge t-neutral">${b.provider}</span>`,
+    acts: b => b.status !== 'CLOSED' ? `<button class="btn btn-ghost" data-act="iban-close" data-rid="${b.id}">${icon('ban', 15)}Close account</button>` : '' },
+});
+
+/* ── Financial · Cards (the same objects as each user’s Cards tab) ── */
+const CARD_STATUS = { active: { label: 'Active', tone: 'success' }, frozen: { label: 'Frozen', tone: 'info' } };
+const cardFreeze = (rows, on) => { rows.forEach(c => c.frozen = on); return `${rows.length} card${rows.length > 1 ? 's' : ''} ${on ? 'frozen' : 'unfrozen'}`; };
+page({
+  id: 'cards', noun: 'card', nouns: 'cards', icon: 'card', live: 1, searchPh: 'Search last 4 digits, user, card ID…',
+  data: () => USERS.flatMap(u => ud(u).cards.map(c => (c.uid = u.id, c))),
+  search: c => `${c.id} ${c.last4} ${c.ext} ${byId(c.uid).name} ${byId(c.uid).email}`,
+  fields: { status: fE('Status', 'activity', CARD_STATUS, c => c.frozen ? 'frozen' : 'active'), kind: fE('Card type', 'card', { virtual: { label: 'Virtual' }, physical: { label: 'Physical' } }, c => c.physical ? 'physical' : 'virtual'),
+    product: fE('Product', 'cardProduct', { 'NS Virtual EUR': { label: 'NS Virtual EUR' }, 'NS Physical EUR': { label: 'NS Physical EUR' } }, c => c.product), created: fD('Issued', c => c.created) },
+  tiles: [allTile('All cards', L => `${fmtEur(sum(L.map(c => c.balance)))} on cards`), tile('act', 'Active', { key: 'status', values: ['active'] }, share), tile('frz', 'Frozen', { key: 'status', values: ['frozen'] }, share),
+    tile('vir', 'Virtual', { key: 'kind', values: ['virtual'] }, share), tile('phy', 'Physical', { key: 'kind', values: ['physical'] }, share)],
+  cols: [{ k: 'last4', l: 'Card', on: 1, cell: c => `<span class="ctry"><span class="mini-card ${c.physical ? 'alt' : ''}">${LOGO_SIGN(9, '#fff')}</span>•••• ${c.last4}</span>` }, K.id(), K.user(),
+    { k: 'product', l: 'Product', on: 1, cell: c => esc(c.product) }, { k: 'physical', l: 'Type', on: 1, val: c => +c.physical, cell: c => c.physical ? 'Physical' : 'Virtual' },
+    K.text('provider', 'Provider', 0), { k: 'balance', l: 'Balance', al: 'r', on: 1, dir: 'desc', cell: c => `<span class="num">${fmtAmt(c.balance, 'EUR')}</span>` }, { k: 'exp', l: 'Expiry', on: 1, cell: c => `<span class="num">${c.exp}</span>` },
+    { k: 'frozen', l: 'Status', on: 1, val: c => +c.frozen, cell: c => dotCell(CARD_STATUS[c.frozen ? 'frozen' : 'active']) }, K.yes('activated', 'Activated', 0), K.date('created', 'Issued')],
+  sort: { k: 'created', dir: 'desc' },
+  quick: c => ({ act: 'card-tog', icon: c.frozen ? 'refresh' : 'lock', tip: c.frozen ? 'Unfreeze' : 'Freeze' }),
+  menu: c => [{ act: 'card-tog', data: { rid: c.id }, icon: c.frozen ? 'refresh' : 'lock', label: c.frozen ? 'Unfreeze card' : 'Freeze card' }, { act: 'copy', data: { copy: c.ext }, icon: 'copy', label: 'Copy external ID' }, { act: 'open-user', data: { id: c.uid }, icon: 'user', label: 'Open user' }],
+  bulk: [{ icon: 'lock', label: 'Freeze', run: rows => cardFreeze(rows, true) }, { icon: 'refresh', label: 'Unfreeze', run: rows => cardFreeze(rows, false) }],
+  rec: { title: c => `${c.product} •••• ${c.last4}`, sub: c => `${userLink(byId(c.uid))}<span class="faint">·</span><span class="num">${fmtAmt(c.balance, 'EUR')}</span>`, badges: c => badge(CARD_STATUS[c.frozen ? 'frozen' : 'active']) + `<span class="badge t-neutral">${c.physical ? 'Physical' : 'Virtual'}</span>`,
+    acts: c => `<button class="btn btn-ghost" data-act="card-tog" data-rid="${c.id}">${icon(c.frozen ? 'refresh' : 'lock', 15)}${c.frozen ? 'Unfreeze' : 'Freeze'}</button>` },
+});
+
 /* ── Financial · SBP top-up ── */
 const SBP_STATUS = { PENDING: { label: 'Awaiting payment', tone: 'warning' }, PAID: { label: 'Paid', tone: 'success' }, EXPIRED: { label: 'Expired', tone: 'neutral' }, FAILED: { label: 'Failed', tone: 'error' } };
 const sbpPaid = rows => { const o = rows.filter(r => r.status === 'PENDING'); o.forEach(r => { r.status = 'PAID'; r.paid = new Date(NOW); r.by = ME; }); return `${o.length} link${o.length === 1 ? '' : 's'} marked as paid`; };
@@ -4087,6 +4150,108 @@ page({
   rec: { title: r => `SBP link #${r.id}`, sub: r => `${userLink(byId(r.uid))}<span class="faint">·</span><span class="num">${fmtInt(r.rub)} ₽ → ${fmtAmt(r.usdt, 'USDT')}</span>`, badges: r => badge(SBP_STATUS[r.status]),
     acts: r => r.status === 'PENDING' ? `<button class="btn btn-dark" data-act="sbp-paid" data-rid="${r.id}">${icon('check', 15, 2)}Mark as paid</button><button class="btn btn-ghost" data-act="sbp-cancel" data-rid="${r.id}">${icon('ban', 15)}Cancel</button>` : '',
     events: r => [r.paid && { ic: 'check', t: 'Paid', s: `${r.bank} · ${fmtDateTime(r.paid)}`, when: rel(r.paid) }, { ic: 'sbp', t: 'QR issued', s: r.ref, when: rel(r.created) }].filter(Boolean) },
+});
+
+/* ── Staking · Strategies, Stakes, Payout pools ── */
+const STRAT_STATUS = { ACTIVE: { label: 'Active', tone: 'success' }, PAUSED: { label: 'Paused', tone: 'warning' }, CLOSED: { label: 'Closed', tone: 'neutral' } };
+const STAKE_STATUS = { ACTIVE: { label: 'Active', tone: 'success' }, UNBONDING: { label: 'Unbonding', tone: 'info' }, COMPLETED: { label: 'Completed', tone: 'neutral' } };
+const POOL_STATUS = { SCHEDULED: { label: 'Scheduled', tone: 'info' }, PROCESSING: { label: 'Processing', tone: 'warning' }, PAID: { label: 'Paid', tone: 'success' }, FAILED: { label: 'Failed', tone: 'error' } };
+const STRATS = [
+  { id: 1, name: 'USDT Flexible', c: 'USDT', apy: 6.5, lock: 0, min: 50, cap: 5e6, status: 'ACTIVE' }, { id: 2, name: 'USDT 90-day lock', c: 'USDT', apy: 9.2, lock: 90, min: 500, cap: 3e6, status: 'ACTIVE' },
+  { id: 3, name: 'USDC Saver', c: 'USDC', apy: 5.8, lock: 0, min: 50, cap: 2e6, status: 'ACTIVE' }, { id: 4, name: 'ETH Liquid staking', c: 'ETH', apy: 3.6, lock: 0, min: .05, cap: 1500, status: 'ACTIVE' },
+  { id: 5, name: 'ETH 180-day vault', c: 'ETH', apy: 4.9, lock: 180, min: .5, cap: 800, status: 'PAUSED' }, { id: 6, name: 'BTC Yield vault', c: 'BTC', apy: 2.4, lock: 30, min: .005, cap: 60, status: 'ACTIVE' },
+  { id: 7, name: 'TRX Boost', c: 'TRX', apy: 11.5, lock: 14, min: 1000, cap: 2e7, status: 'ACTIVE' }, { id: 8, name: 'ZNX Rewards', c: 'ZNX', apy: 18, lock: 60, min: 100, cap: 5e6, status: 'CLOSED' },
+].map((s, i) => ({ ...s, created: new Date(NOW.getTime() - (400 - i * 40) * DAY), updated: new Date(NOW.getTime() - (20 + i * 3) * DAY) }));
+const stratOf = id => STRATS.find(s => s.id === id);
+const STAKES = (() => {
+  const g = gen(904), AU = AUsers();
+  return Array.from({ length: 220 }, (_, i) => {
+    const s = STRATS[+g.wp({ 0: 26, 1: 18, 2: 14, 3: 12, 4: 5, 5: 9, 6: 10, 7: 6 })], eur = 100 + Math.pow(g.r(), 2.2) * 30000, created = g.ago(s.id === 8 ? 300 : 260);
+    const ends = s.lock ? new Date(created.getTime() + s.lock * DAY) : null, amount = eur / ASSET[s.c].rate;
+    const status = ends && ends < NOW ? 'COMPLETED' : g.r() < .07 ? 'UNBONDING' : s.status === 'CLOSED' ? 'COMPLETED' : 'ACTIVE';
+    const days = ((ends && ends < NOW ? ends : NOW) - created) / DAY;
+    return { id: 61000 - i, uid: g.pk(AU).id, sid: s.id, c: s.c, amount, apy: s.apy, rewards: amount * s.apy / 100 * days / 365, status, created, ends };
+  });
+})();
+const stratStats = s => { const a = STAKES.filter(x => x.sid === s.id && x.status !== 'COMPLETED'); return { tvl: sum(a.map(x => x.amount)) * ASSET[s.c].rate, n: new Set(a.map(x => x.uid)).size, amt: sum(a.map(x => x.amount)) }; };
+const stratToggle = rows => { rows.forEach(s => { if (s.status !== 'CLOSED') { s.status = s.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE'; stamp(s); } }); return rows.length === 1 ? `${rows[0].name} ${rows[0].status === 'ACTIVE' ? 'resumed' : 'paused'}` : `${rows.length} strategies updated`; };
+const lockLbl = d => d ? `${d} days` : 'Flexible';
+page({
+  id: 'strategies', noun: 'strategy', nouns: 'strategies', icon: 'strategy', searchPh: 'Search strategy, asset…',
+  data: () => STRATS, search: s => `${s.name} ${s.c}`,
+  fields: { status: fE('Status', 'activity', STRAT_STATUS, s => s.status), asset: fE('Asset', 'coins', optsOf(Object.fromEntries(ASSETS.filter(a => !a.fiat).map(a => [a.c, a.c]))), s => s.c), term: fE('Term', 'calendar', { flex: { label: 'Flexible' }, lock: { label: 'Locked' } }, s => s.lock ? 'lock' : 'flex') },
+  cols: [K.id(), { k: 'name', l: 'Strategy', on: 1, lock: 1, val: s => s.name.toLowerCase(), cell: s => `<b style="font-weight:500">${esc(s.name)}</b>` }, K.asset(), K.pct('apy', 'APY'), { k: 'lock', l: 'Term', on: 1, cell: s => muted(lockLbl(s.lock)) },
+    { k: 'min', l: 'Min. stake', al: 'r', on: 1, cell: s => numM(fmtAmt(s.min, s.c)) }, { k: 'tvl', l: 'TVL', al: 'r', on: 1, dir: 'desc', val: s => stratStats(s).tvl, cell: s => `<span class="num">${fmtEur(stratStats(s).tvl)}</span>` },
+    { k: 'stakers', l: 'Stakers', al: 'r', on: 1, dir: 'desc', val: s => stratStats(s).n, cell: s => `<span class="num">${fmtInt(stratStats(s).n)}</span>` },
+    { k: 'cap', l: 'Capacity used', al: 'r', on: 1, dir: 'desc', val: s => stratStats(s).amt / s.cap, cell: s => `<span class="num">${(stratStats(s).amt / s.cap * 100).toFixed(1)}%</span>` }, K.status(STRAT_STATUS), K.date('updated', 'Updated', 0), K.date('created', 'Created', 0)],
+  sort: { k: 'tvl', dir: 'desc' },
+  quick: s => s.status !== 'CLOSED' ? { act: 'strat-tog', icon: s.status === 'ACTIVE' ? 'minus' : 'refresh', tip: s.status === 'ACTIVE' ? 'Pause' : 'Resume' } : null,
+  menu: s => s.status !== 'CLOSED' ? [{ act: 'strat-tog', data: { rid: s.id }, icon: s.status === 'ACTIVE' ? 'minus' : 'refresh', label: s.status === 'ACTIVE' ? 'Pause new stakes' : 'Resume' }] : [],
+  bulk: [{ icon: 'minus', label: 'Pause / resume', run: stratToggle }],
+  form: {
+    fields: s => [{ id: 'fsName', label: 'Name', value: s?.name, ph: 'e.g. USDT 30-day lock' }, { id: 'fsAsset', label: 'Asset', value: s?.c || 'USDT', options: ASSETS.filter(a => !a.fiat).map(a => [a.c, `${a.c} · ${a.n}`]) },
+      { id: 'fsApy', label: 'APY, %', value: s?.apy ?? 5, type: 'number' }, { id: 'fsLock', label: 'Lock period, days', value: s?.lock ?? 0, type: 'number', hint: '0 = flexible, withdraw any time.' },
+      { id: 'fsMin', label: 'Minimum stake', value: s?.min ?? 50, type: 'number' }, { id: 'fsCap', label: 'Capacity', value: s?.cap ?? 1e6, type: 'number' }, { id: 'fsStatus', label: 'Status', value: s?.status || 'ACTIVE', options: Object.entries(STRAT_STATUS).map(([k, o]) => [k, o.label]) }],
+    save: s => {
+      const name = fv('fsName'); if (!name) return coBad('#fsName'), false;
+      const v = { name, c: fv('fsAsset'), apy: fnum('fsApy'), lock: Math.round(fnum('fsLock')), min: fnum('fsMin'), cap: fnum('fsCap'), status: fv('fsStatus') };
+      if (s) { Object.assign(s, v); stamp(s); return true; }
+      return { id: Math.max(...STRATS.map(x => x.id)) + 1, ...v, created: new Date(NOW), updated: new Date(NOW) };
+    },
+  },
+  rec: {
+    title: s => s.name, sub: s => `<span>${s.c}</span><span class="faint">·</span><span>${s.apy}% APY</span><span class="faint">·</span><span>${lockLbl(s.lock)}</span>`, badges: s => badge(STRAT_STATUS[s.status]),
+    acts: s => s.status !== 'CLOSED' ? `<button class="btn btn-ghost" data-act="strat-tog" data-rid="${s.id}">${icon(s.status === 'ACTIVE' ? 'minus' : 'refresh', 15)}${s.status === 'ACTIVE' ? 'Pause' : 'Resume'}</button>` : '',
+    sections: s => { const L = STAKES.filter(x => x.sid === s.id).sort((a, b) => b.amount - a.amount).slice(0, 8); return tcard('Largest stakes', `<a class="link-btn" href="#/stakes" style="display:flex;align-items:center;gap:2px;height:auto">All stakes ${icon('chevRight', 14)}</a>`, dtable(['Stake', 'User', 'Amount|r', 'Status', 'Started|r'], L.map(x => [recLink('stakes', x.id, '#' + x.id), userLink(byId(x.uid)), `<span class="num">${fmtAmt(x.amount, x.c)}</span>`, dotCell(STAKE_STATUS[x.status]), muted(rel(x.created))]), emptyBlock('stakes', 'No stakes yet', 'Stakes appear here once users join this strategy.'))); },
+  },
+});
+const unstake = rows => { const o = rows.filter(x => x.status === 'ACTIVE'); o.forEach(x => { x.status = 'UNBONDING'; }); return `${o.length} stake${o.length === 1 ? '' : 's'} moved to unbonding`; };
+page({
+  id: 'stakes', noun: 'stake', nouns: 'stakes', icon: 'stakes', searchPh: 'Search stake ID, user, strategy…',
+  data: () => STAKES, search: x => `${x.id} ${stratOf(x.sid).name} ${byId(x.uid).name} ${byId(x.uid).email}`,
+  fields: { status: fE('Status', 'activity', STAKE_STATUS, x => x.status), strategy: fE('Strategy', 'strategy', Object.fromEntries(STRATS.map(s => [s.id, { label: s.name }])), x => String(x.sid)),
+    asset: fE('Asset', 'coins', optsOf(Object.fromEntries(ASSETS.filter(a => !a.fiat).map(a => [a.c, a.c]))), x => x.c), term: fE('Term', 'calendar', { flex: { label: 'Flexible' }, lock: { label: 'Locked' } }, x => x.ends ? 'lock' : 'flex'), created: fD('Started', x => x.created) },
+  tiles: [allTile('All stakes', L => `${fmtEur(sum(L.filter(x => x.status !== 'COMPLETED').map(x => x.amount * ASSET[x.c].rate)))} staked`), tile('act', 'Active', { key: 'status', values: ['ACTIVE'] }, share),
+    tile('unb', 'Unbonding', { key: 'status', values: ['UNBONDING'] }, () => 'Releasing funds'), tile('done', 'Completed', { key: 'status', values: ['COMPLETED'] }, share), tile('lock', 'Locked', { key: 'term', values: ['lock'] }, share)],
+  cols: [K.id(), K.user(), { k: 'sid', l: 'Strategy', on: 1, val: x => stratOf(x.sid).name, cell: x => esc(stratOf(x.sid).name), kv: x => recLink('strategies', x.sid, stratOf(x.sid).name) }, K.asset(), K.amt('amount', 'Amount'), K.pct('apy', 'APY'),
+    { ...K.amt('rewards', 'Rewards earned'), cell: x => `<span class="num pos">+${fmtAmt(x.rewards, x.c)}</span>` }, K.status(STAKE_STATUS), K.date('created', 'Started'),
+    { k: 'ends', l: 'Ends', al: 'r', on: 1, dir: 'desc', val: x => x.ends ? x.ends.getTime() : 9e15, cell: x => x.ends ? `<span class="muted">${fmtDay(x.ends)}</span>` : '<span class="faint">Flexible</span>' }],
+  sort: { k: 'created', dir: 'desc' },
+  quick: x => ({ act: 'open-user', icon: 'user', tip: 'Open user', data: { id: x.uid } }),
+  menu: x => [...(x.status === 'ACTIVE' ? [{ act: 'stake-un', data: { rid: x.id }, icon: 'minus', label: 'Force unstake' }] : []), { act: 'open-user', data: { id: x.uid }, icon: 'user', label: 'Open user' }],
+  bulk: [{ icon: 'minus', label: 'Force unstake', run: unstake }],
+  rec: { title: x => `Stake #${x.id}`, sub: x => `${userLink(byId(x.uid))}<span class="faint">·</span>${recLink('strategies', x.sid, stratOf(x.sid).name)}`, badges: x => badge(STAKE_STATUS[x.status]) + `<span class="badge t-neutral">${x.apy}% APY</span>`,
+    acts: x => x.status === 'ACTIVE' ? `<button class="btn btn-ghost" data-act="stake-un" data-rid="${x.id}">${icon('minus', 15)}Force unstake</button>` : '',
+    events: x => [x.ends && x.ends < NOW && { ic: 'check', t: 'Completed', s: fmtDateTime(x.ends), when: rel(x.ends) }, { ic: 'plus', t: `Staked ${fmtAmt(x.amount, x.c)}`, s: fmtDateTime(x.created), when: rel(x.created) }].filter(Boolean) },
+});
+const runPayout = rows => {
+  const o = rows.filter(p => ['SCHEDULED', 'FAILED'].includes(p.status)); o.forEach(p => { p.status = 'PROCESSING'; });
+  setTimeout(() => { o.forEach(p => { p.status = 'PAID'; p.paid = new Date(NOW); }); if (S.route === 'payout-pools') pgRefresh(); if (o.length) toast(`${o.length} payout${o.length > 1 ? 's' : ''} paid`, 'payout'); }, 1600);
+  return o.length ? `${o.length} payout${o.length > 1 ? 's' : ''} started` : 'Nothing to run in the selection';
+};
+page({
+  id: 'payout-pools', noun: 'payout pool', nouns: 'payout pools', icon: 'payout', searchPh: 'Search pool ID, strategy, period…',
+  data: () => {
+    const g = gen(905), act = STRATS.filter(s => s.status !== 'CLOSED');
+    return Array.from({ length: 42 }, (_, i) => {
+      const s = act[i % act.length], wk = 44 - Math.floor(i / act.length), at = new Date(NOW.getTime() + (3 - Math.floor(i / act.length) * 7 + i % act.length * .1) * DAY);
+      const status = at > NOW ? 'SCHEDULED' : i === act.length + 1 ? 'PROCESSING' : g.r() < .06 ? 'FAILED' : 'PAID', st = stratStats(s);
+      return { id: 880 - i, sid: s.id, c: s.c, period: `Week ${wk}, 2026`, rewards: st.amt * s.apy / 100 / 52 * (.9 + g.r() * .2), recipients: Math.max(1, Math.round(st.n * (.9 + g.r() * .1))), status, at, paid: status === 'PAID' ? new Date(at.getTime() + 36e5) : null };
+    });
+  },
+  search: p => `${p.id} ${stratOf(p.sid).name} ${p.period}`,
+  fields: { status: fE('Status', 'activity', POOL_STATUS, p => p.status), strategy: fE('Strategy', 'strategy', Object.fromEntries(STRATS.map(s => [s.id, { label: s.name }])), p => String(p.sid)), at: fD('Scheduled', p => p.at) },
+  tiles: [allTile('All pools', L => `${L.filter(p => p.status === 'PAID').length} paid`), tile('sch', 'Scheduled', { key: 'status', values: ['SCHEDULED'] }, L => { const n = L.filter(p => p.status === 'SCHEDULED').sort((a, b) => a.at - b.at)[0]; return n ? `next ${fmtDay(n.at, false)}` : 'None'; }),
+    tile('proc', 'Processing', { key: 'status', values: ['PROCESSING'] }, () => 'On-chain'), tile('paid', 'Paid', { key: 'status', values: ['PAID'] }, share), tile('fail', 'Failed', { key: 'status', values: ['FAILED'] }, () => 'Retry needed')],
+  cols: [K.id(), { k: 'sid', l: 'Strategy', on: 1, val: p => stratOf(p.sid).name, cell: p => esc(stratOf(p.sid).name), kv: p => recLink('strategies', p.sid, stratOf(p.sid).name) }, K.asset('c', 'Asset'), K.text('period', 'Period'),
+    { ...K.amt('rewards', 'Rewards') }, K.num('recipients', 'Recipients'), K.status(POOL_STATUS), K.when('at', 'Scheduled'), K.date('paid', 'Paid', 0)],
+  sort: { k: 'at', dir: 'desc' },
+  quick: p => ['SCHEDULED', 'FAILED'].includes(p.status) ? { act: 'pool-run', icon: 'send', tip: p.status === 'FAILED' ? 'Retry payout' : 'Run now' } : null,
+  menu: p => ['SCHEDULED', 'FAILED'].includes(p.status) ? [{ act: 'pool-run', data: { rid: p.id }, icon: 'send', label: p.status === 'FAILED' ? 'Retry payout' : 'Run now' }] : [],
+  bulk: [{ icon: 'send', label: 'Run now', run: runPayout }],
+  rec: { title: p => `${stratOf(p.sid).name} · ${p.period}`, sub: p => `<span class="num">${fmtAmt(p.rewards, p.c)}</span><span class="faint">·</span><span>${p.recipients} recipients</span>`, badges: p => badge(POOL_STATUS[p.status]),
+    acts: p => ['SCHEDULED', 'FAILED'].includes(p.status) ? `<button class="btn btn-dark" data-act="pool-run" data-rid="${p.id}">${icon('send', 15)}${p.status === 'FAILED' ? 'Retry payout' : 'Run now'}</button>` : '',
+    events: p => [p.paid && { ic: 'check', t: 'Paid out', s: fmtDateTime(p.paid), when: rel(p.paid) }, { ic: 'calendar', t: 'Scheduled', s: fmtDateTime(p.at), when: p.at < NOW ? rel(p.at) : 'upcoming' }].filter(Boolean) },
 });
 
 /* ── Risk · KYT rules ── */
@@ -4139,6 +4304,8 @@ page({
   id: 'card-products', noun: 'card product', nouns: 'card products', icon: 'cardProduct', searchPh: 'Search name, provider, BIN…',
   data: () => { const g = gen(906); CARD_PRODUCTS.forEach((p, i) => p.status || Object.assign(p, { issue: p.kind === 'physical' ? g.pk([25, 35, 50]) : g.pk([0, 5, 10]), monthly: p.kind === 'physical' ? 2.5 : g.pk([0, 1]), bin: (p.cur === 'USD' ? '5' : '4') + g.int(10000, 99999), status: i > 20 ? 'DRAFT' : g.r() < .1 ? 'RETIRED' : 'ACTIVE', issued: p.id === 11 || p.id === 12 ? USERS.reduce((s, u) => s + (u.cards ? 1 : 0), 0) * (p.id === 11 ? 1 : .4) | 0 : g.int(0, 900), created: new Date(NOW.getTime() - (520 - i * 15) * DAY), updated: new Date(NOW.getTime() - g.int(2, 90) * DAY) })); return CARD_PRODUCTS; },
   search: p => `${p.id} ${p.name} ${p.provider} ${p.bin}`,
+  tiles: [allTile('All products', L => `${fmtInt(sum(L.map(p => p.issued || 0)))} cards issued`), tile('act', 'Active', { key: 'status', values: ['ACTIVE'] }, share), tile('dr', 'Draft', { key: 'status', values: ['DRAFT'] }, () => 'Not offered yet'),
+    tile('ret', 'Retired', { key: 'status', values: ['RETIRED'] }, () => 'No new cards'), tile('phy', 'Physical', { key: 'kind', values: ['physical'] }, share)],
   fields: { status: fE('Status', 'activity', PROD_STATUS, p => p.status), provider: fE('Provider', 'folder', optsOf(Object.fromEntries(CARD_PROVIDERS.map(x => [x, x]))), p => p.provider), kind: fE('Card type', 'card', { virtual: { label: 'Virtual' }, physical: { label: 'Physical' } }, p => p.kind), cur: fE('Currency', 'coins', { EUR: { label: 'EUR' }, USD: { label: 'USD' } }, p => p.cur) },
   cols: [K.id(), { k: 'name', l: 'Name', on: 1, lock: 1, val: p => p.name.toLowerCase(), cell: p => `<b style="font-weight:500">${esc(p.name)}</b>` }, K.text('provider', 'Provider'), { k: 'kind', l: 'Card type', on: 1, cell: p => cap(p.kind) }, { ...K.text('cur', 'Currency'), cell: p => curCell(p.cur) },
     { k: 'issue', l: 'Issue fee', al: 'r', on: 1, dir: 'desc', cell: p => p.issue ? `<span class="num">${money(p.issue, p.cur)}</span>` : '<span class="faint">Free</span>' }, { k: 'monthly', l: 'Monthly fee', al: 'r', on: 1, dir: 'desc', cell: p => p.monthly ? `<span class="num">${money(p.monthly, p.cur)}</span>` : '<span class="faint">Free</span>' },
@@ -4165,6 +4332,8 @@ page({
   id: 'iban-products', noun: 'IBAN product', nouns: 'IBAN products', icon: 'ibanProduct', searchPh: 'Search name, provider…',
   data: () => { IBAN_PRODUCTS.forEach((p, i) => p.status || Object.assign(p, { status: 'ACTIVE', accounts: USERS.reduce((s, u) => s + ud(u).ibans.filter(b => b.productId === p.id).length, 0) + i * 7, created: new Date(NOW.getTime() - (480 - i * 30) * DAY), updated: new Date(NOW.getTime() - (5 + i * 11) * DAY) })); return IBAN_PRODUCTS; },
   search: p => `${p.id} ${p.name} ${p.provider} ${p.cur}`,
+  tiles: [allTile('All products', L => `${fmtInt(sum(L.map(p => p.accounts || 0)))} accounts`), tile('act', 'Active', { key: 'status', values: ['ACTIVE'] }, share), tile('dr', 'Draft', { key: 'status', values: ['DRAFT'] }, () => 'Not offered yet'),
+    tile('ret', 'Retired', { key: 'status', values: ['RETIRED'] }, () => 'No new accounts'), tile('biz', 'Business', { key: 'type', values: ['Business'] }, share)],
   fields: { status: fE('Status', 'activity', PROD_STATUS, p => p.status), provider: fE('Provider', 'bank', { 'Banking Circle': { label: 'Banking Circle' }, 'Clear Junction': { label: 'Clear Junction' } }, p => p.provider), type: fE('Type', 'user', { Personal: { label: 'Personal' }, Business: { label: 'Business' } }, p => p.type) },
   cols: [K.id(), { k: 'name', l: 'Name', on: 1, lock: 1, val: p => p.name.toLowerCase(), cell: p => `<b style="font-weight:500">${esc(p.name)}</b>` }, K.text('provider', 'Provider'), { ...K.text('cur', 'Currency'), cell: p => curCell(p.cur) }, K.muted('type', 'Type'),
     { k: 'price', l: 'Opening fee', al: 'r', on: 1, dir: 'desc', cell: p => p.price ? `<span class="num">${money(p.price, p.cur)}</span>` : '<span class="faint">Free</span>' }, { k: 'fee', l: 'Monthly fee', al: 'r', on: 1, dir: 'desc', cell: p => `<span class="num">${money(p.fee, p.cur)}</span>` },
@@ -4290,6 +4459,7 @@ const ADMIN_STATUS = { ACTIVE: { label: 'Active', tone: 'success' }, INVITED: { 
 const PERM_GROUPS = [
   ['Customers', [['users.view', 'View users'], ['users.edit', 'Edit users'], ['users.block', 'Block users'], ['users.impersonate', 'Login as user'], ['companies.manage', 'Manage companies'], ['kyc.review', 'Review KYC and documents']]],
   ['Financial', [['tx.view', 'View transactions'], ['confirmations.decide', 'Approve confirmations'], ['balances.adjust', 'Adjust balances'], ['cards.manage', 'Freeze and manage cards'], ['iban.manage', 'Manage IBAN accounts']]],
+  ['Staking', [['staking.view', 'View staking'], ['staking.manage', 'Manage strategies and payouts']]],
   ['Risk', [['kyt.manage', 'Edit KYT rules'], ['reserves.view', 'View reserves']]],
   ['Settings', [['products.manage', 'Edit products and levels'], ['settings.manage', 'Edit currencies, markets and lists']]],
   ['Admin', [['admins.manage', 'Manage administrators'], ['roles.manage', 'Manage roles'], ['logs.view', 'View audit logs']]],
@@ -4299,7 +4469,7 @@ const ROLES = [
   [1, 'Super admin', 'Full access, including roles and administrators', ALL_PERMS],
   [2, 'Compliance officer', 'KYC, documents, confirmations and KYT', ['users.view', 'users.edit', 'users.block', 'companies.manage', 'kyc.review', 'tx.view', 'confirmations.decide', 'kyt.manage', 'reserves.view', 'logs.view']],
   [3, 'Support agent', 'Day-to-day user support', ['users.view', 'users.edit', 'users.impersonate', 'tx.view', 'cards.manage']],
-  [4, 'Finance', 'Balances, payouts, IBAN and reserves', ['users.view', 'tx.view', 'confirmations.decide', 'balances.adjust', 'iban.manage', 'reserves.view']],
+  [4, 'Finance', 'Balances, payouts, IBAN and reserves', ['users.view', 'tx.view', 'confirmations.decide', 'balances.adjust', 'iban.manage', 'staking.view', 'staking.manage', 'reserves.view']],
   [5, 'Risk analyst', 'Monitoring and KYT rules', ['users.view', 'users.block', 'tx.view', 'kyt.manage', 'reserves.view', 'logs.view']],
   [6, 'Read-only auditor', 'Can see everything, change nothing', ALL_PERMS.filter(p => /view$/.test(p))],
 ].map(([id, name, desc, perms], i) => ({ id, name, desc, perms: new Set(perms), created: new Date(NOW.getTime() - (800 - i * 60) * DAY), updated: new Date(NOW.getTime() - (6 + i * 17) * DAY) }));
@@ -4425,6 +4595,23 @@ function dashTopbar() {
   return `${D.range === false ? '' : dpButton(S.range, 'dash-range')}<button class="btn btn-ghost tb-hide-sm" data-act="toast" data-msg="Report exported">${icon('download', 15)}Export</button>`;
 }
 
+DASHES.staking = {
+  kpis: d => { const tvl = sum(STRATS.map(s => stratStats(s).tvl)), stakers = new Set(STAKES.filter(x => x.status !== 'COMPLETED').map(x => x.uid)).size, rw = series(d, 1400, 'srw');
+    return [{ l: 'Total value locked', v: fmtEur(tvl), d: 5.8, s: cumulative(series(d, 100, 'stvl')) }, { l: 'Active stakes', v: fmtInt(STAKES.filter(x => x.status === 'ACTIVE').length), d: 3.1, s: series(d, 9, 'sact') },
+      { l: 'Stakers', v: fmtInt(stakers), d: 2.4, s: series(d, 5, 'sst') }, { l: 'Rewards paid', v: fmtEur(sum(rw)), d: pct(sum(rw), sum(series(d, 1300, 'srwp'))), s: rw },
+      { l: 'Average APY', v: (sum(STRATS.filter(s => s.status === 'ACTIVE').map(s => s.apy * stratStats(s).tvl)) / tvl).toFixed(2) + '%', d: -.2, unit: 'pp' }]; },
+  cards: d => { const act = STRATS.map(s => [s, stratStats(s)]).filter(([, x]) => x.tvl).sort((a, b) => b[1].tvl - a[1].tvl), cols = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)', 'var(--c5)', 'var(--neutral)'];
+    const byAsset = Object.entries(act.reduce((o, [s, x]) => (o[s.c] = (o[s.c] || 0) + x.tvl, o), {})).sort((a, b) => b[1] - a[1]);
+    const next = pgData(PAGES['payout-pools']).filter(p => p.status === 'SCHEDULED').sort((a, b) => a.at - b.at).slice(0, 4);
+    const grow = cumulative(series(d, 1, 'tvl')), top = grow[grow.length - 1] || 1, tvl = sum(act.map(([, x]) => x.tvl)); // chart ends at today’s real TVL
+    const tvlS = grow.map(v => tvl * (.86 + .14 * v / top)), tvlP = tvlS.map((v, i) => v * (.93 + i / tvlS.length * .01));
+    return chartCard(8, 'Total value locked', { dates: d.dates, unit: d.unit, fmt: v => '€' + compact(v), last: 1, series: [{ l: 'This period', data: tvlS, col: 'var(--c1)', area: 1 }, { l: 'Previous', data: tvlP, col: 'var(--prev)', dash: 1 }] })
+      + dcard(4, 'TVL by strategy', ctag('Now'), barRows(act.map(([s, x]) => [esc(s.name), x.tvl]), v => '€' + compact(v)))
+      + dcard(4, 'Assets staked', ctag('Share of TVL'), mixRows(byAsset.map(([c, v], i) => [c, v, cols[i] || 'var(--neutral)']), v => '€' + compact(v)))
+      + dcard(4, 'Upcoming payouts', `<a class="link-btn" href="#/payout-pools" style="display:flex;align-items:center;gap:2px;height:auto">All ${icon('chevRight', 14)}</a>`, next.map(p => `<button class="rk t-info" data-act="route" data-arg="payout-pools/${p.id}"><span class="rk-ic">${icon('payout', 16)}</span><span class="rk-l"><div>${esc(stratOf(p.sid).name)}</div><div>${fmtDateTime(p.at)}</div></span><span class="rk-v">${fmtAmt(p.rewards, p.c)}</span><span class="rk-go">${icon('chevRight', 16)}</span></button>`).join('') || emptyBlock('payout', 'Nothing scheduled', ''))
+      + dcard(4, 'Largest stakes', `<a class="link-btn" href="#/stakes" style="display:flex;align-items:center;gap:2px;height:auto">All ${icon('chevRight', 14)}</a>`, [...STAKES].filter(x => x.status === 'ACTIVE').sort((a, b) => b.amount * ASSET[b.c].rate - a.amount * ASSET[a.c].rate).slice(0, 6).map(x => `<div class="su" data-act="route" data-arg="stakes/${x.id}"><div class="sm"><div>${esc(byId(x.uid).name || byId(x.uid).email)}</div><div>${esc(stratOf(x.sid).name)}</div></div><span class="num">${fmtEur(x.amount * ASSET[x.c].rate)}</span></div>`).join(''));
+  },
+};
 /* ── Products · Card orders (physical cards on their way to the cardholder) ── */
 const ORDER_STATUS = { NEW: { label: 'New', tone: 'warning' }, FAILED: { label: 'Issue failed', tone: 'error' }, PRODUCTION: { label: 'In production', tone: 'info' }, SHIPPED: { label: 'Shipped', tone: 'info' }, DELIVERED: { label: 'Delivered', tone: 'success' }, CANCELLED: { label: 'Cancelled', tone: 'neutral' } };
 const ORDER_NEXT = { NEW: 'PRODUCTION', FAILED: 'PRODUCTION', PRODUCTION: 'SHIPPED', SHIPPED: 'DELIVERED' }, ORDER_STEP = { NEW: 'Send to production', FAILED: 'Retry issue', PRODUCTION: 'Mark as shipped', SHIPPED: 'Mark as delivered' };
@@ -4587,6 +4774,7 @@ Object.assign(ACT, {
   'rec-step': a => stepRec(+a.dataset.d),
   'ld-display': a => openPop(a, listDisplayPop(), { align: 'right', width: 380, kind: 'ldisplay' }),
   'ld-col': a => { const X = colCtx(); S.tcols[X.t] = withCol(X.t, X.cols, a.dataset.k); store.set('nsc.tcols2', S.tcols); refreshLD(); },
+  'ld-cols-reset': () => { resetTcols(colCtx().t); refreshLD(); toast('Columns reset to default', 'columns'); },
   'ld-reset-colw': () => { const X = colCtx(); Object.keys(X.w).forEach(k => delete X.w[k]); store.set(X.key, X.w); refreshLD(); toast('Column widths fitted to this page', 'columns'); },
   // page-specific actions
   'conf-ok': doRows(rows => confDecide(rows, true)), 'conf-no': doRows(rows => confDecide(rows, false), 'ban'),
@@ -4594,6 +4782,9 @@ Object.assign(ACT, {
   'cc-fetch': doRows(rows => `CreditCo KYC status: ${CC_KYC[ccKyc(rows[0])].label.toLowerCase()}`, 'refresh'),
   'cc-req': doRows(rows => { const C = rows[0].C; C.status = 'ACCESS_REQUESTED'; C.created ||= new Date(NOW); C.updated = new Date(NOW); return 'Access requested from CreditCo'; }, 'key'),
   'tx-retry': doRows(rows => { rows[0].status = 'COMPLETED'; rows[0].updated = new Date(NOW); return `Transaction #${rows[0].id} completed on retry`; }, 'refresh'),
+  'iban-close': doRows(ibanClose, 'ban'),
+  'card-tog': doRows(rows => cardFreeze(rows, !rows[0].frozen), 'lock'),
+  'strat-tog': doRows(stratToggle), 'stake-un': doRows(unstake, 'minus'), 'pool-run': doRows(runPayout, 'send'),
   'ord-next': doRows(orderNext), 'ord-cancel': doRows(rows => { rows[0].status = 'CANCELLED'; stamp(rows[0]); return `Order #${rows[0].id} cancelled`; }, 'ban'),
   'chk-ok': doRows(rows => checkDecide(rows, true)), 'chk-no': doRows(rows => checkDecide(rows, false), 'ban'),
   'net-tog': doRows(rows => { const n = rows[0]; n.status = n.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE'; n.updated = new Date(NOW); return `${n.name} ${n.status === 'ACTIVE' ? 'enabled' : 'disabled'}`; }),
