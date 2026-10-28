@@ -594,6 +594,19 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .sel-btn:hover{background:var(--hover);border-color:var(--line)}
 .sel-btn.dirty{background:var(--brand-50);border-color:var(--brand-100)}
 .sel-btn>.i{color:var(--ink-3)}
+/* inline editing: values look plain until hovered or focused; a changed field tints like the Users dropdowns */
+.sel-btn{max-width:100%;min-width:0} .sel-btn .ie-v{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.kv-r:has(.ie-box)>span:first-child{flex:none;white-space:nowrap}
+.ie-box{display:inline-flex;align-items:center;gap:6px;flex:0 1 250px;min-width:0;height:32px;padding:0 10px;margin-right:-10px;border-radius:9px;border:1px solid transparent;cursor:text;transition:background .1s,border-color .1s}
+.ie-box:hover{background:var(--hover);border-color:var(--line)}
+.ie-box:focus-within{background:var(--surface);border-color:var(--brand-line);box-shadow:0 0 0 3px var(--brand-50)}
+.ie-box.dirty{background:var(--brand-50);border-color:var(--brand-100)}
+.ie-box.err,.sel-btn.err{border-color:var(--error);box-shadow:0 0 0 3px var(--error-bg)}
+.ie-in{flex:1;min-width:0;width:100%;border:0;outline:0;background:transparent;font:inherit;font-weight:500;color:var(--ink);text-align:right;padding:0}
+.ie-in::placeholder{color:var(--ink-3);font-weight:400}
+.ie-sfx{color:var(--ink-3);font-size:12.5px;flex:none}
+.sw-t.dirty{box-shadow:0 0 0 3px var(--brand-100)}
+.ie-cal{padding:6px 6px 4px}
 .ver-ic{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:none}
 .ver-ic.ok{background:var(--success-bg);color:var(--success-ink)}
 .ver-ic.no{background:var(--neutral-bg);color:var(--ink-3)}
@@ -1726,7 +1739,7 @@ function route() {
   const uid = r === 'users' && sub ? +sub : null;
   if (uid !== S.userId) { S.draft = {}; S.tx = txDefault(); S.openWallet = null; }
   if (!uid) S.userTab = 'overview';
-  const cid = r === 'companies' && sub && sub !== 'access' ? +sub : null;
+  const cid = r === 'companies' && sub && sub !== 'access' ? +sub : null, prevRoute = S.route;
   if (cid !== S.coId) { S.coDraft = {}; S.brandDraft = {}; S.coUserQ = ''; S.coUserPage = 1; S.curProv = ''; }
   if (!cid) S.coTab = 'overview';
   if (r !== S.route && !S._keepFilters) resetLists();
@@ -1735,7 +1748,9 @@ function route() {
   const sec = curSec(); if (sec && S.navClosed.delete(sec.label)) store.set('nsc.navClosed', [...S.navClosed]); // never hide the current page
   if (sec) S.secLast[sec.label] = '#/' + r + (S.coView === 'access' ? '/access' : ''); // a record reopens as its list
   S.navPeek.clear();
-  S.recId = PAGES[r] && sub ? decodeURIComponent(sub) : null;
+  const rid = PAGES[r] && sub ? decodeURIComponent(sub) : null;
+  if (rid !== S.recId || r !== prevRoute) S.pgDraft = {};
+  S.recId = rid;
   closePop(); $('#app').classList.remove('mobile-open'); $('#tt').classList.remove('show');
   renderSidebar(); renderTopbar();
   $('#main').scrollTop = 0;
@@ -2259,11 +2274,6 @@ function stepUser(dir) {
   const l = navList(), i = l.findIndex(u => u.id === S.userId), nx = l[i + dir];
   if (nx) location.hash = '#/users/' + nx.id;
 }
-function selBtn(field, val) {
-  const opts = { status: STATUS, level: LEVEL, country: ctryOpts, risk: RISK }[field], o = opts[val || 'none'];
-  const content = field === 'status' ? statusCell(val) : field === 'risk' ? riskCell(val) : field === 'country' ? (val ? `<span class="flag">${o.flag}</span>${o.label}` : '<span class="faint">Not set</span>') : o.label;
-  return `<button class="sel-btn ${field in S.draft ? 'dirty' : ''}" data-act="u-select" data-field="${field}">${content}${icon('chevsUD', 14)}</button>`;
-}
 /* ── Per-user data: generated once from the user's id, then changed by actions on the page ── */
 const ASSETS = [
   { c: 'BTC', n: 'Bitcoin', s: '₿', col: '#FC7C1A', rate: 61200, net: 'Bitcoin', dp: 6 },
@@ -2464,16 +2474,13 @@ function renderUserPage() {
 }
 
 function userTab(u, d, D) {
-  const kv = (l, v) => `<div class="kv-r"><span>${l}</span>${v}</div>`;
+  const kv = (l, v) => `<div class="kv-r"><span>${l}</span>${v}</div>`, X = edCtx();
   const ver = (l, ok, v, extra = '') => `<div class="kv-r"><span class="ver-l"><span class="ver-ic ${ok ? 'ok' : 'no'}">${icon(ok ? 'check' : 'minus', 12, 2.5)}</span><span style="color:var(--ink)">${l}</span></span><span style="display:flex;align-items:center;gap:8px">${extra}${v}</span></div>`;
   switch (S.userTab) {
     case 'overview': return `
       <div class="card"><div class="card-h"><span class="card-t">Profile</span></div><div class="kv2 card-b">
-        ${kv('Name', d.name ? `<b>${esc(d.name)}</b>` : '<span class="faint">No profile yet</span>')}${kv('Email', `<span>${esc(d.email)}</span>`)}
-        ${kv('Status', selBtn('status', d.status))}${kv('Level', selBtn('level', d.level))}
-        ${kv('Risk level', selBtn('risk', d.risk))}${kv('Residency', selBtn('country', d.country))}
-        ${kv('Type', `<b>${TYPE[d.type].label}</b>`)}${kv('Company', `<a class="lnk" href="#/companies/${d.companyId}">${esc(companyOf(d).name)} #${d.companyId}</a>`)}
-        ${kv('Language', `<b>${d.lang}</b>`)}${kv('Invited by', u.invitedBy ? `<span class="num">#${u.invitedBy}</span>` : dash)}
+        ${['name', 'email', 'status', 'level', 'risk', 'country', 'type'].map(k => kv(U_EDIT[k].l, edField(X, k))).join('')}${kv('Company', `<a class="lnk" href="#/companies/${d.companyId}">${esc(companyOf(d).name)} #${d.companyId}</a>`)}
+        ${kv('Language', edField(X, 'lang'))}${kv('Invited by', u.invitedBy ? `<span class="num">#${u.invitedBy}</span>` : dash)}
       </div></div>
       <div class="card"><div class="card-h"><span class="card-t">Verification</span><button class="link-btn" data-act="u-tab" data-v="verification" style="height:auto;display:flex;align-items:center;gap:2px">Details ${icon('chevRight', 14)}</button></div><div class="kv2 card-b">
         ${ver('Email', d.emailVerified, `<span class="${d.emailVerified ? '' : 'faint'}">${d.emailVerified ? 'Verified' : 'Not verified'}</span>`, d.emailVerified ? '' : `<button class="link-btn" data-act="toast" data-msg="Verification email sent">Resend</button>`)}
@@ -2719,6 +2726,101 @@ function adjSubmit() {
       toast(`${dir > 0 ? 'Credited' : 'Debited'} ${fmtAmt(amt, c)}${fee ? ` · fee ${fmtAmt(fee, c)}` : ''}`); closeModal(); renderUserPage(); renderTopbar(); });
   }
 }
+/* ════════════════════════════ Inline editing ════════════════════════════
+   Record pages (a user, a company, any PAGES record) edit their fields in place: text, number, dropdown, multi-select, date or switch.
+   Changes stage in the page's draft and tint the field; the floating bar below saves or discards them together, after every changed field passes its checks.
+   Field spec: { t: 'text'|'num'|'sel'|'multi'|'date'|'bool', l?, opts?, none?, num?, ph?, sfx?, up?, req?, min?, valid?(v, r) → message, get?(r), set?(r, v), when?(r), show?(v) } */
+const edCtx = () => S.route === 'users' && S.userId ? { r: byId(S.userId), draft: S.draft, spec: U_EDIT, redraw: renderUserPage }
+  : S.route === 'companies' && S.coId ? { r: coById(S.coId), draft: S.coDraft, spec: CO_EDIT, redraw: renderCompanyPage }
+  : pg()?.edit && S.recId && recOf() ? { r: recOf(), draft: S.pgDraft, spec: pg().edit, redraw: renderRec, P: pg() } : null;
+// options come as { key: { label, tone?, flag? } }, { key: 'Label' }, [[key, label]] or [value]; a function gets the record. Default: the page's filter options.
+function edOpts(X, k) {
+  let o = X.spec[k].opts; if (typeof o === 'function') o = o(X.r); o ||= X.P?.fields[k]?.options || {};
+  return Array.isArray(o) ? o.map(x => Array.isArray(x) ? [String(x[0]), { label: x[1] }] : [String(x), { label: String(x) }])
+    : Object.entries(o).map(([v, x]) => [v, typeof x === 'string' ? { label: x } : x]);
+}
+const edGet = (X, k) => { const f = X.spec[k]; return f.get ? f.get(X.r) : X.r[k]; };
+const edVal = (X, k) => k in X.draft ? X.draft[k] : edGet(X, k);
+const edSame = v => JSON.stringify(Array.isArray(v) ? [...v].sort() : v instanceof Date ? v.getTime() : typeof v === 'string' ? v.trim() || null : v ?? null);
+function edSet(X, k, v) { if (edSame(v) === edSame(edGet(X, k))) delete X.draft[k]; else X.draft[k] = v; }
+const edLook = o => `${o.flag ? `<span class="flag">${o.flag}</span>` : o.tone ? `<i class="dot t-${o.tone}"></i>` : ''}<span class="ie-v">${esc(o.label)}</span>`;
+function edMultiInner(X, k) {
+  const on = new Set((edVal(X, k) || []).map(String)), L = edOpts(X, k).filter(([v]) => on.has(v)).map(([, o]) => o.label);
+  return `<span class="ie-v ${L.length ? '' : 'faint'}">${L.length ? esc(L.slice(0, 2).join(', ')) + (L.length > 2 ? ` <span class="faint">+${L.length - 2}</span>` : '') : 'None'}</span>${icon('chevsUD', 14)}`;
+}
+// The control for one field, or null when the spec says this record can't change it (the caller then shows the plain value)
+function edField(X, k) {
+  const f = X.spec[k]; if (!f || (f.when && !f.when(X.r))) return null;
+  const v = edVal(X, k), dirty = k in X.draft ? 'dirty' : '';
+  switch (f.t) {
+    case 'text': case 'num': return `<span class="ie-box ${dirty}"><input class="ie-in" data-ie="${k}" value="${esc(v ?? '')}" placeholder="${esc(f.ph || 'Empty')}" ${f.t === 'num' ? 'inputmode="decimal"' : ''} autocomplete="off" spellcheck="false" aria-label="${esc(f.l || k)}">${f.sfx ? `<span class="ie-sfx">${f.sfx}</span>` : ''}</span>`;
+    case 'sel': { const o = edOpts(X, k).find(([x]) => x === String(v ?? ''));
+      return `<button class="sel-btn ${dirty}" data-act="ie-sel" data-ie="${k}">${f.show && v != null ? f.show(v) : o ? edLook(o[1]) : `<span class="faint">${f.none || 'Not set'}</span>`}${icon('chevsUD', 14)}</button>`; }
+    case 'multi': return `<button class="sel-btn ${dirty}" data-act="ie-multi" data-ie="${k}">${edMultiInner(X, k)}</button>`;
+    case 'date': return `<button class="sel-btn ${dirty}" data-act="ie-date" data-ie="${k}">${icon('calendar', 14)}<span class="ie-v">${v ? fmtDateTime(v) : '<span class="faint">Not set</span>'}</span>${icon('chevsUD', 14)}</button>`;
+    case 'bool': return `<button class="sw-t ${v ? 'on' : ''} ${dirty}" data-act="ie-bool" data-ie="${k}" aria-pressed="${!!v}" aria-label="${esc(f.l || k)}"></button>`;
+  }
+}
+function edInput(t) {
+  const X = edCtx(); if (!X) return;
+  const k = t.dataset.ie, f = X.spec[k], box = t.closest('.ie-box'); let v = t.value;
+  if (f.up) { const at = t.selectionStart; t.value = v = v.toUpperCase(); t.setSelectionRange(at, at); }
+  if (f.t === 'num') { const n = +v.trim().replace(',', '.'); v = v.trim() === '' ? null : isNaN(n) ? v : n; }
+  edSet(X, k, v); box.classList.toggle('dirty', k in X.draft); box.classList.remove('err'); renderFloat();
+}
+// Esc in a field puts its saved value back
+function edRevert(t) { const X = edCtx(), k = t.dataset.ie; delete X.draft[k]; t.value = edGet(X, k) ?? ''; t.closest('.ie-box').classList.remove('dirty', 'err'); renderFloat(); }
+const edPopList = (X, k, multi) => {
+  const f = X.spec[k], cur = multi ? new Set((edVal(X, k) || []).map(String)) : new Set([String(edVal(X, k) ?? '')]);
+  return [...(f.none && !multi ? [['', { label: f.none }]] : []), ...edOpts(X, k)].map(([v, o]) => `<button class="pi" data-act="${multi ? 'ie-mtog' : 'ie-pick'}" data-ie="${k}" data-v="${esc(v)}">${o.flag ? `<span class="flag">${o.flag}</span>` : o.tone ? `<i class="dot t-${o.tone}"></i>` : ''}<span class="pl">${esc(o.label)}</span>${cur.has(v) ? `<span class="chk">${icon('check', 15, 2)}</span>` : ''}</button>`).join('');
+};
+function edOpenList(a, multi) {
+  const X = edCtx(), k = a.dataset.ie, long = edOpts(X, k).length > 10;
+  openPop(a, `${long ? `<div class="pop-search">${icon('search', 14)}<input id="ieQ" placeholder="Search…" autocomplete="off"></div>` : ''}<div class="pop-list" id="ieList">${edPopList(X, k, multi)}</div>`,
+    { align: 'right', width: 250, kind: multi ? 'iemulti' : 'iesel', onMount: p => $('#ieQ', p)?.focus(), onClose: multi ? () => { const Y = edCtx(); Y?.r === X.r && Y.redraw(); } : null }); // the field and the bar catch up once the list closes
+}
+const edFilterList = q => $$('#ieList .pi').forEach(p => p.hidden = !!q && !p.textContent.toLowerCase().includes(q.toLowerCase()));
+// Single-date calendar for date fields
+let EDC = null;
+function edCalHTML() {
+  const X = edCtx(), v = edVal(X, EDC.k), f = X.spec[EDC.k], min = f.min?.(X.r), y = EDC.view.getFullYear(), m = EDC.view.getMonth();
+  const lead = (new Date(y, m, 1).getDay() + 6) % 7, days = new Date(y, m + 1, 0).getDate();
+  const cells = Array.from({ length: lead }, () => '<span></span>').concat(Array.from({ length: days }, (_, i) => { const d = new Date(y, m, i + 1);
+    return `<button class="dp-day ${sameDay(d, NOW) ? 'today' : ''} ${v && sameDay(d, v) ? 'start' : ''}" data-act="ie-day" data-ts="${d.getTime()}" ${min && d < sod(min) ? 'disabled' : ''}>${i + 1}</button>`; }));
+  return `<div class="ie-cal"><div class="dp-h"><button class="ghost-ic" data-act="ie-cal-nav" data-d="-1" aria-label="Previous">${icon('chevLeft', 16)}</button><b>${EDC.view.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</b><button class="ghost-ic" data-act="ie-cal-nav" data-d="1" aria-label="Next">${icon('chevRight', 16)}</button></div>
+    <div class="dp-grid">${['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(w => `<span class="dp-w">${w}</span>`).join('')}${cells.join('')}</div></div>`;
+}
+// Checks every changed field; the first problem is marked and named, and nothing saves until all pass
+function edCheck(X) {
+  for (const k of Object.keys(X.draft)) {
+    const f = X.spec[k], l = f.l || k; let v = X.draft[k];
+    if (typeof v === 'string') v = X.draft[k] = v.trim();
+    const msg = f.req && (v == null || v === '' || (Array.isArray(v) && !v.length)) ? `${l} can’t be empty`
+      : f.t === 'num' && v != null && typeof v !== 'number' ? `${l}: enter a number` : f.t === 'num' && v != null && v < (f.min ?? 0) ? `${l} can’t be below ${f.min ?? 0}`
+      : f.t === 'num' && v == null ? `${l} can’t be empty` : f.valid?.(v, X.r) || '';
+    if (msg) { const el = $(`[data-ie="${k}"]`); (el?.closest('.ie-box') || el)?.classList.add('err'); el?.tagName === 'INPUT' && el.focus(); toast(msg, 'alert'); return false; }
+  }
+  return true;
+}
+const edApply = X => Object.entries(X.draft).forEach(([k, v]) => { const f = X.spec[k]; f.set ? f.set(X.r, v) : (X.r[k] = v); });
+const isEmail = v => /^\S+@\S+\.\S+$/.test(v) ? '' : 'Enter a valid email address';
+const ctryEdit = () => Object.fromEntries(Object.entries(COUNTRIES).map(([k, c]) => [k, { label: c.name, flag: flag(c.cc) }]));
+const U_EDIT = {
+  name: { t: 'text', l: 'Name', ph: 'No profile yet' },
+  email: { t: 'text', l: 'Email', req: 1, valid: (v, u) => isEmail(v) || (USERS.some(x => x !== u && x.email.toLowerCase() === v.toLowerCase()) ? 'Another user already has this email' : '') },
+  status: { t: 'sel', l: 'Status', opts: STATUS, show: v => statusCell(v) }, level: { t: 'sel', l: 'Level', opts: LEVEL },
+  risk: { t: 'sel', l: 'Risk level', opts: RISK, show: v => riskCell(v) }, country: { t: 'sel', l: 'Residency', opts: ctryEdit, none: 'Not set' },
+  type: { t: 'sel', l: 'Type', opts: TYPE }, lang: { t: 'sel', l: 'Language', opts: ['EN', 'DE', 'FR', 'ES', 'IT', 'PL', 'PT', 'NL', 'RU'] },
+};
+const CO_EDIT = {
+  name: { t: 'text', l: 'Name', req: 1 }, status: { t: 'sel', l: 'Status', opts: STATUS, show: v => statusCell(v) }, type: { t: 'sel', l: 'Type', opts: CO_TYPE },
+  minLevel: { t: 'sel', l: 'Minimal user level', opts: LEVEL }, kycLevel: { t: 'sel', l: 'KYC required on level', opts: LEVEL, none: 'Not required' },
+  email: { t: 'text', l: 'Email', req: 1, valid: isEmail },
+  emboss: { t: 'text', l: 'Emboss name', req: 1, up: 1, valid: v => /^[A-Z0-9 ]{1,21}$/.test(v) ? '' : 'Emboss name: up to 21 Latin letters, digits and spaces' },
+  ref: { t: 'text', l: 'Referral code', req: 1, valid: (v, c) => COMPANIES.some(x => x !== c && x.ref.toLowerCase() === v.toLowerCase()) ? 'This referral code is already taken' : '' },
+  country: { t: 'sel', l: 'Country', opts: ctryEdit }, city: { t: 'text', l: 'City', req: 1 }, street: { t: 'text', l: 'Address', req: 1 },
+  zip: { t: 'text', l: 'Post code' }, regNo: { t: 'text', l: 'Registration number' },
+};
 function fieldsModal(title, fields, saveAct) {
   openModal(`<div class="modal">
     <div class="modal-h">${title}<button class="icon-btn sm bare" data-act="modal-close">${icon('x', 17)}</button></div>
@@ -3025,13 +3127,22 @@ const ACT = {
 
   'u-step': a => stepUser(+a.dataset.d),
   'u-tab': a => { S.userTab = a.dataset.v; renderUserPage(); },
-  'u-select': a => {
-    const f = a.dataset.field, opts = { status: STATUS, level: LEVEL, risk: RISK, country: ctryOpts }[f], u = byId(S.userId), cur = (f in S.draft ? S.draft[f] : u[f]) || 'none';
-    openPop(a, `<div class="pop-list">${Object.entries(opts).map(([k, o]) => `<button class="pi" data-act="set-draft" data-field="${f}" data-v="${k}">${o.flag ? `<span class="flag">${o.flag}</span>` : f === 'risk' ? riskIcon(k) : `<i class="dot t-${o.tone || 'neutral'}"></i>`}<span class="pl">${o.label}</span>${k === cur ? `<span class="chk">${icon('check', 15, 2)}</span>` : ''}</button>`).join('')}</div>`, { align: 'right', width: 220 });
-  },
-  'set-draft': a => { const { field, v } = a.dataset, u = byId(S.userId), val = field === 'country' && v === 'none' ? null : v; if (u[field] === val) delete S.draft[field]; else S.draft[field] = val; closePop(); renderUserPage(); },
   'u-discard': () => { S.draft = {}; renderUserPage(); },
-  'u-save': () => { const u = byId(S.userId); Object.assign(u, S.draft); u.updated = NOW; S.draft = {}; toast('Changes saved'); renderUserPage(); },
+  'u-save': () => { const X = edCtx(); if (!edCheck(X)) return; edApply(X); X.r.updated = NOW; S.draft = {}; toast('Changes saved'); renderUserPage(); },
+  // inline fields on any record page (see edField)
+  'ie-sel': a => edOpenList(a, false),
+  'ie-multi': a => edOpenList(a, true),
+  'ie-pick': a => { const X = edCtx(), k = a.dataset.ie, v = a.dataset.v; edSet(X, k, v === '' ? null : X.spec[k].num ? +v : v); closePop(); X.redraw(); },
+  'ie-mtog': a => {
+    const X = edCtx(), k = a.dataset.ie, on = new Set((edVal(X, k) || []).map(String)), v = a.dataset.v; on.has(v) ? on.delete(v) : on.add(v);
+    const keep = edOpts(X, k).map(([x]) => x).filter(x => on.has(x)); edSet(X, k, X.spec[k].num ? keep.map(Number) : keep);
+    $('#ieList').innerHTML = edPopList(X, k, true); edFilterList($('#ieQ')?.value);
+    const b = $(`[data-act="ie-multi"][data-ie="${k}"]`); b.innerHTML = edMultiInner(X, k); b.classList.toggle('dirty', k in X.draft); b.classList.remove('err'); renderFloat();
+  },
+  'ie-date': a => { const X = edCtx(), v = edVal(X, a.dataset.ie) || NOW; EDC = { k: a.dataset.ie, view: new Date(v.getFullYear(), v.getMonth(), 1) }; openPop(a, edCalHTML(), { align: 'right', width: 300, kind: 'iedate' }); },
+  'ie-cal-nav': a => { EDC.view = new Date(EDC.view.getFullYear(), EDC.view.getMonth() + +a.dataset.d, 1); pop.innerHTML = edCalHTML(); },
+  'ie-day': a => { const X = edCtx(), old = edVal(X, EDC.k) || NOW, d = new Date(+a.dataset.ts); d.setHours(old.getHours(), old.getMinutes()); edSet(X, EDC.k, d); closePop(); X.redraw(); },
+  'ie-bool': a => { const X = edCtx(), k = a.dataset.ie; edSet(X, k, !edVal(X, k)); X.redraw(); },
   'u-more': a => { const u = byId(S.userId); openPop(a, menuItems([{ act: 'adj-open', icon: 'sliders', label: 'Adjust balance' }, { act: 'toast', data: { msg: 'Password reset link sent' }, icon: 'key', label: 'Send password reset' }, { act: 'reset-2fa', data: { id: u.id }, icon: 'lock', label: 'Reset 2FA' }, { act: 'copy', data: { copy: u.email }, icon: 'mail', label: 'Copy email' }, { act: 'export-one', data: { id: u.id }, icon: 'download', label: 'Export data' }]), { align: 'right', width: 220 }); },
   'export-one': a => { closePop(); exportCSV([byId(+a.dataset.id)], 'user-' + a.dataset.id); },
   'reset-2fa': a => { closePop(); const u = byId(+a.dataset.id); u.twofa = false; delete S.draft.twofa; toast('2FA reset — user will re-enroll at next sign-in', 'lock'); afterDataChange(); },
@@ -3448,11 +3559,6 @@ function paBulk(a) {
 }
 
 /* ── Company page ── */
-const CO_OPTS = { status: STATUS, type: CO_TYPE, minLevel: LEVEL, kycLevel: KYC_ON };
-function coSel(field, val) {
-  const content = field === 'status' ? statusCell(val) : field === 'kycLevel' && !val ? '<span class="faint">Not required</span>' : CO_OPTS[field][val].label;
-  return `<button class="sel-btn ${field in S.coDraft ? 'dirty' : ''}" data-act="co-select" data-field="${field}">${content}${icon('chevsUD', 14)}</button>`;
-}
 function renderCompanyPage() {
   const c = coById(S.coId), main = $('#main');
   if (!c) { main.innerHTML = `<div class="page"><div class="ph"><div class="empty"><div class="em-ic">${icon('building', 22)}</div><h3>Company not found</h3><p>#${S.coId} doesn’t exist.</p><a class="btn btn-dark btn-sm" href="#/companies">Back to the company list</a></div></div></div>`; return; }
@@ -3471,21 +3577,16 @@ function renderCompanyPage() {
   renderTopbar(); renderFloat();
 }
 function coTab(c, d, D) {
-  const kv = (l, v) => `<div class="kv-r"><span>${l}</span>${v || dash}</div>`;
+  const kv = (l, v) => `<div class="kv-r"><span>${l}</span>${v || dash}</div>`, X = edCtx();
   switch (S.coTab) {
     case 'overview': {
       const prods = [...c.cp.map(a => ({ a, p: PROD_BY.c[a.pid], k: (PROD_BY.c[a.pid].kind === 'physical' ? 'Physical' : 'Virtual') + ' card' })), ...c.ip.map(a => ({ a, p: PROD_BY.i[a.pid], k: 'IBAN · ' + PROD_BY.i[a.pid].cur }))];
       return `
-      <div class="card"><div class="card-h"><span class="card-t">Company</span><button class="btn btn-ghost btn-sm" data-act="co-edit">${icon('pencil', 14)}Edit</button></div><div class="kv2 card-b">
-        ${kv('Status', coSel('status', d.status))}${kv('Type', coSel('type', d.type))}
-        ${kv('Minimal user level', coSel('minLevel', d.minLevel))}${kv('KYC required on level', coSel('kycLevel', d.kycLevel))}
-        ${kv('Email', `<span>${esc(c.email)}</span>`)}${kv('Emboss name', `<span class="num">${esc(c.emboss)}</span>`)}
-        ${kv('Referral code', copyVal(c.ref))}${kv('Source', srcTag(c.source))}
+      <div class="card"><div class="card-h"><span class="card-t">Company</span></div><div class="kv2 card-b">
+        ${['name', 'status', 'type', 'minLevel', 'kycLevel', 'email', 'emboss', 'ref'].map(k => kv(CO_EDIT[k].l, edField(X, k))).join('')}${kv('Source', srcTag(c.source))}
       </div></div>
-      <div class="card"><div class="card-h"><span class="card-t">Registered address</span><button class="btn btn-ghost btn-sm" data-act="co-addr">${icon('pencil', 14)}Edit</button></div><div class="kv2 card-b">
-        ${kv('Country', `<span class="ctry"><span class="flag">${flag(COUNTRIES[c.country].cc)}</span>${COUNTRIES[c.country].name}</span>`)}${kv('City', esc(c.city))}
-        ${kv('Address', esc(c.street))}${kv('Post code', c.zip && `<span class="num">${esc(c.zip)}</span>`)}
-        ${kv('Registration number', c.regNo && copyVal(c.regNo))}${kv('Created', `<span>${fmtDateTime(c.created)}</span>`)}
+      <div class="card"><div class="card-h"><span class="card-t">Registered address</span></div><div class="kv2 card-b">
+        ${['country', 'city', 'street', 'zip', 'regNo'].map(k => kv(CO_EDIT[k].l, edField(X, k))).join('')}${kv('Created', `<span>${fmtDateTime(c.created)}</span>`)}
       </div></div>
       ${tcard(`Products <span class="ct">${prods.length}</span>`, prods.length ? linkBtn('co-tab', 'products', 'Manage') : '',
         dtable(['Product', 'Kind', 'Provider', 'Status'], prods.map(({ a, p, k }) => [`<div>${esc(p.name)}</div><div class="code">ID ${p.id}</div>`, muted(k), p.provider, badge(a.active ? { label: 'Active', tone: 'success' } : { label: 'Inactive', tone: 'neutral' })]),
@@ -3805,32 +3906,13 @@ Object.assign(ACT, {
   'co-step': a => stepCo(+a.dataset.d),
   'co-tab': a => { closePop(); S.coTab = a.dataset.v; renderCompanyPage(); $('#main').scrollTop = 0; },
   'co-sub': a => { S.coSub[a.dataset.s] = a.dataset.v; renderCompanyPage(); },
-  'co-select': a => {
-    const f = a.dataset.field, c = cur(), v = (f in S.coDraft ? S.coDraft[f] : c[f]) || 'none';
-    openPop(a, `<div class="pop-list">${Object.entries(CO_OPTS[f]).map(([k, o]) => `<button class="pi" data-act="co-set-draft" data-field="${f}" data-v="${k}">${o.tone ? `<i class="dot t-${o.tone}"></i>` : ''}<span class="pl">${o.label}</span>${k === v ? `<span class="chk">${icon('check', 15, 2)}</span>` : ''}</button>`).join('')}</div>`, { align: 'right', width: 220 });
-  },
-  'co-set-draft': a => { const { field, v } = a.dataset, c = cur(), val = field === 'kycLevel' && v === 'none' ? null : v; if (c[field] === val) delete S.coDraft[field]; else S.coDraft[field] = val; closePop(); renderCompanyPage(); },
   'co-discard': () => { S.coDraft = {}; S.brandDraft = {}; renderCompanyPage(); },
-  'co-save': () => { const c = cur(); Object.assign(c, S.coDraft); Object.assign(c.brand, S.brandDraft); c.updated = new Date(NOW); S.coDraft = {}; S.brandDraft = {}; toast('Company saved'); renderCompanyPage(); },
+  'co-save': () => { const c = cur(), X = edCtx(); if (!edCheck(X)) return; edApply(X); Object.assign(c.brand, S.brandDraft); c.updated = new Date(NOW); S.coDraft = {}; S.brandDraft = {}; toast('Company saved'); renderCompanyPage(); },
   'co-new-user': () => newUserModal(S.coId),
   'co-more': a => { const c = cur(); openPop(a, menuItems([{ act: 'copy', data: { copy: `https://wallet.ns.cards/r/${c.ref}` }, icon: 'link', label: 'Copy referral link' }, { act: 'co-export-one', icon: 'download', label: 'Export company' }, '-', { act: 'co-deactivate', icon: c.status === 'inactive' ? 'refresh' : 'minus', label: c.status === 'inactive' ? 'Activate' : 'Deactivate' }]), { align: 'right', width: 230 }); },
   'co-export-one': () => { closePop(); coCSV([cur()], 'company-' + S.coId); },
   'co-deactivate': () => { closePop(); const c = cur(); c.status = c.status === 'inactive' ? 'active' : 'inactive'; c.updated = new Date(NOW); delete S.coDraft.status; toast(`${esc(c.name)} ${c.status === 'inactive' ? 'deactivated' : 'activated'}`); renderCompanyPage(); },
-  'co-edit': () => { const c = cur(); fieldsModal('Edit company', [{ id: 'ceName', label: 'Name', value: c.name }, { id: 'ceEmail', label: 'Email', value: c.email }, { id: 'ceEmboss', label: 'Emboss name', value: c.emboss, hint: 'Printed on physical cards · up to 21 Latin letters, digits and spaces.' }, { id: 'ceRef', label: 'Referral code', value: c.ref }], 'co-edit-save'); },
-  'co-edit-save': () => {
-    const c = cur(), name = $('#ceName').value.trim(), email = $('#ceEmail').value.trim(), emboss = $('#ceEmboss').value.trim().toUpperCase(), ref = $('#ceRef').value.trim();
-    if (!name) return coBad('#ceName');
-    if (!/^\S+@\S+\.\S+$/.test(email)) return coBad('#ceEmail');
-    if (!/^[A-Z0-9 ]{1,21}$/.test(emboss)) return coBad('#ceEmboss', 'Emboss name: up to 21 Latin letters, digits and spaces');
-    if (!ref || COMPANIES.some(x => x !== c && x.ref.toLowerCase() === ref.toLowerCase())) return coBad('#ceRef', 'This referral code is already taken');
-    Object.assign(c, { name, email, emboss, ref, updated: new Date(NOW) }); closeModal(); toast('Company details updated'); renderTopbar(); renderCompanyPage();
-  },
-  'co-addr': () => { const c = cur(); fieldsModal('Registered address', [{ id: 'caCountry', label: 'Country', value: c.country, options: Object.entries(COUNTRIES).map(([k, x]) => [k, x.name, x.cc]) }, { id: 'caCity', label: 'City', value: c.city }, { id: 'caStreet', label: 'Address', value: c.street }, { id: 'caZip', label: 'Post code', value: c.zip }, { id: 'caReg', label: 'Registration number', value: c.regNo }], 'co-addr-save'); },
-  'co-addr-save': () => {
-    const c = cur(), city = $('#caCity').value.trim(), street = $('#caStreet').value.trim();
-    if (!city) return coBad('#caCity'); if (!street) return coBad('#caStreet');
-    Object.assign(c, { country: $('#caCountry').value, city, street, zip: $('#caZip').value.trim(), regNo: $('#caReg').value.trim(), updated: new Date(NOW) }); closeModal(); toast('Address updated', 'mapPin'); renderCompanyPage();
-  },
+
   // products
   'cp-add': () => cpModal(-1),
   'cp-edit': a => cpModal(+a.dataset.i),
@@ -3935,7 +4017,7 @@ Object.assign(ACT, {
 //   quick?(r) → {act, icon, tip, data?}, menu?(r) → menuItems, bulk?: [{icon, label, run(rows) → toast}],
 //   form?: { create?: false, newLabel?, fields(r|null), save(r|null) → false | true | newRecord },
 //   rec: { title(r), sub?(r), badges?(r), acts?(r), sections?(r), side?(r), events?(r) } }
-S.pg = {}; S.pgW = {}; S.recId = null; S._pgList = [];
+S.pg = {}; S.pgW = {}; S.recId = null; S._pgList = []; S.pgDraft = {};
 const PAGES = {}, DASHES = {};
 const pg = () => PAGES[S.route];
 const pgS = id => S.pg[id] ||= { search: '', filters: [], sort: { ...PAGES[id].sort }, page: 1, sel: new Set() };
@@ -4003,7 +4085,10 @@ function pgResults() {
 }
 function pgFloat(el) {
   const P = pg(), st = pgS(P.id), n = st.sel.size;
-  if (S.recId || !n) { el.classList.remove('show'); return; }
+  if (S.recId) { const d = Object.keys(S.pgDraft).length; if (!d) { el.classList.remove('show'); return; }
+    el.innerHTML = `<span class="bk-n"><b>${d}</b>unsaved change${d > 1 ? 's' : ''}</span><span class="sep"></span><button data-act="pg-discard">Discard</button><button class="bk-save" data-act="pg-save">${icon('check', 15, 2)}Save changes</button>`;
+    el.classList.add('show'); return; }
+  if (!n) { el.classList.remove('show'); return; }
   el.innerHTML = `<span class="bk-n"><b>${n}</b>selected</span>
     ${n < S._pgList.length ? `<button class="bk-link" data-act="pg-sel-all">Select all ${fmtInt(S._pgList.length)}</button>` : ''}
     <span class="sep"></span>
@@ -4031,7 +4116,7 @@ function stepRec(d) {
   if (nx) location.hash = `#/${P.id}/${encodeURIComponent(pgKey(P, nx))}`;
 }
 const pgMenu = (P, r, rec) => [...(rec ? [] : [{ act: 'pg-open', data: { rid: esc(pgKey(P, r)) }, icon: P.icon, label: `Open ${P.noun}` }]),
-  ...(P.form && P.form.edit !== false ? [{ act: 'pg-edit', data: { rid: esc(pgKey(P, r)) }, icon: 'pencil', label: 'Edit' }] : []), ...(P.menu?.(r) || []),
+  ...(!P.edit && P.form && P.form.edit !== false ? [{ act: 'pg-edit', data: { rid: esc(pgKey(P, r)) }, icon: 'pencil', label: 'Edit' }] : []), ...(P.menu?.(r) || []),
   { act: 'copy', data: { copy: esc(pgKey(P, r)) }, icon: 'hash', label: 'Copy ID' }];
 const pgEvents = (P, r) => P.rec.events ? P.rec.events(r) : [
   r.updated && r.created && r.updated - r.created > 6e4 ? { ic: 'pencil', t: 'Last updated', s: fmtDateTime(r.updated), when: rel(r.updated) } : null,
@@ -4042,12 +4127,13 @@ function renderRec() {
   const P = pg(), r = recOf(P), main = $('#main');
   if (!r) { main.innerHTML = `<div class="page"><div class="ph"><div class="empty"><div class="em-ic">${icon(P.icon, 22)}</div><h3>${cap(P.noun)} not found</h3><p>${esc(S.recId)} doesn’t exist.</p><a class="btn btn-dark btn-sm" href="#/${P.id}">Back to ${P.title}</a></div></div></div>`; return; }
   const R = P.rec, scroll = main.scrollTop, k = esc(pgKey(P, r)), evs = pgEvents(P, r);
-  const kv = (l, v) => `<div class="kv-r"><span>${l}</span>${v || dash}</div>`;
+  const kv = (l, v) => `<div class="kv-r"><span>${l}</span>${v || dash}</div>`, X = edCtx();
+  const row = c => { const h = X && edField(X, c.k); return h ? kv(P.edit[c.k].l, h) : kv(c.l, `<span>${(c.kv || c.cell)(r)}</span>`); };
   main.innerHTML = `<div class="page">
     <div class="up-grid">
       <div class="up-main">
-        <div class="card"><div class="card-h"><span class="card-t">Details</span>${P.form && P.form.edit !== false ? `<button class="btn btn-ghost btn-sm" data-act="pg-edit" data-rid="${k}">${icon('pencil', 14)}Edit</button>` : ''}</div>
-          <div class="kv2 card-b">${P.cols.filter(c => c.rec !== false).map(c => kv(c.l, `<span>${(c.kv || c.cell)(r)}</span>`)).join('')}</div></div>
+        <div class="card"><div class="card-h"><span class="card-t">Details</span>${!P.edit && P.form && P.form.edit !== false ? `<button class="btn btn-ghost btn-sm" data-act="pg-edit" data-rid="${k}">${icon('pencil', 14)}Edit</button>` : ''}</div>
+          <div class="kv2 card-b">${P.cols.filter(c => c.rec !== false).map(row).join('')}</div></div>
         ${R.sections ? R.sections(r) : ''}
       </div>
       <aside class="up-side">${R.side ? R.side(r) : ''}<div class="card"><div class="card-h"><span class="card-t">Activity</span></div><div class="card-b pad">${evs.length ? timeline(evs) : '<div class="faint" style="font-size:13px">No activity recorded</div>'}</div></div></aside>
@@ -4975,6 +5061,33 @@ Object.entries(MON_KIND).forEach(([kind, M]) => page({
   menu: m => [{ act: 'mon-refresh', data: { rid: m.id }, icon: 'refresh', label: 'Refresh balance' }, { act: 'mon-tog', data: { rid: m.id }, icon: m.on ? 'minus' : 'check', label: m.on ? 'Pause monitor' : 'Resume monitor' }],
   rec: { title: m => m.name, acts: m => `<button class="btn btn-ghost" data-act="mon-refresh" data-rid="${m.id}">${icon('refresh', 15)}Refresh balance</button>` },
 }));
+
+/* Inline-editable fields per record page (see edField). Labels default to the column's; onEdit keeps lookups that copy a record's name in sync. */
+const ROLE1 = r => r.id !== 1, eTxt = (o = {}) => ({ t: 'text', ...o }), eNum = (o = {}) => ({ t: 'num', ...o }), eSel = (opts, o = {}) => ({ t: 'sel', opts, ...o });
+const PAGE_EDIT = {
+  strategies: { name: eTxt({ req: 1 }), c: eSel(() => ASSETS.filter(a => !a.fiat).map(a => [a.c, `${a.c} · ${a.n}`])), apy: eNum({ sfx: '%' }), lock: eNum({ l: 'Lock period', sfx: 'days' }), min: eNum(), cap: eNum({ l: 'Capacity' }), status: eSel(STRAT_STATUS) },
+  'payout-pools': { at: { t: 'date', min: () => NOW, when: p => p.status === 'SCHEDULED' } },
+  kyt: { name: eTxt({ req: 1 }), cat: eSel(KYT_CAT), dir: eSel(KYT_DIR), cond: eTxt({ req: 1, ph: 'e.g. Amount ≥ €10,000' }), action: eSel(KYT_ACTION), on: { t: 'bool' } },
+  'card-products': { name: eTxt({ req: 1 }), provider: eSel(CARD_PROVIDERS), kind: eSel({ virtual: 'Virtual', physical: 'Physical' }), cur: eSel(['EUR', 'USD']), issue: eNum(), monthly: eNum(),
+    bin: eTxt({ ph: '6 digits', valid: v => !v || /^\d{6}$/.test(v) ? '' : 'BIN is 6 digits' }), status: eSel(PROD_STATUS) },
+  'iban-products': { name: eTxt({ req: 1 }), provider: eSel(['Banking Circle', 'Clear Junction']), cur: eSel(['EUR', 'GBP', 'USD', 'CHF']), type: eSel(['Personal', 'Business']), price: eNum(), fee: eNum(), status: eSel(PROD_STATUS) },
+  currencies: { n: eTxt({ req: 1 }), net: eTxt(), dep: { t: 'bool' }, wd: { t: 'bool' }, minWd: eNum(), wdFee: eNum(), status: eSel(ON_OFF) },
+  markets: { spread: eNum({ sfx: '%' }), min: eNum(), status: eSel(MKT_STATUS) },
+  countries: { name: eTxt({ req: 1 }), type: eSel(LIST_TYPE), scope: eSel(LIST_SCOPE), n: { t: 'multi', get: l => l.list, set: (l, v) => { l.list = v; }, opts: () => Object.fromEntries(Object.entries(WORLD).map(([k, c]) => [k, { label: c.name, flag: flag(c.cc) }])) } },
+  sources: { name: eTxt({ req: 1 }), domain: eTxt({ ph: 'wallet.example.com' }), support: eTxt({ valid: v => v ? isEmail(v) : '' }), status: eSel(ON_OFF) },
+  admins: { name: eTxt({ req: 1 }), email: eTxt({ req: 1, valid: (v, a) => isEmail(v) || (ADMINS.some(x => x !== a && x.email === v) ? 'This email already has an account' : '') }), role: eSel(() => ROLES.map(r => [r.id, r.name]), { num: 1, when: ROLE1 }) },
+  roles: { name: eTxt({ req: 1, when: ROLE1 }), desc: eTxt({ when: ROLE1 }) },
+  'card-orders': { country: eSel(ctryEdit), courier: eSel(), tracking: eTxt({ ph: 'Added when shipped' }) },
+  networks: { name: eTxt({ req: 1 }), assets: { t: 'multi', req: 1, opts: () => Object.values(ASSET).map(a => [a.c, `${a.c} · ${a.n}`]) }, conf: eNum(), fee: eNum(), min: eNum(), status: eSel(ON_OFF) },
+  'verification-templates': { name: eTxt({ req: 1 }), provider: eSel(), level: eSel(LEVEL), who: eSel(['Individuals', 'Businesses']), steps: { t: 'multi', req: 1, opts: () => [...new Set(VTEMPLATES.flatMap(v => v.steps))] },
+    regions: eSel(['All countries', 'EEA', 'Non-EEA']), status: eSel(ON_OFF) },
+  ...Object.fromEntries(Object.values(MON_KIND).map(M => [M.page, { name: eTxt({ req: 1 }), min: eNum(), on: { t: 'bool' } }])),
+};
+Object.entries(PAGE_EDIT).forEach(([id, E]) => { const P = PAGES[id]; Object.entries(E).forEach(([k, f]) => { f.l ||= P.cols.find(c => c.k === k)?.l || k; }); P.edit = E; });
+PAGES.sources.onEdit = s => { CO_SOURCES[s.id] = s.name; CO_FIELDS.source.options[s.id] = { label: s.name }; };
+PAGES['card-products'].onEdit = p => { CO_FIELDS.product.options['c:' + p.id] = { label: p.name }; };
+PAGES['iban-products'].onEdit = p => { CO_FIELDS.product.options['i:' + p.id] = { label: p.name + ' (IBAN)' }; };
+
 DASHES.monitors = {
   range: false,
   kpis: () => { const L = monitorsOf(), on = L.filter(m => m.on), low = [...on].sort((a, b) => a.bal / a.min - b.bal / b.min)[0];
@@ -5012,6 +5125,8 @@ Object.assign(ACT, {
   'pg-rec-more': a => openPop(a, menuItems(pgMenu(pg(), pgRow(a.dataset.rid), true)), { align: 'right', width: 230 }),
   'pg-new': () => pgForm(null),
   'pg-edit': a => { closePop(); pgForm(pgRow(a.dataset.rid)); },
+  'pg-discard': () => { S.pgDraft = {}; renderRec(); renderFloat(); },
+  'pg-save': () => { const X = edCtx(), P = pg(); if (!edCheck(X)) return; edApply(X); stamp(X.r); P.onEdit?.(X.r); S.pgDraft = {}; toast(`${cap(P.noun)} saved`); pgRefresh(); },
   'pg-form-save': () => {
     const P = pg(), r = S._pgEdit, res = P.form.save(r); if (!res) return;
     closeModal(); toast(r ? `${cap(P.noun)} updated` : `${cap(P.noun)} created`, r ? 'check' : 'plus');
@@ -5077,6 +5192,8 @@ function onChange(t) {
 document.addEventListener('change', e => onChange(e.target));
 document.addEventListener('input', e => {
   const t = e.target;
+  if (t.dataset.ie) { edInput(t); return; }
+  if (t.id === 'ieQ') { edFilterList(t.value); return; }
   if (t.dataset.tx === 'ref') { S.tx.ref = t.value; S.tx.page = 1; refreshTx(); return; }
   if (t.id === 'adjBankAmt' || t.id === 'adjBankFee') { const net = Math.max(0, (+$('#adjBankAmt').value || 0) - (+$('#adjBankFee').value || 0)); $('#adjNet').textContent = `Credited to the EUR wallet: ${fmtEur(net, 2)}`; t.style.borderColor = ''; }
   if (t.closest?.('.modal')) t.style.borderColor = '';
@@ -5097,6 +5214,9 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && (e.target.id === 'dpFrom' || e.target.id === 'dpTo')) ACT['dp-apply']();
   if (e.key === 'Enter' && e.target.id === 'ddQ') { const b = $('#ddList .pi[data-v]'); b && b.click(); }
   if (e.key === 'Enter' && e.target.id === 'nuEmail') ACT['create-user']();
+  if (e.target.dataset?.ie && e.key === 'Enter') { e.target.blur(); return; }
+  if (e.target.dataset?.ie && e.key === 'Escape') { edRevert(e.target); e.target.blur(); return; }
+  if (e.key === 'Enter' && e.target.id === 'ieQ') { const b = $('#ieList .pi:not([hidden])'); b && b.click(); }
   if (e.key === 'Escape') {
     if (cfm.classList.contains('open')) closeConfirm();
     else if (pop.classList.contains('open')) closePop();
