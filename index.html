@@ -687,6 +687,29 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .delta.down{color:var(--error-ink);background:var(--error-bg)}
 .spark{width:86px;height:30px;flex:none}
 .dgrid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px;padding:24px 28px 32px}
+/* sign in / sign up: shown instead of the app while signed out */
+.auth{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:32px 16px;background:var(--bg);overflow:auto}
+.auth[hidden],.app[hidden]{display:none}
+.auth-box{width:100%;max-width:400px}
+.auth-logo{display:flex;align-items:center;justify-content:center;gap:9px;color:var(--ink);margin-bottom:28px}
+.auth-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-xl);padding:28px;box-shadow:var(--shadow-sm)}
+.auth-card h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}
+.auth-sub{margin:6px 0 22px;color:var(--ink-2);font-size:13.5px}
+.auth .field{margin-bottom:14px}
+.auth .field label{display:flex;justify-content:space-between;align-items:baseline}
+.auth .field label .link-btn{height:auto;padding:0;font-size:12.5px;font-weight:400;color:var(--ink-2)}
+.auth .field.bad input{border-color:var(--error)}
+.auth .field.bad input:focus{box-shadow:0 0 0 3px var(--error-bg)}
+.f-err{color:var(--error-ink);font-size:12px;margin-top:6px}
+.pw{position:relative}
+.pw input{padding-right:44px}
+.pw .ghost-ic{position:absolute;right:6px;top:6px}
+.auth-go{width:100%;height:40px;margin-top:8px}
+.auth-go:disabled{opacity:.7;cursor:default}
+.auth-alt{text-align:center;color:var(--ink-2);font-size:13.5px;margin:18px 0 0}
+.auth-alt a{color:var(--ink);font-weight:500}
+.auth-alt a:hover{text-decoration:underline;text-decoration-color:var(--line-strong)}
+.auth-note{text-align:center;color:var(--ink-3);font-size:12px;margin:10px 0 0}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow-sm);min-width:0}
 .span-8{grid-column:span 8}.span-4{grid-column:span 4}.span-3{grid-column:span 3}.span-5{grid-column:span 5}.span-7{grid-column:span 7}.span-6{grid-column:span 6}.span-12{grid-column:span 12}
 .card-h{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;min-height:28px}
@@ -932,6 +955,7 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 </style>
 </head>
 <body>
+<div class="auth" id="auth" hidden></div>
 <div class="app" id="app">
   <aside class="sidebar" id="sidebar"></aside>
   <div class="main-wrap">
@@ -1122,6 +1146,8 @@ const SOLAR = {
   ban: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" d="m18.5 5.5l-13 13"/><circle cx="12" cy="12" r="10"/></g>`,
   calendar: `<g fill="none"><path stroke="currentColor" stroke-width="1.5" d="M2 12c0-3.771 0-5.657 1.172-6.828S6.229 4 10 4h4c3.771 0 5.657 0 6.828 1.172S22 8.229 22 12v2c0 3.771 0 5.657-1.172 6.828S17.771 22 14 22h-4c-3.771 0-5.657 0-6.828-1.172S2 17.771 2 14z"/><path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M7 4V2.5M17 4V2.5M2.5 9h19"/><path fill="currentColor" d="M18 17a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m-5 4a1 1 0 1 1-2 0a1 1 0 0 1 2 0m0-4a1 1 0 1 1-2 0a1 1 0 0 1 2 0"/></g>`,
   mail: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12c0-3.771 0-5.657 1.172-6.828S6.229 4 10 4h4c3.771 0 5.657 0 6.828 1.172S22 8.229 22 12s0 5.657-1.172 6.828S17.771 20 14 20h-4c-3.771 0-5.657 0-6.828-1.172S2 15.771 2 12Z"/><path stroke-linecap="round" d="m6 8l2.159 1.8c1.837 1.53 2.755 2.295 3.841 2.295s2.005-.765 3.841-2.296L18 8"/></g>`,
+  eye: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3.275 15.296C2.425 14.192 2 13.639 2 12c0-1.64.425-2.191 1.275-3.296C4.972 6.5 7.818 4 12 4s7.028 2.5 8.725 4.704C21.575 9.81 22 10.361 22 12c0 1.64-.425 2.191-1.275 3.296C19.028 17.5 16.182 20 12 20s-7.028-2.5-8.725-4.704Z"/><path d="M15 12a3 3 0 1 1-6 0a3 3 0 0 1 6 0Z"/></g>`,
+  eyeOff: `<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path d="M2 9c4.5 6 15.5 6 20 0"/><path d="m4.5 12.5-1.5 2M19.5 12.5l1.5 2M9.3 14.6l-.6 2.4M14.7 14.6l.6 2.4"/></g>`,
   lock: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 16c0-2.828 0-4.243.879-5.121C3.757 10 5.172 10 8 10h8c2.828 0 4.243 0 5.121.879C22 11.757 22 13.172 22 16s0 4.243-.879 5.121C20.243 22 18.828 22 16 22H8c-2.828 0-4.243 0-5.121-.879C2 20.243 2 18.828 2 16Z"/><path stroke-linecap="round" d="M12 14v4m-6-8V8a6 6 0 1 1 12 0v2"/></g>`,
   tag: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4.728 16.137c-1.545-1.546-2.318-2.318-2.605-3.321c-.288-1.003-.042-2.068.45-4.197l.283-1.228c.413-1.792.62-2.688 1.233-3.302s1.51-.82 3.302-1.233l1.228-.284c2.13-.491 3.194-.737 4.197-.45c1.003.288 1.775 1.061 3.32 2.606l1.83 1.83C20.657 9.248 22 10.592 22 12.262c0 1.671-1.344 3.015-4.033 5.704c-2.69 2.69-4.034 4.034-5.705 4.034c-1.67 0-3.015-1.344-5.704-4.033z"/><circle cx="8.607" cy="8.879" r="2" transform="rotate(-45 8.607 8.879)"/><path stroke-linecap="round" d="m11.542 18.5l6.979-6.98"/></g>`,
   alert: `<g fill="none"><path stroke="currentColor" stroke-width="1.5" d="M5.312 10.762C8.23 5.587 9.689 3 12 3s3.77 2.587 6.688 7.762l.364.644c2.425 4.3 3.638 6.45 2.542 8.022S17.786 21 12.364 21h-.728c-5.422 0-8.134 0-9.23-1.572s.117-3.722 2.542-8.022z"/><path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M12 8v5"/><circle cx="12" cy="16" r="1" fill="currentColor"/></g>`,
@@ -1429,7 +1455,12 @@ const RU = {
   Navigation: 'Навигация', Theme: 'Тема', Light: 'Светлая', Dark: 'Тёмная', Language: 'Язык', Classic: 'Классика', Focus: 'Фокус', Flyout: 'Панель', 'Profile settings': 'Настройки профиля', 'Keyboard shortcuts': 'Горячие клавиши', 'Help & docs': 'Помощь', 'Sign out': 'Выйти',
   'Issued cards': 'Выпущенные карты', 'Needs attention': 'Требуют внимания', 'Documents to review': 'Документы на проверке',
   'Card issue errors': 'Ошибки выпуска карт', 'Transaction checks': 'Проверки транзакций', 'All clear': 'Всё разобрано', 'Finance monitors': 'Finance Monitors', 'Wallet funds': 'Средства в кошельках', 
-  'Provider reserves': 'Резервы провайдеров', 'Recent changes': 'Последние изменения', 'Full log': 'Весь журнал',
+  'Provider reserves': 'Резервы провайдеров',
+  'Sign in': 'Войти', 'Create an account': 'Создать аккаунт', 'Create account': 'Создать аккаунт', 'Get access to the NS.Cards admin panel': 'Доступ к админ-панели NS.Cards', 'Welcome back to the NS.Cards admin panel': 'Вход в админ-панель NS.Cards',
+  'Full name': 'Имя и фамилия', 'Work email': 'Рабочая почта', Email: 'Почта', Password: 'Пароль', 'At least 8 characters': 'Не менее 8 символов', 'Forgot password?': 'Забыли пароль?', 'Password reset link sent': 'Ссылка для сброса пароля отправлена',
+  'Already have an account?': 'Уже есть аккаунт?', 'New to the admin panel?': 'Впервые в админ-панели?', 'Prototype: any email and password work.': 'Прототип: подойдут любые почта и пароль.',
+  'Show password': 'Показать пароль', 'Hide password': 'Скрыть пароль', 'Enter your name': 'Введите имя', 'Enter your email': 'Введите почту', 'Enter a valid email address': 'Введите корректную почту', 'Enter your password': 'Введите пароль', 'Use at least 8 characters': 'Не менее 8 символов',
+  'Creating account…': 'Создаём аккаунт…', 'Signing in…': 'Входим…', 'Account created': 'Аккаунт создан', 'Signed in as': 'Вы вошли как', 'Signed out': 'Вы вышли', 'Recent changes': 'Последние изменения', 'Full log': 'Весь журнал',
 };
 S.lang = store.get('nsc.lang', 'en') === 'ru' ? 'ru' : 'en';
 const t = s => S.lang === 'ru' && RU[s] || s;
@@ -1497,7 +1528,7 @@ function renderSidebar() {
       ${NAV.map(n => n.items ? navSection(n) : navLink(n)).join('')}
     </nav>
     <div class="sb-foot">
-      <button class="me" data-act="me" data-tip="Account" data-tip-collapsed><span class="me-av">SA</span><span class="em fade">super_admin@ns.cards</span><span class="fade me-more">${icon('more', 14)}</span></button>
+      <button class="me" data-act="me" data-tip="Account" data-tip-collapsed><span class="me-av">${meInitials()}</span><span class="em fade">${esc(S.me.email)}</span><span class="fade me-more">${icon('more', 14)}</span></button>
     </div>`;
   // re-rendering resets the scroll: put it back, then nudge only if the current item is out of view
   const box = $('#sidebar .sb-scroll'), cur = $('.nav.active', box); box.scrollTop = keep;
@@ -1556,12 +1587,12 @@ function meMenu(view) {
     return `<div class="pop-head"><button class="ghost-ic" data-act="me-view" data-v="" aria-label="Back">${icon('chevLeft', 15)}</button>${t(title)}</div>`
       + menuItems(opts.map(([v, label]) => ({ act, data: { v }, label, on: cur === v }))); }
   const row = (v, ic, l, val) => ({ act: 'me-view', data: { v }, icon: ic, html: `<span class="pl">${t(l)}</span><span class="pv">${val}</span>${icon('chevRight', 14)}` });
-  return `<div class="me-h"><span class="me-av">SA</span><div style="min-width:0"><div class="me-n">Super admin</div><div class="me-e">super_admin@ns.cards</div></div></div>
+  return `<div class="me-h"><span class="me-av">${meInitials()}</span><div style="min-width:0"><div class="me-n">${esc(S.me.name)}</div><div class="me-e">${esc(S.me.email)}</div></div></div>
     <div class="pop-sep"></div>
     <div class="pop-row me-row"><span>${t('Theme')}</span><div class="seg sm"><button class="${dark ? '' : 'on'}" data-act="theme" data-v="light">${icon('sun', 14)}${t('Light')}</button><button class="${dark ? 'on' : ''}" data-act="theme" data-v="dark">${icon('moon', 13)}${t('Dark')}</button></div></div>
     ${menuItems([row('lang', 'globe', 'Language', S.lang === 'ru' ? 'Русский' : 'English'), row('navv', 'panelClose', 'Navigation', t(NAV_V[S.navV][0]))])}
     <div class="pop-sep"></div>
-    ${menuItems([{ act: 'toast', data: { msg: t('Profile settings') }, icon: 'user', label: t('Profile settings') }, { act: 'shortcuts', icon: 'keyboard', label: t('Keyboard shortcuts') }, { act: 'toast', data: { msg: 'Docs would open here' }, icon: 'help', label: t('Help & docs') }, '-', { act: 'toast', data: { msg: 'Signed out (prototype)' }, icon: 'logout', label: t('Sign out') }])}`;
+    ${menuItems([{ act: 'toast', data: { msg: t('Profile settings') }, icon: 'user', label: t('Profile settings') }, { act: 'shortcuts', icon: 'keyboard', label: t('Keyboard shortcuts') }, { act: 'toast', data: { msg: 'Docs would open here' }, icon: 'help', label: t('Help & docs') }, '-', { act: 'sign-out', icon: 'logout', label: t('Sign out') }])}`;
 }
 function shortcutsModal() {
   const k = (...ks) => ks.map(x => `<kbd>${x}</kbd>`).join('');
@@ -1588,6 +1619,7 @@ $('#sidebar').addEventListener('transitionend', e => { if (e.target.id === 'side
 
 /* ════════════════════════════ Router ════════════════════════════ */
 function route() {
+  if (authRoute()) return;
   const [id, sub] = location.hash.replace(/^#\/?/, '').split('/');
   const r = NAV_FLAT.some(n => n.id === id) ? id : 'dashboard';
   const uid = r === 'users' && sub ? +sub : null;
@@ -2731,6 +2763,8 @@ function goFilter(key, values) {
 
 const ACT = {
   'toggle-sidebar': toggleSidebar,
+  'sign-out': () => { closePop(); S.me = null; store.set('nsc.me', false); S.authNext = null; location.hash = '#/login'; toast(t('Signed out'), 'logout'); },
+  'au-eye': a => { const i = a.previousElementSibling, show = i.type === 'password'; i.type = show ? 'text' : 'password'; a.innerHTML = icon(show ? 'eyeOff' : 'eye', 16); a.dataset.tip = t(show ? 'Hide password' : 'Show password'); i.focus(); },
   'nav-sec': a => {
     const k = a.dataset.sec, shut = !a.closest('.sb-sec').classList.contains('closed');
     if (S.navV === 'focus') S.navPeek.has(k) ? S.navPeek.delete(k) : S.navPeek.add(k);
@@ -3896,7 +3930,7 @@ const gen = seed => {
     wp: o => { const e = Object.entries(o); let x = r() * e.reduce((s, [, w]) => s + w, 0); for (const [k, w] of e) if ((x -= w) < 0) return k; return e[0][0]; },
     ago: days => new Date(NOW.getTime() - r() * days * DAY) };
 };
-const ME = 'Super admin';
+let ME = 'Super admin'; // the signed-in admin's name; set on sign in
 const stamp = r => { r.updated = new Date(NOW); r.by = ME; };
 
 /* Dashboard template: KPI strip + 12-column card grid, charts drawn with drawSeries() */
@@ -4842,6 +4876,7 @@ document.addEventListener('input', e => {
 document.addEventListener('keydown', e => {
   const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName);
   const mod = e.metaKey || e.ctrlKey;
+  if (!S.me) return; // the auth screen has no shortcuts
   if (mod && e.key.toLowerCase() === 'b') { e.preventDefault(); toggleSidebar(); return; }
   if (e.key === 'Enter' && e.target.id === 'popQ') { const b = $('#popFields .pi[data-key]'); b && b.click(); }
   if (e.key === 'Enter' && (e.target.id === 'dpFrom' || e.target.id === 'dpTo')) ACT['dp-apply']();
@@ -5003,7 +5038,62 @@ document.addEventListener('drop', e => {
   else col.classList.remove('over');
 });
 
+/* ════════════════════════════ Sign in · Sign up ════════════════════════════
+   Prototype: any well-formed email with any password signs in; sign up only asks for a name and an 8+ character password.
+   The session (name + email) lives in localStorage, so a reload keeps you signed in until Sign out. */
+S.me = store.get('nsc.me', { name: 'Super admin', email: 'super_admin@ns.cards' }) || null;
+const meInitials = () => S.me.name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+const nameFromEmail = e => e.split('@')[0].split(/[._-]+/).filter(Boolean).map(w => w[0].toUpperCase() + w.slice(1)).join(' ') || e;
+// Signed out: every address shows the auth screen (the page asked for opens after sign in). Signed in: #/login and #/signup go to Overview.
+function authRoute() {
+  const h = location.hash.replace(/^#\/?/, '').split('/')[0], auth = h === 'login' || h === 'signup';
+  if (S.me) { if (auth) { location.replace('#/dashboard'); return true; } $('#auth').hidden = true; $('#app').hidden = false; return false; }
+  if (!auth) { S.authNext = location.hash && location.hash !== '#/' ? location.hash : '#/dashboard'; location.replace('#/login'); return true; }
+  closePop(); closeModal(); $('#bulk').classList.remove('show'); $('#app').hidden = true; $('#auth').hidden = false; renderAuth(h === 'signup');
+  return true;
+}
+function renderAuth(up) {
+  const f = (id, label, type, ac, ph, extra = '') => `<div class="field"><label for="${id}">${t(label)}${extra}</label>${type === 'password'
+    ? `<div class="pw"><input id="${id}" type="password" autocomplete="${ac}" placeholder="${ph}"><button type="button" class="ghost-ic" data-act="au-eye" data-tip="${t('Show password')}" aria-label="${t('Show password')}">${icon('eye', 16)}</button></div>`
+    : `<input id="${id}" type="${type}" autocomplete="${ac}" placeholder="${ph}" spellcheck="false">`}</div>`;
+  $('#auth').innerHTML = `<div class="auth-box">
+    <div class="auth-logo">${LOGO_SIGN(22)}${LOGO_WORD(19)}</div>
+    <div class="auth-card">
+      <h1>${t(up ? 'Create an account' : 'Sign in')}</h1>
+      <p class="auth-sub">${t(up ? 'Get access to the NS.Cards admin panel' : 'Welcome back to the NS.Cards admin panel')}</p>
+      <form id="authForm" data-up="${up ? 1 : ''}" novalidate>
+        ${up ? f('auName', 'Full name', 'text', 'name', 'Anna Kowalski') : ''}
+        ${f('auEmail', up ? 'Work email' : 'Email', 'email', 'username', 'name@ns.cards')}
+        ${f('auPw', 'Password', 'password', up ? 'new-password' : 'current-password', up ? t('At least 8 characters') : '', up ? '' : `<button type="button" class="link-btn" data-act="toast" data-msg="${t('Password reset link sent')}">${t('Forgot password?')}</button>`)}
+        <button class="btn btn-primary auth-go" type="submit">${t(up ? 'Create account' : 'Sign in')}</button>
+      </form>
+    </div>
+    <p class="auth-alt">${up ? `${t('Already have an account?')} <a href="#/login">${t('Sign in')}</a>` : `${t('New to the admin panel?')} <a href="#/signup">${t('Create an account')}</a>`}</p>
+    <p class="auth-note">${t('Prototype: any email and password work.')}</p>
+  </div>`;
+  $(up ? '#auName' : '#auEmail').focus();
+}
+const auBad = (id, msg) => { const fl = $('#' + id).closest('.field'); fl.classList.add('bad'); fl.insertAdjacentHTML('beforeend', `<div class="f-err">${t(msg)}</div>`); };
+document.addEventListener('input', e => { const fl = e.target.closest?.('#authForm .field.bad'); if (fl) { fl.classList.remove('bad'); fl.querySelector('.f-err')?.remove(); } });
+document.addEventListener('submit', e => {
+  const form = e.target; if (form.id !== 'authForm') return; e.preventDefault();
+  $$('.field.bad', form).forEach(fl => { fl.classList.remove('bad'); fl.querySelector('.f-err')?.remove(); });
+  const up = !!form.dataset.up, name = up ? $('#auName').value.trim() : '', email = $('#auEmail').value.trim().toLowerCase(), pw = $('#auPw').value;
+  if (up && !name) auBad('auName', 'Enter your name');
+  if (!email) auBad('auEmail', 'Enter your email'); else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) auBad('auEmail', 'Enter a valid email address');
+  if (!pw) auBad('auPw', 'Enter your password'); else if (up && pw.length < 8) auBad('auPw', 'Use at least 8 characters');
+  const bad = $('.field.bad input', form); if (bad) return bad.focus();
+  const btn = $('.auth-go', form); btn.disabled = true; btn.textContent = t(up ? 'Creating account…' : 'Signing in…');
+  setTimeout(() => {
+    S.me = { name: name || nameFromEmail(email), email }; ME = S.me.name; store.set('nsc.me', S.me);
+    const next = S.authNext || '#/dashboard'; S.authNext = null;
+    location.hash = next; if (location.hash === next) route(); // same address: hashchange won't fire
+    toast(up ? `${t('Account created')} · ${esc(email)}` : `${t('Signed in as')} ${esc(email)}`, up ? 'check' : 'login');
+  }, 450);
+});
+
 /* ════════════════════════════ Boot ════════════════════════════ */
+if (S.me) ME = S.me.name;
 if (store.get('nsc.sidebar', 'open') === 'collapsed') $('#app').classList.add('collapsed');
 route();
 </script>
