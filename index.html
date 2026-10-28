@@ -1481,8 +1481,8 @@ const monitorsDue = kind => monitorsOf(kind).filter(m => m.status === 'ALERT' ||
 // attn() counts what waits on an admin on that page (why says what): the item shows the count as a badge (a dot on its icon when the sidebar is collapsed), its section title a dot while folded.
 const waiting = (id, key, values) => () => { const P = PAGES[id]; return applyFilters(pgData(P), [{ key, values }], null, P.fields).length; };
 const NAV = [
-  { label: 'Clients', icon: 'users', items: [{ id: 'dashboard', label: 'Overview', icon: 'dashboard' },
-    { id: 'users', label: 'Users', icon: 'users', attn: () => USERS.filter(u => ['pending', 'review'].includes(u.kyc)).length, why: 'with KYC to review' },
+  { id: 'dashboard', label: 'Overview', icon: 'dashboard' }, // the homepage sits above every section
+  { label: 'Clients', icon: 'users', items: [{ id: 'users', label: 'Users', icon: 'users', attn: () => USERS.filter(u => ['pending', 'review'].includes(u.kyc)).length, why: 'with KYC to review' },
     { id: 'companies', label: 'Company list', icon: 'building', on: () => S.route === 'companies' && S.coView !== 'access', attn: () => COMPANIES.filter(c => !c.cp.length && !c.ip.length).length, why: 'not set up' },
     { id: 'companies', href: '#/companies/access', label: 'Product access', icon: 'table', on: () => S.route === 'companies' && S.coView === 'access' }] },
   // issued cards and accounts are the clients' own objects; Products below are the types they are issued from
@@ -1973,7 +1973,7 @@ document.addEventListener('mousemove', e => {
       tt.className = 'tt plain'; tt.dataset.src = 'simple'; tt.dataset.for = tip.dataset.tip; tt.textContent = tip.dataset.tip;
       const r = tip.getBoundingClientRect();
       if (tip.closest('.sidebar')) placeTT(r.right - 6, r.top + r.height / 2);
-      else { tt.classList.add('show'); const w = tt.offsetWidth; tt.style.left = Math.min(innerWidth - w - 8, Math.max(8, r.left + r.width / 2 - w / 2)) + 'px'; tt.style.top = (r.bottom + 8) + 'px'; }
+      else { tt.classList.add('show'); const w = tt.offsetWidth; tt.style.left = Math.min(innerWidth - w - 8, Math.max(8, r.left + r.width / 2 - w / 2)) + 'px'; const h = tt.offsetHeight; tt.style.top = (r.bottom + 8 + h > innerHeight - 8 ? r.top - 8 - h : r.bottom + 8) + 'px'; } // flips above near the bottom edge (config button)
     }
     return;
   }
