@@ -94,7 +94,7 @@ a{color:inherit;text-decoration:none}
 .app.collapsed .sb-head:hover .sb-toggle{opacity:1;pointer-events:auto}
 .app.collapsed .sb-head:hover .logo{opacity:0}
 .sb-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:var(--space-8) var(--space-12) var(--space-12)}
-.nav{display:flex;align-items:center;gap:var(--space-12);height:var(--control-lg);padding:0 var(--space-12);border-radius:var(--r-sm);color:var(--ink-2);font-size:var(--fs-14);line-height:var(--lh-20);font-weight:var(--fw-medium);width:100%;white-space:nowrap;overflow:hidden;transition:background .12s}
+.nav{display:flex;align-items:center;gap:var(--space-12);height:var(--control-lg);padding:0 var(--space-12);border-radius:var(--r);color:var(--ink-2);font-size:var(--fs-14);line-height:var(--lh-20);font-weight:var(--fw-medium);width:100%;white-space:nowrap;overflow:hidden;transition:background .12s}
 .nav:hover{background:var(--hover)}
 .nav .i{color:var(--ink-3)}
 .nav.active,.nav.active:hover{background:var(--selected);color:var(--ink)}
@@ -138,7 +138,7 @@ a{color:inherit;text-decoration:none}
 .pi .pv{color:var(--ink-3);font-size:var(--fs-14)}
 .pi .pv+.i{color:var(--ink-3)}
 .sb-foot{padding:var(--space-8);border-top:var(--border-width) solid var(--line);flex:none}
-.me{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-4);border-radius:var(--r-sm);width:100%;white-space:nowrap;overflow:hidden}
+.me{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-4);border-radius:var(--r);width:100%;white-space:nowrap;overflow:hidden}
 .me:hover{background:var(--hover)}
 .me-more{color:var(--ink-3)} .me:hover .me-more{color:var(--ink-2)}
 .me .em{font-size:var(--fs-14);line-height:var(--lh-20);overflow:hidden;text-overflow:ellipsis;flex:1;text-align:left}
@@ -149,7 +149,7 @@ a{color:inherit;text-decoration:none}
 .me-h .me-e{font-size:var(--fs-12);color:var(--ink-3)}
 .me-h .me-n,.me-h .me-e{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .seg.ic button{width:var(--control-md);padding:0;justify-content:center}
-.pop-row.me-theme{gap:var(--space-8);height:var(--control-lg);padding:0 var(--space-8)}
+.pop-row.me-theme{gap:var(--space-8);height:var(--control-md);padding:0 var(--space-8)}
 .pop-row.me-theme>.i{color:var(--ink-2);flex:none}
 .pop-row.me-theme>span{flex:1;color:var(--ink)}
 
@@ -169,7 +169,7 @@ kbd{font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font
 .tb-sp{flex:1}
 /* Buttons — DS «Button» / «Icon button». Medium 32 (pages), .btn-lg 40 (overlays). */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-8);height:var(--control-md);padding:0 var(--space-16);border-radius:var(--r-sm);border:var(--border-width) solid transparent;background:transparent;color:var(--ink);font-family:var(--font);font-size:var(--fs-14);line-height:var(--lh-20);font-weight:var(--fw-medium);white-space:nowrap;cursor:pointer;transition:background .12s,box-shadow .12s,border-color .12s,color .12s}
-.btn-lg{border-radius:var(--r);height:var(--control-lg);padding:0 var(--space-24)}
+.btn-lg{border-radius:var(--r);height:var(--control-lg);padding:0 var(--space-16)}
 .btn:focus-visible{outline:0;box-shadow:var(--focus-brand)}
 .btn-primary{background:var(--brand);color:var(--on-brand);border-color:var(--brand-edge)}
 .btn-primary:hover{background:var(--brand-hover)} .btn-primary:active{background:var(--brand-pressed)}
@@ -488,7 +488,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .up-badges{display:flex;gap:var(--space-8);flex-wrap:wrap;margin-top:var(--space-12)}
 .tabs{display:flex;align-items:center;gap:var(--space-4);padding:0 calc(var(--page-padding) - var(--space-8));overflow-x:auto;scrollbar-width:none}
 .tab{position:relative;height:var(--control-lg);padding:0 var(--space-8);display:flex;align-items:center;gap:var(--space-8);font-size:var(--fs-14);line-height:var(--lh-20);font-weight:var(--fw-medium);color:var(--ink-2);white-space:nowrap;border-radius:var(--r-sm) var(--r-sm) 0 0}
-.tab:focus-visible{outline:0;box-shadow:var(--focus-brand)}
+.tab:focus-visible{outline:0;box-shadow:var(--focus-brand);border-radius:var(--r)} /* the focus ring is the only place the tab shows a radius: 40 tall → 12 */
 .tab:hover{color:var(--ink)}
 .tab.on{color:var(--ink)}
 .tab-att{font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);font-style:normal;display:inline-flex;align-items:center;height:var(--control-xs);min-width:var(--control-xs);justify-content:center;color:var(--brand-ink);background:var(--brand-subtle);padding:0 var(--space-4);border-radius:var(--r-xs)}
@@ -506,19 +506,19 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .up-grid .card>.card-h{min-height:56px;margin:0;padding:var(--space-12) var(--space-16) var(--space-12) var(--card-padding);border-bottom:var(--border-width) solid var(--line);flex-wrap:nowrap}
 .up-grid .card-b{padding:var(--space-4) var(--card-padding) var(--space-8)}
 .up-grid .card-b.pad{padding:var(--space-16) var(--card-padding)}
-.up-grid .card-tools{padding:var(--space-12) var(--card-padding);border-bottom:var(--border-width) solid var(--line)}
+.up-grid .card-tools{padding:var(--space-12) var(--space-24);border-bottom:var(--border-width) solid var(--line)}
 
 .card-t .ct{font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);color:var(--ink-3);margin-left:var(--space-4)}
 .ch-act{display:flex;align-items:center;gap:var(--space-8);flex-wrap:wrap}
-.card-tools{display:flex;align-items:center;gap:var(--space-8);flex-wrap:wrap;padding:0 var(--card-padding) var(--space-16)}
+.card-tools{display:flex;align-items:center;gap:var(--space-8);flex-wrap:wrap;padding:0 var(--space-24) var(--space-16)}
 .dt-wrap{overflow-x:auto}
 .dt{min-width:720px}
 .dt th{position:static;height:var(--row);font-size:var(--fs-12)}
 .dt td{height:var(--row)}
 /* two-line rows (a label with a code line under it) keep their taller height until every table goes single-line */
 .dt:has(tbody td div.code) td{height:52px}
-.dt th:first-child,.dt td:first-child{padding-left:var(--card-padding)}
-.dt th:last-child,.dt td:last-child{padding-right:var(--card-padding)}
+.dt th:first-child,.dt td:first-child{padding-left:var(--space-24)} /* tables in cards keep a 24 edge (Table header / cell) */
+.dt th:last-child,.dt td:last-child{padding-right:var(--space-24)}
 .dt th.a{width:1%;padding:0!important}
 .dt th.r,.dt td.r{text-align:right} .dt th.c,.dt td.c{text-align:center} .dt th.w,.dt td.w{width:1%}
 .dt tbody tr{cursor:default}
@@ -625,7 +625,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .dp-btn:hover{background:var(--hover)}
 .topbar .dp-btn{height:var(--control-lg);border-radius:var(--r)}
 /* topbar actions are Large (40): radius/md */
-.topbar .btn{height:var(--control-lg);padding:0 var(--space-24);border-radius:var(--r)}
+.topbar .btn{height:var(--control-lg);padding:0 var(--space-16);border-radius:var(--r)}
 .topbar .icon-btn{width:var(--control-lg);height:var(--control-lg);border-radius:var(--r)}
 .dp{display:flex;margin:calc(-1 * var(--space-4))}
 .pop-head+.dp{margin-top:var(--space-4);border-top:var(--border-width) solid var(--line)}
@@ -680,7 +680,10 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .pop-sep{height:var(--border-width);background:var(--line-soft);margin:var(--space-4) calc(-1 * var(--space-4))}
 .pop-sec{padding:var(--space-8) var(--space-8) var(--space-4)}
 .pop-sec+.pop-sec{border-top:var(--border-width) solid var(--line-soft);margin:var(--space-4) calc(-1 * var(--space-4)) 0;padding-left:var(--space-12);padding-right:var(--space-12)}
-.pop-lbl{font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);min-height:var(--control-md);margin:calc(-1 * var(--space-8)) calc(-1 * var(--space-4)) var(--space-4) 0;display:flex;align-items:center;justify-content:space-between}
+/* between sections: 8 under the content, then the divider (4 · line · 4), as Popover divider in Figma */
+.pop-sec:has(+.pop-sec){padding-bottom:var(--space-8)}
+.pop-sec+.pop-sec{padding-top:var(--space-12)}
+.pop-lbl{font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);min-height:var(--control-lg);margin:calc(-1 * var(--space-8)) calc(-1 * var(--space-4)) var(--space-8) 0;display:flex;align-items:center;justify-content:space-between}
 /* Popover header → Section: actions are Link buttons, medium */
 .pop-lbl .btn-link{padding:0 var(--space-16);text-transform:none;letter-spacing:0}
 .pop-lbl .pop-acts>.btn-link:last-child,.pop-lbl>.btn-link:last-child{margin-right:var(--space-4)} /* actions end 12 from the popover edge */
@@ -838,7 +841,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .os-l{display:flex;flex-direction:column;gap:var(--space-4);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
 .os-l b{font-size:var(--fs-20);line-height:var(--lh-24);font-weight:var(--fw-semibold);color:var(--ink);letter-spacing:-.02em;text-transform:none;font-variant-numeric:tabular-nums}
  /* beats .dgrid .card.flush>.card-h: title centred in the header bar */
-.ovr{display:grid;grid-template-columns:var(--avatar-sm) minmax(0,1fr) 72px 16px;align-items:center;gap:var(--space-12);width:100%;height:var(--row);padding:0 var(--space-16) 0 var(--space-24);border-bottom:var(--border-width) solid var(--line-soft);text-align:left;font-size:var(--fs-14)}
+.ovr{display:grid;grid-template-columns:var(--avatar-sm) minmax(0,1fr) 72px 16px;align-items:center;gap:var(--space-12);width:100%;height:var(--row);padding:0 var(--space-16) 0 var(--card-padding);border-bottom:var(--border-width) solid var(--line-soft);text-align:left;font-size:var(--fs-14)}
 .ovr:last-child{border-bottom:0}
 .ovr:hover{background:var(--hover)}
 .ovr .os-ic{width:var(--avatar-sm);height:var(--avatar-sm);border-radius:var(--r-sm)}
@@ -847,11 +850,11 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .ovr.clear .ovr-n{font-family:var(--font);font-weight:400;color:var(--ink-3);background:none;padding:0}
 .ovr>.i{color:var(--ink-3)}
 .ovr:hover>.i{color:var(--ink)}
-.ovw{display:flex;align-items:center;justify-content:space-between;height:var(--row);padding:0 var(--space-24);border-bottom:var(--border-width) solid var(--line-soft)}
+.ovw{display:flex;align-items:center;justify-content:space-between;height:var(--row);padding:0 var(--card-padding);border-bottom:var(--border-width) solid var(--line-soft)}
 .ovw:last-child{border-bottom:0}
 .ovw b{font-size:var(--fs-14);font-weight:var(--fw-medium)}
 
-.ovl{display:grid;grid-template-columns:96px 160px minmax(0,1fr) auto;gap:var(--space-12);align-items:center;height:var(--row);padding:0 var(--space-24);border-bottom:var(--border-width) solid var(--line-soft);font-size:var(--fs-14)}
+.ovl{display:grid;grid-template-columns:96px 160px minmax(0,1fr) auto;gap:var(--space-12);align-items:center;height:var(--row);padding:0 var(--card-padding);border-bottom:var(--border-width) solid var(--line-soft);font-size:var(--fs-14)}
 .ovl:last-child{border-bottom:0}
 .ovl-a{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* finance monitors: headroom bar (threshold mark in the middle) and the per-kind dashboard cards */
@@ -947,9 +950,9 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .bf-r{display:grid;grid-template-columns:190px minmax(0,1fr);align-items:center;gap:var(--space-16);min-height:58px;padding:var(--space-8) 0;border-bottom:var(--border-width) solid var(--line-soft)}
 .bf-r:last-child{border-bottom:0}
 .bf-r>label{font-size:var(--fs-14);color:var(--ink-2)}
-.bf-r .inp{height:38px}
+.bf-r .inp{height:var(--control-lg);border-radius:var(--r)} /* branding form: Large controls (40 → radius 12) */
 .clr{display:flex;align-items:center;gap:var(--space-8)}
-.clr input[type=color]{width:38px;height:38px;padding:var(--space-4);border-radius:var(--r-sm);border:var(--border-width) solid var(--line);background:var(--surface);cursor:pointer;flex:none}
+.clr input[type=color]{width:var(--control-lg);height:var(--control-lg);padding:var(--space-4);border-radius:var(--r);border:var(--border-width) solid var(--line);background:var(--surface);cursor:pointer;flex:none}
 .clr input[type=color]::-webkit-color-swatch-wrapper{padding:0}
 .clr input[type=color]::-webkit-color-swatch{border:0;border-radius:var(--r-xs)}
 .clr .inp:not(.w){width:120px;font-variant-numeric:tabular-nums;text-transform:uppercase}
@@ -3034,7 +3037,7 @@ function newUserModal(coId = 47) {
   openModal(`<div class="modal">
     <div class="modal-h">New user<button class="icon-btn icon-btn-link" data-act="modal-close">${icon('x', 16)}</button></div>
     <div class="modal-b">
-      <div class="field"><label>Email</label><div style="display:flex;gap:var(--space-8)"><input id="nuEmail" type="email" placeholder="name@company.com" autocomplete="off" style="flex:1"><button class="btn btn-tertiary" style="height:40px;border-radius:var(--r-sm)" data-act="nu-gen">${icon('refresh', 16)}Generate</button></div></div>
+      <div class="field"><label>Email</label><div style="display:flex;gap:var(--space-8)"><input id="nuEmail" type="email" placeholder="name@company.com" autocomplete="off" style="flex:1"><button class="btn btn-tertiary btn-lg" data-act="nu-gen">${icon('refresh', 16)}Generate</button></div></div>
       <div class="field"><label>Company</label><select id="nuCompany" data-search>${COMPANIES.map(c => `<option value="${c.id}" ${c.id === coId ? 'selected' : ''}>${esc(c.name)} · #${c.id}</option>`).join('')}</select></div>
       <div class="field"><label>Referral code</label><input id="nuRef" placeholder="Optional" autocomplete="off"></div>
     </div>
@@ -3776,7 +3779,7 @@ function coBrandTab(c) {
   return `<div class="br-grid"><div class="br-main">
     <div class="card"><div class="card-h"><span class="card-t">Identity</span></div><div class="card-b">
       ${row('Brand name', txt('name'))}
-      ${row('Logo', `<div class="clr">${txt('logo', b.logo.startsWith('data:') ? 'Uploaded image' : 'https://…/logo.svg')}<label class="btn btn-tertiary" style="height:38px;border-radius:var(--r-sm);cursor:pointer;flex:none">${icon('upload', 16)}Upload<input type="file" id="logoFile" hidden accept="image/*"></label></div>`)}
+      ${row('Logo', `<div class="clr">${txt('logo', b.logo.startsWith('data:') ? 'Uploaded image' : 'https://…/logo.svg')}<label class="btn btn-tertiary btn-lg" style="cursor:pointer;flex:none">${icon('upload', 16)}Upload<input type="file" id="logoFile" hidden accept="image/*"></label></div>`)}
       ${row('Brand color', clr('color'))}
       ${row('Background color', clr('bg'))}
       ${row('Button text color', `${clr('btn')}<div class="hint" id="brContrast" style="margin-top:var(--space-8)">${contrastHint(b)}</div>`)}
