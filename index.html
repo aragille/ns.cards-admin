@@ -761,11 +761,11 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 /* ───────────────────────── Dashboard ───────────────────────── */
 .kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--grid-gap);padding:var(--page-padding) var(--page-padding) 0}
 .kpis+.dgrid{padding-top:var(--grid-gap)}
-.kpi{padding:var(--space-12) var(--space-16);min-width:0;background:var(--surface);border:var(--border-width) solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm)}
+.kpi{display:flex;flex-direction:column;padding:var(--space-12) var(--space-16);min-width:0;background:var(--surface);border:var(--border-width) solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm)}
 
 .kpi-l{font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
 .kpi-v{font-size:var(--fs-20);font-weight:var(--fw-semibold);letter-spacing:-.02em;margin-top:var(--space-4);line-height:var(--lh-24);white-space:nowrap}
-.kpi-f{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-8);margin-top:var(--space-12)}
+.kpi-f{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-8);margin-top:auto;padding-top:var(--space-12)} /* the trend row sits on the card's bottom edge, with or without a sparkline */
 .delta{display:inline-flex;align-items:center;gap:var(--space-4);font-size:var(--fs-12);font-weight:500;padding:var(--space-2) var(--space-8) var(--space-2) var(--space-4);border-radius:var(--r-xs);white-space:nowrap}
 .delta.up{color:var(--success-ink);background:var(--success-bg)}
 .delta.down{color:var(--error-ink);background:var(--error-bg)}
