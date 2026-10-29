@@ -187,6 +187,7 @@
   --r: 12px;
   --r-lg: 16px;
   --r-xl: 24px;
+  --r-inner: 6px;
   --pill: 999px;
 
   /* Size */
@@ -203,7 +204,7 @@
   --avatar-md: 32px;
   --sidebar: 280px;
   --sidebar-collapsed: 68px;
-  --topbar: 56px;
+  --topbar: 64px;
   --modal-w: 480px;
   --border-width: 1px;
   --border-width-icon: 1.5px;

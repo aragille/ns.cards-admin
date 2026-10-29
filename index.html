@@ -144,12 +144,13 @@ a{color:inherit;text-decoration:none}
 .me .em{font-size:var(--fs-14);line-height:var(--lh-20);overflow:hidden;text-overflow:ellipsis;flex:1;text-align:left}
 .me-av{width:var(--avatar-md);height:var(--avatar-md);border-radius:var(--pill);background:var(--inv);color:var(--on-inv);display:grid;place-items:center;flex:none}
 .me-h{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-8) var(--space-8) var(--space-8) var(--space-12)}
+.me-h .me-av{background:var(--surface-2);color:var(--ink-3);box-shadow:inset 0 0 0 var(--border-width) var(--line)}
 .me-h .me-n{font-weight:500;font-size:var(--fs-14)}
 .me-h .me-e{font-size:var(--fs-12);color:var(--ink-3)}
 .me-h .me-n,.me-h .me-e{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.seg.ic button{aspect-ratio:1;padding:0;justify-content:center}
-.pop-row.me-theme{gap:var(--space-8);padding:0 0 0 var(--space-8)}
-.pop-row.me-theme>.i{color:var(--ink-3);flex:none}
+.seg.ic button{width:var(--control-md);padding:0;justify-content:center}
+.pop-row.me-theme{gap:var(--space-8);height:var(--control-lg);padding:0 var(--space-8)}
+.pop-row.me-theme>.i{color:var(--ink-2);flex:none}
 .pop-row.me-theme>span{flex:1;color:var(--ink)}
 
 .main-wrap{display:flex;flex-direction:column;min-width:0;height:100vh}
@@ -168,7 +169,7 @@ kbd{font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font
 .tb-sp{flex:1}
 /* Buttons — DS «Button» / «Icon button». Medium 32 (pages), .btn-lg 40 (overlays). */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-8);height:var(--control-md);padding:0 var(--space-16);border-radius:var(--r-sm);border:var(--border-width) solid transparent;background:transparent;color:var(--ink);font-family:var(--font);font-size:var(--fs-14);line-height:var(--lh-20);font-weight:var(--fw-medium);white-space:nowrap;cursor:pointer;transition:background .12s,box-shadow .12s,border-color .12s,color .12s}
-.btn-lg{height:var(--control-lg);padding:0 var(--space-24)}
+.btn-lg{border-radius:var(--r);height:var(--control-lg);padding:0 var(--space-24)}
 .btn:focus-visible{outline:0;box-shadow:var(--focus-brand)}
 .btn-primary{background:var(--brand);color:var(--on-brand);border-color:var(--brand-edge)}
 .btn-primary:hover{background:var(--brand-hover)} .btn-primary:active{background:var(--brand-pressed)}
@@ -212,8 +213,8 @@ h1 .count{font-family:var(--font);font-size:var(--fs-14);font-weight:400;color:v
 .ghost-ic{width:28px;height:28px;border-radius:var(--r-sm);display:grid;place-items:center;color:var(--ink-2)}
 .ghost-ic:hover{background:var(--hover);color:var(--ink)}
 
-.seg{display:inline-flex;align-items:stretch;gap:0;height:var(--control-md);padding:calc(var(--space-2) - var(--border-width));background:var(--surface-2);border:var(--border-width) solid var(--line);border-radius:var(--r)}
-.seg button{padding:0 var(--space-8);border-radius:var(--r-sm);border:var(--border-width) solid transparent;font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);color:var(--ink-2);display:flex;align-items:center;gap:var(--space-4);white-space:nowrap}
+.seg{display:inline-flex;align-items:stretch;gap:0;height:var(--control-md);padding:calc(var(--space-2) - var(--border-width));background:var(--surface-2);border:var(--border-width) solid var(--line);border-radius:var(--r-sm)}
+.seg button{padding:0 var(--space-8);border-radius:var(--r-inner);border:var(--border-width) solid transparent;font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);color:var(--ink-2);display:flex;align-items:center;gap:var(--space-4);white-space:nowrap}
 .seg button:hover{color:var(--ink)}
 .seg button.on{background:var(--surface);color:var(--ink);border-color:var(--line);box-shadow:var(--shadow-sm)}
 
@@ -322,7 +323,7 @@ tbody tr{cursor:pointer}
 tbody tr:hover td{background:var(--hover)}
 tbody tr.sel td,tbody tr.sel:hover td{background:var(--selected)}
 tbody tr:last-child td{border-bottom:0}
-th.cbcell,td.cbcell{width:44px;padding:0 var(--space-4) 0 var(--space-16)}
+th.cbcell,td.cbcell{width:44px;padding:0 var(--space-12)}
 /* bulk-select column stays pinned on the left while the table scrolls sideways (mirrors the pinned row actions on the right) */
 th.cbcell,td.cbcell,.dt th.cbcell{position:sticky;left:0}
 td.cbcell{z-index:1;background:var(--surface)}
@@ -332,7 +333,7 @@ th.pin,td.pin{position:sticky;left:44px}
 td.pin{z-index:1;background:var(--surface)}
 th.pin{z-index:3;background:var(--bg)}
 .hs-wrap.hs-l th.pin,.hs-wrap.hs-l td.pin{box-shadow:inset -1px 0 0 var(--line)}
-th.act-h{width:84px}
+th.act-h{width:88px}
 td.act{position:sticky;right:0;z-index:1;padding:0!important;background:transparent!important;overflow:visible!important}
 tbody tr:hover td.act{z-index:5}
 .row-actions{position:absolute;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:flex-end;gap:var(--space-4);padding:0 var(--space-12) 0 var(--space-40);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .1s;
@@ -348,19 +349,20 @@ table.ut.fixed{table-layout:fixed}
 .ut td{overflow:hidden;text-overflow:ellipsis}
 .ut .th-in{max-width:100%;overflow:hidden}
 .ut th.c,.ut td.c{text-align:center}
-/* column reorder: dragged column fades, a brand line marks where it will land */
+/* column chips: the dragged chip fades */
 .col-dragging{opacity:.35}
-/* header: grip dots appear on hover; while dragging, the column moves live and a dashed slot holds its place */
+/* header: grip dots appear on hover */
 th[draggable="true"]::before{content:"";position:absolute;left:3px;top:50%;width:8px;height:13px;transform:translateY(-50%);opacity:0;transition:opacity .12s;pointer-events:none;
   background-image:radial-gradient(circle,var(--ink-3) 1.15px,transparent 1.35px);background-size:4px 4.4px}
 th[draggable="true"]:hover::before{opacity:1}
 .dt th[draggable="true"]{position:relative}
-.col-ghost{visibility:hidden} /* the dragged column's cells, while a white dashed slot holds their place */
+.col-origin{opacity:.4} /* the dragged column's trace (Origin) */
+th.col-gap,td.col-gap{padding:0!important;border-bottom-color:transparent!important;background:transparent!important} /* the empty column under the Drop slot */
 .col-slot{position:absolute;z-index:3;pointer-events:none;border:var(--border-width) dashed var(--line-strong);border-radius:var(--r);background:var(--surface);transition:left .14s cubic-bezier(.2,.8,.2,1),width .14s}
 /* what you carry while dragging a column: the whole column as a small card (header + the rows in view) */
 .col-drag-img{position:fixed;top:-10000px;left:0;padding:var(--space-12) var(--space-16) var(--space-24);pointer-events:none}
 .cdi-card{background:var(--surface);border:var(--border-width) solid var(--line-strong);border-radius:var(--r);overflow:hidden;color:var(--ink);font-size:var(--fs-14);
-  box-shadow:0 14px 30px rgba(17,17,17,.14),0 3px 8px rgba(17,17,17,.08)}
+  box-shadow:var(--shadow-lg)}
 .cdi-h{display:flex;align-items:center;gap:var(--space-8);height:40px;padding:0 var(--space-12);background:var(--hover);border-bottom:var(--border-width) solid var(--line);font-size:var(--fs-12);font-weight:500;white-space:nowrap}
 .cdi-h .i{color:var(--ink-3)}
 .cdi-c{display:flex;align-items:center;padding:0 var(--space-12);border-bottom:var(--border-width) solid var(--line-soft);white-space:nowrap;overflow:hidden}
@@ -384,6 +386,7 @@ th[draggable="true"]:hover::before{opacity:1}
 .dgrid .card:not(.ov-stat):not(.flush)>.card-h~*{margin-left:var(--card-padding);margin-right:var(--card-padding)}
 .dgrid .card:not(.ov-stat):not(.flush)>.card-h+*{margin-top:var(--space-16)}
 .dgrid .card:not(.ov-stat):not(.flush)>:last-child{margin-bottom:var(--card-padding)}
+.dgrid .card:not(.ov-stat):not(.flush)>.su{margin-left:calc(var(--card-padding) - var(--space-8));margin-right:calc(var(--card-padding) - var(--space-8))}
 .flags{display:inline-flex;align-items:center;gap:var(--space-4)}
 .flags .faint{font-size:var(--fs-12);margin-left:var(--space-4)}
 .col-rs{position:absolute;top:0;right:-5px;width:10px;height:100%;cursor:col-resize;z-index:3}
@@ -439,24 +442,28 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 
 /* board view */
 .board{display:flex;gap:var(--grid-gap);overflow-x:auto;align-items:flex-start;padding-bottom:var(--space-8)}
-.col{flex:0 0 290px;background:var(--surface-2);border:var(--border-width) solid var(--line);border-radius:var(--r-lg);display:flex;flex-direction:column;max-height:calc(100vh - 248px);transition:background .12s,border-color .12s}
-.col.over{background:var(--brand-subtle);border-color:var(--brand)}
-.col-h{display:flex;align-items:center;gap:var(--space-8);padding:var(--space-12) var(--space-16);font-weight:var(--fw-semibold);font-size:var(--fs-14);line-height:var(--lh-20)}
+.col{flex:0 0 290px;background:var(--surface-2);border:var(--border-width) solid var(--line);border-radius:var(--r-lg);display:flex;flex-direction:column;max-height:calc(100vh - 248px);padding-bottom:var(--space-8)}
+.col-h{display:flex;align-items:center;gap:var(--space-8);padding:var(--space-12) var(--space-16) var(--space-12) var(--space-24);font-weight:var(--fw-semibold);font-size:var(--fs-14);line-height:var(--lh-20)}
 .col-h .mono{font-weight:var(--fw-medium);color:var(--ink-3)}
-.col-b{padding:0 var(--space-8) var(--space-8);overflow-y:auto;display:flex;flex-direction:column;gap:var(--space-8);min-height:60px}
-.bcard{background:var(--surface);border:var(--border-width) solid var(--line);border-radius:var(--r);padding:var(--space-12);box-shadow:var(--shadow-sm);cursor:grab;transition:box-shadow .12s,transform .12s,border-color .12s}
+.col-b{padding:0 var(--space-8);overflow-y:auto;display:flex;flex-direction:column;gap:var(--space-8);min-height:60px}
+.bcard{flex:none;display:flex;flex-direction:column;gap:var(--space-12);background:var(--surface);border:var(--border-width) solid var(--line);border-radius:var(--r);padding:var(--space-12) var(--space-16);box-shadow:var(--shadow-sm);cursor:grab;transition:box-shadow .12s,border-color .12s}
 .bcard:hover{border-color:var(--line-strong);box-shadow:var(--shadow-md)}
-.bcard.dragging{opacity:.45;transform:rotate(1.5deg)}
+.bcard.dragging{opacity:.4} /* Origin: the card's trace while it is carried */
+.bcard-img .bcard{border-color:var(--line-strong);box-shadow:var(--shadow-lg)} /* Dragging: what follows the pointer */
+.bslot{flex:none;border:var(--border-width) dashed var(--line-strong);border-radius:var(--r);background:var(--surface);display:grid;place-items:center;color:var(--ink-3);font-size:var(--fs-12);line-height:var(--lh-16)}
 .bcard.link{cursor:pointer}
 .bc-top{display:flex;align-items:center;gap:var(--space-8)}
 .bc-name{font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bc-email{font-size:var(--fs-12);color:var(--ink-2);margin:var(--space-4) 0 var(--space-12);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bc-head{display:flex;flex-direction:column;gap:var(--space-4);min-width:0}
+.bc-tags:empty{display:none}
+.bc-email{font-size:var(--fs-12);line-height:var(--lh-16);color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bc-tags{display:flex;flex-wrap:wrap;gap:var(--space-4)}
 .tag{display:inline-flex;align-items:center;gap:var(--space-4);height:var(--tag-h);padding:0 var(--space-8);border-radius:var(--r-xs);border:var(--border-width) solid var(--line);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);color:var(--ink-2);background:var(--surface)}
-.bc-foot{display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-12);padding-top:var(--space-12);border-top:var(--border-width) dashed var(--line);font-size:var(--fs-12)}
-.col-empty{border:var(--border-width) dashed var(--line-strong);border-radius:var(--r);height:72px;display:grid;place-items:center;color:var(--ink-3);font-size:var(--fs-12)}
-.more-btn{height:var(--control-md);border-radius:var(--r-sm);color:var(--ink-2);font-size:var(--fs-12);font-weight:500}
-.more-btn:hover{background:var(--surface)}
+.bc-foot{display:flex;justify-content:space-between;align-items:center;padding-top:var(--space-12);border-top:var(--border-width) dashed var(--line);font-size:var(--fs-12);line-height:var(--lh-16)}
+.bc-foot .num{font-size:var(--fs-14);line-height:var(--lh-20)}
+.col-b:has(.bslot) .col-empty{display:none}
+.col-empty{flex:none;border:var(--border-width) dashed var(--line);border-radius:var(--r);height:72px;display:grid;place-items:center;color:var(--ink-3);font-size:var(--fs-12)}
+.col-more{padding:var(--space-8) var(--space-8) 0}
 
 /* floating bar (bulk actions + unsaved changes) */
 .bulk{position:fixed;left:50%;bottom:24px;transform:translate(-50%,140%);opacity:0;z-index:40;display:flex;align-items:center;gap:var(--space-4);padding:var(--space-4);background:var(--float);color:var(--ink);border-radius:var(--r);box-shadow:var(--shadow-lg);transition:transform .2s cubic-bezier(.2,.8,.2,1),opacity .2s;pointer-events:none}
@@ -529,7 +536,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .dd{text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px}
 .dd.dd-ph{color:var(--ink-3)}
 .dd .flag{margin-right:var(--space-8)}
-.dd-field{display:block;width:100%;max-width:none;height:var(--control-lg);border-radius:var(--r-sm);border:var(--border-width) solid var(--line);padding:0 var(--space-32) 0 var(--space-12);font-size:var(--fs-14);color:var(--ink);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B9B98' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right var(--space-8) center/16px}
+.dd-field{display:block;width:100%;max-width:none;height:var(--control-lg);border-radius:var(--r);border:var(--border-width) solid var(--line);padding:0 var(--space-32) 0 var(--space-12);font-size:var(--fs-14);color:var(--ink);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B9B98' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right var(--space-8) center/16px}
 .dd:hover{border-color:var(--line-strong)}
 .dd.open,.dd:focus-visible{border-color:var(--focus);box-shadow:var(--focus-brand);outline:0}
 .fsel:hover,.inp:hover,.dd-field:hover,.field input:hover,.field select:hover{border-color:var(--line-strong)}
@@ -616,7 +623,10 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .dp-btn span{overflow:hidden;text-overflow:ellipsis}
 .dp-btn .i{color:var(--ink-3)}
 .dp-btn:hover{background:var(--hover)}
-.topbar .dp-btn{height:var(--control-md)}
+.topbar .dp-btn{height:var(--control-lg);border-radius:var(--r)}
+/* topbar actions are Large (40): radius/md */
+.topbar .btn{height:var(--control-lg);padding:0 var(--space-24);border-radius:var(--r)}
+.topbar .icon-btn{width:var(--control-lg);height:var(--control-lg);border-radius:var(--r)}
 .dp{display:flex;margin:calc(-1 * var(--space-4))}
 .pop-head+.dp{margin-top:var(--space-4);border-top:var(--border-width) solid var(--line)}
 .dp-presets{width:192px;flex:none;padding:var(--space-16) var(--space-4);border-right:var(--border-width) solid var(--line)}
@@ -636,7 +646,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .dp-mo.today{color:var(--brand-ink);font-weight:var(--fw-medium)}
 .dp-mo.on,.dp-mo.on:hover{background:var(--inv);color:var(--on-inv)}
 .dp-in{flex:1;min-width:0;display:flex;align-items:center;gap:var(--space-8)}
-.dp-in .inp{flex:none;width:120px;height:var(--control-lg);padding:0 var(--space-12);font-size:var(--fs-14);font-variant-numeric:tabular-nums}
+.dp-in .inp{flex:none;width:120px;height:var(--control-lg);border-radius:var(--r);padding:0 var(--space-12);font-size:var(--fs-14);font-variant-numeric:tabular-nums}
 .dp-in .inp.err{border-color:var(--error);box-shadow:var(--focus-error)}
 .dp-dash{color:var(--ink-3)}
 .dp-grid{display:grid;grid-template-columns:repeat(7,1fr)}
@@ -645,10 +655,15 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .dp-day:hover:not(:disabled){background:var(--hover)}
 .dp-day.today{font-weight:var(--fw-medium);color:var(--brand-ink)}
 .dp-day.in{background:var(--surface-2);border-radius:0}
+.dp-grid{isolation:isolate}
+.dp-day.rng{position:relative}
+.dp-day.start.rng:not(.end)::before,.dp-day.end.rng:not(.start)::before{content:'';position:absolute;inset:0;z-index:-1;background:var(--surface-2)}
+.dp-day.start.rng:not(.end)::before{left:50%}
+.dp-day.end.rng:not(.start)::before{right:50%}
 .dp-day.start,.dp-day.end,.dp-day.start:hover,.dp-day.end:hover{background:var(--inv);color:var(--on-inv);font-weight:var(--fw-medium)}
 .dp-f{display:flex;align-items:center;gap:var(--space-8);margin:0 calc(-1 * var(--space-4)) calc(-1 * var(--space-4));padding:var(--space-12) var(--space-16);border-top:var(--border-width) solid var(--line)}
 
-.pop-head{display:flex;align-items:center;gap:var(--space-8);height:var(--control-md);padding:0 0 0 var(--space-8);font-weight:var(--fw-semibold);font-size:var(--fs-14);line-height:var(--lh-20)}
+.pop-head{display:flex;align-items:center;gap:var(--space-8);height:var(--control-lg);padding:0 0 0 var(--space-8);font-weight:var(--fw-semibold);font-size:var(--fs-14);line-height:var(--lh-20)}
 .pop-search{display:flex;align-items:center;gap:var(--space-8);height:var(--control-md);padding:0 var(--space-12);margin:calc(-1 * var(--space-4)) calc(-1 * var(--space-4)) var(--space-4);border-bottom:var(--border-width) solid var(--line-soft);color:var(--ink-3)}
 .pop-head+.pop-search{margin-top:0;border-top:var(--border-width) solid var(--line-soft)}
 .pop-search input{border:0;outline:0;flex:1;min-width:0;background:transparent;color:var(--ink);font-size:var(--fs-14)}
@@ -657,7 +672,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .pi:disabled{color:var(--ink-disabled);background:none}
 .pi.danger,.pi.danger>.i{color:var(--error-ink)}
 .pi:hover,.pi.kb{background:var(--hover)}
-.pi>.i{color:var(--ink-3)}
+.pi>.i:first-child{color:var(--ink-2)} .pi>.i{color:var(--ink-3)}
 .pi .pl{flex:1;overflow:hidden;text-overflow:ellipsis}
 .pi .pc{color:var(--ink-3);font-size:var(--fs-12);font-weight:var(--fw-medium)}
 .pi .chk{margin-left:auto;color:var(--ink)}
@@ -666,8 +681,13 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .pop-sec+.pop-sec{border-top:var(--border-width) solid var(--line-soft);margin:var(--space-4) calc(-1 * var(--space-4)) 0;padding-left:var(--space-12);padding-right:var(--space-12)}
 .pop-lbl{font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);min-height:var(--control-md);margin:calc(-1 * var(--space-8)) calc(-1 * var(--space-4)) var(--space-4) 0;display:flex;align-items:center;justify-content:space-between}
 /* Popover header → Section: actions are Link buttons, medium */
-.pop-lbl .btn-link{padding:0 var(--space-8);text-transform:none;letter-spacing:0}
+.pop-lbl .btn-link{padding:0 var(--space-16);text-transform:none;letter-spacing:0}
+.pop-lbl .pop-acts>.btn-link:last-child,.pop-lbl>.btn-link:last-child{margin-right:var(--space-4)} /* actions end 12 from the popover edge */
 .pop-acts{display:flex}
+/* column resets under the chips: the first link's text starts on the chips' left edge */
+.pop-foot{display:flex;margin-top:var(--space-4)}
+.pop-foot .btn-link{padding:0 var(--space-16)}
+.pop-foot .btn-link:first-child{margin-left:calc(-1 * var(--space-12));padding-left:calc(var(--space-12) - var(--border-width))}
 /* a Link in a key–value row lines its label up with the values */
 .kv-r .btn-link{margin-right:calc(-1 * var(--space-16))}
 .pop-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);height:var(--control-md)}
@@ -699,7 +719,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .modal{width:min(var(--modal-w),100%);background:var(--surface);border:var(--border-width) solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);animation:pop-in .16s ease;overflow:hidden}
 .modal-h{display:flex;align-items:center;justify-content:space-between;gap:var(--space-8);padding:var(--space-16) var(--space-16) var(--space-8) var(--space-24);font-weight:var(--fw-semibold);font-size:var(--fs-16);line-height:var(--lh-24)}
 .modal-b{padding:var(--space-8) var(--space-24) var(--space-24);display:flex;flex-direction:column;gap:var(--space-16)}
-.modal-f{display:flex;justify-content:flex-end;gap:var(--space-8);padding:var(--space-16) var(--space-24);border-top:var(--border-width) solid var(--line);background:var(--surface-2)}
+.modal-f{display:flex;justify-content:flex-end;gap:var(--space-8);padding:var(--space-12) var(--space-24);border-top:var(--border-width) solid var(--line);background:var(--surface)}
 /* Confirmation step: sits above any open modal so a form behind it keeps its input */
 .cfm-wrap{z-index:78;padding-top:22vh}
 .modal.cfm{width:min(var(--modal-w),100%)}
@@ -731,13 +751,14 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .pc-nav.on .pc-rad{border-color:var(--inv);background:var(--inv)} .pc-nav.on .pc-rad::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--on-inv)}
 @media (max-width:600px){.pc-brands,.pc-navs{grid-template-columns:minmax(0,1fr)}}
 .field label{display:block;font-size:var(--fs-12);line-height:var(--lh-16);color:var(--ink-2);margin-bottom:var(--space-8);font-weight:var(--fw-medium)}
-.field input,.field select{width:100%;height:var(--control-lg);border-radius:var(--r-sm);border:var(--border-width) solid var(--line);padding:0 var(--space-12);outline:0;background:var(--surface)}
+.field input,.field select{width:100%;height:var(--control-lg);border-radius:var(--r);border:var(--border-width) solid var(--line);padding:0 var(--space-12);outline:0;background:var(--surface)}
 .field input:focus,.field select:focus{border-color:var(--focus);box-shadow:var(--focus-brand)}
 
 /* ───────────────────────── Dashboard ───────────────────────── */
-.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
-.kpi{padding:var(--card-padding);border-right:var(--border-width) solid var(--line);min-width:0}
-.kpi:last-of-type{border-right:0}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--grid-gap);padding:var(--page-padding) var(--page-padding) 0}
+.kpis+.dgrid{padding-top:var(--grid-gap)}
+.kpi{padding:var(--space-12) var(--space-16);min-width:0;background:var(--surface);border:var(--border-width) solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-sm)}
+
 .kpi-l{font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
 .kpi-v{font-size:var(--fs-20);font-weight:var(--fw-semibold);letter-spacing:-.02em;margin-top:var(--space-4);line-height:var(--lh-24);white-space:nowrap}
 .kpi-f{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-8);margin-top:var(--space-12)}
@@ -816,20 +837,20 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .os-l{display:flex;flex-direction:column;gap:var(--space-4);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
 .os-l b{font-size:var(--fs-20);line-height:var(--lh-24);font-weight:var(--fw-semibold);color:var(--ink);letter-spacing:-.02em;text-transform:none;font-variant-numeric:tabular-nums}
  /* beats .dgrid .card.flush>.card-h: title centred in the header bar */
-.ovr{display:grid;grid-template-columns:32px minmax(0,1fr) 72px 16px;align-items:center;gap:var(--space-12);width:100%;height:44px;padding:0 var(--space-16) 0 var(--space-24);border-bottom:var(--border-width) solid var(--line-soft);text-align:left;font-size:var(--fs-14)}
+.ovr{display:grid;grid-template-columns:var(--avatar-sm) minmax(0,1fr) 72px 16px;align-items:center;gap:var(--space-12);width:100%;height:var(--row);padding:0 var(--space-16) 0 var(--space-24);border-bottom:var(--border-width) solid var(--line-soft);text-align:left;font-size:var(--fs-14)}
 .ovr:last-child{border-bottom:0}
 .ovr:hover{background:var(--hover)}
-.ovr .os-ic{width:28px;height:28px;border-radius:var(--r-sm)}
+.ovr .os-ic{width:var(--avatar-sm);height:var(--avatar-sm);border-radius:var(--r-sm)}
 .ovr-l{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ovr-n{justify-self:end;font-family:var(--font);font-size:var(--fs-14);font-weight:500;color:var(--brand-ink);background:var(--brand-subtle);padding:0 var(--space-8);line-height:20px;border-radius:var(--r-xs)}
 .ovr.clear .ovr-n{font-family:var(--font);font-weight:400;color:var(--ink-3);background:none;padding:0}
 .ovr>.i{color:var(--ink-3)}
 .ovr:hover>.i{color:var(--ink)}
-.ovw{display:flex;align-items:center;justify-content:space-between;height:44px;padding:0 var(--space-24);border-bottom:var(--border-width) solid var(--line-soft)}
+.ovw{display:flex;align-items:center;justify-content:space-between;height:var(--row);padding:0 var(--space-24);border-bottom:var(--border-width) solid var(--line-soft)}
 .ovw:last-child{border-bottom:0}
-.ovw b{font-size:var(--fs-14);font-weight:600}
+.ovw b{font-size:var(--fs-14);font-weight:var(--fw-medium)}
 
-.ovl{display:grid;grid-template-columns:96px 160px minmax(0,1fr) auto;gap:var(--space-12);align-items:center;height:42px;padding:0 var(--space-24);border-bottom:var(--border-width) solid var(--line-soft);font-size:var(--fs-14)}
+.ovl{display:grid;grid-template-columns:96px 160px minmax(0,1fr) auto;gap:var(--space-12);align-items:center;height:var(--row);padding:0 var(--space-24);border-bottom:var(--border-width) solid var(--line-soft);font-size:var(--fs-14)}
 .ovl:last-child{border-bottom:0}
 .ovl-a{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* finance monitors: headroom bar (threshold mark in the middle) and the per-kind dashboard cards */
@@ -966,8 +987,6 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 /* ───────────────────────── Responsive ───────────────────────── */
 @media (max-width:1180px){
   .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
-  .kpi:nth-of-type(3){border-right:0}
-  .kpi:nth-of-type(n+4){border-top:var(--border-width) solid var(--line)}
   .ustats{grid-template-columns:repeat(3,minmax(0,1fr))}
   .span-8,.span-4,.span-6,.span-3,.span-5,.span-7{grid-column:span 12}
   .up-grid{grid-template-columns:minmax(0,1fr)}
@@ -997,9 +1016,6 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
   .results{padding:0 var(--page-padding-mobile) var(--page-padding-mobile)}
   .dgrid,.up-grid{padding:var(--page-padding-mobile)}
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .kpi{border-right:var(--border-width) solid var(--line)!important;border-top:var(--border-width) solid var(--line)}
-  .kpi:nth-of-type(-n+2){border-top:0}
-  .kpi:nth-of-type(2n){border-right:0!important}
   .ustats{display:flex;overflow-x:auto;scrollbar-width:none;margin:var(--page-padding-mobile) var(--page-padding-mobile) 0}
   .ust{flex:0 0 140px}
   .search{width:100%}
@@ -1160,7 +1176,7 @@ const ICONS = {
   board: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M8 7v7M12 7v4M16 7v9"/>',
   download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
   more: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
-  check: '<path d="M20 6 9 17l-5-5"/>',
+  check: '<path d="M4.5 12.5l4.5 4.5 10-10.5"/>',
   minus: '<path d="M5 12h14"/>',
   copy: '<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
   login: '<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/>',
@@ -1273,7 +1289,7 @@ const SOLAR = {
   panelOpen: `<g transform="matrix(-1 0 0 1 24 0)"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 11c0-3.771 0-5.657 1.172-6.828S6.229 3 10 3h4c3.771 0 5.657 0 6.828 1.172S22 7.229 22 11v2c0 3.771 0 5.657-1.172 6.828S17.771 21 14 21h-4c-3.771 0-5.657 0-6.828-1.172S2 16.771 2 13z"/><path stroke-linecap="round" d="M15 21V3"/></g></g>`,
 };
 // Solar where available; the plain stroke set (ICONS) covers tiny utility marks: check, plus, minus, ×, small arrows
-const icon = (n, s = 16, sw = 1.75) => SOLAR[n]
+const icon = (n, s = 16, sw = 1.5) => SOLAR[n]
   ? `<svg class="i" width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true">${SOLAR[n]}</svg>`
   : `<svg class="i" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ''}</svg>`;
 
@@ -1455,17 +1471,17 @@ const COLS = [
   { key: 'country', label: 'Residency', val: u => u.country || 'ZZZ', dir: 'asc', cell: u => ctryCell(u.country) },
   { key: 'status', label: 'Status', val: u => Object.keys(STATUS).indexOf(u.status), dir: 'asc', cell: u => statusCell(u.status) },
   { key: 'kyc', label: 'KYC', val: u => Object.keys(KYC).indexOf(u.kyc), dir: 'asc', cell: u => badge(KYC[u.kyc]) },
-  { key: 'kycVerified', label: 'KYC verified', val: u => +(u.kyc === 'approved'), dir: 'desc', cell: u => u.kyc === 'approved' ? `<span style="color:var(--success-ink)">${icon('check', 15, 2.2)}</span>` : '<span class="faint">—</span>' },
-  { key: 'idv', label: 'IDV verified', val: u => +u.idv, dir: 'desc', cell: u => u.idv ? `<span style="color:var(--success-ink)">${icon('check', 15, 2.2)}</span>` : '<span class="faint">—</span>' },
-  { key: 'emailVerified', label: 'Email verified', val: u => +u.emailVerified, dir: 'desc', cell: u => u.emailVerified ? `<span style="color:var(--success-ink)">${icon('check', 15, 2.2)}</span>` : '<span class="faint">—</span>' },
+  { key: 'kycVerified', label: 'KYC verified', val: u => +(u.kyc === 'approved'), dir: 'desc', cell: u => u.kyc === 'approved' ? `<span style="color:var(--success-ink)">${icon('check', 16, 2.2)}</span>` : '<span class="faint">—</span>' },
+  { key: 'idv', label: 'IDV verified', val: u => +u.idv, dir: 'desc', cell: u => u.idv ? `<span style="color:var(--success-ink)">${icon('check', 16, 2.2)}</span>` : '<span class="faint">—</span>' },
+  { key: 'emailVerified', label: 'Email verified', val: u => +u.emailVerified, dir: 'desc', cell: u => u.emailVerified ? `<span style="color:var(--success-ink)">${icon('check', 16, 2.2)}</span>` : '<span class="faint">—</span>' },
   { key: 'risk', label: 'Risk', val: u => RISK[u.risk].n, dir: 'desc', cell: u => riskCell(u.risk) },
   { key: 'riskPoints', label: 'Risk points', val: u => u.riskPoints ?? -1, dir: 'desc', right: 1, cell: u => u.riskPoints == null ? '<span class="faint">—</span>' : `<span class="num">${u.riskPoints}</span>` },
   { key: 'level', label: 'Level', val: u => Object.keys(LEVEL).indexOf(u.level), dir: 'desc', cell: u => `<span class="muted">${LEVEL[u.level].label}</span>` },
   { key: 'type', label: 'Type', val: u => u.type, dir: 'asc', cell: u => `<span class="muted">${TYPE[u.type].label}</span>` },
   { key: 'balance', label: 'Balance', val: u => u.balance, dir: 'desc', right: 1, cell: u => `<span class="num ${u.balance ? '' : 'zero'}">${fmtEur(u.balance)}</span>` },
   { key: 'cards', label: 'Cards', val: u => u.cards, dir: 'desc', right: 1, cell: u => `<span class="num ${u.cards ? '' : 'zero'}">${u.cards}</span>` },
-  { key: 'twofa', label: '2FA', val: u => +u.twofa, dir: 'desc', cell: u => u.twofa ? `<span style="color:var(--success-ink)">${icon('check', 15, 2.2)}</span>` : '<span class="faint">—</span>' },
-  { key: 'tempPassword', label: 'Temporary password', val: u => +u.tempPassword, dir: 'desc', cell: u => u.tempPassword ? `<span style="color:var(--success-ink)">${icon('check', 15, 2.2)}</span>` : '<span class="faint">—</span>' },
+  { key: 'twofa', label: '2FA', val: u => +u.twofa, dir: 'desc', cell: u => u.twofa ? `<span style="color:var(--success-ink)">${icon('check', 16, 2.2)}</span>` : '<span class="faint">—</span>' },
+  { key: 'tempPassword', label: 'Temporary password', val: u => +u.tempPassword, dir: 'desc', cell: u => u.tempPassword ? `<span style="color:var(--success-ink)">${icon('check', 16, 2.2)}</span>` : '<span class="faint">—</span>' },
   { key: 'lang', label: 'Language', val: u => u.lang, dir: 'asc', cell: u => `<span class="muted">${u.lang}</span>` },
   { key: 'referral', label: 'Referral code', val: u => u.referral, dir: 'asc', cell: u => `<span class="num muted">${u.referral}</span>` },
   { key: 'invitedBy', label: 'Invited by', val: u => u.invitedBy || 0, dir: 'desc', cell: u => u.invitedBy ? `<span class="num">#${u.invitedBy}</span>` : '<span class="faint">—</span>' },
@@ -1524,9 +1540,10 @@ const NAV = [
     { id: 'creditco', label: 'CreditCo KYC', icon: 'passport', attn: waiting('creditco', 'status', ['ACCESS_REQUESTED', 'NOT_ALL_FORM_SUBMITTED']), why: 'to follow up' }, { id: 'kyt', label: 'KYT rules', icon: 'radar' }] },
   { label: 'Staking', icon: 'stakingDash', items: [{ id: 'staking', label: 'Staking dashboard', icon: 'stakingDash' }, { id: 'stakes', label: 'Stakes', icon: 'stakes' },
     { id: 'payout-pools', label: 'Payout pools', icon: 'payout', attn: waiting('payout-pools', 'status', ['FAILED']), why: 'failed' }, { id: 'strategies', label: 'Strategies', icon: 'strategy' }] },
-  { label: 'Finance', icon: 'walletStats', items: [{ id: 'wallet-stats', label: 'Wallet statistics', icon: 'walletStats' }, { id: 'activity-stats', label: 'Operation statistics', icon: 'pieChart' }, { id: 'reserves', label: 'Reserves', icon: 'scale' },
-    { id: 'monitors', label: 'Finance monitors', icon: 'activity', tabs: [['monitors', 'Dashboard'], ...Object.values(MON_KIND).map(m => [m.page, m.label])], on: () => tabHost(S.route)?.id === 'monitors', attn: () => monitorsDue().length, why: 'monitors need attention' },
-    ...Object.entries(MON_KIND).map(([k, m]) => ({ id: m.page, label: m.label, icon: m.icon, tab: 'monitors', attn: () => monitorsDue(k).length, why: 'need attention' }))] },
+  { label: 'Finance', icon: 'walletStats', items: [{ id: 'wallet-stats', label: 'Wallet statistics', icon: 'walletStats' }, { id: 'activity-stats', label: 'Operation statistics', icon: 'pieChart' }, { id: 'reserves', label: 'Reserves', icon: 'scale' }] },
+  // Finance monitors: a group of its own — the dashboard across them, then one list per kind
+  { label: 'Finance monitors', icon: 'activity', items: [{ id: 'monitors', label: 'Monitors dashboard', icon: 'activity', attn: () => monitorsDue().length, why: 'monitors need attention' },
+    ...Object.entries(MON_KIND).map(([k, m]) => ({ id: m.page, label: { cards: 'Card issuers', bank: 'Bank accounts' }[k] || m.label, icon: m.icon, attn: () => monitorsDue(k).length, why: 'need attention' }))] },
   { label: 'Reference data', icon: 'sliders', items: [{ id: 'currencies', label: 'Currencies', icon: 'coins' }, { id: 'networks', label: 'Networks', icon: 'link' }, { id: 'markets', label: 'Markets', icon: 'candles' }, { id: 'countries', label: 'Country lists', icon: 'globe' }] },
   { label: 'Administration', icon: 'userCog', items: [{ id: 'admins', label: 'Administrators', icon: 'userCog' }, { id: 'roles', label: 'Roles', icon: 'key' }, { id: 'sources', label: 'Sources', icon: 'folder' },
     { id: 'verification-templates', label: 'Verification templates', icon: 'file' }, { id: 'logs', label: 'Audit log', icon: 'logs' }] },
@@ -1587,7 +1604,7 @@ function navSection(n) {
   if (S.navV === 'fly') {
     const cur = navShown(n.items).find(navOn);
     const row = cur || n; // inside a section, its row shows the current page instead of the section
-    return `<button class="nav nav-fly ${cur ? 'active' : ''}" data-act="nav-fly" data-sec="${n.label}" data-tip="${t(row.label)}" data-tip-collapsed>${icon(row.icon, 16)}<span class="fade">${t(row.label)}</span>${dot ? '<i class="ndot"></i>' : ''}<span class="fade nf-chev">${icon('chevRight', 14)}</span></button>`;
+    return `<button class="nav nav-fly ${cur ? 'active' : ''}" data-act="nav-fly" data-sec="${n.label}" data-tip="${t(row.label)}" data-tip-collapsed>${icon(row.icon, 16)}<span class="fade">${t(row.label)}</span>${dot ? '<i class="ndot"></i>' : ''}<span class="fade nf-chev">${icon('chevRight', 16)}</span></button>`;
   }
   const shut = secShut(n);
   return `<div class="sb-sec ${shut ? 'closed' : ''}"><button class="sb-label fade" data-act="nav-sec" data-sec="${n.label}" aria-expanded="${!shut}"><span>${t(n.label)}</span>${dot ? `<i class="sb-dot" data-tip="Something here needs a look"></i>` : ''}${icon('chevDown', 12)}</button><div class="sb-items">${navShown(n.items).map(it => navLink(it)).join('')}</div></div>`;
@@ -1611,13 +1628,13 @@ function renderSidebar() {
   $('#sidebar').innerHTML = `
     <div class="sb-head">
       <a class="logo lg-${S.brand}" href="#/dashboard" aria-label="${brand().name} home">${brand().side()}</a>
-      <button class="sb-toggle" data-act="toggle-sidebar" data-tip="${col ? 'Expand' : 'Collapse'} sidebar  ⌘B">${icon(col ? 'panelOpen' : 'panelClose', 18)}</button>
+      <button class="sb-toggle" data-act="toggle-sidebar" data-tip="${col ? 'Expand' : 'Collapse'} sidebar  ⌘B">${icon(col ? 'panelOpen' : 'panelClose', 16)}</button>
     </div>
     <nav class="sb-scroll v-${S.navV}">
       ${NAV.map(n => n.items ? navSection(n) : navLink(n)).join('')}
     </nav>
     <div class="sb-foot">
-      <button class="me" data-act="me" data-tip="Account" data-tip-collapsed><span class="me-av">${icon('user', 16)}</span><span class="em fade">${esc(S.me.email)}</span><span class="fade me-more">${icon('more', 14)}</span></button>
+      <button class="me" data-act="me" data-tip="Account" data-tip-collapsed><span class="me-av">${icon('user', 16)}</span><span class="em fade">${esc(S.me.email)}</span><span class="fade me-more">${icon('more', 16)}</span></button>
     </div>`;
   // re-rendering resets the scroll: put it back, then nudge only if the current item is out of view
   const box = $('#sidebar .sb-scroll'), cur = $('.nav.active', box); box.scrollTop = keep;
@@ -1634,20 +1651,20 @@ function crumbs() {
   return host ? [[host.label]] : [[navTitle(S.route)]];
 }
 function topbarActions() {
-  if (S.route === 'dashboard') return `<a class="btn btn-tertiary" href="#/logs">${icon('logs', 15)}${t('Audit log')}${icon('chevRight', 14)}</a>`;
+  if (S.route === 'dashboard') return `<a class="btn btn-tertiary" href="#/logs">${icon('logs', 16)}${t('Audit log')}${icon('chevRight', 16)}</a>`;
   if (S.route === 'users' && !S.userId) return `
     <button class="btn btn-tertiary" id="displayBtn" data-act="display"></button>
-    <button class="btn btn-tertiary" data-act="export">${icon('download', 15)}<span class="tb-lbl">Export</span>${icon('chevDown', 13)}</button>
-    <button class="btn btn-primary" data-act="new-user">${icon('plus', 15, 2)}<span class="tb-lbl">New user</span></button>`;
+    <button class="btn btn-tertiary" data-act="export">${icon('download', 16)}<span class="tb-lbl">Export</span>${icon('chevDown', 16)}</button>
+    <button class="btn btn-primary" data-act="new-user">${icon('plus', 16, 2)}<span class="tb-lbl">New user</span></button>`;
   if (S.route === 'users' && byId(S.userId)) {
     const l = navList(), i = l.findIndex(x => x.id === S.userId);
     return `<span class="mono faint tb-hide-sm" style="margin-right:var(--space-2)">${i + 1} / ${fmtInt(l.length)}</span>
       <button class="icon-btn" data-act="u-step" data-d="-1" ${i <= 0 ? 'disabled' : ''} data-tip="Previous  k">${icon('chevUp', 16)}</button>
       <button class="icon-btn" data-act="u-step" data-d="1" ${i >= l.length - 1 ? 'disabled' : ''} data-tip="Next  j">${icon('chevDown', 16)}</button>
       <span class="tb-div"></span>
-      <button class="btn btn-tertiary" data-act="toggle-block" data-id="${S.userId}">${icon(byId(S.userId).status === 'blocked' ? 'refresh' : 'ban', 15)}<span class="tb-lbl">${byId(S.userId).status === 'blocked' ? 'Unblock' : 'Block'}</span></button>
+      <button class="btn btn-tertiary" data-act="toggle-block" data-id="${S.userId}">${icon(byId(S.userId).status === 'blocked' ? 'refresh' : 'ban', 16)}<span class="tb-lbl">${byId(S.userId).status === 'blocked' ? 'Unblock' : 'Block'}</span></button>
       <button class="icon-btn" data-act="u-more" data-tip="More">${icon('more', 16)}</button>
-      <button class="btn btn-secondary" data-act="impersonate" data-id="${S.userId}">${icon('login', 15)}<span class="tb-lbl">Login as user</span></button>`;
+      <button class="btn btn-secondary" data-act="impersonate" data-id="${S.userId}">${icon('login', 16)}<span class="tb-lbl">Login as user</span></button>`;
   }
   if (S.route === 'companies') return coTopbar();
   if (PAGES[S.route]) return pgTopbar();
@@ -1659,7 +1676,7 @@ function topbarActions() {
 function renderTopbar() {
   const c = crumbs(), acts = topbarActions(), sec = S.navV === 'tabs' && curSec(), list = sec && c.length === 1;
   const path = sec && !list ? [[sec.label, '', '', 1], ...c] : c;
-  const menu = `<button class="icon-btn menu-btn" data-act="mobile-menu" aria-label="Menu">${icon('menu', 18)}</button>`, ctx = acts ? `<div class="tb-ctx">${acts}</div>` : '';
+  const menu = `<button class="icon-btn menu-btn" data-act="mobile-menu" aria-label="Menu">${icon('menu', 16)}</button>`, ctx = acts ? `<div class="tb-ctx">${acts}</div>` : '';
   $('#topbar').classList.toggle('sec', !!list);
   $('#topbar').innerHTML = list ? `<div class="tb-row">${menu}<h1 class="tb-title">${esc(t(sec.label))}</h1><div class="tb-sp"></div>${ctx}</div>${secTabs(sec)}` : `${menu}
     <nav class="crumbs" aria-label="Breadcrumb">${path.map(([l, h, id, plain], i) => (i ? '<span class="crumb-sep">/</span>' : '') + (h ? `<a href="${h}">${esc(t(l))}</a>` : `<span class="${plain ? '' : 'cur'}">${esc(t(l))}</span>`) + (id ? `<span class="count">${id}</span>` : '')).join('')}</nav>
@@ -1672,13 +1689,13 @@ const ME_PICK = {
 function meMenu(view) {
   const dark = document.documentElement.dataset.theme === 'dark';
   if (ME_PICK[view]) { const [title, opts, cur, act] = ME_PICK[view]();
-    return `<div class="pop-head"><button class="ghost-ic" data-act="me-view" data-v="" aria-label="Back">${icon('chevLeft', 15)}</button>${t(title)}</div>`
+    return `<div class="pop-head"><button class="ghost-ic" data-act="me-view" data-v="" aria-label="Back">${icon('chevLeft', 16)}</button>${t(title)}</div>`
       + menuItems(opts.map(([v, label]) => ({ act, data: { v }, label, on: cur === v }))); }
-  const row = (v, ic, l, val) => ({ act: 'me-view', data: { v }, icon: ic, html: `<span class="pl">${t(l)}</span><span class="pv">${val}</span>${icon('chevRight', 14)}` });
+  const row = (v, ic, l, val) => ({ act: 'me-view', data: { v }, icon: ic, html: `<span class="pl">${t(l)}</span><span class="pv">${val}</span>${icon('chevRight', 16)}` });
   return `<div class="me-h"><span class="me-av">${icon('user', 16)}</span><div style="min-width:0"><div class="me-n">${esc(S.me.name)}</div><div class="me-e" title="${esc(S.me.email)}">${esc(S.me.email)}</div></div></div>
     <div class="pop-sep"></div>
     ${menuItems([{ act: 'toast', data: { msg: t('Profile settings') }, icon: 'user', label: t('Profile settings') }, row('lang', 'globe', 'Language', S.lang === 'ru' ? 'Русский' : 'English'), { act: 'shortcuts', icon: 'keyboard', label: t('Keyboard shortcuts') }, { act: 'toast', data: { msg: 'Docs would open here' }, icon: 'help', label: t('Help & docs') }])}
-    <div class="pop-row me-theme">${icon('palette', 16)}<span>${t('Theme')}</span><div class="seg sm ic" role="group" aria-label="${t('Theme')}"><button class="${dark ? '' : 'on'}" data-act="theme" data-v="light" aria-label="${t('Light')}" aria-pressed="${!dark}" data-tip="${t('Light')}">${icon('sun', 14)}</button><button class="${dark ? 'on' : ''}" data-act="theme" data-v="dark" aria-label="${t('Dark')}" aria-pressed="${dark}" data-tip="${t('Dark')}">${icon('moon', 13)}</button></div></div>
+    <div class="pop-row me-theme">${icon('palette', 16)}<span>${t('Theme')}</span><div class="seg sm ic" role="group" aria-label="${t('Theme')}"><button class="${dark ? '' : 'on'}" data-act="theme" data-v="light" aria-label="${t('Light')}" aria-pressed="${!dark}" data-tip="${t('Light')}">${icon('sun', 16)}</button><button class="${dark ? 'on' : ''}" data-act="theme" data-v="dark" aria-label="${t('Dark')}" aria-pressed="${dark}" data-tip="${t('Dark')}">${icon('moon', 16)}</button></div></div>
     <div class="pop-sep"></div>
     ${menuItems([{ act: 'sign-out', icon: 'logout', label: t('Sign out') }])}`;
 }
@@ -1687,7 +1704,7 @@ function protoModal() {
   const D = S.pcDraft ||= { brand: S.brand, navV: S.navV };
   const opt = (k, on, act, body, cls) => `<button class="${cls} ${on ? 'on' : ''}" data-act="${act}" data-v="${k}" aria-pressed="${on}">${body}</button>`;
   const html = `<div class="modal pc" role="dialog" aria-label="${t('Prototype config')}">
-    <div class="modal-h">${t('Prototype config')}<button class="icon-btn icon-btn-link" data-act="modal-close" aria-label="${t('Close')}">${icon('x', 17)}</button></div>
+    <div class="modal-h">${t('Prototype config')}<button class="icon-btn icon-btn-link" data-act="modal-close" aria-label="${t('Close')}">${icon('x', 16)}</button></div>
     <div class="modal-b">
       <section><div class="pc-lbl">${t('White-label product')}</div><div class="pc-sub">${t('The client the admin panel is branded for: logo, favicon and accent colour.')}</div>
         <div class="pc-brands">${Object.entries(BRANDS).map(([k, b]) => opt(k, k === D.brand, 'pc-pick-brand', `<span class="pc-logo"><span class="lg-${k}">${b.chip()}</span></span><span class="pc-meta"><span class="pc-n">${b.name}</span><span class="pc-c"><i style="background:${b.color}"></i>${b.color.slice(1)}</span></span>`, 'pc-brand')).join('')}</div></section>
@@ -1708,7 +1725,7 @@ function applyProto({ brand: b, navV: n }) {
 function shortcutsModal() {
   const k = (...ks) => ks.map(x => `<kbd>${x}</kbd>`).join('');
   openModal(`<div class="modal">
-    <div class="modal-h">Keyboard shortcuts<button class="icon-btn icon-btn-link" data-act="modal-close">${icon('x', 17)}</button></div>
+    <div class="modal-h">Keyboard shortcuts<button class="icon-btn icon-btn-link" data-act="modal-close">${icon('x', 16)}</button></div>
     <div class="modal-b keys">
       <div><span>Toggle sidebar</span><span>${k('⌘', 'B')} or ${k('[')}</span></div>
       <div><span>Search users</span><span>${k('/')}</span></div>
@@ -1723,7 +1740,7 @@ function toggleSidebar() {
   if (innerWidth <= 900) { app.classList.toggle('mobile-open'); return; }
   const col = app.classList.toggle('collapsed');
   store.set('nsc.sidebar', col ? 'collapsed' : 'open');
-  const t = $('.sb-toggle'); t.innerHTML = icon(col ? 'panelOpen' : 'panelClose', 18); t.dataset.tip = `${col ? 'Expand' : 'Collapse'} sidebar  ⌘B`;
+  const t = $('.sb-toggle'); t.innerHTML = icon(col ? 'panelOpen' : 'panelClose', 16); t.dataset.tip = `${col ? 'Expand' : 'Collapse'} sidebar  ⌘B`;
   closePop(); $('#tt').classList.remove('show'); $('#tt').dataset.for = '';
 }
 $('#sidebar').addEventListener('transitionend', e => { if (e.target.id === 'sidebar' && e.propertyName === 'width') { if (DASHES[S.route]) drawCharts(); if ($('#chips')) renderChips(); refreshHints(); } });
@@ -1799,7 +1816,7 @@ function resolveRange(r) {
   return { from, to, label: RANGE_PRESETS[r.key].label };
 }
 const inRange = (d, r) => { const { from, to } = resolveRange(r); return d >= from && d <= to; };
-const dpButton = (r, act, extra = '') => `<button class="dp-btn" data-act="${act}" ${extra}>${icon('calendar', 15)}<span>${esc(resolveRange(r).label)}</span>${icon('chevDown', 13)}</button>`;
+const dpButton = (r, act, extra = '') => `<button class="dp-btn" data-act="${act}" ${extra}>${icon('calendar', 16)}<span>${esc(resolveRange(r).label)}</span>${icon('chevDown', 16)}</button>`;
 
 let DP = null;
 function openDatePicker(anchor, current, onApply, opts = {}) {
@@ -1836,7 +1853,7 @@ function dpBody() {
     const lead = (new Date(yy, mm, 1).getDay() + 6) % 7, days = new Date(yy, mm + 1, 0).getDate(), mv = new Date(yy, mm, 1);
     const cells = Array.from({ length: lead }, () => '<span></span>').concat(Array.from({ length: days }, (_, i) => {
       const d = new Date(yy, mm, i + 1), t = d.getTime(), fut = d > NOW;
-      const cls = [sameDay(d, NOW) && 'today', a && t === a.getTime() && 'start', b && t === b.getTime() && 'end', a && b && t > a && t < b && 'in'].filter(Boolean).join(' ');
+      const cls = [sameDay(d, NOW) && 'today', a && t === a.getTime() && 'start', b && t === b.getTime() && 'end', a && b && t > a && t < b && 'in', a && b && a.getTime() !== b.getTime() && 'rng'].filter(Boolean).join(' ');
       return `<button class="dp-day ${cls}" data-act="dp-day" data-ts="${t}" ${fut ? 'disabled' : ''}>${i + 1}</button>`;
     }));
     const title = mv.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
@@ -1848,7 +1865,7 @@ function dpBody() {
 }
 function dpHTML() {
   return `${DP.head}<div class="dp">
-    <div class="dp-presets">${DP.presets.map(k => `<button class="pi ${!DP.custom && DP.cur.key === k ? 'on' : ''}" data-act="dp-preset" data-k="${k}"><span class="pl">${RANGE_PRESETS[k].label}</span>${!DP.custom && DP.cur.key === k ? `<span class="chk">${icon('check', 14, 2)}</span>` : ''}</button>`).join('')}</div>
+    <div class="dp-presets">${DP.presets.map(k => `<button class="pi ${!DP.custom && DP.cur.key === k ? 'on' : ''}" data-act="dp-preset" data-k="${k}"><span class="pl">${RANGE_PRESETS[k].label}</span>${!DP.custom && DP.cur.key === k ? `<span class="chk">${icon('check', 16, 2)}</span>` : ''}</button>`).join('')}</div>
     <div class="dp-cal">
       <div class="dp-body" id="dpBody">${dpBody()}</div>
     </div>
@@ -1932,7 +1949,7 @@ function renderDashboard() {
     { id: 'monitors', l: 'Finance monitors', ic: 'activity', v: '', n: monitorsDue().length }];
   const funds = ASSETS.map(a => [a.c, sum(USERS.map(u => ud(u).wallets.find(w => w.c === a.c)?.amt || 0))]).filter(([, v]) => v > 0);
   const log = pgData(PAGES.logs).slice(0, 8);
-  const go = (href, l) => `<a class="btn btn-link" href="${href}">${t(l)}${icon('chevRight', 14)}</a>`;
+  const go = (href, l) => `<a class="btn btn-link" href="${href}">${t(l)}${icon('chevRight', 16)}</a>`;
   $('#main').innerHTML = `<div class="page"><div class="dgrid">
     ${stats.map(([l, ic, n, href]) => `<a class="card span-3 ov-stat" href="${href}"><span class="os-ic">${icon(ic, 16)}</span><span class="os-l">${t(l)}<b>${fmtInt(n)}</b></span>${icon('chevRight', 16)}</a>`).join('')}
     <div class="card span-6 flush ov"><div class="card-h"><span class="card-t">${t('Needs attention')}</span></div>
@@ -2041,9 +2058,9 @@ function renderUsersPage() {
   $('#main').innerHTML = `<div class="page fit">
     <section class="ustats" id="uStats"></section>
     <div class="toolbar">
-      <label class="search">${icon('search', 15)}<input id="uSearch" placeholder="Search name, email, ID…" value="${esc(S.search)}" autocomplete="off"><kbd>/</kbd></label>
+      <label class="search">${icon('search', 16)}<input id="uSearch" placeholder="Search name, email, ID…" value="${esc(S.search)}" autocomplete="off"><kbd>/</kbd></label>
       <div class="chips" id="chips"></div>
-      <button class="btn btn-tertiary" id="addFilter" data-act="add-filter">${icon('filter', 15)}Filter</button>
+      <button class="btn btn-tertiary" id="addFilter" data-act="add-filter">${icon('filter', 16)}Filter</button>
     </div>
     <div class="results" id="results"></div>
   </div>`;
@@ -2076,17 +2093,17 @@ function chipParts(f, X = fx()) {
 function renderChips() {
   const X = fx(), el = $('#chips'); if (!el) return;
   el.innerHTML = X.list.map(f => { const { F, vt, op } = chipParts(f, X);
-    return `<div class="chip" data-chip="${f.key}"><span class="cf">${icon(F.icon, 14)}${F.label}</span><span class="co">${op}</span><button class="cv" data-act="edit-filter" data-key="${f.key}">${vt}</button><button class="cx" data-act="rm-filter" data-key="${f.key}" aria-label="Remove filter">${icon('x', 13)}</button></div>`;
+    return `<div class="chip" data-chip="${f.key}"><span class="cf">${icon(F.icon, 16)}${F.label}</span><span class="co">${op}</span><button class="cv" data-act="edit-filter" data-key="${f.key}">${vt}</button><button class="cx" data-act="rm-filter" data-key="${f.key}" aria-label="Remove filter">${icon('x', 16)}</button></div>`;
   }).join('') + (X.list.length ? `<button class="btn btn-link" data-act="clear-filters">Clear</button>` : '');
   if (X.list.length && el.scrollWidth > el.clientWidth + 1)
-    el.innerHTML = `<div class="chip chip-group"><button class="cv" data-act="filter-group">${icon('filter', 14)}${X.list.length} filter${X.list.length > 1 ? 's' : ''}${icon('chevDown', 13)}</button><button class="cx" data-act="clear-filters" aria-label="Clear filters" data-tip="Clear filters">${icon('x', 13)}</button></div>`;
+    el.innerHTML = `<div class="chip chip-group"><button class="cv" data-act="filter-group">${icon('filter', 16)}${X.list.length} filter${X.list.length > 1 ? 's' : ''}${icon('chevDown', 16)}</button><button class="cx" data-act="clear-filters" aria-label="Clear filters" data-tip="Clear filters">${icon('x', 16)}</button></div>`;
   if (popOpts.kind === 'fgroup') { if ($('.chip-group')) { pop.innerHTML = filterGroupPop(); reanchor(); } else closePop(); }
 }
 const filterGroupPop = () => `<div class="pop-sec"><div class="pop-lbl">Applied filters<button class="btn btn-link" data-act="clear-filters">Clear all</button></div>
-  ${fx().list.map(f => { const { F, vt, op } = chipParts(f); return `<div class="fg-row"><button class="fg-v" data-act="edit-filter" data-key="${f.key}">${icon(F.icon, 14)}<span class="fg-l">${F.label}</span><span class="fg-o">${op}</span><b>${vt}</b></button><button class="icon-btn icon-btn-link" data-act="rm-filter" data-key="${f.key}" aria-label="Remove filter">${icon('x', 14)}</button></div>`; }).join('')}</div>`;
+  ${fx().list.map(f => { const { F, vt, op } = chipParts(f); return `<div class="fg-row"><button class="fg-v" data-act="edit-filter" data-key="${f.key}">${icon(F.icon, 16)}<span class="fg-l">${F.label}</span><span class="fg-o">${op}</span><b>${vt}</b></button><button class="icon-btn icon-btn-link" data-act="rm-filter" data-key="${f.key}" aria-label="Remove filter">${icon('x', 16)}</button></div>`; }).join('')}</div>`;
 // Display button shows the current layout icon; layout itself is switched inside the Display popover
 function renderLayoutSeg() {
-  $('#displayBtn').innerHTML = `${icon(S.view, 15)}<span class="sl">Display</span>${icon('chevDown', 13)}`;
+  $('#displayBtn').innerHTML = `${icon(S.view, 16)}<span class="sl">Display</span>${icon('chevDown', 16)}`;
 }
 function renderResults() {
   const list = getList(); S._list = list;
@@ -2130,7 +2147,7 @@ function tableHTML(list) {
     <tbody>${rows.map(u => `<tr data-uid="${u.id}" class="${S.selected.has(u.id) ? 'sel' : ''}">
       <td class="cbcell"><button class="cb ${S.selected.has(u.id) ? 'on' : ''}" data-act="sel" data-id="${u.id}" aria-label="Select">${icon('check', 11, 3)}</button></td>
       ${cols.map(c => `<td class="${c.right ? 'r' : ''} ${c.pin ? 'pin' : ''}">${c.cell(u)}</td>`).join('')}
-      <td class="act"><div class="row-actions"><button class="ghost-ic" data-act="impersonate" data-id="${u.id}" data-tip="Login as user">${icon('login', 15)}</button><button class="ghost-ic" data-act="row-more" data-id="${u.id}" data-tip="More">${icon('more', 15)}</button></div></td>
+      <td class="act"><div class="row-actions"><button class="ghost-ic" data-act="impersonate" data-id="${u.id}" data-tip="Login as user">${icon('login', 16)}</button><button class="ghost-ic" data-act="row-more" data-id="${u.id}" data-tip="More">${icon('more', 16)}</button></div></td>
     </tr>`).join('')}</tbody></table></div></div>${tfoot(list, rows, 'user', 'users')}</div>`;
 }
 /* Infinite scroll instead of pages: a list shows its first CHUNK rows and loads the next CHUNK as the scroll nears the end.
@@ -2185,7 +2202,7 @@ function listHTML(list) {
   return `<div class="tcard compact"><div class="hs-wrap"><div class="tscroll hs">${gs.map(g => {
     const lim = S.more[g.key] || 30, col = S.collapsed.has(g.key);
     return `<div class="lg ${col ? 'collapsed' : ''}">
-      ${by !== 'none' ? `<button class="lg-h" data-act="toggle-group" data-g="${g.key}">${icon('chevDown', 14)}${groupHead(by, g.key, g.o)}<span class="mono faint">${g.items.length}</span></button>` : ''}
+      ${by !== 'none' ? `<button class="lg-h" data-act="toggle-group" data-g="${g.key}">${icon('chevDown', 16)}${groupHead(by, g.key, g.o)}<span class="mono faint">${g.items.length}</span></button>` : ''}
       <div class="lg-b">${g.items.slice(0, lim).map(u => lrowHTML(u, by)).join('')}
       ${g.items.length > lim ? `<button class="more-row" data-act="more" data-g="${g.key}">Show ${g.items.length - lim} more</button>` : ''}</div>
     </div>`;
@@ -2217,15 +2234,15 @@ function boardHTML(list) {
     return `<div class="col" data-col="${k}" data-field="${by}">
       <div class="col-h"><i class="dot t-${o.tone || 'neutral'}"></i>${o.label}<span class="mono">${items.length}</span></div>
       <div class="col-b">${items.slice(0, lim).map(u => bcardHTML(u, by)).join('')}
-        ${items.length > lim ? `<button class="more-btn" data-act="more" data-g="${k}">Show ${items.length - lim} more</button>` : ''}
-        ${!items.length ? '<div class="col-empty">Drop here</div>' : ''}</div>
+        ${!items.length ? '<div class="col-empty">Nothing here</div>' : ''}</div>
+      ${items.length > lim ? `<div class="col-more"><button class="btn btn-link" data-act="more" data-g="${k}">Show ${items.length - lim} more</button></div>` : ''}
     </div>`;
   }).join('')}</div>`;
 }
 function bcardHTML(u, by) {
   return `<div class="bcard" draggable="true" data-uid="${u.id}">
-    <div class="bc-top"><span class="bc-name">${esc(u.name || 'No profile yet')}</span><span class="mono faint" style="font-size:var(--fs-12)">#${u.id}</span></div>
-    <div class="bc-email">${esc(u.email)}</div>
+    <div class="bc-head"><div class="bc-top"><span class="bc-name">${esc(u.name || 'No profile yet')}</span><span class="mono faint" style="font-size:var(--fs-12)">#${u.id}</span></div>
+    <div class="bc-email">${esc(u.email)}</div></div>
     <div class="bc-tags">
       ${u.country ? `<span class="tag"><span class="flag" style="font-size:var(--fs-12)">${flag(COUNTRIES[u.country].cc)}</span>${u.country}</span>` : ''}
       ${by !== 'kyc' ? `<span class="tag"><i class="dot t-${KYC[u.kyc].tone}"></i>KYC ${KYC[u.kyc].label.toLowerCase()}</span>` : ''}
@@ -2429,8 +2446,8 @@ function ctable(t, rows, empty, o = {}) {
     return o.rowCls ? { cls: o.rowCls(r), cells } : cells;
   }), empty, { t, keys: [...(o.pre ? [null] : []), ...cols.map(c => c.k), ...(o.post ? [null] : [])] });
 }
-const colsBtn = t => `<button class="icon-btn" data-act="tcols" data-t="${t}" data-tip="Columns">${icon('columns', 15)}</button>`;
-const tcolsPop = t => `<div class="pop-sec"><div class="pop-lbl">Columns<button class="btn btn-link" data-act="tcols-reset" data-t="${t}">Reset columns</button></div>${colChips(t, 'tcol')}</div>`;
+const colsBtn = t => `<button class="icon-btn" data-act="tcols" data-t="${t}" data-tip="Columns">${icon('columns', 16)}</button>`;
+const tcolsPop = t => `<div class="pop-sec"><div class="pop-lbl">Columns</div>${colChips(t, 'tcol')}<div class="pop-foot"><button class="btn btn-link" data-act="tcols-reset" data-t="${t}">Reset columns</button></div></div>`;
 // Reset columns: back to the table's default shown columns in their default order (widths have their own reset)
 const resetTcols = t => { delete (S.tcols ||= store.get('nsc.tcols2', {}))[t]; delete (S.tord ||= store.get('nsc.tord', {}))[t]; store.set('nsc.tcols2', S.tcols); store.set('nsc.tord', S.tord); };
 const tcard = (title, acts, body, tools = '') => `<div class="card flush"><div class="card-h"><span class="card-t">${title}</span>${acts ? `<div class="ch-act">${acts}</div>` : ''}</div>${tools ? `<div class="card-tools">${tools}</div>` : ''}${body}</div>`;
@@ -2461,13 +2478,13 @@ function renderUserPage() {
       <div class="up-main">${userTab(u, d, D)}</div>
       ${over ? `<aside class="up-side">
         <div class="card">
-          <div class="card-h"><span class="card-t">Balance</span><button class="btn btn-link" data-act="u-tab" data-v="wallets">Wallets ${icon('chevRight', 14)}</button></div>
+          <div class="card-h"><span class="card-t">Balance</span><button class="btn btn-link" data-act="u-tab" data-v="wallets">Wallets ${icon('chevRight', 16)}</button></div>
           <div class="card-b pad"><div class="w-total"><b>${fmtEur(u.balance, 2)}</b></div>
           ${ws.length ? `<div class="stack" style="height:8px;margin:var(--space-12) 0 var(--space-12)">${ws.map(w => `<i style="width:${eurOf(w) / u.balance * 100}%;background:${ASSET[w.c].col}" data-tt="${w.c}|${fmtEur(eurOf(w))}|${(eurOf(w) / u.balance * 100).toFixed(0)}%"></i>`).join('')}</div>
           <div class="legend">${ws.map(w => `<span><i class="sw" style="background:${ASSET[w.c].col}"></i>${w.c}</span>`).join('')}</div>` : '<div class="faint" style="font-size:var(--fs-14)">No deposits yet</div>'}</div>
         </div>
         <div class="card">
-          <div class="card-h"><span class="card-t">Recent activity</span><button class="btn btn-link" data-act="u-tab" data-v="transactions">Transactions ${icon('chevRight', 14)}</button></div>
+          <div class="card-h"><span class="card-t">Recent activity</span><button class="btn btn-link" data-act="u-tab" data-v="transactions">Transactions ${icon('chevRight', 16)}</button></div>
           <div class="card-b pad">${timeline(eventsOf(u).slice(0, 4))}</div>
         </div>
       </aside>` : ''}
@@ -2486,7 +2503,7 @@ function userTab(u, d, D) {
         ${['name', 'email', 'status', 'level', 'risk', 'country', 'type'].map(k => kv(U_EDIT[k].l, edField(X, k))).join('')}${kv('Company', `<a class="lnk" href="#/companies/${d.companyId}">${esc(companyOf(d).name)} #${d.companyId}</a>`)}
         ${kv('Language', edField(X, 'lang'))}${kv('Invited by', u.invitedBy ? `<span class="num">#${u.invitedBy}</span>` : dash)}
       </div></div>
-      <div class="card"><div class="card-h"><span class="card-t">Verification</span><button class="btn btn-link" data-act="u-tab" data-v="verification">Details ${icon('chevRight', 14)}</button></div><div class="kv2 card-b">
+      <div class="card"><div class="card-h"><span class="card-t">Verification</span><button class="btn btn-link" data-act="u-tab" data-v="verification">Details ${icon('chevRight', 16)}</button></div><div class="kv2 card-b">
         ${ver('Email', d.emailVerified, `<span class="${d.emailVerified ? '' : 'faint'}">${d.emailVerified ? 'Verified' : 'Not verified'}</span>`, d.emailVerified ? '' : `<button class="btn btn-link" data-act="toast" data-msg="Verification email sent">Resend</button>`)}
         ${ver('KYC', d.kyc === 'approved', badge(KYC[d.kyc]))}
         ${ver('Identity (IDV)', d.idv, `<span class="${d.idv ? '' : 'faint'}">${d.idv ? 'Passed' : 'Not started'}</span>`)}
@@ -2522,15 +2539,15 @@ function walletsTab(u, D) {
       <div><div class="kl">Locked</div><div class="num">${fmtAmt(w.locked, w.c)}</div></div>
       <div><div class="kl">${a.fiat ? 'Rail' : 'Deposit address'}</div>${w.address ? copyVal(w.address, `${w.address.slice(0, 10)}…${w.address.slice(-6)}`) : `<span>${a.net}</span>`}</div>
       <div class="wdet-act">
-        <button class="btn btn-tertiary" data-act="adj-open" data-c="${w.c}">${icon('sliders', 14)}Adjust</button>
-        <button class="btn btn-tertiary" data-act="wallet-freeze" data-c="${w.c}">${icon(w.frozen ? 'refresh' : 'lock', 14)}${w.frozen ? 'Unfreeze' : 'Freeze'}</button>
+        <button class="btn btn-tertiary" data-act="adj-open" data-c="${w.c}">${icon('sliders', 16)}Adjust</button>
+        <button class="btn btn-tertiary" data-act="wallet-freeze" data-c="${w.c}">${icon(w.frozen ? 'refresh' : 'lock', 16)}${w.frozen ? 'Unfreeze' : 'Freeze'}</button>
       </div>
     </div>` : ''}`;
   }).join('');
-  return tcard(`Wallets <span class="ct">${fmtEur(u.balance, 2)}</span>`, `<button class="btn btn-tertiary" data-act="adj-open">${icon('sliders', 14)}Adjust balance</button>`, `<div class="wlist">${rows}</div>`);
+  return tcard(`Wallets <span class="ct">${fmtEur(u.balance, 2)}</span>`, `<button class="btn btn-tertiary" data-act="adj-open">${icon('sliders', 16)}Adjust balance</button>`, `<div class="wlist">${rows}</div>`);
 }
 
-const txType = h => `<span class="txt">${icon(TX[h.type].icon, 14)}${TX[h.type].label}</span>`;
+const txType = h => `<span class="txt">${icon(TX[h.type].icon, 16)}${TX[h.type].label}</span>`;
 const txCur = h => `<span class="ctry">${assetIc(h.c, 16)}${h.c}</span>`;
 const txAmt = h => `<span class="num ${h.amount > 0 ? 'pos' : ''}">${fmtAmt(h.amount, h.c, true)}</span>`;
 const numM = v => `<span class="num muted">${v}</span>`, muted = v => v ? `<span class="muted">${esc(v)}</span>` : dash;
@@ -2599,7 +2616,7 @@ function txTab(u, D) {
     <select class="fsel" data-tx="type">${opts(Object.fromEntries(Object.entries(TX).map(([k, t]) => [k, t.label])), f.type, 'All types')}</select>
     ${agg ? `<select class="fsel" data-tx="source">${opts(SOURCES, f.source, 'All sources')}</select><input class="inp" data-tx="ref" placeholder="Referral ID" value="${esc(f.ref)}" autocomplete="off">` : ''}`;
   const acts = `
-    <button class="btn btn-tertiary" data-act="tx-export">${icon('download', 14)}Export${icon('chevDown', 13)}</button>${colsBtn(agg ? 'txa' : 'txw')}`;
+    <button class="btn btn-tertiary" data-act="tx-export">${icon('download', 16)}Export${icon('chevDown', 16)}</button>${colsBtn(agg ? 'txa' : 'txw')}`;
   return `<div class="card flush">
     <div class="card-h"><span class="card-t">Transactions</span><div class="ch-act">${acts}</div></div>
     <div class="card-tools">${tools}</div>
@@ -2621,38 +2638,38 @@ const refreshTx = () => { const el = $('#txBody'); if (el) el.innerHTML = txBody
 
 /* Cards */
 function cardsTab(u, D) {
-  return tcard('Cards', (D.cards.length ? `<button class="btn btn-tertiary" data-act="cards-update">${icon('refresh', 14)}Update balances</button>` : '') + colsBtn('cards'),
+  return tcard('Cards', (D.cards.length ? `<button class="btn btn-tertiary" data-act="cards-update">${icon('refresh', 16)}Update balances</button>` : '') + colsBtn('cards'),
     ctable('cards', D.cards, emptyBlock('card', 'No cards', u.kyc === 'approved' ? 'This user hasn’t ordered a card yet.' : 'Cards are available after KYC approval.'),
-      { post: (c, i) => `<button class="ghost-ic" data-act="card-more" data-i="${i}" data-tip="More">${icon('more', 15)}</button>` }));
+      { post: (c, i) => `<button class="ghost-ic" data-act="card-more" data-i="${i}" data-tip="More">${icon('more', 16)}</button>` }));
 }
 
 /* IBAN */
 function ibanTab(u, D) {
   const ok = u.kyc === 'approved';
   return tcard('IBAN accounts', colsBtn('iban'), ctable('iban', D.ibans,
-    emptyBlock('bank', 'No IBAN accounts', ok ? 'Issue a EUR account for this user.' : 'IBAN accounts are available after KYC approval.', ok ? `<button class="btn btn-secondary" data-act="iban-issue">${icon('plus', 14)}Issue IBAN</button>` : '')));
+    emptyBlock('bank', 'No IBAN accounts', ok ? 'Issue a EUR account for this user.' : 'IBAN accounts are available after KYC approval.', ok ? `<button class="btn btn-secondary" data-act="iban-issue">${icon('plus', 16)}Issue IBAN</button>` : '')));
 }
 
 /* Fees & limits — readable versions of the per-operation JSON */
 const feeStr = f => { const p = []; if (f.pct) p.push(+(f.pct * 100).toFixed(3) + '%'); Object.entries(f.fixed || {}).forEach(([c, v]) => v && p.push(`${v} ${c}`)); return p.length ? p.join(' + ') : '<span class="faint">Free</span>'; };
 const fixedStr = o => Object.entries(o || {}).filter(([, v]) => v).map(([c, v]) => `${v} ${c}`).join(', ');
 const parseFixed = s => Object.fromEntries(s.split(',').map(x => x.trim().split(/\s+/)).filter(p => p.length === 2 && !isNaN(+p[0])).map(([v, c]) => [c.toUpperCase(), +v]));
-const editBtn = (act, i) => `<button class="ghost-ic" data-act="${act}" data-i="${i}" data-tip="Edit">${icon('pencil', 15)}</button>`;
-const opCell = (op, extra = '') => `<div style="display:flex;align-items:center;gap:var(--space-8)">${opLabel(op)}${extra}</div><div class="code">${op}</div>`;
+const editBtn = (act, i) => `<button class="ghost-ic" data-act="${act}" data-i="${i}" data-tip="Edit">${icon('pencil', 16)}</button>`;
+const opCells = (op, extra = '') => [`<span style="display:flex;align-items:center;gap:var(--space-8)">${opLabel(op)}${extra}</span>`, `<span class="code">${op}</span>`]; // operation + its code, one line each
 function feesTab(u, D) {
   const lim = v => v ? `<span class="num">${fmtInt(v)}</span>` : '<span class="num faint">0</span>';
-  return tcard('Fees', '<span class="code">App users vs API clients</span>', dtable(['Operation', 'App fee', 'API fee', '|a'],
-      D.fees.map((f, i) => [opCell(f.op), feeStr(f.user), feeStr(f.api), editBtn('fee-edit', i)])))
-    + tcard('Limits', '', dtable(['Operation', 'Daily|r', 'Monthly|r', 'Yearly|r', 'Currency', '|a'],
-      D.limits.map((l, i) => [opCell(l.op, !l.day && !l.month && !l.year ? badge({ label: 'Blocked', tone: 'error' }) : ''), lim(l.day), lim(l.month), lim(l.year), l.cur, editBtn('limit-edit', i)])));
+  return tcard('Fees', '<span class="code">App users vs API clients</span>', dtable(['Operation', 'Code', 'App fee', 'API fee', '|a'],
+      D.fees.map((f, i) => [...opCells(f.op), feeStr(f.user), feeStr(f.api), editBtn('fee-edit', i)])))
+    + tcard('Limits', '', dtable(['Operation', 'Code', 'Daily|r', 'Monthly|r', 'Yearly|r', 'Currency', '|a'],
+      D.limits.map((l, i) => [...opCells(l.op, !l.day && !l.month && !l.year ? badge({ label: 'Blocked', tone: 'error' }) : ''), lim(l.day), lim(l.month), lim(l.year), l.cur, editBtn('limit-edit', i)])));
 }
 
 /* Addresses */
 function addrTab(u, D) {
-  return tcard('Addresses', `<button class="btn btn-tertiary" data-act="addr-add">${icon('plus', 14)}Add address</button>`,
+  return tcard('Addresses', `<button class="btn btn-tertiary" data-act="addr-add">${icon('plus', 16)}Add address</button>`,
     dtable(['ID', 'Country', 'City', 'Address', 'Post code', '|a'], D.addresses.map((a, i) => [`<span class="num muted">${a.id}</span>`,
       `<span class="ctry"><span class="flag">${flag(COUNTRIES[a.country].cc)}</span>${COUNTRIES[a.country].name}</span>`, esc(a.city), esc(a.street), `<span class="num">${esc(a.zip)}</span>`,
-      `<button class="ghost-ic" data-act="addr-rm" data-i="${i}" data-tip="Remove">${icon('trash', 15)}</button>`]),
+      `<button class="ghost-ic" data-act="addr-rm" data-i="${i}" data-tip="Remove">${icon('trash', 16)}</button>`]),
       emptyBlock('mapPin', 'No addresses', 'Add the user’s residential address.')));
 }
 
@@ -2663,14 +2680,14 @@ function verifTab(u, D) {
     `<span class="num muted">${k.id}</span>`, k.provider,
     `<select class="fsel sm" data-kyc="${i}">${Object.entries(KYC).map(([v, o]) => `<option value="${v}" ${u.kyc === v ? 'selected' : ''}>${o.label}</option>`).join('')}</select>`,
     yes(u.idv), yes(u.kyc === 'approved'), yes(k.downloaded), yes(k.def), `<span class="muted">${fmtDateTime(k.created)}</span>`, `<span class="muted">${fmtDateTime(k.updated)}</span>`,
-    `<button class="btn btn-tertiary" data-act="toast" data-msg="Identity verification link sent">${icon('send', 14)}Resend</button>`])));
+    `<button class="btn btn-tertiary" data-act="toast" data-msg="Identity verification link sent">${icon('send', 16)}Resend</button>`])));
   const cc = `<div class="card">
-    <div class="card-h"><span class="card-t">CreditCo</span><button class="btn btn-tertiary" data-act="cc-actions">Actions${icon('chevDown', 13)}</button></div>
+    <div class="card-h"><span class="card-t">CreditCo</span><button class="btn btn-tertiary" data-act="cc-actions">Actions${icon('chevDown', 16)}</button></div>
     <div class="kv2 card-b">${kv('ID', C.id && copyVal(C.id))}${kv('CreditCo email', C.email && esc(C.email))}${kv('Status', badge(CC_STATUS[C.status]))}${kv('KYC status', C.kycStatus)}
       ${kv('KYC remark', C.remark)}${kv('Created', C.created && fmtDateTime(C.created))}${kv('Updated', C.updated && fmtDateTime(C.updated))}${kv('Documents', `<span class="num">${C.docs.length}</span>`)}</div>
     <div class="docs">
       <div class="docs-h"><span class="sub-t">Documents</span><select class="fsel sm" id="docType"><option value="">Document type</option>${Object.entries(DOC_TYPES).map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select></div>
-      ${C.docs.map(x => `<div class="doc"><span class="doc-ic">${icon('file', 15)}</span><div style="flex:1;min-width:0"><div>${esc(x.name)}</div><div class="code">${DOC_TYPES[x.type]} · ${x.size} · ${rel(x.date)}</div></div></div>`).join('')}
+      ${C.docs.map(x => `<div class="doc"><span class="doc-ic">${icon('file', 16)}</span><div style="flex:1;min-width:0"><div>${esc(x.name)}</div><div class="code">${DOC_TYPES[x.type]} · ${x.size} · ${rel(x.date)}</div></div></div>`).join('')}
       <label class="dropzone" id="dropzone"><input type="file" id="docFile" hidden accept=".pdf,.jpg,.jpeg,.png">${icon('upload', 24)}<div><b>Click to upload</b> or drag and drop</div><div class="code">PDF, JPG or PNG, up to 10 MB</div></label>
     </div>
   </div>`;
@@ -2685,7 +2702,7 @@ function verifTab(u, D) {
 function adjustModal(c) {
   const D = ud(byId(S.userId)), manual = !!c;
   openModal(`<div class="modal">
-    <div class="modal-h">Adjust balance<button class="icon-btn icon-btn-link" data-act="modal-close">${icon('x', 17)}</button></div>
+    <div class="modal-h">Adjust balance<button class="icon-btn icon-btn-link" data-act="modal-close">${icon('x', 16)}</button></div>
     <div class="modal-b">
       <div class="seg" style="width:100%" id="adjMode">${[['bank', 'Bank deposit'], ['manual', 'Manual adjustment']].map(([k, l]) => `<button style="flex:1;justify-content:center" class="${(k === 'manual') === manual ? 'on' : ''}" data-act="adj-mode" data-v="${k}">${l}</button>`).join('')}</div>
       <div class="adj-pane ${manual ? '' : 'on'}" data-pane="bank">
@@ -2695,7 +2712,7 @@ function adjustModal(c) {
       </div>
       <div class="adj-pane ${manual ? 'on' : ''}" data-pane="manual">
         <div class="field"><label>Wallet</label><select id="adjCur">${D.wallets.map(w => `<option value="${w.c}" ${w.c === c ? 'selected' : ''}>${w.c} · ${fmtAmt(w.amt, w.c)}</option>`).join('')}</select></div>
-        <div class="field"><label>Direction</label><div class="seg" style="width:100%" id="adjDir"><button class="on" style="flex:1;justify-content:center" data-act="adj-dir" data-v="1">${icon('plus', 14)}Credit</button><button style="flex:1;justify-content:center" data-act="adj-dir" data-v="-1">${icon('minus', 14)}Debit</button></div></div>
+        <div class="field"><label>Direction</label><div class="seg" style="width:100%" id="adjDir"><button class="on" style="flex:1;justify-content:center" data-act="adj-dir" data-v="1">${icon('plus', 16)}Credit</button><button style="flex:1;justify-content:center" data-act="adj-dir" data-v="-1">${icon('minus', 16)}Debit</button></div></div>
         <div class="field"><label>Amount, in the wallet's currency</label><input id="adjAmt" type="number" min="0" step="any" placeholder="0"></div>
         <div class="field"><label>Fee</label><input id="adjFee" type="number" min="0" step="any" placeholder="0"></div>
         <div class="field"><label>Note</label><input id="adjReason" placeholder="Shown in the audit log" autocomplete="off"></div>
@@ -2750,7 +2767,7 @@ function edSet(X, k, v) { if (edSame(v) === edSame(edGet(X, k))) delete X.draft[
 const edLook = o => `${o.flag ? `<span class="flag">${o.flag}</span>` : o.tone ? `<i class="dot t-${o.tone}"></i>` : ''}<span class="ie-v">${esc(o.label)}</span>`;
 function edMultiInner(X, k) {
   const on = new Set((edVal(X, k) || []).map(String)), L = edOpts(X, k).filter(([v]) => on.has(v)).map(([, o]) => o.label);
-  return `<span class="ie-v ${L.length ? '' : 'faint'}">${L.length ? esc(L.slice(0, 2).join(', ')) + (L.length > 2 ? ` <span class="faint">+${L.length - 2}</span>` : '') : 'None'}</span>${icon('chevsUD', 14)}`;
+  return `<span class="ie-v ${L.length ? '' : 'faint'}">${L.length ? esc(L.slice(0, 2).join(', ')) + (L.length > 2 ? ` <span class="faint">+${L.length - 2}</span>` : '') : 'None'}</span>${icon('chevsUD', 16)}`;
 }
 // The control for one field, or null when the spec says this record can't change it (the caller then shows the plain value)
 function edField(X, k) {
@@ -2759,9 +2776,9 @@ function edField(X, k) {
   switch (f.t) {
     case 'text': case 'num': return `<span class="ie-box ${dirty}"><input class="ie-in" data-ie="${k}" value="${esc(v ?? '')}" placeholder="${esc(f.ph || 'Empty')}" ${f.t === 'num' ? 'inputmode="decimal"' : ''} autocomplete="off" spellcheck="false" aria-label="${esc(f.l || k)}">${f.sfx ? `<span class="ie-sfx">${f.sfx}</span>` : ''}</span>`;
     case 'sel': { const o = edOpts(X, k).find(([x]) => x === String(v ?? ''));
-      return `<button class="sel-btn ${dirty}" data-act="ie-sel" data-ie="${k}">${f.show && v != null ? f.show(v) : o ? edLook(o[1]) : `<span class="faint">${f.none || 'Not set'}</span>`}${icon('chevsUD', 14)}</button>`; }
+      return `<button class="sel-btn ${dirty}" data-act="ie-sel" data-ie="${k}">${f.show && v != null ? f.show(v) : o ? edLook(o[1]) : `<span class="faint">${f.none || 'Not set'}</span>`}${icon('chevsUD', 16)}</button>`; }
     case 'multi': return `<button class="sel-btn ${dirty}" data-act="ie-multi" data-ie="${k}">${edMultiInner(X, k)}</button>`;
-    case 'date': return `<button class="sel-btn ${dirty}" data-act="ie-date" data-ie="${k}">${icon('calendar', 14)}<span class="ie-v">${v ? fmtDateTime(v) : '<span class="faint">Not set</span>'}</span>${icon('chevsUD', 14)}</button>`;
+    case 'date': return `<button class="sel-btn ${dirty}" data-act="ie-date" data-ie="${k}">${icon('calendar', 16)}<span class="ie-v">${v ? fmtDateTime(v) : '<span class="faint">Not set</span>'}</span>${icon('chevsUD', 16)}</button>`;
     case 'bool': return `<button class="sw-t ${v ? 'on' : ''} ${dirty}" data-act="ie-bool" data-ie="${k}" aria-pressed="${!!v}" aria-label="${esc(f.l || k)}"></button>`;
   }
 }
@@ -2776,11 +2793,11 @@ function edInput(t) {
 function edRevert(t) { const X = edCtx(), k = t.dataset.ie; delete X.draft[k]; t.value = edGet(X, k) ?? ''; t.closest('.ie-box').classList.remove('dirty', 'err'); renderFloat(); }
 const edPopList = (X, k, multi) => {
   const f = X.spec[k], cur = multi ? new Set((edVal(X, k) || []).map(String)) : new Set([String(edVal(X, k) ?? '')]);
-  return [...(f.none && !multi ? [['', { label: f.none }]] : []), ...edOpts(X, k)].map(([v, o]) => `<button class="pi" data-act="${multi ? 'ie-mtog' : 'ie-pick'}" data-ie="${k}" data-v="${esc(v)}">${o.flag ? `<span class="flag">${o.flag}</span>` : o.tone ? `<i class="dot t-${o.tone}"></i>` : ''}<span class="pl">${esc(o.label)}</span>${cur.has(v) ? `<span class="chk">${icon('check', 15, 2)}</span>` : ''}</button>`).join('');
+  return [...(f.none && !multi ? [['', { label: f.none }]] : []), ...edOpts(X, k)].map(([v, o]) => `<button class="pi" data-act="${multi ? 'ie-mtog' : 'ie-pick'}" data-ie="${k}" data-v="${esc(v)}">${o.flag ? `<span class="flag">${o.flag}</span>` : o.tone ? `<i class="dot t-${o.tone}"></i>` : ''}<span class="pl">${esc(o.label)}</span>${cur.has(v) ? `<span class="chk">${icon('check', 16, 2)}</span>` : ''}</button>`).join('');
 };
 function edOpenList(a, multi) {
   const X = edCtx(), k = a.dataset.ie, long = edOpts(X, k).length > 10;
-  openPop(a, `${long ? `<div class="pop-search">${icon('search', 14)}<input id="ieQ" placeholder="Search…" autocomplete="off"></div>` : ''}<div class="pop-list" id="ieList">${edPopList(X, k, multi)}</div>`,
+  openPop(a, `${long ? `<div class="pop-search">${icon('search', 16)}<input id="ieQ" placeholder="Search…" autocomplete="off"></div>` : ''}<div class="pop-list" id="ieList">${edPopList(X, k, multi)}</div>`,
     { align: 'right', width: 250, kind: multi ? 'iemulti' : 'iesel', onMount: p => $('#ieQ', p)?.focus(), onClose: multi ? () => { const Y = edCtx(); Y?.r === X.r && Y.redraw(); } : null }); // the field and the bar catch up once the list closes
 }
 const edFilterList = q => $$('#ieList .pi').forEach(p => p.hidden = !!q && !p.textContent.toLowerCase().includes(q.toLowerCase()));
@@ -2827,7 +2844,7 @@ const CO_EDIT = {
 };
 function fieldsModal(title, fields, saveAct) {
   openModal(`<div class="modal">
-    <div class="modal-h">${title}<button class="icon-btn icon-btn-link" data-act="modal-close">${icon('x', 17)}</button></div>
+    <div class="modal-h">${title}<button class="icon-btn icon-btn-link" data-act="modal-close">${icon('x', 16)}</button></div>
     <div class="modal-b">${fields.map(f => `<div class="field"><label>${f.label}</label>${f.options
       ? `<select id="${f.id}">${f.options.map(([v, l, fl]) => `<option value="${v}" ${fl ? `data-flag="${fl}"` : ''} ${v === f.value ? 'selected' : ''}>${l}</option>`).join('')}</select>`
       : `<input id="${f.id}" value="${esc(f.value ?? '')}" placeholder="${f.ph || ''}" ${f.type ? `type="${f.type}" step="any" min="0"` : ''} autocomplete="off">`}${f.hint ? `<div class="hint" style="margin-top:var(--space-8)">${f.hint}</div>` : ''}</div>`).join('')}</div>
@@ -2883,12 +2900,12 @@ function enhanceSelects(root) {
   });
 }
 const ddItems = (sel, q = '') => [...sel.options].filter(o => o.text.toLowerCase().includes(q.trim().toLowerCase()))
-  .map(o => `<button class="pi" data-act="dd-pick" data-v="${esc(o.value)}">${o.dataset.flag ? `<span class="flag">${flag(o.dataset.flag)}</span>` : ''}<span class="pl">${esc(o.text)}</span>${o.value === sel.value ? `<span class="chk">${icon('check', 14, 2)}</span>` : ''}</button>`).join('') || '<div class="pi faint">No matches</div>';
+  .map(o => `<button class="pi" data-act="dd-pick" data-v="${esc(o.value)}">${o.dataset.flag ? `<span class="flag">${flag(o.dataset.flag)}</span>` : ''}<span class="pl">${esc(o.text)}</span>${o.value === sel.value ? `<span class="chk">${icon('check', 16, 2)}</span>` : ''}</button>`).join('') || '<div class="pi faint">No matches</div>';
 new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => n.nodeType === 1 && enhanceSelects(n.tagName === 'SELECT' ? n.parentNode : n)))).observe(document.body, { childList: true, subtree: true });
 
 /* filter popovers */
-const fieldItems = (q = '', X = fx()) => Object.entries(X.F).filter(([, F]) => F.label.toLowerCase().includes(q.toLowerCase())).map(([k, F]) => `<button class="pi" data-act="pick-field" data-key="${k}">${icon(F.icon, 15)}<span class="pl">${F.label}</span>${X.list.some(f => f.key === k) ? `<span class="dot" style="--tone:var(--brand)"></span>` : ''}${icon('chevRight', 14)}</button>`).join('') || '<div class="pi faint">No matches</div>';
-const fieldsPop = () => `<div class="pop-search">${icon('search', 14)}<input id="popQ" placeholder="Filter by…" autocomplete="off"></div><div class="pop-list" id="popFields">${fieldItems()}</div>`;
+const fieldItems = (q = '', X = fx()) => Object.entries(X.F).filter(([, F]) => F.label.toLowerCase().includes(q.toLowerCase())).map(([k, F]) => `<button class="pi" data-act="pick-field" data-key="${k}">${icon(F.icon, 16)}<span class="pl">${F.label}</span>${X.list.some(f => f.key === k) ? `<span class="dot" style="--tone:var(--brand)"></span>` : ''}${icon('chevRight', 16)}</button>`).join('') || '<div class="pi faint">No matches</div>';
+const fieldsPop = () => `<div class="pop-search">${icon('search', 16)}<input id="popQ" placeholder="Filter by…" autocomplete="off"></div><div class="pop-list" id="popFields">${fieldItems()}</div>`;
 function facetCounts(key) {
   const X = fx(), base = X.search(applyFilters(X.items, X.list, key, X.F)), F = X.F[key], c = {};
   if (F.test) Object.keys(F.options).forEach(v => c[v] = base.filter(u => F.test(u, [v])).length);
@@ -2903,11 +2920,11 @@ function valueItems(key, q = '') {
   }).join('') || '<div class="pi faint">No matches</div>';
 }
 // Title row of a filter's popover (values list or date picker). back: true = to the field list, 'fg-back' = to the folded filters list
-const filterHead = (F, back) => `<div class="pop-head">${back ? `<button class="ghost-ic" data-act="${back === true ? 'pop-back' : back}" aria-label="Back">${icon('chevLeft', 15)}</button>` : `<span style="width:6px"></span>`}${icon(F.icon, 14)}${F.label}</div>`;
+const filterHead = (F, back) => `<div class="pop-head">${back ? `<button class="ghost-ic" data-act="${back === true ? 'pop-back' : back}" aria-label="Back">${icon('chevLeft', 16)}</button>` : `<span style="width:6px"></span>`}${icon(F.icon, 16)}${F.label}</div>`;
 function valuesPop(key, back) {
   const F = fx().F[key], many = Object.keys(F.options).length > 8;
   return `${filterHead(F, back)}
-    ${many ? `<div class="pop-search">${icon('search', 14)}<input id="popVQ" data-key="${key}" placeholder="Search ${F.label.toLowerCase()}…" autocomplete="off"></div>` : ''}
+    ${many ? `<div class="pop-search">${icon('search', 16)}<input id="popVQ" data-key="${key}" placeholder="Search ${F.label.toLowerCase()}…" autocomplete="off"></div>` : ''}
     <div class="pop-list" id="popVals">${valueItems(key)}</div>`;
 }
 
@@ -2918,10 +2935,10 @@ function displayPop() {
   const curGroup = S.view === 'board' && !FIELDS[S.groupBy]?.board ? 'kyc' : S.groupBy;
   return `
     <div class="pop-sec"><div class="pop-lbl">Layout</div>
-      <div class="seg" style="width:100%">${[['table', 'Table'], ['list', 'List'], ['board', 'Board']].map(([k, l]) => `<button style="flex:1;justify-content:center" class="${S.view === k ? 'on' : ''}" data-act="layout" data-v="${k}">${icon(k, 14)}${l}</button>`).join('')}</div>
+      <div class="seg" style="width:100%">${[['table', 'Table'], ['list', 'List'], ['board', 'Board']].map(([k, l]) => `<button style="flex:1;justify-content:center" class="${S.view === k ? 'on' : ''}" data-act="layout" data-v="${k}">${icon(k, 16)}${l}</button>`).join('')}</div>
     </div>
     ${S.view !== 'table' ? `<div class="pop-sec"><div class="pop-lbl">Group by</div><div class="pills">${groupOpts.map(k => `<button class="pill ${curGroup === k ? 'on' : ''}" data-act="disp-group" data-v="${k}">${gl(k)}</button>`).join('')}</div></div>` : ''}
-    ${S.view === 'table' ? `<div class="pop-sec"><div class="pop-lbl">Columns<span class="pop-acts"><button class="btn btn-link" data-act="reset-cols">Reset columns</button><button class="btn btn-link" data-act="reset-colw">Reset widths</button></span></div>${colChips('users', 'disp-col')}</div>` : ''}`;
+    ${S.view === 'table' ? `<div class="pop-sec"><div class="pop-lbl">Columns</div>${colChips('users', 'disp-col')}<div class="pop-foot"><button class="btn btn-link" data-act="reset-cols">Reset columns</button><button class="btn btn-link" data-act="reset-colw">Reset widths</button></div></div>` : ''}`;
 }
 const refreshDisplayPop = () => { if (popOpts.kind === 'display') { pop.innerHTML = displayPop(); positionPop(); } };
 
@@ -2935,7 +2952,7 @@ const cfm = $('#confirm'); let cfmRun = null;
 function askConfirm({ title, body, ok, danger = true, ic }, run) {
   closePop(); cfmRun = run;
   cfm.innerHTML = `<div class="modal cfm" role="alertdialog" aria-modal="true" aria-labelledby="cfmT" aria-describedby="cfmD">
-    <div class="cfm-b"><span class="cfm-ic ${danger ? 'bad' : ''}">${icon(ic || (danger ? 'alert' : 'help'), 20)}</span><div><h2 id="cfmT">${title}</h2><p id="cfmD">${body}</p></div></div>
+    <div class="cfm-b"><span class="cfm-ic ${danger ? 'bad' : ''}">${icon(ic || (danger ? 'alert' : 'help'), 24)}</span><div><h2 id="cfmT">${title}</h2><p id="cfmD">${body}</p></div></div>
     <div class="modal-f"><button class="btn btn-tertiary btn-lg" data-act="cfm-cancel">Cancel</button><button class="btn ${danger ? 'btn-danger' : 'btn-primary'} btn-lg" data-act="cfm-ok">${ok}</button></div></div>`;
   cfm.classList.add('open'); $('[data-act=cfm-ok]', cfm).focus();
 }
@@ -3014,9 +3031,9 @@ function exportCSV(list, name = 'users') {
 }
 function newUserModal(coId = 47) {
   openModal(`<div class="modal">
-    <div class="modal-h">New user<button class="icon-btn icon-btn-link" data-act="modal-close">${icon('x', 17)}</button></div>
+    <div class="modal-h">New user<button class="icon-btn icon-btn-link" data-act="modal-close">${icon('x', 16)}</button></div>
     <div class="modal-b">
-      <div class="field"><label>Email</label><div style="display:flex;gap:var(--space-8)"><input id="nuEmail" type="email" placeholder="name@company.com" autocomplete="off" style="flex:1"><button class="btn btn-tertiary" style="height:40px;border-radius:var(--r-sm)" data-act="nu-gen">${icon('refresh', 14)}Generate</button></div></div>
+      <div class="field"><label>Email</label><div style="display:flex;gap:var(--space-8)"><input id="nuEmail" type="email" placeholder="name@company.com" autocomplete="off" style="flex:1"><button class="btn btn-tertiary" style="height:40px;border-radius:var(--r-sm)" data-act="nu-gen">${icon('refresh', 16)}Generate</button></div></div>
       <div class="field"><label>Company</label><select id="nuCompany" data-search>${COMPANIES.map(c => `<option value="${c.id}" ${c.id === coId ? 'selected' : ''}>${esc(c.name)} · #${c.id}</option>`).join('')}</select></div>
       <div class="field"><label>Referral code</label><input id="nuRef" placeholder="Optional" autocomplete="off"></div>
     </div>
@@ -3058,9 +3075,9 @@ const ACT = {
   },
   'mobile-menu': () => $('#app').classList.toggle('mobile-open'),
   'nav-fly': a => openFly(a),
-  'lang': a => { S.lang = a.dataset.v; store.set('nsc.lang', S.lang); document.documentElement.lang = S.lang; route(); openPop($('#sidebar .me'), meMenu(), { width: 280, kind: 'me' }); },
+  'lang': a => { S.lang = a.dataset.v; store.set('nsc.lang', S.lang); document.documentElement.lang = S.lang; route(); openPop($('#sidebar .me'), meMenu(), { width: 260, kind: 'me' }); },
   'theme': a => { setTheme(a.dataset.v); if (popOpts.kind === 'me') { pop.innerHTML = meMenu(); positionPop(); } },
-  'me': a => openPop(a, meMenu(), { width: 280, kind: 'me' }),
+  'me': a => openPop(a, meMenu(), { width: 260, kind: 'me' }),
   'me-view': a => { pop.innerHTML = meMenu(a.dataset.v); positionPop(); },
   'shortcuts': () => { closePop(); shortcutsModal(); },
   'toast': a => { closePop(); toast(a.dataset.msg); },
@@ -3267,7 +3284,7 @@ const ACT = {
   'dd': a => {
     const sel = a.previousElementSibling, search = sel.options.length > 8 || 'search' in sel.dataset;
     S._dd = sel; a.classList.add('open');
-    openPop(a, `${search ? `<div class="pop-search">${icon('search', 14)}<input id="ddQ" placeholder="Search…" autocomplete="off"></div>` : ''}<div class="pop-list" id="ddList">${ddItems(sel)}</div>`,
+    openPop(a, `${search ? `<div class="pop-search">${icon('search', 16)}<input id="ddQ" placeholder="Search…" autocomplete="off"></div>` : ''}<div class="pop-list" id="ddList">${ddItems(sel)}</div>`,
       { width: Math.max(180, a.offsetWidth), kind: 'dd', onMount: p => { $('#ddQ', p)?.focus(); $('#ddList .chk', p)?.closest('.pi')?.scrollIntoView({ block: 'nearest' }); } });
     if (!pop.classList.contains('open')) a.classList.remove('open');
   },
@@ -3301,12 +3318,12 @@ function setP(c, k, on) {
 }
 const money = (v, cur = 'EUR') => ({ EUR: '€', USD: '$', GBP: '£' }[cur] || cur + ' ') + (+v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const volFmt = v => v >= 1e9 ? v / 1e9 + 'B' : v >= 1e6 ? v / 1e6 + 'M' : v >= 1e3 ? v / 1e3 + 'K' : String(v);
-const prodCell = c => { const a = c.cp.length, b = c.ip.length; return !a && !b ? badge({ label: 'Not set up', tone: 'warning' }) : `<span class="pchips">${a ? `<span class="tag" data-tip="${a} card product${a > 1 ? 's' : ''}">${icon('card', 13)}${a}</span>` : ''}${b ? `<span class="tag" data-tip="${b} IBAN product${b > 1 ? 's' : ''}">${icon('bank', 13)}${b}</span>` : ''}</span>`; };
+const prodCell = c => { const a = c.cp.length, b = c.ip.length; return !a && !b ? badge({ label: 'Not set up', tone: 'warning' }) : `<span class="pchips">${a ? `<span class="tag" data-tip="${a} card product${a > 1 ? 's' : ''}">${icon('card', 16)}${a}</span>` : ''}${b ? `<span class="tag" data-tip="${b} IBAN product${b > 1 ? 's' : ''}">${icon('bank', 16)}${b}</span>` : ''}</span>`; };
 const kycCell = v => v ? `<span>${LEVEL[v].label}</span>` : '<span class="faint">Not required</span>';
 const lum = h => { const c = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(v => v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; };
 const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
 const hexOk = v => /^#[0-9A-F]{6}$/i.test(v || '');
-const linkBtn = (act, v, l) => `<button class="btn btn-link" data-act="${act}" data-v="${v}">${l} ${icon('chevRight', 14)}</button>`;
+const linkBtn = (act, v, l) => `<button class="btn btn-link" data-act="${act}" data-v="${v}">${l} ${icon('chevRight', 16)}</button>`;
 
 Object.assign(TCOLS, {
   companies: [
@@ -3328,7 +3345,9 @@ Object.assign(TCOLS, {
   ],
   coCards: [
     { k: 'id', l: 'ID', on: 1, cell: a => numM(a.id) },
-    { k: 'product', l: 'Card product', on: 1, cell: a => { const p = PROD_BY.c[a.pid]; return `<div>${esc(p.name)}</div><div class="code">${p.provider} · product ${p.id}</div>`; } },
+    { k: 'product', l: 'Card product', on: 1, cell: a => esc(PROD_BY.c[a.pid].name) },
+    { k: 'provider', l: 'Provider', on: 1, cell: a => PROD_BY.c[a.pid].provider },
+    { k: 'pid', l: 'Product ID', on: 1, cell: a => numM(a.pid) },
     { k: 'active', l: 'Active', al: 'c', on: 1, cell: (a, i) => `<button class="sw-t ${a.active ? 'on' : ''}" data-act="cp-active" data-i="${i}" data-tip="${a.active ? 'Deactivate' : 'Activate'}" aria-label="Active"></button>` },
     { k: 'level', l: 'Min. user level', on: 1, cell: a => muted(LEVEL[a.minLevel].label) },
     { k: 'kind', l: 'Card type', on: 1, cell: a => PROD_BY.c[a.pid].kind === 'physical' ? 'Physical' : 'Virtual' },
@@ -3344,8 +3363,8 @@ Object.assign(TCOLS, {
   ],
   coIban: [
     { k: 'id', l: 'ID', on: 1, cell: a => numM(a.id) },
-    { k: 'pid', l: 'IBAN product ID', cell: a => numM(a.pid) },
-    { k: 'name', l: 'Name', on: 1, cell: a => { const p = PROD_BY.i[a.pid]; return `<div>${esc(p.name)}</div><div class="code">product ${p.id}</div>`; } },
+    { k: 'pid', l: 'IBAN product ID', on: 1, cell: a => numM(a.pid) },
+    { k: 'name', l: 'Name', on: 1, cell: a => esc(PROD_BY.i[a.pid].name) },
     { k: 'cur', l: 'Currency', on: 1, cell: a => curCell(PROD_BY.i[a.pid].cur) },
     { k: 'type', l: 'Type', on: 1, cell: a => muted(PROD_BY.i[a.pid].type) },
     { k: 'provider', l: 'Provider', on: 1, cell: a => PROD_BY.i[a.pid].provider },
@@ -3409,13 +3428,13 @@ function coTopbar() {
       <button class="icon-btn" data-act="co-step" data-d="-1" ${i <= 0 ? 'disabled' : ''} data-tip="Previous  k">${icon('chevUp', 16)}</button>
       <button class="icon-btn" data-act="co-step" data-d="1" ${i >= l.length - 1 ? 'disabled' : ''} data-tip="Next  j">${icon('chevDown', 16)}</button>
       ${coById(S.coId) ? `<span class="tb-div"></span>
-      <button class="btn btn-tertiary" data-act="co-block" data-id="${S.coId}">${icon(coById(S.coId).status === 'blocked' ? 'refresh' : 'ban', 15)}<span class="tb-lbl">${coById(S.coId).status === 'blocked' ? 'Unblock' : 'Block'}</span></button>
+      <button class="btn btn-tertiary" data-act="co-block" data-id="${S.coId}">${icon(coById(S.coId).status === 'blocked' ? 'refresh' : 'ban', 16)}<span class="tb-lbl">${coById(S.coId).status === 'blocked' ? 'Unblock' : 'Block'}</span></button>
       <button class="icon-btn" data-act="co-more" data-tip="More">${icon('more', 16)}</button>
-      <button class="btn btn-secondary" data-act="co-new-user">${icon('plus', 15, 2)}<span class="tb-lbl">Create user</span></button>` : ''}`;
+      <button class="btn btn-secondary" data-act="co-new-user">${icon('plus', 16, 2)}<span class="tb-lbl">Create user</span></button>` : ''}`;
   }
-  return `${S.coView === 'list' ? `<button class="btn btn-tertiary" id="displayBtn" data-act="ld-display">${icon(lvView('companies'), 15)}<span class="sl">Display</span>${icon('chevDown', 13)}</button>` : ''}
-    <button class="btn btn-tertiary" data-act="co-export">${icon('download', 15)}<span class="tb-lbl">Export</span>${icon('chevDown', 13)}</button>
-    <button class="btn btn-primary" data-act="co-new">${icon('plus', 15, 2)}<span class="tb-lbl">New company</span></button>`;
+  return `${S.coView === 'list' ? `<button class="btn btn-tertiary" id="displayBtn" data-act="ld-display">${icon(lvView('companies'), 16)}<span class="sl">Display</span>${icon('chevDown', 16)}</button>` : ''}
+    <button class="btn btn-tertiary" data-act="co-export">${icon('download', 16)}<span class="tb-lbl">Export</span>${icon('chevDown', 16)}</button>
+    <button class="btn btn-primary" data-act="co-new">${icon('plus', 16, 2)}<span class="tb-lbl">New company</span></button>`;
 }
 function stepCo(d) {
   const l = S._coList.some(c => c.id === S.coId) ? S._coList : COMPANIES, nx = l[l.findIndex(c => c.id === S.coId) + d];
@@ -3431,9 +3450,9 @@ function coFloat(el) {
   show(`<span class="bk-n"><b>${n}</b>selected</span>
     ${n < S._coList.length ? `<button class="bk-link" data-act="co-sel-all">Select all ${fmtInt(S._coList.length)}</button>` : ''}
     <span class="sep"></span>
-    <button data-act="co-bulk-status">${icon('activity', 15)}Status</button>
-    <button data-act="co-bulk-grant">${icon('cardProduct', 15)}Grant product</button>
-    <button data-act="co-bulk-export">${icon('download', 15)}Export</button>
+    <button data-act="co-bulk-status">${icon('activity', 16)}Status</button>
+    <button data-act="co-bulk-grant">${icon('cardProduct', 16)}Grant product</button>
+    <button data-act="co-bulk-export">${icon('download', 16)}Export</button>
     <span class="sep"></span>
     <button class="bk-x" data-act="co-sel-clear" title="Clear selection">${icon('x', 16)}</button>`);
 }
@@ -3469,9 +3488,9 @@ function renderCompanies() {
   $('#main').innerHTML = `<div class="page fit">
     <section class="ustats" id="coStats"></section>
     <div class="toolbar">
-      <label class="search">${icon('search', 15)}<input id="coSearch" placeholder="Search name, email, ID, referral…" value="${esc(S.co.search)}" autocomplete="off"><kbd>/</kbd></label>
+      <label class="search">${icon('search', 16)}<input id="coSearch" placeholder="Search name, email, ID, referral…" value="${esc(S.co.search)}" autocomplete="off"><kbd>/</kbd></label>
       <div class="chips" id="chips"></div>
-      <button class="btn btn-tertiary" id="addFilter" data-act="add-filter">${icon('filter', 15)}Filter</button>
+      <button class="btn btn-tertiary" id="addFilter" data-act="add-filter">${icon('filter', 16)}Filter</button>
     </div>
     <div class="results" id="coResults"></div>
   </div>`;
@@ -3497,7 +3516,7 @@ function coResults() {
     <tbody>${rows.map(c => `<tr data-cid="${c.id}" class="${f.sel.has(c.id) ? 'sel' : ''}">
       <td class="cbcell"><button class="cb ${f.sel.has(c.id) ? 'on' : ''}" data-act="co-sel" data-id="${c.id}" aria-label="Select">${icon('check', 11, 3)}</button></td>
       ${cols.map(x => `<td class="${x.al === 'r' ? 'r' : ''} ${x.pin ? 'pin' : ''}">${x.cell(c)}</td>`).join('')}
-      <td class="act"><div class="row-actions"><button class="ghost-ic" data-act="co-open-tab" data-id="${c.id}" data-v="products" data-tip="Products">${icon('cardProduct', 15)}</button><button class="ghost-ic" data-act="co-row-more" data-id="${c.id}" data-tip="More">${icon('more', 15)}</button></div></td>
+      <td class="act"><div class="row-actions"><button class="ghost-ic" data-act="co-open-tab" data-id="${c.id}" data-v="products" data-tip="Products">${icon('cardProduct', 16)}</button><button class="ghost-ic" data-act="co-row-more" data-id="${c.id}" data-tip="More">${icon('more', 16)}</button></div></td>
     </tr>`).join('')}</tbody></table></div></div>${tfoot(list, rows, 'company', 'companies')}</div>`;
   fitColumns(); markHits($('tbody', el), f.search);
 }
@@ -3519,7 +3538,7 @@ const mxShown = () => { const f = S.mx, q = f.pq.trim().toLowerCase(); return MX
 function renderAccess() {
   $('#main').innerHTML = `<div class="page fit">
     <div class="toolbar">
-      <label class="search">${icon('search', 15)}<input id="mxSearch" placeholder="Search companies…" value="${esc(S.mx.q)}" autocomplete="off"><kbd>/</kbd></label>
+      <label class="search">${icon('search', 16)}<input id="mxSearch" placeholder="Search companies…" value="${esc(S.mx.q)}" autocomplete="off"><kbd>/</kbd></label>
     </div>
     <div class="results pa"><div class="tcard" id="paCos"></div><div class="tcard" id="paProds"></div></div>
   </div>`;
@@ -3542,22 +3561,23 @@ function paProds() {
   // a group is switched on and off with a checkbox: it can show "some on" (mixed), a toggle can't
   const groupCb = (st, g, label) => `<button class="cb ${st === 'off' ? '' : st}" data-act="pa-bulk" data-g="${g}" aria-label="${esc(label)}" data-tip="${st === 'on' ? 'Turn all off' : 'Turn all on'}">${st === 'on' ? icon('check', 11, 3) : ''}</button>`;
   const state = l => { const t = l.filter(x => mxOn(c, x.k)).length; return !t ? 'off' : t === l.length ? 'on' : 'mixed'; }; // mixed: some of a group are on
-  const sw = (st, attrs, label) => `<button class="sw-t ${st === 'off' ? '' : st}" ${attrs} aria-label="${esc(label)}" data-tip="${st === 'on' ? 'Turn off' : 'Turn on'}"></button>`;
+  // every product is a checkbox, like its group: the list reads as one multi-select
+  const itemCb = (st, attrs, label) => `<button class="cb ${st === 'on' ? 'on' : ''}" ${attrs} aria-label="${esc(label)}" aria-pressed="${st === 'on'}" data-tip="${st === 'on' ? 'Turn off' : 'Turn on'}">${st === 'on' ? icon('check', 11, 3) : ''}</button>`;
   const head = `<div class="pa-t"><a class="lnk" href="#/companies/${c.id}">${esc(c.name)}</a><span class="pa-ts">${mxCount(c)} of ${MX_ALL.length} products on</span></div>`;
   const groups = [['c', 'Card products', 'card'], ['i', 'IBAN accounts', 'bank']].map(([g, l, ic]) => {
     const gx = xs.filter(x => x.g === g); if (!gx.length) return '';
     return `<section class="pa-g">
-      <div class="pa-gh">${icon(ic, 15)}<span>${l}</span><span class="pa-n">${gx.filter(x => mxOn(c, x.k)).length} of ${gx.length} on</span>${groupCb(state(gx), g, g === 'c' ? 'All cards' : 'All IBAN accounts')}</div>
+      <div class="pa-gh">${icon(ic, 16)}<span>${l}</span><span class="pa-n">${gx.filter(x => mxOn(c, x.k)).length} of ${gx.length} on</span>${groupCb(state(gx), g, g === 'c' ? 'All cards' : 'All IBAN accounts')}</div>
       ${[...new Set(gx.map(x => x.p.provider))].map(pv => { const px = gx.filter(x => x.p.provider === pv);
         return `<div class="pa-ph"><span>${esc(pv)}</span></div>
         ${px.map(x => { const st = mxOn(c, x.k) ? 'on' : 'off', dirty = f.draft.has(c.id + '|' + x.k);
           return `<div class="pa-p ${dirty ? 'dirty' : ''}" data-act="pa-tog" data-k="${x.k}"><div class="pa-pn"><div>${esc(x.p.name)}</div><div class="code">${g === 'c' ? cap(x.p.kind) + ' card' : x.p.type + ' account'} · ${x.p.cur} · ID ${x.p.id}</div></div>
-            ${sw(st, `data-act="pa-tog" data-k="${x.k}"`, x.p.name)}</div>`; }).join('')}`; }).join('')}
+            ${itemCb(st, `data-act="pa-tog" data-k="${x.k}"`, x.p.name)}</div>`; }).join('')}`; }).join('')}
     </section>`;
   }).join('');
   el.innerHTML = `<div class="pa-top">${head}</div>
     <div class="pa-tools">
-      <label class="search">${icon('search', 14)}<input id="paQ" placeholder="Find product, provider or ID" value="${esc(f.pq)}" autocomplete="off"></label>
+      <label class="search">${icon('search', 16)}<input id="paQ" placeholder="Find product, provider or ID" value="${esc(f.pq)}" autocomplete="off"></label>
       <div class="seg sm">${[['all', 'All'], ['cards', 'Cards'], ['iban', 'IBAN']].map(([k, l]) => `<button class="${f.kind === k ? 'on' : ''}" data-act="mx-kind" data-v="${k}">${l}</button>`).join('')}</div>
     </div>
     <div class="pa-body">${groups || emptyBlock('search', 'No products match', 'Try another name, provider or ID.')}</div>`;
@@ -3600,8 +3620,8 @@ function coTab(c, d, D) {
         ${['country', 'city', 'street', 'zip', 'regNo'].map(k => kv(CO_EDIT[k].l, edField(X, k))).join('')}${kv('Created', `<span>${fmtDateTime(c.created)}</span>`)}
       </div></div>
       ${tcard(`Products <span class="ct">${prods.length}</span>`, prods.length ? linkBtn('co-tab', 'products', 'Manage') : '',
-        dtable(['Product', 'Kind', 'Provider', 'Status'], prods.map(({ a, p, k }) => [`<div>${esc(p.name)}</div><div class="code">ID ${p.id}</div>`, muted(k), p.provider, badge(a.active ? { label: 'Active', tone: 'success' } : { label: 'Inactive', tone: 'neutral' })]),
-          emptyBlock('cardProduct', 'No products yet', 'Users of this company can’t order cards or open IBANs until a product is assigned.', `<button class="btn btn-secondary" data-act="co-tab" data-v="products">${icon('plus', 14)}Assign a product</button>`)))}`;
+        dtable(['Product', 'ID', 'Kind', 'Provider', 'Status'], prods.map(({ a, p, k }) => [esc(p.name), numM(p.id), muted(k), p.provider, badge(a.active ? { label: 'Active', tone: 'success' } : { label: 'Inactive', tone: 'neutral' })]),
+          emptyBlock('cardProduct', 'No products yet', 'Users of this company can’t order cards or open IBANs until a product is assigned.', `<button class="btn btn-secondary" data-act="co-tab" data-v="products">${icon('plus', 16)}Assign a product</button>`)))}`;
     }
     case 'products': return coProductsTab(c);
     case 'gifts': return coGiftsTab(c, D);
@@ -3628,7 +3648,7 @@ function coSide(c, D) {
   return `<aside class="up-side">
     <div class="card"><div class="card-h"><span class="card-t">Setup</span><span class="code">${done} of ${steps.length} done</span><i class="card-prog" style="width:${done / steps.length * 100}%"></i></div>
       <div class="card-b">
-      ${steps.map(([l, ok, tab]) => `<button class="su-step ${ok ? 'done' : ''}" data-act="co-tab" data-v="${tab}"><span class="ver-ic ${ok ? 'ok' : 'no'}">${icon(ok ? 'check' : 'minus', 12, 2.5)}</span><span class="pl">${l}</span>${icon('chevRight', 14)}</button>`).join('')}</div>
+      ${steps.map(([l, ok, tab]) => `<button class="su-step ${ok ? 'done' : ''}" data-act="co-tab" data-v="${tab}"><span class="ver-ic ${ok ? 'ok' : 'no'}">${icon(ok ? 'check' : 'minus', 12, 2.5)}</span><span class="pl">${l}</span>${icon('chevRight', 16)}</button>`).join('')}</div>
     </div>
     <div class="card"><div class="card-h"><span class="card-t">Branding</span>${linkBtn('co-tab', 'branding', 'Edit')}</div><div class="card-b pad">${brandPreview(c.brand, true)}</div></div>
   </aside>`;
@@ -3637,27 +3657,27 @@ function coSide(c, D) {
 const subSeg = (s, opts) => `<div class="seg">${opts.map(([k, l]) => `<button class="${S.coSub[s] === k ? 'on' : ''}" data-act="co-sub" data-s="${s}" data-v="${k}">${l}</button>`).join('')}</div>`;
 function coProductsTab(c) {
   const seg = subSeg('products', [['cards', 'Cards' + tabCount(c.cp.length)], ['iban', 'IBAN' + tabCount(c.ip.length)]]);
-  const rm = (act, i) => `<button class="ghost-ic" data-act="${act}" data-i="${i}" data-tip="Remove">${icon('trash', 15)}</button>`;
+  const rm = (act, i) => `<button class="ghost-ic" data-act="${act}" data-i="${i}" data-tip="Remove">${icon('trash', 16)}</button>`;
   if (S.coSub.products === 'cards') {
-    const add = `<button class="btn btn-secondary" data-act="cp-add">${icon('plus', 14)}Add card product</button>`;
+    const add = `<button class="btn btn-secondary" data-act="cp-add">${icon('plus', 16)}Add card product</button>`;
     return tcard('Products', (c.cp.length ? add : '') + colsBtn('coCards'), ctable('coCards', c.cp, emptyBlock('cardProduct', 'No card products', 'Assign a card product so this company’s users can order cards.', add),
       { post: (a, i) => editBtn('cp-edit', i) + rm('cp-rm', i) }), seg);
   }
-  const add = `<button class="btn btn-secondary" data-act="ip-add">${icon('plus', 14)}Add IBAN product</button>`;
+  const add = `<button class="btn btn-secondary" data-act="ip-add">${icon('plus', 16)}Add IBAN product</button>`;
   return tcard('Products', (c.ip.length ? add : '') + colsBtn('coIban'), ctable('coIban', c.ip, emptyBlock('bank', 'No IBAN products', 'Assign an IBAN product so this company’s users can open accounts.', add), { post: (a, i) => rm('ip-rm', i) }), seg);
 }
 function coGiftsTab(c, D) {
-  const btn = c.cp.length ? `<button class="btn btn-secondary" data-act="gift-new">${icon('plus', 14)}Create gift codes</button>` : `<button class="btn btn-secondary" data-act="co-tab" data-v="products">Assign a card product</button>`;
-  return tcard('Gift codes', D.gifts.length ? btn : '', dtable(['Code', 'Value', 'Card product', 'Redeemed|r', 'Status', 'Expires', 'Created|r', '|a'], D.gifts.map((g, i) => {
+  const btn = c.cp.length ? `<button class="btn btn-secondary" data-act="gift-new">${icon('plus', 16)}Create gift codes</button>` : `<button class="btn btn-secondary" data-act="co-tab" data-v="products">Assign a card product</button>`;
+  return tcard('Gift codes', D.gifts.length ? btn : '', dtable(['Code', 'Value', 'Card product', 'Provider', 'Redeemed|r', 'Status', 'Expires', 'Created|r', '|a'], D.gifts.map((g, i) => {
     const p = PROD_BY.c[g.pid];
-    return [copyVal(g.code), `<span class="num">${money(g.value, p.cur)}</span>`, `<div>${esc(p.name)}</div><div class="code">${p.provider}</div>`, `<span class="num">${g.used} / ${g.max}</span>`, badge(GIFT_STATUS[g.status]),
+    return [copyVal(g.code), `<span class="num">${money(g.value, p.cur)}</span>`, esc(p.name), p.provider, `<span class="num">${g.used} / ${g.max}</span>`, badge(GIFT_STATUS[g.status]),
       `<span class="${g.status === 'EXPIRED' ? 'faint' : 'muted'}">${fmtDay(g.expires)}</span>`, muted(rel(g.created)),
-      ['ACTIVE', 'DISABLED'].includes(g.status) ? `<button class="ghost-ic" data-act="gift-toggle" data-i="${i}" data-tip="${g.status === 'ACTIVE' ? 'Disable' : 'Enable'}">${icon(g.status === 'ACTIVE' ? 'ban' : 'refresh', 15)}</button>` : ''];
+      ['ACTIVE', 'DISABLED'].includes(g.status) ? `<button class="ghost-ic" data-act="gift-toggle" data-i="${i}" data-tip="${g.status === 'ACTIVE' ? 'Disable' : 'Enable'}">${icon(g.status === 'ACTIVE' ? 'ban' : 'refresh', 16)}</button>` : ''];
   }), emptyBlock('tag', 'No gift codes', c.cp.length ? 'Create codes that give users a card for free or at a discount.' : 'Gift codes redeem against a card product — assign one first.', btn)));
 }
 function coUsersBody(c) {
   const all = coUsers(c), q = S.coUserQ.trim().toLowerCase(), list = q ? all.filter(u => `${u.name} ${u.email} ${u.id} ${u.uid}`.toLowerCase().includes(q)) : all;
-  if (!all.length) return emptyBlock('users', 'No users yet', 'Create users one by one or import them from a CSV.', `<div style="display:flex;gap:var(--space-8);justify-content:center"><button class="btn btn-tertiary" data-act="co-tab" data-v="imports">${icon('upload', 14)}Import users</button><button class="btn btn-secondary" data-act="co-new-user">${icon('plus', 14)}Create user</button></div>`);
+  if (!all.length) return emptyBlock('users', 'No users yet', 'Create users one by one or import them from a CSV.', `<div style="display:flex;gap:var(--space-8);justify-content:center"><button class="btn btn-tertiary" data-act="co-tab" data-v="imports">${icon('upload', 16)}Import users</button><button class="btn btn-secondary" data-act="co-new-user">${icon('plus', 16)}Create user</button></div>`);
   if (!list.length) return emptyBlock('search', 'No users match', 'Try a different name, email or ID.');
   const rows = loaded(list, S.coUserPage);
   return `<div class="hs-wrap"><div class="dt-wrap hs"><table class="dt"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Residency</th><th>Status</th><th>KYC</th><th>Risk</th><th class="r">Balance</th><th class="r">Created</th></tr></thead>
@@ -3666,24 +3686,24 @@ function coUsersBody(c) {
 }
 function coUsersTab(c) {
   const n = coUsers(c).length;
-  return tcard(`Users${n ? ` <span class="ct">${fmtInt(n)}</span>` : ''}`, n ? `<button class="btn btn-tertiary" data-act="co-tab" data-v="imports">${icon('upload', 14)}Import</button><button class="btn btn-secondary" data-act="co-new-user">${icon('plus', 14)}Create user</button>` : '',
-    `<div id="coUsersBody">${coUsersBody(c)}</div>`, n ? `<label class="search" style="width:300px">${icon('search', 15)}<input id="coUserQ" placeholder="Search name, email, ID…" value="${esc(S.coUserQ)}" autocomplete="off"></label>` : '');
+  return tcard(`Users${n ? ` <span class="ct">${fmtInt(n)}</span>` : ''}`, n ? `<button class="btn btn-tertiary" data-act="co-tab" data-v="imports">${icon('upload', 16)}Import</button><button class="btn btn-secondary" data-act="co-new-user">${icon('plus', 16)}Create user</button>` : '',
+    `<div id="coUsersBody">${coUsersBody(c)}</div>`, n ? `<label class="search" style="width:300px">${icon('search', 16)}<input id="coUserQ" placeholder="Search name, email, ID…" value="${esc(S.coUserQ)}" autocomplete="off"></label>` : '');
 }
 function coKeysTab(c, D) {
-  const btn = `<button class="btn btn-secondary" data-act="key-new">${icon('plus', 14)}Add API key</button>`;
+  const btn = `<button class="btn btn-secondary" data-act="key-new">${icon('plus', 16)}Add API key</button>`;
   return tcard('API keys', D.keys.length ? btn : '', dtable(['Name', 'Key', 'Permissions', 'IP allowlist', 'Status', 'Last used', 'Created|r', '|a'], D.keys.map((k, i) => [
     `<b style="font-weight:500">${esc(k.name)}</b>`, `<span class="num muted">${k.key.slice(0, 14)}••••${k.key.slice(-4)}</span>`,
     `<span class="pchips">${k.scopes.map(s => `<span class="tag">${s}</span>`).join('')}</span>`, k.ips.length ? `<span class="num muted">${esc(k.ips.join(', '))}</span>` : '<span class="faint">Any IP</span>',
     badge(k.status === 'ACTIVE' ? { label: 'Active', tone: 'success' } : { label: 'Revoked', tone: 'neutral' }), k.lastUsed ? muted(rel(k.lastUsed)) : '<span class="faint">Never</span>', muted(fmtDay(k.created)),
-    k.status === 'ACTIVE' ? `<button class="ghost-ic" data-act="key-revoke" data-i="${i}" data-tip="Revoke">${icon('ban', 15)}</button>` : '']),
+    k.status === 'ACTIVE' ? `<button class="ghost-ic" data-act="key-revoke" data-i="${i}" data-tip="Revoke">${icon('ban', 16)}</button>` : '']),
     emptyBlock('key', 'No API keys', 'Issue a key so this company can manage users and cards through the API.', btn)));
 }
 function coDirTab(c, D) {
-  const btn = `<button class="btn btn-secondary" data-act="dir-add">${icon('plus', 14)}Add person</button>`, own = D.directors.reduce((s, p) => s + p.own, 0);
+  const btn = `<button class="btn btn-secondary" data-act="dir-add">${icon('plus', 16)}Add person</button>`, own = D.directors.reduce((s, p) => s + p.own, 0);
   return tcard(`Directors & owners${D.directors.length ? ` <span class="ct">${own}% ownership declared</span>` : ''}`, D.directors.length ? btn : '', dtable(['Name', 'Role', 'Nationality', 'Date of birth', 'Ownership|r', 'KYC', 'Added|r', '|a'], D.directors.map((p, i) => [
     `<b style="font-weight:500">${esc(p.name)}</b>`, muted(DIR_ROLE[p.role]), `<span class="ctry"><span class="flag">${flag(COUNTRIES[p.nat].cc)}</span>${COUNTRIES[p.nat].name}</span>`,
     `<span class="num">${fmtDay(p.dob)}</span>`, p.own ? `<span class="num">${p.own}%</span>` : dash, badge(KYC[p.kyc]), muted(fmtDay(p.added)),
-    (p.kyc !== 'approved' ? `<button class="ghost-ic" data-act="dir-kyc" data-i="${i}" data-tip="Send KYC link">${icon('send', 15)}</button>` : '') + `<button class="ghost-ic" data-act="dir-rm" data-i="${i}" data-tip="Remove">${icon('trash', 15)}</button>`]),
+    (p.kyc !== 'approved' ? `<button class="ghost-ic" data-act="dir-kyc" data-i="${i}" data-tip="Send KYC link">${icon('send', 16)}</button>` : '') + `<button class="ghost-ic" data-act="dir-rm" data-i="${i}" data-tip="Remove">${icon('trash', 16)}</button>`]),
     emptyBlock('idcard', 'No directors or owners', c.type === 'single' ? 'Single-user companies usually don’t need them, but you can still add people for KYB.' : 'Add the company’s directors and beneficial owners for KYB.', btn)));
 }
 function coRatesTab(c, D) {
@@ -3692,8 +3712,8 @@ function coRatesTab(c, D) {
   const lvl = `<span class="tools-sep"></span><select class="fsel" data-rate="level">${Object.entries(LEVEL).map(([k, o]) => `<option value="${k}" ${R.level === k ? 'selected' : ''}>${o.label} level</option>`).join('')}</select>`;
   const init = `<select class="fsel" data-rate="init">${[['user', 'Company user'], ['api', 'API']].map(([k, l]) => `<option value="${k}" ${R.init === k ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
   const note = '<span class="code">Platform defaults · edited rows are marked Custom</span>';
-  if (sub === 'bank') return tcard('Sell rates', note, dtable(['Operation', 'Provider', 'Currency', 'Fee|r', 'Fixed|r', 'Minimum|r', '|a'], bankRows(D, R.level, R.init).map((x, i) => [
-    opCell(x.op, custom(x)), x.provider, curCell(x.cur), `<span class="num">${x.pct}%</span>`, x.fixed ? `<span class="num">${money(x.fixed, x.cur)}</span>` : dash, `<span class="num">${money(x.min, x.cur)}</span>`, editBtn('rate-bank', i)])), seg + lvl + init);
+  if (sub === 'bank') return tcard('Sell rates', note, dtable(['Operation', 'Code', 'Provider', 'Currency', 'Fee|r', 'Fixed|r', 'Minimum|r', '|a'], bankRows(D, R.level, R.init).map((x, i) => [
+    ...opCells(x.op, custom(x)), x.provider, curCell(x.cur), `<span class="num">${x.pct}%</span>`, x.fixed ? `<span class="num">${money(x.fixed, x.cur)}</span>` : dash, `<span class="num">${money(x.min, x.cur)}</span>`, editBtn('rate-bank', i)])), seg + lvl + init);
   if (sub === 'spread') return tcard('Sell rates', note, dtable(['Pair', 'System|r', 'Client|r', 'Total|r', '|a'], D.spread.map((x, i) => [
     `<b style="font-weight:500">${x.pair}</b>${custom(x)}`, numM(x.sys + '%'), `<span class="num">${x.client}%</span>`, `<span class="num" style="font-weight:600">${+(x.sys + x.client).toFixed(2)}%</span>`, editBtn('rate-spread', i)])), seg);
   if (sub === 'exfees') {
@@ -3710,22 +3730,22 @@ function coRatesTab(c, D) {
 }
 function coImportsTab(c, D) {
   const sub = S.coSub.imports, list = D.imports[sub], what = sub === 'users' ? 'users' : 'top-ups';
-  const acts = `<button class="btn btn-tertiary" data-act="imp-template">${icon('download', 14)}Template</button><button class="btn btn-secondary" data-act="imp-open">${icon('upload', 14)}Import ${what}</button>`;
+  const acts = `<button class="btn btn-tertiary" data-act="imp-template">${icon('download', 16)}Template</button><button class="btn btn-secondary" data-act="imp-open">${icon('upload', 16)}Import ${what}</button>`;
   return tcard('Bulk operations', acts, dtable(['Operation ID', 'File', 'Rows|r', 'Imported|r', 'Skipped|r', 'Errors|r', 'Status', 'Created|r', '|a'], list.map((o, i) => {
     const run = o.status === 'PROCESSING', cnt = v => run ? dash : `<span class="num ${v ? '' : 'zero'}">${fmtInt(v)}</span>`;
-    return [numM(o.id), `<span class="txt">${icon('file', 14)}${esc(o.file)}</span>`, cnt(o.total), cnt(o.ok), cnt(o.skipped), run ? dash : `<span class="num ${o.errors ? '' : 'zero'}" style="${o.errors ? 'color:var(--error-ink)' : ''}">${o.errors}</span>`,
-      badge(IMP_STATUS[o.status]), muted(rel(o.created)), run ? '' : `<button class="ghost-ic" data-act="imp-report" data-i="${i}" data-tip="Download report">${icon('download', 15)}</button>`];
-  }), emptyBlock('upload', `No ${what} imported yet`, sub === 'users' ? 'Upload a CSV to create many users at once. Start from the template so columns match.' : 'Upload a CSV to top up many cards at once.', `<button class="btn btn-secondary" data-act="imp-open">${icon('upload', 14)}Import ${what}</button>`)),
+    return [numM(o.id), `<span class="txt">${icon('file', 16)}${esc(o.file)}</span>`, cnt(o.total), cnt(o.ok), cnt(o.skipped), run ? dash : `<span class="num ${o.errors ? '' : 'zero'}" style="${o.errors ? 'color:var(--error-ink)' : ''}">${o.errors}</span>`,
+      badge(IMP_STATUS[o.status]), muted(rel(o.created)), run ? '' : `<button class="ghost-ic" data-act="imp-report" data-i="${i}" data-tip="Download report">${icon('download', 16)}</button>`];
+  }), emptyBlock('upload', `No ${what} imported yet`, sub === 'users' ? 'Upload a CSV to create many users at once. Start from the template so columns match.' : 'Upload a CSV to top up many cards at once.', `<button class="btn btn-secondary" data-act="imp-open">${icon('upload', 16)}Import ${what}</button>`)),
     subSeg('imports', [['users', 'User import'], ['topups', 'Card top-up']]));
 }
 function coCurTab(c, D) {
   const provs = [...new Set(D.currencies.map(x => x.provider))], list = D.currencies.filter(x => !S.curProv || x.provider === S.curProv);
-  const btn = `<button class="btn btn-secondary" data-act="cur-add">${icon('plus', 14)}Add currency</button>`;
+  const btn = `<button class="btn btn-secondary" data-act="cur-add">${icon('plus', 16)}Add currency</button>`;
   return tcard('Currencies', D.currencies.length ? `<select class="fsel sm" data-curprov="1"><option value="">All providers</option>${provs.map(p => `<option value="${p}" ${S.curProv === p ? 'selected' : ''}>${p}</option>`).join('')}</select>${btn}` : '',
     dtable(['ID', 'Currency', 'Network', 'Type', 'Network ID', 'Provider ID', 'Provider', 'Created', 'Updated|r', '|a'], list.map(x => {
       const a = ASSET[x.c];
       return [numM(x.id), `<span class="ctry">${assetIc(x.c, 16)}<span><b style="font-weight:500">${x.c}</b> <span class="muted">${a.n}</span></span></span>`, muted(a.net), a.fiat ? 'Fiat' : 'Crypto', `<span class="code">${NET_ID[x.c]}</span>`,
-        copyVal(x.providerId), x.provider, muted(fmtDay(x.created)), muted(rel(x.updated)), `<button class="ghost-ic" data-act="cur-rm" data-id="${x.id}" data-tip="Remove">${icon('trash', 15)}</button>`];
+        copyVal(x.providerId), x.provider, muted(fmtDay(x.created)), muted(rel(x.updated)), `<button class="ghost-ic" data-act="cur-rm" data-id="${x.id}" data-tip="Remove">${icon('trash', 16)}</button>`];
     }), D.currencies.length ? emptyBlock('search', 'No currencies for this provider', 'Pick another provider.') : emptyBlock('coins', 'No currencies enabled', 'Enable the assets this company’s users can hold and exchange.', btn)));
 }
 
@@ -3755,7 +3775,7 @@ function coBrandTab(c) {
   return `<div class="br-grid"><div class="br-main">
     <div class="card"><div class="card-h"><span class="card-t">Identity</span></div><div class="card-b">
       ${row('Brand name', txt('name'))}
-      ${row('Logo', `<div class="clr">${txt('logo', b.logo.startsWith('data:') ? 'Uploaded image' : 'https://…/logo.svg')}<label class="btn btn-tertiary" style="height:38px;border-radius:var(--r-sm);cursor:pointer;flex:none">${icon('upload', 14)}Upload<input type="file" id="logoFile" hidden accept="image/*"></label></div>`)}
+      ${row('Logo', `<div class="clr">${txt('logo', b.logo.startsWith('data:') ? 'Uploaded image' : 'https://…/logo.svg')}<label class="btn btn-tertiary" style="height:38px;border-radius:var(--r-sm);cursor:pointer;flex:none">${icon('upload', 16)}Upload<input type="file" id="logoFile" hidden accept="image/*"></label></div>`)}
       ${row('Brand color', clr('color'))}
       ${row('Background color', clr('bg'))}
       ${row('Button text color', `${clr('btn')}<div class="hint" id="brContrast" style="margin-top:var(--space-8)">${contrastHint(b)}</div>`)}
@@ -3787,7 +3807,7 @@ function brandInput(t) {
 function newCompanyModal() {
   const opts = o => Object.entries(o).map(([k, x]) => `<option value="${k}">${x.label || x}</option>`).join('');
   openModal(`<div class="modal">
-    <div class="modal-h">New company<button class="icon-btn icon-btn-link" data-act="modal-close">${icon('x', 17)}</button></div>
+    <div class="modal-h">New company<button class="icon-btn icon-btn-link" data-act="modal-close">${icon('x', 16)}</button></div>
     <div class="modal-b">
       <div class="field"><label>Company name</label><input id="ncName" placeholder="e.g. Orbit Exchange" autocomplete="off"></div>
       <div class="field"><label>Contact email</label><input id="ncEmail" type="email" placeholder="ops@company.com" autocomplete="off"></div>
@@ -3966,7 +3986,7 @@ Object.assign(ACT, {
   'gift-toggle': a => { const g = cd(cur()).gifts[+a.dataset.i]; g.status = g.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE'; toast(`${g.code} ${g.status === 'ACTIVE' ? 'enabled' : 'disabled'}`, g.status === 'ACTIVE' ? 'check' : 'ban'); renderCompanyPage(); },
   // API keys
   'key-new': () => openModal(`<div class="modal">
-    <div class="modal-h">New API key<button class="icon-btn icon-btn-link" data-act="modal-close">${icon('x', 17)}</button></div>
+    <div class="modal-h">New API key<button class="icon-btn icon-btn-link" data-act="modal-close">${icon('x', 16)}</button></div>
     <div class="modal-b">
       <div class="field"><label>Name</label><input id="akName" placeholder="e.g. Production backend" autocomplete="off"></div>
       <div class="field"><label>Permissions</label><div class="pills" id="akScopes">${SCOPES.map(s => `<button class="pill ${['users', 'cards'].includes(s) ? 'on' : ''}" data-act="ak-scope">${s}</button>`).join('')}</div></div>
@@ -3981,9 +4001,9 @@ Object.assign(ACT, {
     const key = 'nsk_live_' + Array.from({ length: 32 }, () => '0123456789abcdef'[Math.floor(Math.random() * 16)]).join('');
     D.keys.unshift({ id: 700 + c.id * 3 + D.keys.length + 10, name, key, scopes, ips: $('#akIps').value.split(',').map(s => s.trim()).filter(Boolean), status: 'ACTIVE', lastUsed: null, created: new Date(NOW) });
     renderCompanyPage();
-    openModal(`<div class="modal"><div class="modal-h">API key created<button class="icon-btn icon-btn-link" data-act="modal-close">${icon('x', 17)}</button></div>
+    openModal(`<div class="modal"><div class="modal-h">API key created<button class="icon-btn icon-btn-link" data-act="modal-close">${icon('x', 16)}</button></div>
       <div class="modal-b"><div class="hint">Copy the key now and store it somewhere safe. For security it won’t be shown again.</div>
-      <div class="key-box"><span style="flex:1">${key}</span><button class="icon-btn" data-act="copy" data-copy="${key}" data-tip="Copy">${icon('copy', 15)}</button></div></div>
+      <div class="key-box"><span style="flex:1">${key}</span><button class="icon-btn" data-act="copy" data-copy="${key}" data-tip="Copy">${icon('copy', 16)}</button></div></div>
       <div class="modal-f"><button class="btn btn-primary btn-lg" data-act="modal-close">Done</button></div></div>`);
   },
   'key-revoke': a => { const k = cd(cur()).keys[+a.dataset.i]; k.status = 'REVOKED'; toast(`${esc(k.name)} key revoked — requests with it now fail`, 'ban'); renderCompanyPage(); },
@@ -4009,7 +4029,7 @@ Object.assign(ACT, {
   'rate-ex-save': () => { const x = exRows(cd(cur()), S.rate.level)[S._edit]; Object.assign(x, { apiM: +$('#reAM').value || 0, apiT: +$('#reAT').value || 0, userM: +$('#reUM').value || 0, userT: +$('#reUT').value || 0, custom: true }); closeModal(); toast('Exchange fee tier updated'); renderCompanyPage(); },
   // imports
   'imp-open': () => { S.impFile = null; const u = S.coSub.imports === 'users'; openModal(`<div class="modal">
-    <div class="modal-h">${u ? 'Import users' : 'Import card top-ups'}<button class="icon-btn icon-btn-link" data-act="modal-close">${icon('x', 17)}</button></div>
+    <div class="modal-h">${u ? 'Import users' : 'Import card top-ups'}<button class="icon-btn icon-btn-link" data-act="modal-close">${icon('x', 16)}</button></div>
     <div class="modal-b">
       <div id="impPick">${impPickHTML()}</div>
       <div class="hint">Rows that fail validation are skipped. You can download a report for every import.</div>
@@ -4076,8 +4096,8 @@ function renderPg() {
   $('#main').innerHTML = `<div class="page fit">${pageTabs()}
     ${P.tiles ? `<section class="ustats" id="pgStats" style="--n:${P.tiles.length}"></section>` : ''}
     <div class="toolbar">
-      <label class="search">${icon('search', 15)}<input id="pgSearch" placeholder="${P.searchPh || 'Search…'}" value="${esc(st.search)}" autocomplete="off"><kbd>/</kbd></label>
-      ${Object.keys(P.fields).length ? `<div class="chips" id="chips"></div><button class="btn btn-tertiary" id="addFilter" data-act="add-filter">${icon('filter', 15)}Filter</button>` : ''}
+      <label class="search">${icon('search', 16)}<input id="pgSearch" placeholder="${P.searchPh || 'Search…'}" value="${esc(st.search)}" autocomplete="off"><kbd>/</kbd></label>
+      ${Object.keys(P.fields).length ? `<div class="chips" id="chips"></div><button class="btn btn-tertiary" id="addFilter" data-act="add-filter">${icon('filter', 16)}Filter</button>` : ''}
     </div>
     <div class="results" id="pgResults"></div>
   </div>`;
@@ -4104,7 +4124,7 @@ function pgResults() {
     <tbody>${rows.map((r, i) => { const k = esc(keys[i]), q = P.quick?.(r), on = st.sel.has(keys[i]); return `<tr data-rid="${k}" class="${on ? 'sel' : ''}">
       <td class="cbcell"><button class="cb ${on ? 'on' : ''}" data-act="pg-sel" data-rid="${k}" aria-label="Select">${icon('check', 11, 3)}</button></td>
       ${cols.map(c => `<td class="${al(c)} ${c.pin ? 'pin' : ''}">${c.cell(r)}</td>`).join('')}
-      <td class="act"><div class="row-actions">${q ? `<button class="ghost-ic" data-act="${q.act}" data-rid="${k}" ${Object.entries(q.data || {}).map(([a, v]) => `data-${a}="${esc(v)}"`).join(' ')} data-tip="${q.tip}">${icon(q.icon, 15)}</button>` : ''}<button class="ghost-ic" data-act="pg-row-more" data-rid="${k}" data-tip="More">${icon('more', 15)}</button></div></td>
+      <td class="act"><div class="row-actions">${q ? `<button class="ghost-ic" data-act="${q.act}" data-rid="${k}" ${Object.entries(q.data || {}).map(([a, v]) => `data-${a}="${esc(v)}"`).join(' ')} data-tip="${q.tip}">${icon(q.icon, 16)}</button>` : ''}<button class="ghost-ic" data-act="pg-row-more" data-rid="${k}" data-tip="More">${icon('more', 16)}</button></div></td>
     </tr>`; }).join('')}</tbody></table></div></div>${tfoot(list, rows, P.noun, P.nouns)}</div>`;
   fitColumns(); markHits($('tbody', el), st.search);
 }
@@ -4117,8 +4137,8 @@ function pgFloat(el) {
   el.innerHTML = `<span class="bk-n"><b>${n}</b>selected</span>
     ${n < S._pgList.length ? `<button class="bk-link" data-act="pg-sel-all">Select all ${fmtInt(S._pgList.length)}</button>` : ''}
     <span class="sep"></span>
-    ${(P.bulk || []).map((b, i) => `<button data-act="pg-bulk" data-i="${i}">${icon(b.icon, 15)}${b.label}</button>`).join('')}
-    <button data-act="pg-bulk-export">${icon('download', 15)}Export</button>
+    ${(P.bulk || []).map((b, i) => `<button ${/^(Block|Close|Freeze|Reject|Cancel|Disable|Pause|Delete|Remove|Halt)/.test(b.label) ? 'class="bk-danger"' : ''} data-act="pg-bulk" data-i="${i}">${icon(b.icon, 16)}${b.label}</button>`).join('')}
+    <button data-act="pg-bulk-export">${icon('download', 16)}Export</button>
     <span class="sep"></span>
     <button class="bk-x" data-act="pg-sel-clear" title="Clear selection">${icon('x', 16)}</button>`;
   el.classList.add('show');
@@ -4132,9 +4152,9 @@ function pgTopbar() {
       <button class="icon-btn" data-act="rec-step" data-d="1" ${i < 0 || i >= l.length - 1 ? 'disabled' : ''} data-tip="Next  j">${icon('chevDown', 16)}</button>
       ${recOf(P) ? `<span class="tb-div"></span>${P.rec.acts ? P.rec.acts(recOf(P)) : ''}<button class="icon-btn" data-act="pg-rec-more" data-rid="${esc(S.recId)}" data-tip="More">${icon('more', 16)}</button>` : ''}`;
   }
-  return `<button class="btn btn-tertiary" id="displayBtn" data-act="ld-display">${icon(lvView('pg:' + P.id), 15)}<span class="sl">Display</span>${icon('chevDown', 13)}</button>
-    <button class="btn btn-tertiary" data-act="pg-export">${icon('download', 15)}<span class="tb-lbl">Export</span>${icon('chevDown', 13)}</button>
-    ${P.form && P.form.create !== false ? `<button class="btn btn-primary" data-act="pg-new">${icon('plus', 15, 2)}<span class="tb-lbl">${P.form.newLabel || 'New ' + P.noun}</span></button>` : ''}`;
+  return `<button class="btn btn-tertiary" id="displayBtn" data-act="ld-display">${icon(lvView('pg:' + P.id), 16)}<span class="sl">Display</span>${icon('chevDown', 16)}</button>
+    <button class="btn btn-tertiary" data-act="pg-export">${icon('download', 16)}<span class="tb-lbl">Export</span>${icon('chevDown', 16)}</button>
+    ${P.form && P.form.create !== false ? `<button class="btn btn-primary" data-act="pg-new">${icon('plus', 16, 2)}<span class="tb-lbl">${P.form.newLabel || 'New ' + P.noun}</span></button>` : ''}`;
 }
 function stepRec(d) {
   const P = pg(), l = S._pgList.some(r => pgKey(P, r) === S.recId) ? S._pgList : pgList(P), nx = l[l.findIndex(r => pgKey(P, r) === S.recId) + d];
@@ -4157,7 +4177,7 @@ function renderRec() {
   main.innerHTML = `<div class="page">
     <div class="up-grid">
       <div class="up-main">
-        <div class="card"><div class="card-h"><span class="card-t">Details</span>${!P.edit && P.form && P.form.edit !== false ? `<button class="btn btn-tertiary" data-act="pg-edit" data-rid="${k}">${icon('pencil', 14)}Edit</button>` : ''}</div>
+        <div class="card"><div class="card-h"><span class="card-t">Details</span>${!P.edit && P.form && P.form.edit !== false ? `<button class="btn btn-tertiary" data-act="pg-edit" data-rid="${k}">${icon('pencil', 16)}Edit</button>` : ''}</div>
           <div class="kv2 card-b">${P.cols.filter(c => c.rec !== false).map(row).join('')}</div></div>
         ${R.sections ? R.sections(r) : ''}
       </div>
@@ -4183,9 +4203,9 @@ function pgCSV(P, rows, name) {
 function listDisplayPop() {
   const X = colCtx(), F = fx().F, bf = boardFields(F), L = lvOf(X.t), lnk = (act, l) => `<button class="btn btn-link" data-act="${act}">${l}</button>`;
   return `${bf.length ? `<div class="pop-sec"><div class="pop-lbl">Layout</div>
-      <div class="seg" style="width:100%">${[['table', 'Table'], ['board', 'Board']].map(([k, l]) => `<button style="flex:1;justify-content:center" class="${L.view === k ? 'on' : ''}" data-act="ld-layout" data-v="${k}">${icon(k, 14)}${l}</button>`).join('')}</div></div>` : ''}
+      <div class="seg" style="width:100%">${[['table', 'Table'], ['board', 'Board']].map(([k, l]) => `<button style="flex:1;justify-content:center" class="${L.view === k ? 'on' : ''}" data-act="ld-layout" data-v="${k}">${icon(k, 16)}${l}</button>`).join('')}</div></div>` : ''}
     ${lvView(X.t) === 'board' ? `<div class="pop-sec"><div class="pop-lbl">Group by</div><div class="pills">${bf.map(k => `<button class="pill ${boardBy(X.t, F) === k ? 'on' : ''}" data-act="ld-group" data-v="${k}">${F[k].label}</button>`).join('')}</div></div>`
-    : `<div class="pop-sec"><div class="pop-lbl">Columns<span style="display:flex;gap:var(--space-12)">${lnk('ld-cols-reset', 'Reset columns')}${lnk('ld-reset-colw', 'Reset widths')}</span></div>${colChips(X.t, 'ld-col')}</div>`}`;
+    : `<div class="pop-sec"><div class="pop-lbl">Columns</div>${colChips(X.t, 'ld-col')}<div class="pop-foot">${lnk('ld-cols-reset', 'Reset columns')}${lnk('ld-reset-colw', 'Reset widths')}</div></div>`}`;
 }
 /* Board layout for Companies and every PAGES list: one column per value of a short option field (Status unless picked otherwise), cards open the record.
    Unlike the Users board, cards can't be dragged: these status changes go through their own actions and confirmations. Layout and grouping are kept per list. */
@@ -4202,13 +4222,13 @@ function lboardHTML(t, list, card) {
     const items = list.filter(r => F.get(r) === k), lim = more[k] || 25, o = F.options[k];
     return `<div class="col"><div class="col-h"><i class="dot t-${o.tone || 'neutral'}"></i>${esc(o.label)}<span class="mono">${items.length}</span></div>
       <div class="col-b">${items.slice(0, lim).map(r => card(r, by)).join('')}
-        ${items.length > lim ? `<button class="more-btn" data-act="lb-more" data-g="${esc(k)}">Show ${items.length - lim} more</button>` : ''}
-        ${!items.length ? `<div class="col-empty">Nothing here</div>` : ''}</div></div>`;
+        ${!items.length ? `<div class="col-empty">Nothing here</div>` : ''}</div>
+      ${items.length > lim ? `<div class="col-more"><button class="btn btn-link" data-act="lb-more" data-g="${esc(k)}">Show ${items.length - lim} more</button></div>` : ''}</div>`;
   }).join('')}</div>`;
 }
 const bcardTpl = ({ attr, title, id, sub, tags, num, when }) => `<div class="bcard link" ${attr}>
-    <div class="bc-top"><span class="bc-name">${title}</span>${id ? `<span class="mono faint" style="font-size:var(--fs-12)">#${id}</span>` : ''}</div>
-    ${sub ? `<div class="bc-email">${sub}</div>` : '<div style="height:10px"></div>'}
+    <div class="bc-head"><div class="bc-top"><span class="bc-name">${title}</span>${id ? `<span class="mono faint" style="font-size:var(--fs-12)">#${id}</span>` : ''}</div>
+    ${sub ? `<div class="bc-email">${sub}</div>` : ''}</div>
     <div class="bc-tags">${tags}</div>
     ${num || when ? `<div class="bc-foot"><span class="num">${num || ''}</span><span class="faint">${when ? rel(when) : ''}</span></div>` : ''}
   </div>`;
@@ -4261,7 +4281,7 @@ S._charts = [];
 function renderDashPage() {
   const D = DASHES[S.route], d = dashData(S.range); S._charts = [];
   const kpis = D.kpis(d);
-  $('#main').innerHTML = `<div class="page">${pageTabs()}<section class="kpis band">${kpis.map(k => `
+  $('#main').innerHTML = `<div class="page">${pageTabs()}<section class="kpis">${kpis.map(k => `
     <div class="kpi"><div class="kpi-l">${k.l}</div><div class="kpi-v">${k.v}</div><div class="kpi-f">${k.d != null ? deltaPill(k.d, k.unit) : `<span class="code">${k.note || ''}</span>`}${k.s ? spark(k.s) : ''}</div></div>`).join('')}
     </section><div class="dgrid">${D.cards(d)}</div></div>`;
   drawCharts();
@@ -4318,8 +4338,9 @@ page({
   },
   tiles: [allTile('All requests', L => `${L.filter(r => r.status === 'PENDING').length} pending`), tile('pending', 'Pending', { key: 'status', values: ['PENDING'] }, L => { const o = L.filter(r => r.status === 'PENDING').sort((a, b) => a.created - b.created)[0]; return o ? `oldest ${rel(o.created)}` : 'All clear'; }),
     tile('high', 'High value', { key: 'value', values: ['high'] }, () => '€10,000 and above'), tile('ok', 'Approved', { key: 'status', values: ['APPROVED'] }, share), tile('no', 'Rejected', { key: 'status', values: ['REJECTED'] }, share)],
-  cols: [K.id(), K.user(), { k: 'type', l: 'Type', on: 1, cell: r => `<span class="txt">${icon(CONF_TYPE[r.type].icon, 14)}${CONF_TYPE[r.type].label}</span>` },
-    { k: 'amount', l: 'Amount', al: 'r', on: 1, dir: 'desc', val: r => r.eur, cell: r => r.type === 'LIMIT' ? `<span class="num">${fmtEur(r.eur)}</span>` : `<span class="num">${fmtAmt(r.amount, r.c)}</span>${r.c !== 'EUR' ? `<div class="code">${fmtEur(r.eur)}</div>` : ''}` },
+  cols: [K.id(), K.user(), { k: 'type', l: 'Type', on: 1, cell: r => `<span class="txt">${icon(CONF_TYPE[r.type].icon, 16)}${CONF_TYPE[r.type].label}</span>` },
+    { k: 'amount', l: 'Amount', al: 'r', on: 1, dir: 'desc', val: r => r.eur, cell: r => r.type === 'LIMIT' ? `<span class="num">${fmtEur(r.eur)}</span>` : `<span class="num">${fmtAmt(r.amount, r.c)}</span>` },
+    { k: 'eur', l: 'In EUR', al: 'r', on: 1, dir: 'desc', val: r => r.eur, cell: r => r.type !== 'LIMIT' && r.c !== 'EUR' ? `<span class="num muted">${fmtEur(r.eur)}</span>` : dash },
     { k: 'dest', l: 'Destination', on: 1, cell: r => `<span class="num muted">${esc(r.dest)}</span>` },
     { k: 'risk', l: 'User risk', on: 1, dir: 'desc', val: r => RISK[byId(r.uid).risk].n, cell: r => riskCell(byId(r.uid).risk) },
     K.status(CONF_STATUS), K.date('created', 'Requested'), K.muted('by', 'Decided by', 0), K.date('decided', 'Decided', 0)],
@@ -4330,7 +4351,7 @@ page({
   rec: {
     title: r => `${CONF_TYPE[r.type].label} #${r.id}`, sub: r => `${userLink(byId(r.uid))}<span class="faint">·</span><span>${fmtDateTime(r.created)}</span>`,
     badges: r => badge(CONF_STATUS[r.status]) + `<span class="badge t-neutral">${riskIcon(byId(r.uid).risk)}${RISK[byId(r.uid).risk].label} risk</span>`,
-    acts: r => r.status === 'PENDING' ? `<button class="btn btn-secondary" data-act="conf-ok" data-rid="${r.id}">${icon('check', 15, 2)}Approve</button><button class="btn btn-tertiary" data-act="conf-no" data-rid="${r.id}">${icon('ban', 15)}Reject</button>` : '',
+    acts: r => r.status === 'PENDING' ? `<button class="btn btn-secondary" data-act="conf-ok" data-rid="${r.id}">${icon('check', 16, 2)}Approve</button><button class="btn btn-tertiary" data-act="conf-no" data-rid="${r.id}">${icon('ban', 16)}Reject</button>` : '',
     events: r => [r.decided && { ic: r.status === 'APPROVED' ? 'check' : 'ban', t: `${CONF_STATUS[r.status].label} by ${r.by}`, s: fmtDateTime(r.decided), when: rel(r.decided) }, { ic: 'send', t: 'Requested by user', s: fmtDateTime(r.created), when: rel(r.created) }].filter(Boolean),
   },
 });
@@ -4354,7 +4375,7 @@ page({
   fields: { status: fE('Status', 'activity', DOC_STATUS, r => r.status), type: fE('Document type', 'file', optsOf(DOC_TYPES), r => r.type), provider: fE('Provider', 'folder', optsOf(DOC_PROV), r => r.provider), created: fD('Uploaded', r => r.created) },
   tiles: [allTile('All documents', L => `${L.filter(r => NOW - r.created < 7 * DAY).length} this week`), tile('pending', 'To review', { key: 'status', values: ['PENDING'] }, () => 'Awaiting compliance'),
     tile('ok', 'Approved', { key: 'status', values: ['APPROVED'] }, share), tile('no', 'Rejected', { key: 'status', values: ['REJECTED'] }, share), tile('exp', 'Expired', { key: 'status', values: ['EXPIRED'] }, () => 'Need re-upload')],
-  cols: [K.id(), K.user(), { k: 'type', l: 'Document', on: 1, cell: r => `<span class="txt">${icon('file', 14)}${DOC_TYPES[r.type]}</span>` }, K.muted('file', 'File'),
+  cols: [K.id(), K.user(), { k: 'type', l: 'Document', on: 1, cell: r => `<span class="txt">${icon('file', 16)}${DOC_TYPES[r.type]}</span>` }, K.muted('file', 'File'),
     { ...K.num('size', 'Size', fmtSize, 0) }, { k: 'provider', l: 'Provider', on: 1, cell: r => DOC_PROV[r.provider] }, K.status(DOC_STATUS), K.date('created', 'Uploaded'),
     K.muted('by', 'Reviewed by', 0), K.date('reviewed', 'Reviewed', 0), K.muted('reason', 'Reject reason', 0)],
   sort: { k: 'created', dir: 'desc' },
@@ -4363,8 +4384,8 @@ page({
   bulk: [{ icon: 'check', label: 'Approve', run: rows => docDecide(rows, true) }, { icon: 'ban', label: 'Reject', run: rows => docDecide(rows, false) }],
   rec: {
     title: r => `${DOC_TYPES[r.type]} #${r.id}`, sub: r => `${userLink(byId(r.uid))}<span class="faint">·</span><span>${esc(r.file)}</span>`, badges: r => badge(DOC_STATUS[r.status]),
-    acts: r => (r.status === 'PENDING' ? `<button class="btn btn-secondary" data-act="doc-ok" data-rid="${r.id}">${icon('check', 15, 2)}Approve</button><button class="btn btn-tertiary" data-act="doc-no" data-rid="${r.id}">${icon('ban', 15)}Reject</button>` : '') + `<button class="btn btn-tertiary" data-act="doc-dl" data-rid="${r.id}">${icon('download', 15)}Download</button>`,
-    sections: r => tcard('File', '', `<div class="docs" style="border-top:0"><div class="doc"><span class="doc-ic">${icon('file', 15)}</span><div style="flex:1;min-width:0"><div>${esc(r.file)}</div><div class="code">${DOC_TYPES[r.type]} · ${fmtSize(r.size)} · ${DOC_PROV[r.provider]}</div></div><button class="btn btn-tertiary" data-act="doc-dl" data-rid="${r.id}">${icon('download', 14)}Download</button></div></div>`),
+    acts: r => (r.status === 'PENDING' ? `<button class="btn btn-secondary" data-act="doc-ok" data-rid="${r.id}">${icon('check', 16, 2)}Approve</button><button class="btn btn-tertiary" data-act="doc-no" data-rid="${r.id}">${icon('ban', 16)}Reject</button>` : '') + `<button class="btn btn-tertiary" data-act="doc-dl" data-rid="${r.id}">${icon('download', 16)}Download</button>`,
+    sections: r => tcard('File', '', `<div class="docs" style="border-top:0"><div class="doc"><span class="doc-ic">${icon('file', 16)}</span><div style="flex:1;min-width:0"><div>${esc(r.file)}</div><div class="code">${DOC_TYPES[r.type]} · ${fmtSize(r.size)} · ${DOC_PROV[r.provider]}</div></div><button class="btn btn-tertiary" data-act="doc-dl" data-rid="${r.id}">${icon('download', 16)}Download</button></div></div>`),
     events: r => [r.reviewed && { ic: r.status === 'REJECTED' ? 'ban' : 'check', t: `${DOC_STATUS[r.status].label} by ${r.by}`, s: r.reason || fmtDateTime(r.reviewed), when: rel(r.reviewed) }, { ic: 'upload', t: `Uploaded via ${DOC_PROV[r.provider]}`, s: fmtDateTime(r.created), when: rel(r.created) }].filter(Boolean),
   },
 });
@@ -4392,8 +4413,8 @@ page({
   bulk: [{ icon: 'refresh', label: 'Fetch KYC status', run: ccFetch }],
   rec: {
     title: r => r.C.id || `CreditCo · ${byId(r.uid).name || byId(r.uid).email}`, sub: r => userLink(byId(r.uid)), badges: r => badge(CC_STATUS[r.C.status]) + badge(CC_KYC[ccKyc(r)], 'KYC '),
-    acts: r => `${r.C.status !== 'APPROVED' ? `<button class="btn btn-secondary" data-act="cc-req" data-rid="${r.id}">${icon('key', 15)}Request access</button>` : ''}<button class="btn btn-tertiary" data-act="cc-fetch" data-rid="${r.id}">${icon('refresh', 15)}Fetch KYC status</button>`,
-    sections: r => tcard(`Documents <span class="ct">${r.C.docs.length}</span>`, '', r.C.docs.length ? `<div class="docs" style="border-top:0">${r.C.docs.map(x => `<div class="doc"><span class="doc-ic">${icon('file', 15)}</span><div style="flex:1;min-width:0"><div>${esc(x.name)}</div><div class="code">${DOC_TYPES[x.type]} · ${x.size} · ${rel(x.date)}</div></div></div>`).join('')}</div>` : emptyBlock('file', 'No documents', 'Upload documents from the user’s Verification tab.')),
+    acts: r => `${r.C.status !== 'APPROVED' ? `<button class="btn btn-secondary" data-act="cc-req" data-rid="${r.id}">${icon('key', 16)}Request access</button>` : ''}<button class="btn btn-tertiary" data-act="cc-fetch" data-rid="${r.id}">${icon('refresh', 16)}Fetch KYC status</button>`,
+    sections: r => tcard(`Documents <span class="ct">${r.C.docs.length}</span>`, '', r.C.docs.length ? `<div class="docs" style="border-top:0">${r.C.docs.map(x => `<div class="doc"><span class="doc-ic">${icon('file', 16)}</span><div style="flex:1;min-width:0"><div>${esc(x.name)}</div><div class="code">${DOC_TYPES[x.type]} · ${x.size} · ${rel(x.date)}</div></div></div>`).join('')}</div>` : emptyBlock('file', 'No documents', 'Upload documents from the user’s Verification tab.')),
     events: r => [r.C.updated && { ic: 'refresh', t: 'Status synced', s: fmtDateTime(r.C.updated), when: rel(r.C.updated) }, r.C.created && { ic: 'plus', t: 'Application created', s: fmtDateTime(r.C.created), when: rel(r.C.created) }].filter(Boolean),
   },
 });
@@ -4414,7 +4435,7 @@ const txCols = () => [K.id(), K.when('created', 'Created'), K.user(), { k: 'type
   K.status(TX_STATUS), { k: 'ref', l: 'Referral', cell: r => r.ref ? `<span class="num">${r.ref}</span>` : dash }];
 const txRec = {
   title: r => `${TX[r.type].label} #${r.id}`, sub: r => `${userLink(byId(r.uid))}<span class="faint">·</span><span class="num">${fmtAmt(r.amount, r.c, true)}</span>`, badges: r => badge(TX_STATUS[r.status]) + `<span class="badge t-neutral">${SOURCES[r.source]}</span>`,
-  acts: r => r.status === 'FAILED' ? `<button class="btn btn-secondary" data-act="tx-retry" data-rid="${r.id}">${icon('refresh', 15)}Retry</button>` : '',
+  acts: r => r.status === 'FAILED' ? `<button class="btn btn-secondary" data-act="tx-retry" data-rid="${r.id}">${icon('refresh', 16)}Retry</button>` : '',
   events: r => [r.status !== 'PENDING' && { ic: r.status === 'FAILED' ? 'alert' : 'check', t: TX_STATUS[r.status].label, s: fmtDateTime(r.updated), when: rel(r.updated) }, { ic: TX[r.type].icon, t: 'Created', s: fmtDateTime(r.created), when: rel(r.created) }].filter(Boolean),
 };
 const txMenu = r => [...(r.status === 'FAILED' ? [{ act: 'tx-retry', data: { rid: r.id }, icon: 'refresh', label: 'Retry' }] : []), { act: 'open-user', data: { id: r.uid }, icon: 'user', label: 'Open user' }];
@@ -4454,7 +4475,7 @@ page({
   menu: b => [...(b.status !== 'CLOSED' ? [{ act: 'iban-close', data: { rid: b.id }, icon: 'ban', label: 'Close account' }] : []), { act: 'open-user', data: { id: b.uid }, icon: 'user', label: 'Open user' }],
   bulk: [{ icon: 'ban', label: 'Close', run: ibanClose }],
   rec: { title: b => b.iban, sub: b => `${userLink(byId(b.uid))}<span class="faint">·</span><span>${esc(b.productName)}</span>`, badges: b => badge(IBAN_STATUS[b.status]) + `<span class="badge t-neutral">${b.provider}</span>`,
-    acts: b => b.status !== 'CLOSED' ? `<button class="btn btn-tertiary" data-act="iban-close" data-rid="${b.id}">${icon('ban', 15)}Close account</button>` : '' },
+    acts: b => b.status !== 'CLOSED' ? `<button class="btn btn-tertiary" data-act="iban-close" data-rid="${b.id}">${icon('ban', 16)}Close account</button>` : '' },
 });
 
 /* ── Financial · Cards (the same objects as each user’s Cards tab) ── */
@@ -4477,7 +4498,7 @@ page({
   menu: c => [{ act: 'card-tog', data: { rid: c.id }, icon: c.frozen ? 'refresh' : 'lock', label: c.frozen ? 'Unfreeze card' : 'Freeze card' }, { act: 'copy', data: { copy: c.ext }, icon: 'copy', label: 'Copy external ID' }, { act: 'open-user', data: { id: c.uid }, icon: 'user', label: 'Open user' }],
   bulk: [{ icon: 'lock', label: 'Freeze', run: rows => cardFreeze(rows, true) }, { icon: 'refresh', label: 'Unfreeze', run: rows => cardFreeze(rows, false) }],
   rec: { title: c => `${c.product} •••• ${c.last4}`, sub: c => `${userLink(byId(c.uid))}<span class="faint">·</span><span class="num">${fmtAmt(c.balance, 'EUR')}</span>`, badges: c => badge(CARD_STATUS[c.frozen ? 'frozen' : 'active']) + `<span class="badge t-neutral">${c.physical ? 'Physical' : 'Virtual'}</span>`,
-    acts: c => `<button class="btn btn-tertiary" data-act="card-tog" data-rid="${c.id}">${icon(c.frozen ? 'refresh' : 'lock', 15)}${c.frozen ? 'Unfreeze' : 'Freeze'}</button>` },
+    acts: c => `<button class="btn btn-tertiary" data-act="card-tog" data-rid="${c.id}">${icon(c.frozen ? 'refresh' : 'lock', 16)}${c.frozen ? 'Unfreeze' : 'Freeze'}</button>` },
 });
 
 /* ── Financial · SBP top-up ── */
@@ -4505,7 +4526,7 @@ page({
   menu: r => [...(r.status === 'PENDING' ? [{ act: 'sbp-paid', data: { rid: r.id }, icon: 'check', label: 'Mark as paid' }, { act: 'sbp-cancel', data: { rid: r.id }, icon: 'ban', label: 'Cancel request' }] : []), { act: 'open-user', data: { id: r.uid }, icon: 'user', label: 'Open user' }],
   bulk: [{ icon: 'check', label: 'Mark as paid', run: sbpPaid }],
   rec: { title: r => `SBP link #${r.id}`, sub: r => `${userLink(byId(r.uid))}<span class="faint">·</span><span class="num">${fmtInt(r.rub)} ₽ → ${fmtAmt(r.usdt, 'USDT')}</span>`, badges: r => badge(SBP_STATUS[r.status]),
-    acts: r => r.status === 'PENDING' ? `<button class="btn btn-secondary" data-act="sbp-paid" data-rid="${r.id}">${icon('check', 15, 2)}Mark as paid</button><button class="btn btn-tertiary" data-act="sbp-cancel" data-rid="${r.id}">${icon('ban', 15)}Cancel</button>` : '',
+    acts: r => r.status === 'PENDING' ? `<button class="btn btn-secondary" data-act="sbp-paid" data-rid="${r.id}">${icon('check', 16, 2)}Mark as paid</button><button class="btn btn-tertiary" data-act="sbp-cancel" data-rid="${r.id}">${icon('ban', 16)}Cancel</button>` : '',
     events: r => [r.paid && { ic: 'check', t: 'Paid', s: `${r.bank} · ${fmtDateTime(r.paid)}`, when: rel(r.paid) }, { ic: 'sbp', t: 'QR issued', s: r.ref, when: rel(r.created) }].filter(Boolean) },
 });
 
@@ -4558,8 +4579,8 @@ page({
   },
   rec: {
     title: s => s.name, sub: s => `<span>${s.c}</span><span class="faint">·</span><span>${s.apy}% APY</span><span class="faint">·</span><span>${lockLbl(s.lock)}</span>`, badges: s => badge(STRAT_STATUS[s.status]),
-    acts: s => s.status !== 'CLOSED' ? `<button class="btn btn-tertiary" data-act="strat-tog" data-rid="${s.id}">${icon(s.status === 'ACTIVE' ? 'minus' : 'refresh', 15)}${s.status === 'ACTIVE' ? 'Pause' : 'Resume'}</button>` : '',
-    sections: s => { const L = STAKES.filter(x => x.sid === s.id).sort((a, b) => b.amount - a.amount).slice(0, 8); return tcard('Largest stakes', `<a class="btn btn-link" href="#/stakes">All stakes ${icon('chevRight', 14)}</a>`, dtable(['Stake', 'User', 'Amount|r', 'Status', 'Started|r'], L.map(x => [recLink('stakes', x.id, '#' + x.id), userLink(byId(x.uid)), `<span class="num">${fmtAmt(x.amount, x.c)}</span>`, dotCell(STAKE_STATUS[x.status]), muted(rel(x.created))]), emptyBlock('stakes', 'No stakes yet', 'Stakes appear here once users join this strategy.'))); },
+    acts: s => s.status !== 'CLOSED' ? `<button class="btn btn-tertiary" data-act="strat-tog" data-rid="${s.id}">${icon(s.status === 'ACTIVE' ? 'minus' : 'refresh', 16)}${s.status === 'ACTIVE' ? 'Pause' : 'Resume'}</button>` : '',
+    sections: s => { const L = STAKES.filter(x => x.sid === s.id).sort((a, b) => b.amount - a.amount).slice(0, 8); return tcard('Largest stakes', `<a class="btn btn-link" href="#/stakes">All stakes ${icon('chevRight', 16)}</a>`, dtable(['Stake', 'User', 'Amount|r', 'Status', 'Started|r'], L.map(x => [recLink('stakes', x.id, '#' + x.id), userLink(byId(x.uid)), `<span class="num">${fmtAmt(x.amount, x.c)}</span>`, dotCell(STAKE_STATUS[x.status]), muted(rel(x.created))]), emptyBlock('stakes', 'No stakes yet', 'Stakes appear here once users join this strategy.'))); },
   },
 });
 const unstake = rows => { const o = rows.filter(x => x.status === 'ACTIVE'); o.forEach(x => { x.status = 'UNBONDING'; }); return `${o.length} stake${o.length === 1 ? '' : 's'} moved to unbonding`; };
@@ -4578,7 +4599,7 @@ page({
   menu: x => [...(x.status === 'ACTIVE' ? [{ act: 'stake-un', data: { rid: x.id }, icon: 'minus', label: 'Force unstake' }] : []), { act: 'open-user', data: { id: x.uid }, icon: 'user', label: 'Open user' }],
   bulk: [{ icon: 'minus', label: 'Force unstake', run: unstake }],
   rec: { title: x => `Stake #${x.id}`, sub: x => `${userLink(byId(x.uid))}<span class="faint">·</span>${recLink('strategies', x.sid, stratOf(x.sid).name)}`, badges: x => badge(STAKE_STATUS[x.status]) + `<span class="badge t-neutral">${x.apy}% APY</span>`,
-    acts: x => x.status === 'ACTIVE' ? `<button class="btn btn-tertiary" data-act="stake-un" data-rid="${x.id}">${icon('minus', 15)}Force unstake</button>` : '',
+    acts: x => x.status === 'ACTIVE' ? `<button class="btn btn-tertiary" data-act="stake-un" data-rid="${x.id}">${icon('minus', 16)}Force unstake</button>` : '',
     events: x => [x.ends && x.ends < NOW && { ic: 'check', t: 'Completed', s: fmtDateTime(x.ends), when: rel(x.ends) }, { ic: 'plus', t: `Staked ${fmtAmt(x.amount, x.c)}`, s: fmtDateTime(x.created), when: rel(x.created) }].filter(Boolean) },
 });
 const runPayout = rows => {
@@ -4607,7 +4628,7 @@ page({
   menu: p => ['SCHEDULED', 'FAILED'].includes(p.status) ? [{ act: 'pool-run', data: { rid: p.id }, icon: 'send', label: p.status === 'FAILED' ? 'Retry payout' : 'Run now' }] : [],
   bulk: [{ icon: 'send', label: 'Run now', run: runPayout }],
   rec: { title: p => `${stratOf(p.sid).name} · ${p.period}`, sub: p => `<span class="num">${fmtAmt(p.rewards, p.c)}</span><span class="faint">·</span><span>${p.recipients} recipients</span>`, badges: p => badge(POOL_STATUS[p.status]),
-    acts: p => ['SCHEDULED', 'FAILED'].includes(p.status) ? `<button class="btn btn-secondary" data-act="pool-run" data-rid="${p.id}">${icon('send', 15)}${p.status === 'FAILED' ? 'Retry payout' : 'Run now'}</button>` : '',
+    acts: p => ['SCHEDULED', 'FAILED'].includes(p.status) ? `<button class="btn btn-secondary" data-act="pool-run" data-rid="${p.id}">${icon('send', 16)}${p.status === 'FAILED' ? 'Retry payout' : 'Run now'}</button>` : '',
     events: p => [p.paid && { ic: 'check', t: 'Paid out', s: fmtDateTime(p.paid), when: rel(p.paid) }, { ic: 'calendar', t: 'Scheduled', s: fmtDateTime(p.at), when: p.at < NOW ? rel(p.at) : 'upcoming' }].filter(Boolean) },
 });
 
@@ -4646,7 +4667,7 @@ page({
   },
   rec: {
     title: k => k.name, sub: k => `<span>${KYT_CAT[k.cat]}</span><span class="faint">·</span><span>${KYT_DIR[k.dir]}</span><span class="faint">·</span><span class="code">${esc(k.cond)}</span>`, badges: k => badge(KYT_ACTION[k.action]) + badge(k.on ? { label: 'Enabled', tone: 'success' } : { label: 'Disabled', tone: 'neutral' }),
-    acts: k => `<button class="btn btn-tertiary" data-act="kyt-tog" data-rid="${k.id}">${icon(k.on ? 'minus' : 'check', 15)}${k.on ? 'Disable' : 'Enable'}</button>`,
+    acts: k => `<button class="btn btn-tertiary" data-act="kyt-tog" data-rid="${k.id}">${icon(k.on ? 'minus' : 'check', 16)}${k.on ? 'Disable' : 'Enable'}</button>`,
     sections: k => { const g = gen(k.id), AU = AUsers(); const hits = Array.from({ length: Math.min(8, k.hits) }, () => ({ u: g.pk(AU), c: g.pk(['USDT', 'BTC', 'ETH']), eur: 200 + g.r() * 20000, score: g.int(40, 99), at: g.ago(30) })).sort((a, b) => b.at - a.at);
       return tcard(`Recent hits <span class="ct">${k.hits} in 30 days</span>`, '', dtable(['User', 'Amount|r', 'Risk score|r', 'Outcome', 'When|r'], hits.map(h => [userLink(h.u), `<span class="num">${fmtEur(h.eur)}</span>`, `<span class="num">${h.score}</span>`, badge(KYT_ACTION[k.action]), muted(rel(h.at))]), emptyBlock('radar', 'No hits yet', 'Transactions that match this rule will show up here.'))); },
   },
@@ -4759,7 +4780,7 @@ page({
     },
   },
   rec: { title: m => m.id, sub: m => `<span class="num">${(+m.price.toPrecision(6)).toLocaleString('en-US', { maximumFractionDigits: 6 })} ${m.q}</span>${deltaPill(m.change)}`, badges: m => badge(MKT_STATUS[m.status]),
-    acts: m => `<button class="btn btn-tertiary" data-act="mkt-tog" data-rid="${m.id}">${icon(m.status === 'TRADING' ? 'minus' : 'refresh', 15)}${m.status === 'TRADING' ? 'Halt trading' : 'Resume trading'}</button>` },
+    acts: m => `<button class="btn btn-tertiary" data-act="mkt-tog" data-rid="${m.id}">${icon(m.status === 'TRADING' ? 'minus' : 'refresh', 16)}${m.status === 'TRADING' ? 'Halt trading' : 'Resume trading'}</button>` },
 });
 const LIST_TYPE = { ALLOW: { label: 'Allow list', tone: 'success' }, BLOCK: { label: 'Block list', tone: 'error' }, WATCH: { label: 'Watch list', tone: 'warning' } };
 const LIST_SCOPE = { REG: 'Registration', CARD: 'Card issuing', IBAN: 'IBAN accounts', ALL: 'All operations', EDD: 'Enhanced due diligence' };
@@ -4783,8 +4804,8 @@ page({
       return { id: Math.max(...pgData(PAGES.countries).map(x => x.id)) + 1, ...v, list: [], created: new Date(NOW), updated: new Date(NOW), by: ME }; },
   },
   rec: { title: l => l.name, sub: l => `<span>${LIST_SCOPE[l.scope]}</span><span class="faint">·</span><span>${l.list.length} countries</span>`, badges: l => badge(LIST_TYPE[l.type]),
-    sections: l => tcard(`Countries <span class="ct">${l.list.length}</span>`, `<button class="btn btn-secondary" data-act="cl-add" data-rid="${l.id}">${icon('plus', 14)}Add country</button>`,
-      dtable(['Country', 'Code', 'Region', '|a'], [...l.list].sort((a, b) => WORLD[a].name.localeCompare(WORLD[b].name)).map(k => [`<span class="ctry"><span class="flag">${flag(WORLD[k].cc)}</span>${WORLD[k].name}</span>`, `<span class="num muted">${k}</span>`, muted(COUNTRIES[k]?.eea ? 'EEA' : 'Non-EEA'), `<button class="ghost-ic" data-act="cl-rm" data-rid="${l.id}" data-c="${k}" data-tip="Remove">${icon('trash', 15)}</button>`]),
+    sections: l => tcard(`Countries <span class="ct">${l.list.length}</span>`, `<button class="btn btn-secondary" data-act="cl-add" data-rid="${l.id}">${icon('plus', 16)}Add country</button>`,
+      dtable(['Country', 'Code', 'Region', '|a'], [...l.list].sort((a, b) => WORLD[a].name.localeCompare(WORLD[b].name)).map(k => [`<span class="ctry"><span class="flag">${flag(WORLD[k].cc)}</span>${WORLD[k].name}</span>`, `<span class="num muted">${k}</span>`, muted(COUNTRIES[k]?.eea ? 'EEA' : 'Non-EEA'), `<button class="ghost-ic" data-act="cl-rm" data-rid="${l.id}" data-c="${k}" data-tip="Remove">${icon('trash', 16)}</button>`]),
       emptyBlock('globe', 'No countries yet', 'Add the countries this list applies to.'))) },
 });
 page({
@@ -4858,8 +4879,8 @@ page({
   },
   rec: {
     title: a => a.name, sub: a => `<span>${esc(a.email)}</span><span class="faint">·</span>${recLink('roles', a.role, roleOf(a.role).name)}`, badges: a => badge(ADMIN_STATUS[a.status]) + badge(a.twofa ? { label: '2FA on', tone: 'success' } : { label: '2FA off', tone: 'warning' }),
-    acts: a => a.id !== 1 ? `<button class="btn btn-tertiary" data-act="adm-tog" data-rid="${a.id}">${icon(a.status === 'DISABLED' ? 'refresh' : 'ban', 15)}${a.status === 'DISABLED' ? 'Enable' : 'Disable'}</button>` : '',
-    sections: a => tcard(`Permissions <span class="ct">from ${esc(roleOf(a.role).name)}</span>`, `<a class="btn btn-link" href="#/roles/${a.role}">Edit role ${icon('chevRight', 14)}</a>`,
+    acts: a => a.id !== 1 ? `<button class="btn btn-tertiary" data-act="adm-tog" data-rid="${a.id}">${icon(a.status === 'DISABLED' ? 'refresh' : 'ban', 16)}${a.status === 'DISABLED' ? 'Enable' : 'Disable'}</button>` : '',
+    sections: a => tcard(`Permissions <span class="ct">from ${esc(roleOf(a.role).name)}</span>`, `<a class="btn btn-link" href="#/roles/${a.role}">Edit role ${icon('chevRight', 16)}</a>`,
       `<div class="card-b pad"><div class="pills">${PERM_GROUPS.flatMap(([, p]) => p).filter(([k]) => roleOf(a.role).perms.has(k)).map(([, l]) => `<span class="tag">${l}</span>`).join('')}</div></div>`),
     events: a => pgData(PAGES.logs).filter(l => l.admin === a.name).slice(0, 6).map(l => ({ ic: LOG_GROUP[l.group].icon, t: l.label, s: l.entity, when: rel(l.at) })),
   },
@@ -4902,7 +4923,7 @@ page({
   fields: { group: fE('Area', 'layers', LOG_GROUP, l => l.group), admin: fE('Administrator', 'userCog', Object.fromEntries(ADMIN_NAMES.map(n => [n, { label: n }])), l => l.admin), result: fE('Result', 'activity', LOG_RESULT, l => l.result), at: fD('Time', l => l.at) },
   tiles: [allTile('All events', L => `${L.filter(l => NOW - l.at < DAY).length} in 24 hours`), tile('auth', 'Sign-ins', { key: 'group', values: ['AUTH'] }, share), tile('fin', 'Financial', { key: 'group', values: ['FINANCIAL'] }, share),
     tile('set', 'Settings changes', { key: 'group', values: ['SETTINGS', 'RISK'] }, share), tile('den', 'Denied', { key: 'result', values: ['DENIED'] }, () => 'Missing permission')],
-  cols: [K.when('at', 'Time'), K.text('admin', 'Administrator'), { k: 'label', l: 'Action', on: 1, cell: l => `<span class="txt">${icon(LOG_GROUP[l.group].icon, 14)}${l.label}</span>` }, K.code('code', 'Event code'),
+  cols: [K.when('at', 'Time'), K.text('admin', 'Administrator'), { k: 'label', l: 'Action', on: 1, cell: l => `<span class="txt">${icon(LOG_GROUP[l.group].icon, 16)}${l.label}</span>` }, K.code('code', 'Event code'),
     { k: 'entity', l: 'Entity', on: 1, cell: l => l.href ? `<a class="lnk" href="${l.href}">${esc(l.entity)}</a>` : muted(l.entity) }, K.code('ip', 'IP address', 0), K.status(LOG_RESULT, 'result', 'Result'), K.id('Event ID')],
   sort: { k: 'at', dir: 'desc' },
   menu: l => l.href ? [{ act: 'route', data: { arg: l.href.slice(2) }, icon: 'link', label: `Open ${l.entity}` }] : [],
@@ -4943,13 +4964,13 @@ DASHES['wallet-stats'] = {
     return chartCard(8, 'Deposits and withdrawals', { dates: d.dates, unit: d.unit, fmt: v => '€' + compact(v), series: [{ l: 'Deposits', data: series(d, 1.1e6, 'wd'), col: 'var(--c3)', area: 1 }, { l: 'Withdrawals', data: series(d, .84e6, 'ww'), col: 'var(--c5)' }] })
       + dcard(4, 'Balances by asset', ctag('Now'), mixRows(ASSETS.map(a => [a.c, sum(USERS.map(u => { const w = ud(u).wallets.find(x => x.c === a.c); return w ? w.amt * a.rate : 0; })), a.col]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]), v => '€' + compact(v * 40)))
       + dcard(4, 'Wallet size', ctag('Funded users'), barRows(buckets.map(([l, f]) => [l, USERS.filter(u => u.balance > 0 && f(u)).length])))
-      + dcard(4, 'Top holders', `<a class="btn btn-link" href="#/users">All ${icon('chevRight', 14)}</a>`, [...USERS].sort((a, b) => b.balance - a.balance).slice(0, 6).map(u => `<div class="su" data-uid="${u.id}"><div class="sm"><div>${esc(u.name || u.email)}</div><div>${esc(u.email)}</div></div><span class="num">${fmtEur(u.balance)}</span></div>`).join(''))
+      + dcard(4, 'Top holders', `<a class="btn btn-link" href="#/users">All ${icon('chevRight', 16)}</a>`, [...USERS].sort((a, b) => b.balance - a.balance).slice(0, 6).map(u => `<div class="su" data-uid="${u.id}"><div class="sm"><div>${esc(u.name || u.email)}</div><div>${esc(u.email)}</div></div><span class="num">${fmtEur(u.balance)}</span></div>`).join(''))
       + dcard(4, 'Fees earned', ctag('This period'), barRows([['Exchange fees', 41200], ['Card top-up fees', 26800], ['Withdrawal fees', 14900], ['Monthly card fees', 9400], ['IBAN fees', 5100]], v => '€' + compact(v)));
   },
 };
 function dashTopbar() {
   const D = DASHES[S.route];
-  return `${D.range === false ? '' : dpButton(S.range, 'dash-range')}<button class="btn btn-tertiary tb-hide-sm" data-act="toast" data-msg="Report exported">${icon('download', 15)}Export</button>`;
+  return `${D.range === false ? '' : dpButton(S.range, 'dash-range')}<button class="btn btn-tertiary tb-hide-sm" data-act="toast" data-msg="Report exported">${icon('download', 16)}Export</button>`;
 }
 
 DASHES.staking = {
@@ -4965,8 +4986,8 @@ DASHES.staking = {
     return chartCard(8, 'Total value locked', { dates: d.dates, unit: d.unit, fmt: v => '€' + compact(v), last: 1, series: [{ l: 'This period', data: tvlS, col: 'var(--c1)', area: 1 }, { l: 'Previous', data: tvlP, col: 'var(--prev)', dash: 1 }] })
       + dcard(4, 'TVL by strategy', ctag('Now'), barRows(act.map(([s, x]) => [esc(s.name), x.tvl]), v => '€' + compact(v)))
       + dcard(4, 'Assets staked', ctag('Share of TVL'), mixRows(byAsset.map(([c, v], i) => [c, v, cols[i] || 'var(--neutral)']), v => '€' + compact(v)))
-      + dcard(4, 'Upcoming payouts', `<a class="btn btn-link" href="#/payout-pools">All ${icon('chevRight', 14)}</a>`, next.map(p => `<button class="rk t-info" data-act="route" data-arg="payout-pools/${p.id}"><span class="rk-ic">${icon('payout', 16)}</span><span class="rk-l"><div>${esc(stratOf(p.sid).name)}</div><div>${fmtDateTime(p.at)}</div></span><span class="rk-v">${fmtAmt(p.rewards, p.c)}</span><span class="rk-go">${icon('chevRight', 16)}</span></button>`).join('') || emptyBlock('payout', 'Nothing scheduled', ''))
-      + dcard(4, 'Largest stakes', `<a class="btn btn-link" href="#/stakes">All ${icon('chevRight', 14)}</a>`, [...STAKES].filter(x => x.status === 'ACTIVE').sort((a, b) => b.amount * ASSET[b.c].rate - a.amount * ASSET[a.c].rate).slice(0, 6).map(x => `<div class="su" data-act="route" data-arg="stakes/${x.id}"><div class="sm"><div>${esc(byId(x.uid).name || byId(x.uid).email)}</div><div>${esc(stratOf(x.sid).name)}</div></div><span class="num">${fmtEur(x.amount * ASSET[x.c].rate)}</span></div>`).join(''));
+      + dcard(4, 'Upcoming payouts', `<a class="btn btn-link" href="#/payout-pools">All ${icon('chevRight', 16)}</a>`, next.map(p => `<button class="rk t-info" data-act="route" data-arg="payout-pools/${p.id}"><span class="rk-ic">${icon('payout', 16)}</span><span class="rk-l"><div>${esc(stratOf(p.sid).name)}</div><div>${fmtDateTime(p.at)}</div></span><span class="rk-v">${fmtAmt(p.rewards, p.c)}</span><span class="rk-go">${icon('chevRight', 16)}</span></button>`).join('') || emptyBlock('payout', 'Nothing scheduled', ''))
+      + dcard(4, 'Largest stakes', `<a class="btn btn-link" href="#/stakes">All ${icon('chevRight', 16)}</a>`, [...STAKES].filter(x => x.status === 'ACTIVE').sort((a, b) => b.amount * ASSET[b.c].rate - a.amount * ASSET[a.c].rate).slice(0, 6).map(x => `<div class="su" data-act="route" data-arg="stakes/${x.id}"><div class="sm"><div>${esc(byId(x.uid).name || byId(x.uid).email)}</div><div>${esc(stratOf(x.sid).name)}</div></div><span class="num">${fmtEur(x.amount * ASSET[x.c].rate)}</span></div>`).join(''));
   },
 };
 /* ── Products · Card orders (physical cards on their way to the cardholder) ── */
@@ -4997,7 +5018,7 @@ page({
   menu: r => [...(ORDER_NEXT[r.status] ? [{ act: 'ord-next', data: { rid: r.id }, icon: 'check', label: ORDER_STEP[r.status] }] : []), ...(['NEW', 'PRODUCTION'].includes(r.status) ? [{ act: 'ord-cancel', data: { rid: r.id }, icon: 'ban', label: 'Cancel order' }] : []),
     { act: 'open-user', data: { id: r.uid }, icon: 'user', label: 'Open user' }],
   bulk: [{ icon: 'check', label: 'Move to next step', run: orderNext }],
-  rec: { title: r => `Card order #${r.id}`, acts: r => ORDER_NEXT[r.status] ? `<button class="btn btn-secondary" data-act="ord-next" data-rid="${r.id}">${icon('check', 15, 2)}${ORDER_STEP[r.status]}</button>` : '' },
+  rec: { title: r => `Card order #${r.id}`, acts: r => ORDER_NEXT[r.status] ? `<button class="btn btn-secondary" data-act="ord-next" data-rid="${r.id}">${icon('check', 16, 2)}${ORDER_STEP[r.status]}</button>` : '' },
 });
 
 /* ── Compliance · KYC checks (every verification attempt, one queue) ── */
@@ -5027,7 +5048,7 @@ page({
   menu: r => [...(r.status === 'PENDING' ? [{ act: 'chk-ok', data: { rid: r.id }, icon: 'check', label: 'Approve' }, { act: 'chk-no', data: { rid: r.id }, icon: 'ban', label: 'Reject' }] : []), { act: 'open-user', data: { id: r.uid }, icon: 'user', label: 'Open user' }],
   bulk: [{ icon: 'check', label: 'Approve', run: rows => checkDecide(rows, true) }, { icon: 'ban', label: 'Reject', run: rows => checkDecide(rows, false) }],
   rec: { title: r => `${CHECK_TYPE[r.type]} check #${r.id}`,
-    acts: r => r.status === 'PENDING' ? `<button class="btn btn-tertiary" data-act="chk-no" data-rid="${r.id}">${icon('ban', 15)}Reject</button><button class="btn btn-secondary" data-act="chk-ok" data-rid="${r.id}">${icon('check', 15, 2)}Approve</button>` : '' },
+    acts: r => r.status === 'PENDING' ? `<button class="btn btn-tertiary" data-act="chk-no" data-rid="${r.id}">${icon('ban', 16)}Reject</button><button class="btn btn-secondary" data-act="chk-ok" data-rid="${r.id}">${icon('check', 16, 2)}Approve</button>` : '' },
 });
 
 /* ── Reference data · Networks (blockchains and fiat rails money moves on) ── */
@@ -5046,7 +5067,7 @@ page({
   sort: { k: 'id', dir: 'asc' },
   quick: n => ({ act: 'net-tog', icon: n.status === 'ACTIVE' ? 'minus' : 'check', tip: n.status === 'ACTIVE' ? 'Disable' : 'Enable' }),
   menu: n => [{ act: 'net-tog', data: { rid: n.id }, icon: n.status === 'ACTIVE' ? 'minus' : 'check', label: n.status === 'ACTIVE' ? 'Disable network' : 'Enable network' }],
-  rec: { title: n => n.name, acts: n => `<button class="btn btn-tertiary" data-act="net-tog" data-rid="${n.id}">${icon(n.status === 'ACTIVE' ? 'minus' : 'check', 15)}${n.status === 'ACTIVE' ? 'Disable' : 'Enable'}</button>` },
+  rec: { title: n => n.name, acts: n => `<button class="btn btn-tertiary" data-act="net-tog" data-rid="${n.id}">${icon(n.status === 'ACTIVE' ? 'minus' : 'check', 16)}${n.status === 'ACTIVE' ? 'Disable' : 'Enable'}</button>` },
 });
 
 /* ── Administration · Verification templates (which checks a user goes through, per level) ── */
@@ -5064,7 +5085,7 @@ page({
     { k: 'steps', l: 'Steps', on: 1, val: v => v.steps.length, cell: v => muted(v.steps.join(' · ')) }, K.muted('regions', 'Countries'), K.num('users', 'Users verified'), K.status(ON_OFF), K.date('updated', 'Updated')],
   quick: v => ({ act: 'vt-tog', icon: v.status === 'ACTIVE' ? 'minus' : 'check', tip: v.status === 'ACTIVE' ? 'Disable' : 'Enable' }),
   menu: v => [{ act: 'vt-tog', data: { rid: v.id }, icon: v.status === 'ACTIVE' ? 'minus' : 'check', label: v.status === 'ACTIVE' ? 'Disable template' : 'Enable template' }],
-  rec: { title: v => v.name, acts: v => `<button class="btn btn-tertiary" data-act="vt-tog" data-rid="${v.id}">${icon(v.status === 'ACTIVE' ? 'minus' : 'check', 15)}${v.status === 'ACTIVE' ? 'Disable' : 'Enable'}</button>` },
+  rec: { title: v => v.name, acts: v => `<button class="btn btn-tertiary" data-act="vt-tog" data-rid="${v.id}">${icon(v.status === 'ACTIVE' ? 'minus' : 'check', 16)}${v.status === 'ACTIVE' ? 'Disable' : 'Enable'}</button>` },
 });
 
 /* ── Finance monitors · one list per kind, plus a dashboard across them ── */
@@ -5084,7 +5105,7 @@ Object.entries(MON_KIND).forEach(([kind, M]) => page({
   sort: { k: 'headroom', dir: 'asc' },
   quick: () => ({ act: 'mon-refresh', icon: 'refresh', tip: 'Refresh balance' }),
   menu: m => [{ act: 'mon-refresh', data: { rid: m.id }, icon: 'refresh', label: 'Refresh balance' }, { act: 'mon-tog', data: { rid: m.id }, icon: m.on ? 'minus' : 'check', label: m.on ? 'Pause monitor' : 'Resume monitor' }],
-  rec: { title: m => m.name, acts: m => `<button class="btn btn-tertiary" data-act="mon-refresh" data-rid="${m.id}">${icon('refresh', 15)}Refresh balance</button>` },
+  rec: { title: m => m.name, acts: m => `<button class="btn btn-tertiary" data-act="mon-refresh" data-rid="${m.id}">${icon('refresh', 16)}Refresh balance</button>` },
 }));
 
 /* Inline-editable fields per record page (see edField). Labels default to the column's; onEdit keeps lookups that copy a record's name in sync. */
@@ -5120,7 +5141,7 @@ DASHES.monitors = {
       { l: 'No fresh data', v: L.filter(m => m.status === 'STALE').length, note: 'Over 6 hours old' }, { l: 'Tracked balance', v: '€' + compact(sum(on.map(m => m.bal * ASSET[m.c].rate))), note: 'Active monitors' },
       { l: 'Lowest headroom', v: Math.round(low.bal / low.min * 100) + '%', note: esc(low.name) }]; },
   cards: () => Object.entries(MON_KIND).map(([kind, M]) => { const L = monitorsOf(kind);
-    return dcard(6, M.label, `<a class="btn btn-link" href="#/${M.page}">Open ${icon('chevRight', 14)}</a>`,
+    return dcard(6, M.label, `<a class="btn btn-link" href="#/${M.page}">Open ${icon('chevRight', 16)}</a>`,
       `<div class="mon-d">${M.desc}</div><div class="mon-sum"><div><span>Total</span><b>${L.length}</b></div><div><span>Active</span><b>${L.filter(m => m.on).length}</b></div><div><span>Alerts</span><b class="${L.some(m => m.status === 'ALERT' || m.status === 'STALE') ? 'bad' : ''}">${L.filter(m => m.status === 'ALERT' || m.status === 'STALE').length}</b></div></div>`
       + L.map(m => `<a class="mon-row" href="#/${M.page}/${m.id}"><i class="dot t-${MON_STATUS[m.status].tone}"></i><span class="mon-n">${esc(m.name)}</span><span class="num muted">${fmtAmt(m.bal, m.c)}</span>${monMeter(m)}</a>`).join(''));
   }).join(''),
@@ -5159,7 +5180,7 @@ Object.assign(ACT, {
   },
   'rec-step': a => stepRec(+a.dataset.d),
   'ld-display': a => openPop(a, listDisplayPop(), { align: 'right', width: 380, kind: 'ldisplay' }),
-  'ld-layout': a => { const t = colCtx().t; lvOf(t).view = a.dataset.v; store.set('nsc.lview', S.lv); $('#displayBtn').innerHTML = `${icon(lvView(t), 15)}<span class="sl">Display</span>${icon('chevDown', 13)}`; refreshLD(); },
+  'ld-layout': a => { const t = colCtx().t; lvOf(t).view = a.dataset.v; store.set('nsc.lview', S.lv); $('#displayBtn').innerHTML = `${icon(lvView(t), 16)}<span class="sl">Display</span>${icon('chevDown', 16)}`; refreshLD(); },
   'ld-group': a => { const t = colCtx().t; lvOf(t).by = a.dataset.v; S.lbMore[t] = {}; store.set('nsc.lview', S.lv); refreshLD(); },
   'lb-more': a => { const t = colCtx().t, m = S.lbMore[t] ||= {}; m[a.dataset.g] = (m[a.dataset.g] || 25) + 50; colCtx().redraw(); },
   'ld-col': a => { const X = colCtx(); S.tcols[X.t] = withCol(X.t, X.cols, a.dataset.k); store.set('nsc.tcols2', S.tcols); refreshLD(); },
@@ -5276,7 +5297,7 @@ function colChips(t, act) {
   const items = t === 'users'
     ? usersOrder().map(k => COLS.find(c => c.key === k)).filter(c => !c.lock).map(c => ({ k: c.key, l: c.label, on: !S.hidden.has(c.key) }))
     : (vis => tOrder(t).map(k => TCOLS[t].find(c => c.k === k)).filter(c => !c.lock).map(c => ({ k: c.k, l: c.l, on: vis.includes(c) })))(tVisible(t));
-  return `<div class="cchips">${items.map(c => `<button class="cchip ${c.on ? '' : 'off'}" data-act="${act}" data-t="${t}" data-k="${c.k}" data-v="${c.k}" draggable="true" data-drag="${c.k}" title="${c.on ? 'Shown' : 'Hidden'} · click to ${c.on ? 'hide' : 'show'}">${icon('grip', 13)}<span>${c.l}</span>${icon(c.on ? 'check' : 'plus', 12, 2.2)}</button>`).join('')}</div>`;
+  return `<div class="cchips">${items.map(c => `<button class="cchip ${c.on ? '' : 'off'}" data-act="${act}" data-t="${t}" data-k="${c.k}" data-v="${c.k}" draggable="true" data-drag="${c.k}" title="${c.on ? 'Shown' : 'Hidden'} · click to ${c.on ? 'hide' : 'show'}">${icon('grip', 16)}<span>${c.l}</span>${icon(c.on ? 'check' : 'plus', 12, 2.2)}</button>`).join('')}</div>`;
 }
 // Save a new column order. Users keeps hidden columns in its full order (S.colOrder); other tables in S.tord.
 function saveOrder(t, o) {
@@ -5291,19 +5312,31 @@ function moveCol(t, k, target, after) { const o = fullOrder(t).filter(x => x !==
 // The visible columns now read `keys` left to right; hidden columns keep their slots in the full order
 function setVisibleOrder(t, keys) { const vis = new Set(keys); let i = 0; saveOrder(t, fullOrder(t).map(k => vis.has(k) ? keys[i++] : k)); }
 
-/* Header drag: the whole column travels through the table while you drag, and its place is held by a dashed slot.
-   Drop commits the order; dropping elsewhere (or Esc) puts the table back. Column chips drag the same way inside their menu. */
+/* Header drag, as on the board: the column stays put as a 40% trace, a dashed Drop slot opens where it will land,
+   and the column card follows the pointer. Drop commits the order; dropping elsewhere (or Esc) leaves the table as it was.
+   Column chips drag the same way inside their menu. */
 let colDrag = null, slot = null;
 const dropAfter = (el, e) => { const r = el.getBoundingClientRect(); return e.clientX > r.left + r.width / 2; };
-function moveColumnDom(tbl, k, target, after) {
-  const head = [...tbl.tHead.rows[0].cells], from = head.findIndex(c => c.dataset.drag === k), to = head.findIndex(c => c.dataset.drag === target), dest = after ? to + 1 : to;
-  if (from < 0 || to < 0 || dest === from || dest === from + 1) return false;
-  for (const row of tbl.rows) { const c = row.cells; if (c.length === head.length) row.insertBefore(c[from], c[dest] || null); } // full-width rows only (skips colspans)
-  const cg = tbl.querySelector('colgroup'); if (cg && cg.children.length === head.length) cg.insertBefore(cg.children[from], cg.children[dest] || null);
+function clearColGap(d) {
+  d.table.querySelectorAll('.col-gap').forEach(c => c.remove()); (d.spans || []).forEach(c => c.colSpan--); d.spans = []; d.gap = null; d.slot?.remove(); d.slot = null;
+}
+// Open an empty column of the dragged column's width before head cell `dest`; returns false when that is where it already stands
+function openColGap(d, dest) {
+  const head = [...d.table.tHead.rows[0].cells].filter(c => !c.classList.contains('col-gap')), from = head.findIndex(c => c.dataset.drag === d.k);
+  if (dest === from || dest === from + 1) { clearColGap(d); return false; }
+  if (d.gap === dest) return true;
+  clearColGap(d); d.gap = dest;
+  for (const row of d.table.rows) {
+    const c = [...row.cells];
+    if (c.length === head.length) row.insertBefore(Object.assign(document.createElement(row.parentElement.tagName === 'THEAD' ? 'th' : 'td'), { className: 'col-gap' }), c[dest] || null);
+    else if (c.length && c[c.length - 1].colSpan > 1) { c[c.length - 1].colSpan++; d.spans.push(c[c.length - 1]); } // group rows: span the extra column
+  }
+  const cg = d.table.querySelector('colgroup'); if (cg && cg.children.length === head.length) cg.insertBefore(Object.assign(document.createElement('col'), { className: 'col-gap', style: `width:${d.w}px` }), cg.children[dest] || null);
+  d.table.querySelectorAll('tr > .col-gap').forEach(c => { c.style.width = c.style.minWidth = d.w + 'px'; });
   return true;
 }
 function placeColSlot() {
-  const d = colDrag, th = d.table.querySelector(`thead th[data-drag="${d.k}"]`), wrap = d.table.closest('.hs-wrap'), sc = d.table.parentElement;
+  const d = colDrag, th = d.table.tHead.rows[0].querySelector('.col-gap'), wrap = d.table.closest('.hs-wrap'), sc = d.table.parentElement;
   const r = th.getBoundingClientRect(), w = wrap.getBoundingClientRect(), v = sc.getBoundingClientRect(), b = Math.min(v.bottom, d.table.getBoundingClientRect().bottom);
   d.slot ||= wrap.appendChild(Object.assign(document.createElement('div'), { className: 'col-slot' }));
   Object.assign(d.slot.style, { left: r.left - w.left + 3 + 'px', width: r.width - 6 + 'px', top: r.top - w.top + 3 + 'px', height: b - r.top - 6 + 'px' });
@@ -5326,7 +5359,7 @@ document.addEventListener('dragstart', e => {
   if (colDrag.table) colDragImage(h, e);
   setTimeout(() => { // after the browser has taken the drag image
     if (!colDrag) return;
-    if (colDrag.table) { colCells(colDrag).forEach(c => c.classList.add('col-ghost')); placeColSlot(); } else h.classList.add('col-dragging');
+    if (colDrag.table) colCells(colDrag).forEach(c => c.classList.add('col-origin')); else h.classList.add('col-dragging');
   });
 });
 document.addEventListener('dragover', e => {
@@ -5335,9 +5368,10 @@ document.addEventListener('dragover', e => {
   if (d.table) { // header drag: move the column live as the pointer crosses other columns
     if (e.target.closest?.('table') !== d.table) return;
     e.preventDefault();
-    const cell = e.target.closest('th, td'), k = cell && d.table.tHead.rows[0].cells[cell.cellIndex]?.dataset.drag;
-    if (!k || k === d.k || cell.parentElement.cells.length !== d.table.tHead.rows[0].cells.length) return;
-    if (moveColumnDom(d.table, d.k, k, dropAfter(cell, e))) { d.moved = true; placeColSlot(); }
+    const cell = e.target.closest('th, td'); if (!cell || cell.classList.contains('col-gap') || cell.parentElement.cells.length !== d.table.tHead.rows[0].cells.length) return;
+    const hc = d.table.tHead.rows[0].cells[cell.cellIndex]; if (!hc?.dataset.drag) return;
+    const head = [...d.table.tHead.rows[0].cells].filter(c => !c.classList.contains('col-gap')), i = head.indexOf(hc);
+    if (openColGap(d, i + (dropAfter(cell, e) ? 1 : 0))) placeColSlot();
     return;
   }
   if (e.target.closest?.('.cchip-slot')) { e.preventDefault(); return; }
@@ -5351,12 +5385,16 @@ document.addEventListener('dragover', e => {
 document.addEventListener('drop', e => {
   if (!colDrag) return;
   const d = colDrag;
-  if (d.table) { if (e.target.closest?.('table') === d.table) { e.preventDefault(); d.done = true; if (d.moved) setVisibleOrder(d.t, [...d.table.tHead.rows[0].cells].map(c => c.dataset.drag).filter(Boolean)); } return; }
+  if (d.table) {
+    if (e.target.closest?.('table') !== d.table) return; e.preventDefault();
+    if (d.gap != null) { const keys = [...d.table.tHead.rows[0].cells].map(c => c.classList.contains('col-gap') ? d.k : c.dataset.drag === d.k ? null : c.dataset.drag).filter(Boolean); d.done = true; clearColGap(d); setVisibleOrder(d.t, keys); }
+    return;
+  }
   if (slot?.parentNode && slot.dataset.target) { e.preventDefault(); moveCol(d.t, d.k, slot.dataset.target, !!slot.dataset.after); }
 });
 document.addEventListener('dragend', () => {
   const d = colDrag; if (!d) return;
-  if (d.table) { d.slot?.remove(); $$('.col-ghost').forEach(c => c.classList.remove('col-ghost')); if (d.moved && !d.done) rerender(); } // cancelled: put the table back
+  if (d.table) { clearColGap(d); $$('.col-origin').forEach(c => c.classList.remove('col-origin')); }
   slot?.remove(); slot = null; $$('.col-dragging').forEach(x => x.classList.remove('col-dragging')); colDrag = null;
 });
 
@@ -5386,9 +5424,17 @@ new MutationObserver(refreshHints).observe($('#main'), { childList: true, subtre
 
 /* board drag & drop */
 let dragId = null;
-document.addEventListener('dragstart', e => { const c = e.target.closest?.('.bcard'); if (!c) return; dragId = +c.dataset.uid; c.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragId); });
-document.addEventListener('dragend', e => { e.target.closest?.('.bcard')?.classList.remove('dragging'); $$('.col.over').forEach(c => c.classList.remove('over')); });
-document.addEventListener('dragover', e => { const col = e.target.closest?.('.col'); if (!col || dragId == null) return; e.preventDefault(); $$('.col.over').forEach(c => c !== col && c.classList.remove('over')); col.classList.add('over'); });
+let bSlot = null;
+document.addEventListener('dragstart', e => { const c = e.target.closest?.('.bcard'); if (!c) return; dragId = +c.dataset.uid; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragId);
+  bSlot = Object.assign(document.createElement('div'), { className: 'bslot', textContent: 'Drop here' }); bSlot.style.height = c.offsetHeight + 'px';
+  const g = document.body.appendChild(Object.assign(document.createElement('div'), { className: 'col-drag-img bcard-img' })), b = c.getBoundingClientRect();
+  g.appendChild(c.cloneNode(true)).style.width = c.offsetWidth + 'px'; e.dataTransfer.setDragImage(g, e.clientX - b.left + 16, e.clientY - b.top + 12); setTimeout(() => g.remove());
+  setTimeout(() => c.classList.add('dragging')); }); // after the browser has taken the drag image
+document.addEventListener('dragend', e => { e.target.closest?.('.bcard')?.classList.remove('dragging'); bSlot?.remove(); bSlot = null; });
+document.addEventListener('dragover', e => { const col = e.target.closest?.('.col'); if (!col || dragId == null) return; e.preventDefault();
+  const b = col.querySelector('.col-b'), home = b.querySelector(`.bcard[data-uid="${dragId}"]`);
+  if (home) { bSlot?.remove(); return; } // over its own column: the trace already marks the place
+  if (bSlot.parentNode !== b) b.prepend(bSlot); });
 document.addEventListener('dragover', e => { const z = e.target.closest?.('#dropzone'); if (z) { e.preventDefault(); z.classList.add('over'); } });
 document.addEventListener('dragleave', e => { const z = e.target.closest?.('#dropzone'); if (z && !z.contains(e.relatedTarget)) z.classList.remove('over'); });
 document.addEventListener('drop', e => { const z = e.target.closest?.('#dropzone'); if (!z) return; e.preventDefault(); z.classList.remove('over'); const f = e.dataTransfer.files[0]; f && uploadDoc(f); });
@@ -5396,7 +5442,7 @@ document.addEventListener('drop', e => {
   const col = e.target.closest?.('.col'); if (!col || dragId == null) return; e.preventDefault();
   const u = byId(dragId), f = col.dataset.field, v = col.dataset.col; dragId = null;
   if (u[f] !== v) { u[f] = v; u.updated = NOW; toast(`${esc(u.name || u.email)} → ${FIELDS[f].options[v].label}`); afterDataChange(); }
-  else col.classList.remove('over');
+  else bSlot?.remove();
 });
 
 /* ════════════════════════════ Sign in · Sign up ════════════════════════════
