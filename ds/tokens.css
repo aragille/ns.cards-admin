@@ -235,7 +235,8 @@
   --focus-error: 0 0 0 4px var(--error-bg);
 }
 
-:root[data-theme="dark"] {
+:root[data-theme="dark"],
+[data-theme="dark"] {
   --bg: var(--neutral-950);
   --surface: var(--neutral-900);
   --surface-2: var(--neutral-850);
