@@ -506,19 +506,19 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .up-grid .card>.card-h{min-height:56px;margin:0;padding:var(--space-12) var(--space-16) var(--space-12) var(--card-padding);border-bottom:var(--border-width) solid var(--line);flex-wrap:nowrap}
 .up-grid .card-b{padding:var(--space-4) var(--card-padding) var(--space-8)}
 .up-grid .card-b.pad{padding:var(--space-16) var(--card-padding)}
-.up-grid .card-tools{padding:var(--space-12) var(--card-padding);border-bottom:var(--border-width) solid var(--line)}
+.up-grid .card-tools{padding:var(--space-12) var(--space-24);border-bottom:var(--border-width) solid var(--line)}
 
 .card-t .ct{font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);color:var(--ink-3);margin-left:var(--space-4)}
 .ch-act{display:flex;align-items:center;gap:var(--space-8);flex-wrap:wrap}
-.card-tools{display:flex;align-items:center;gap:var(--space-8);flex-wrap:wrap;padding:0 var(--card-padding) var(--space-16)}
+.card-tools{display:flex;align-items:center;gap:var(--space-8);flex-wrap:wrap;padding:0 var(--space-24) var(--space-16)}
 .dt-wrap{overflow-x:auto}
 .dt{min-width:720px}
 .dt th{position:static;height:var(--row);font-size:var(--fs-12)}
 .dt td{height:var(--row)}
 /* two-line rows (a label with a code line under it) keep their taller height until every table goes single-line */
 .dt:has(tbody td div.code) td{height:52px}
-.dt th:first-child,.dt td:first-child{padding-left:var(--card-padding)}
-.dt th:last-child,.dt td:last-child{padding-right:var(--card-padding)}
+.dt th:first-child,.dt td:first-child{padding-left:var(--space-24)} /* tables in cards keep a 24 edge (Table header / cell) */
+.dt th:last-child,.dt td:last-child{padding-right:var(--space-24)}
 .dt th.a{width:1%;padding:0!important}
 .dt th.r,.dt td.r{text-align:right} .dt th.c,.dt td.c{text-align:center} .dt th.w,.dt td.w{width:1%}
 .dt tbody tr{cursor:default}
@@ -838,7 +838,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .os-l{display:flex;flex-direction:column;gap:var(--space-4);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
 .os-l b{font-size:var(--fs-20);line-height:var(--lh-24);font-weight:var(--fw-semibold);color:var(--ink);letter-spacing:-.02em;text-transform:none;font-variant-numeric:tabular-nums}
  /* beats .dgrid .card.flush>.card-h: title centred in the header bar */
-.ovr{display:grid;grid-template-columns:var(--avatar-sm) minmax(0,1fr) 72px 16px;align-items:center;gap:var(--space-12);width:100%;height:var(--row);padding:0 var(--space-16) 0 var(--space-24);border-bottom:var(--border-width) solid var(--line-soft);text-align:left;font-size:var(--fs-14)}
+.ovr{display:grid;grid-template-columns:var(--avatar-sm) minmax(0,1fr) 72px 16px;align-items:center;gap:var(--space-12);width:100%;height:var(--row);padding:0 var(--space-16) 0 var(--card-padding);border-bottom:var(--border-width) solid var(--line-soft);text-align:left;font-size:var(--fs-14)}
 .ovr:last-child{border-bottom:0}
 .ovr:hover{background:var(--hover)}
 .ovr .os-ic{width:var(--avatar-sm);height:var(--avatar-sm);border-radius:var(--r-sm)}
@@ -847,11 +847,11 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .ovr.clear .ovr-n{font-family:var(--font);font-weight:400;color:var(--ink-3);background:none;padding:0}
 .ovr>.i{color:var(--ink-3)}
 .ovr:hover>.i{color:var(--ink)}
-.ovw{display:flex;align-items:center;justify-content:space-between;height:var(--row);padding:0 var(--space-24);border-bottom:var(--border-width) solid var(--line-soft)}
+.ovw{display:flex;align-items:center;justify-content:space-between;height:var(--row);padding:0 var(--card-padding);border-bottom:var(--border-width) solid var(--line-soft)}
 .ovw:last-child{border-bottom:0}
 .ovw b{font-size:var(--fs-14);font-weight:var(--fw-medium)}
 
-.ovl{display:grid;grid-template-columns:96px 160px minmax(0,1fr) auto;gap:var(--space-12);align-items:center;height:var(--row);padding:0 var(--space-24);border-bottom:var(--border-width) solid var(--line-soft);font-size:var(--fs-14)}
+.ovl{display:grid;grid-template-columns:96px 160px minmax(0,1fr) auto;gap:var(--space-12);align-items:center;height:var(--row);padding:0 var(--card-padding);border-bottom:var(--border-width) solid var(--line-soft);font-size:var(--fs-14)}
 .ovl:last-child{border-bottom:0}
 .ovl-a{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* finance monitors: headroom bar (threshold mark in the middle) and the per-kind dashboard cards */
