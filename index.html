@@ -348,19 +348,20 @@ table.ut.fixed{table-layout:fixed}
 .ut td{overflow:hidden;text-overflow:ellipsis}
 .ut .th-in{max-width:100%;overflow:hidden}
 .ut th.c,.ut td.c{text-align:center}
-/* column reorder: dragged column fades, a brand line marks where it will land */
+/* column chips: the dragged chip fades */
 .col-dragging{opacity:.35}
-/* header: grip dots appear on hover; while dragging, the column moves live and a dashed slot holds its place */
+/* header: grip dots appear on hover */
 th[draggable="true"]::before{content:"";position:absolute;left:3px;top:50%;width:8px;height:13px;transform:translateY(-50%);opacity:0;transition:opacity .12s;pointer-events:none;
   background-image:radial-gradient(circle,var(--ink-3) 1.15px,transparent 1.35px);background-size:4px 4.4px}
 th[draggable="true"]:hover::before{opacity:1}
 .dt th[draggable="true"]{position:relative}
-.col-ghost{visibility:hidden} /* the dragged column's cells, while a white dashed slot holds their place */
+.col-origin{opacity:.4} /* the dragged column's trace (Origin) */
+th.col-gap,td.col-gap{padding:0!important;border-bottom-color:transparent!important;background:transparent!important} /* the empty column under the Drop slot */
 .col-slot{position:absolute;z-index:3;pointer-events:none;border:var(--border-width) dashed var(--line-strong);border-radius:var(--r);background:var(--surface);transition:left .14s cubic-bezier(.2,.8,.2,1),width .14s}
 /* what you carry while dragging a column: the whole column as a small card (header + the rows in view) */
 .col-drag-img{position:fixed;top:-10000px;left:0;padding:var(--space-12) var(--space-16) var(--space-24);pointer-events:none}
 .cdi-card{background:var(--surface);border:var(--border-width) solid var(--line-strong);border-radius:var(--r);overflow:hidden;color:var(--ink);font-size:var(--fs-14);
-  box-shadow:0 14px 30px rgba(17,17,17,.14),0 3px 8px rgba(17,17,17,.08)}
+  box-shadow:var(--shadow-lg)}
 .cdi-h{display:flex;align-items:center;gap:var(--space-8);height:40px;padding:0 var(--space-12);background:var(--hover);border-bottom:var(--border-width) solid var(--line);font-size:var(--fs-12);font-weight:500;white-space:nowrap}
 .cdi-h .i{color:var(--ink-3)}
 .cdi-c{display:flex;align-items:center;padding:0 var(--space-12);border-bottom:var(--border-width) solid var(--line-soft);white-space:nowrap;overflow:hidden}
@@ -446,6 +447,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .bcard{flex:none;display:flex;flex-direction:column;gap:var(--space-12);background:var(--surface);border:var(--border-width) solid var(--line);border-radius:var(--r);padding:var(--space-12) var(--space-16);box-shadow:var(--shadow-sm);cursor:grab;transition:box-shadow .12s,border-color .12s}
 .bcard:hover{border-color:var(--line-strong);box-shadow:var(--shadow-md)}
 .bcard.dragging{opacity:.4} /* Origin: the card's trace while it is carried */
+.bcard-img .bcard{border-color:var(--line-strong);box-shadow:var(--shadow-lg)} /* Dragging: what follows the pointer */
 .bslot{flex:none;border:var(--border-width) dashed var(--line-strong);border-radius:var(--r);background:var(--surface);display:grid;place-items:center;color:var(--ink-3);font-size:var(--fs-12);line-height:var(--lh-16)}
 .bcard.link{cursor:pointer}
 .bc-top{display:flex;align-items:center;gap:var(--space-8)}
@@ -5303,19 +5305,31 @@ function moveCol(t, k, target, after) { const o = fullOrder(t).filter(x => x !==
 // The visible columns now read `keys` left to right; hidden columns keep their slots in the full order
 function setVisibleOrder(t, keys) { const vis = new Set(keys); let i = 0; saveOrder(t, fullOrder(t).map(k => vis.has(k) ? keys[i++] : k)); }
 
-/* Header drag: the whole column travels through the table while you drag, and its place is held by a dashed slot.
-   Drop commits the order; dropping elsewhere (or Esc) puts the table back. Column chips drag the same way inside their menu. */
+/* Header drag, as on the board: the column stays put as a 40% trace, a dashed Drop slot opens where it will land,
+   and the column card follows the pointer. Drop commits the order; dropping elsewhere (or Esc) leaves the table as it was.
+   Column chips drag the same way inside their menu. */
 let colDrag = null, slot = null;
 const dropAfter = (el, e) => { const r = el.getBoundingClientRect(); return e.clientX > r.left + r.width / 2; };
-function moveColumnDom(tbl, k, target, after) {
-  const head = [...tbl.tHead.rows[0].cells], from = head.findIndex(c => c.dataset.drag === k), to = head.findIndex(c => c.dataset.drag === target), dest = after ? to + 1 : to;
-  if (from < 0 || to < 0 || dest === from || dest === from + 1) return false;
-  for (const row of tbl.rows) { const c = row.cells; if (c.length === head.length) row.insertBefore(c[from], c[dest] || null); } // full-width rows only (skips colspans)
-  const cg = tbl.querySelector('colgroup'); if (cg && cg.children.length === head.length) cg.insertBefore(cg.children[from], cg.children[dest] || null);
+function clearColGap(d) {
+  d.table.querySelectorAll('.col-gap').forEach(c => c.remove()); (d.spans || []).forEach(c => c.colSpan--); d.spans = []; d.gap = null; d.slot?.remove(); d.slot = null;
+}
+// Open an empty column of the dragged column's width before head cell `dest`; returns false when that is where it already stands
+function openColGap(d, dest) {
+  const head = [...d.table.tHead.rows[0].cells].filter(c => !c.classList.contains('col-gap')), from = head.findIndex(c => c.dataset.drag === d.k);
+  if (dest === from || dest === from + 1) { clearColGap(d); return false; }
+  if (d.gap === dest) return true;
+  clearColGap(d); d.gap = dest;
+  for (const row of d.table.rows) {
+    const c = [...row.cells];
+    if (c.length === head.length) row.insertBefore(Object.assign(document.createElement(row.parentElement.tagName === 'THEAD' ? 'th' : 'td'), { className: 'col-gap' }), c[dest] || null);
+    else if (c.length && c[c.length - 1].colSpan > 1) { c[c.length - 1].colSpan++; d.spans.push(c[c.length - 1]); } // group rows: span the extra column
+  }
+  const cg = d.table.querySelector('colgroup'); if (cg && cg.children.length === head.length) cg.insertBefore(Object.assign(document.createElement('col'), { className: 'col-gap', style: `width:${d.w}px` }), cg.children[dest] || null);
+  d.table.querySelectorAll('tr > .col-gap').forEach(c => { c.style.width = c.style.minWidth = d.w + 'px'; });
   return true;
 }
 function placeColSlot() {
-  const d = colDrag, th = d.table.querySelector(`thead th[data-drag="${d.k}"]`), wrap = d.table.closest('.hs-wrap'), sc = d.table.parentElement;
+  const d = colDrag, th = d.table.tHead.rows[0].querySelector('.col-gap'), wrap = d.table.closest('.hs-wrap'), sc = d.table.parentElement;
   const r = th.getBoundingClientRect(), w = wrap.getBoundingClientRect(), v = sc.getBoundingClientRect(), b = Math.min(v.bottom, d.table.getBoundingClientRect().bottom);
   d.slot ||= wrap.appendChild(Object.assign(document.createElement('div'), { className: 'col-slot' }));
   Object.assign(d.slot.style, { left: r.left - w.left + 3 + 'px', width: r.width - 6 + 'px', top: r.top - w.top + 3 + 'px', height: b - r.top - 6 + 'px' });
@@ -5338,7 +5352,7 @@ document.addEventListener('dragstart', e => {
   if (colDrag.table) colDragImage(h, e);
   setTimeout(() => { // after the browser has taken the drag image
     if (!colDrag) return;
-    if (colDrag.table) { colCells(colDrag).forEach(c => c.classList.add('col-ghost')); placeColSlot(); } else h.classList.add('col-dragging');
+    if (colDrag.table) colCells(colDrag).forEach(c => c.classList.add('col-origin')); else h.classList.add('col-dragging');
   });
 });
 document.addEventListener('dragover', e => {
@@ -5347,9 +5361,10 @@ document.addEventListener('dragover', e => {
   if (d.table) { // header drag: move the column live as the pointer crosses other columns
     if (e.target.closest?.('table') !== d.table) return;
     e.preventDefault();
-    const cell = e.target.closest('th, td'), k = cell && d.table.tHead.rows[0].cells[cell.cellIndex]?.dataset.drag;
-    if (!k || k === d.k || cell.parentElement.cells.length !== d.table.tHead.rows[0].cells.length) return;
-    if (moveColumnDom(d.table, d.k, k, dropAfter(cell, e))) { d.moved = true; placeColSlot(); }
+    const cell = e.target.closest('th, td'); if (!cell || cell.classList.contains('col-gap') || cell.parentElement.cells.length !== d.table.tHead.rows[0].cells.length) return;
+    const hc = d.table.tHead.rows[0].cells[cell.cellIndex]; if (!hc?.dataset.drag) return;
+    const head = [...d.table.tHead.rows[0].cells].filter(c => !c.classList.contains('col-gap')), i = head.indexOf(hc);
+    if (openColGap(d, i + (dropAfter(cell, e) ? 1 : 0))) placeColSlot();
     return;
   }
   if (e.target.closest?.('.cchip-slot')) { e.preventDefault(); return; }
@@ -5363,12 +5378,16 @@ document.addEventListener('dragover', e => {
 document.addEventListener('drop', e => {
   if (!colDrag) return;
   const d = colDrag;
-  if (d.table) { if (e.target.closest?.('table') === d.table) { e.preventDefault(); d.done = true; if (d.moved) setVisibleOrder(d.t, [...d.table.tHead.rows[0].cells].map(c => c.dataset.drag).filter(Boolean)); } return; }
+  if (d.table) {
+    if (e.target.closest?.('table') !== d.table) return; e.preventDefault();
+    if (d.gap != null) { const keys = [...d.table.tHead.rows[0].cells].map(c => c.classList.contains('col-gap') ? d.k : c.dataset.drag === d.k ? null : c.dataset.drag).filter(Boolean); d.done = true; clearColGap(d); setVisibleOrder(d.t, keys); }
+    return;
+  }
   if (slot?.parentNode && slot.dataset.target) { e.preventDefault(); moveCol(d.t, d.k, slot.dataset.target, !!slot.dataset.after); }
 });
 document.addEventListener('dragend', () => {
   const d = colDrag; if (!d) return;
-  if (d.table) { d.slot?.remove(); $$('.col-ghost').forEach(c => c.classList.remove('col-ghost')); if (d.moved && !d.done) rerender(); } // cancelled: put the table back
+  if (d.table) { clearColGap(d); $$('.col-origin').forEach(c => c.classList.remove('col-origin')); }
   slot?.remove(); slot = null; $$('.col-dragging').forEach(x => x.classList.remove('col-dragging')); colDrag = null;
 });
 
@@ -5401,6 +5420,8 @@ let dragId = null;
 let bSlot = null;
 document.addEventListener('dragstart', e => { const c = e.target.closest?.('.bcard'); if (!c) return; dragId = +c.dataset.uid; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragId);
   bSlot = Object.assign(document.createElement('div'), { className: 'bslot', textContent: 'Drop here' }); bSlot.style.height = c.offsetHeight + 'px';
+  const g = document.body.appendChild(Object.assign(document.createElement('div'), { className: 'col-drag-img bcard-img' })), b = c.getBoundingClientRect();
+  g.appendChild(c.cloneNode(true)).style.width = c.offsetWidth + 'px'; e.dataTransfer.setDragImage(g, e.clientX - b.left + 16, e.clientY - b.top + 12); setTimeout(() => g.remove());
   setTimeout(() => c.classList.add('dragging')); }); // after the browser has taken the drag image
 document.addEventListener('dragend', e => { e.target.closest?.('.bcard')?.classList.remove('dragging'); bSlot?.remove(); bSlot = null; });
 document.addEventListener('dragover', e => { const col = e.target.closest?.('.col'); if (!col || dragId == null) return; e.preventDefault();
