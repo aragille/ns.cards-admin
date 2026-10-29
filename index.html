@@ -463,7 +463,6 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .bc-foot .num{font-size:var(--fs-14);line-height:var(--lh-20)}
 .col-b:has(.bslot) .col-empty{display:none}
 .col-empty{flex:none;border:var(--border-width) dashed var(--line);border-radius:var(--r);height:72px;display:grid;place-items:center;color:var(--ink-3);font-size:var(--fs-12)}
-.col-more{padding:var(--space-8) var(--space-8) 0}
 
 /* floating bar (bulk actions + unsaved changes) */
 .bulk{position:fixed;left:50%;bottom:24px;transform:translate(-50%,140%);opacity:0;z-index:40;display:flex;align-items:center;gap:var(--space-4);padding:var(--space-4);background:var(--float);color:var(--ink);border-radius:var(--r);box-shadow:var(--shadow-lg);transition:transform .2s cubic-bezier(.2,.8,.2,1),opacity .2s;pointer-events:none}
@@ -2229,7 +2228,17 @@ function lrowHTML(u, by) {
 }
 
 /* board */
+// Board columns load the next cards as you scroll to their bottom; the total is already in the column header
+const COLQ = new Map(); let colQid = 0;
+function colFeed(items, draw, lim, keep) { const id = ++colQid; COLQ.set(id, { items, draw, shown: Math.min(lim, items.length), keep }); return id; }
+document.addEventListener('scroll', e => {
+  const b = e.target; if (!b.classList?.contains('col-b')) return;
+  const q = COLQ.get(+b.dataset.feed); if (!q || q.shown >= q.items.length || b.scrollTop + b.clientHeight < b.scrollHeight - 160) return;
+  const next = q.items.slice(q.shown, q.shown + 25); q.shown += next.length; q.keep(q.shown);
+  b.insertAdjacentHTML('beforeend', next.map(q.draw).join(''));
+}, true);
 function boardHTML(list) {
+  COLQ.clear();
   const by = FIELDS[S.groupBy]?.board ? S.groupBy : 'kyc', F = FIELDS[by];
   let keys = Object.keys(F.options);
   const fl = S.filters.find(f => f.key === by && f.values.length); if (fl) keys = keys.filter(k => fl.values.includes(k));
@@ -2237,9 +2246,8 @@ function boardHTML(list) {
     const items = list.filter(u => F.get(u) === k), lim = S.more[k] || 25, o = F.options[k];
     return `<div class="col" data-col="${k}" data-field="${by}">
       <div class="col-h"><i class="dot t-${o.tone || 'neutral'}"></i>${o.label}<span class="mono">${items.length}</span></div>
-      <div class="col-b">${items.slice(0, lim).map(u => bcardHTML(u, by)).join('')}
+      <div class="col-b" data-feed="${colFeed(items, u => bcardHTML(u, by), lim, n => { S.more[k] = n; })}">${items.slice(0, lim).map(u => bcardHTML(u, by)).join('')}
         ${!items.length ? '<div class="col-empty">Nothing here</div>' : ''}</div>
-      ${items.length > lim ? `<div class="col-more"><button class="btn btn-link" data-act="more" data-g="${k}">Show ${items.length - lim} more</button></div>` : ''}
     </div>`;
   }).join('')}</div>`;
 }
@@ -2251,7 +2259,7 @@ function bcardHTML(u, by) {
       ${u.country ? `<span class="tag"><span class="flag" style="font-size:var(--fs-12)">${flag(COUNTRIES[u.country].cc)}</span>${u.country}</span>` : ''}
       ${by !== 'kyc' ? `<span class="tag"><i class="dot t-${KYC[u.kyc].tone}"></i>KYC ${KYC[u.kyc].label.toLowerCase()}</span>` : ''}
       ${by !== 'risk' && u.risk !== 'unknown' ? `<span class="tag">${riskIcon(u.risk)}${RISK[u.risk].label}</span>` : ''}
-      ${by !== 'level' ? `<span class="tag">${LEVEL[u.level].label}</span>` : ''}
+      ${by !== 'level' ? `<span class="tag"><i class="dot t-${LEVEL[u.level].tone}"></i>${LEVEL[u.level].label}</span>` : ''}
       ${by !== 'status' && u.status !== 'active' ? `<span class="tag"><i class="dot t-${STATUS[u.status].tone}"></i>${STATUS[u.status].label}</span>` : ''}
     </div>
     <div class="bc-foot"><span class="num ${u.balance ? '' : 'zero'}">${fmtEur(u.balance)}</span><span class="faint">${rel(u.created)}</span></div>
@@ -4220,14 +4228,14 @@ const lvView = t => lvOf(t).view === 'board' && boardFields(fx().F).length ? 'bo
 const boardBy = (t, F) => { const bf = boardFields(F), by = lvOf(t).by; return bf.includes(by) ? by : bf.includes('status') ? 'status' : bf[0]; };
 const optTag = (F, r) => { const o = F.options[F.get(r)]; return o ? `<span class="tag">${o.tone ? `<i class="dot t-${o.tone}"></i>` : ''}${esc(o.label)}</span>` : ''; };
 function lboardHTML(t, list, card) {
+  COLQ.clear();
   const X = fx(), by = boardBy(t, X.F), F = X.F[by], more = S.lbMore[t] ||= {};
   let keys = Object.keys(F.options); const fl = X.list.find(f => f.key === by && f.values.length); if (fl) keys = keys.filter(k => fl.values.includes(k));
   return `<div class="board">${keys.map(k => {
     const items = list.filter(r => F.get(r) === k), lim = more[k] || 25, o = F.options[k];
     return `<div class="col"><div class="col-h"><i class="dot t-${o.tone || 'neutral'}"></i>${esc(o.label)}<span class="mono">${items.length}</span></div>
-      <div class="col-b">${items.slice(0, lim).map(r => card(r, by)).join('')}
-        ${!items.length ? `<div class="col-empty">Nothing here</div>` : ''}</div>
-      ${items.length > lim ? `<div class="col-more"><button class="btn btn-link" data-act="lb-more" data-g="${esc(k)}">Show ${items.length - lim} more</button></div>` : ''}</div>`;
+      <div class="col-b" data-feed="${colFeed(items, r => card(r, by), lim, n => { more[k] = n; })}">${items.slice(0, lim).map(r => card(r, by)).join('')}
+        ${!items.length ? `<div class="col-empty">Nothing here</div>` : ''}</div></div>`;
   }).join('')}</div>`;
 }
 const bcardTpl = ({ attr, title, id, sub, tags, num, when }) => `<div class="bcard link" ${attr}>
@@ -5186,7 +5194,6 @@ Object.assign(ACT, {
   'ld-display': a => openPop(a, listDisplayPop(), { align: 'right', width: 380, kind: 'ldisplay' }),
   'ld-layout': a => { const t = colCtx().t; lvOf(t).view = a.dataset.v; store.set('nsc.lview', S.lv); $('#displayBtn').innerHTML = `${icon(lvView(t), 16)}<span class="sl">Display</span>${icon('chevDown', 16)}`; refreshLD(); },
   'ld-group': a => { const t = colCtx().t; lvOf(t).by = a.dataset.v; S.lbMore[t] = {}; store.set('nsc.lview', S.lv); refreshLD(); },
-  'lb-more': a => { const t = colCtx().t, m = S.lbMore[t] ||= {}; m[a.dataset.g] = (m[a.dataset.g] || 25) + 50; colCtx().redraw(); },
   'ld-col': a => { const X = colCtx(); S.tcols[X.t] = withCol(X.t, X.cols, a.dataset.k); store.set('nsc.tcols2', S.tcols); refreshLD(); },
   'ld-cols-reset': () => { resetTcols(colCtx().t); refreshLD(); toast('Columns reset to default', 'columns'); },
   'ld-reset-colw': () => { const X = colCtx(); Object.keys(X.w).forEach(k => delete X.w[k]); store.set(X.key, X.w); refreshLD(); toast('Column widths fitted to this page', 'columns'); },
