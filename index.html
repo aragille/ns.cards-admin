@@ -390,7 +390,6 @@ th.col-gap,td.col-gap{padding:0!important;border-bottom-color:transparent!import
 .dgrid .card:not(.ov-stat):not(.flush)>.card-h~*{margin-left:var(--card-padding);margin-right:var(--card-padding)}
 .dgrid .card:not(.ov-stat):not(.flush)>.card-h+*{margin-top:var(--space-16)}
 .dgrid .card:not(.ov-stat):not(.flush)>:last-child{margin-bottom:var(--card-padding)}
-.dgrid .card:not(.ov-stat):not(.flush)>.su{margin-left:calc(var(--card-padding) - var(--space-8));margin-right:calc(var(--card-padding) - var(--space-8))}
 .flags{display:inline-flex;align-items:center;gap:var(--space-4)}
 .flags .faint{font-size:var(--fs-12);margin-left:var(--space-4)}
 .col-rs{position:absolute;top:0;right:-5px;width:10px;height:100%;cursor:col-resize;z-index:3}
@@ -872,8 +871,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .mon-sum span{display:block;font-size:var(--fs-12);color:var(--ink-3);margin-bottom:var(--space-2)}
 .mon-sum b{font-family:var(--font);font-size:var(--fs-20);font-weight:500}
 .mon-sum b.bad{color:var(--error)}
-.mon-row{display:flex;align-items:center;gap:var(--space-12);height:42px;border-top:var(--border-width) solid var(--line-soft);font-size:var(--fs-14)}
-.mon-row:hover .mon-n{text-decoration:underline;text-decoration-color:var(--ink-3);text-underline-offset:3px}
+.mon-row{display:flex;align-items:center;gap:var(--space-12);height:var(--row);border-top:var(--border-width) solid var(--line-soft);font-size:var(--fs-14)}
 .mon-row .mon-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
 .res-h{display:flex;justify-content:space-between;align-items:center;font-size:var(--fs-14);margin-bottom:var(--space-8)}
 .res-h .rn{display:flex;align-items:center;gap:var(--space-8);font-weight:500}
@@ -881,12 +879,16 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .res .meter i{background:var(--tone)}
 .res-v{display:inline-flex;align-items:center;gap:var(--space-8)}
 .res .meter .par{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--surface);box-shadow:0 0 0 var(--border-width) var(--ink-3);border-radius:1px;z-index:1}
-.su{display:flex;align-items:center;gap:var(--space-12);height:52px;border-bottom:var(--border-width) solid var(--line-soft);cursor:pointer;margin:0 calc(-1 * var(--space-8));padding:0 var(--space-8);border-radius:var(--r-sm)}
-.su:hover{background:var(--hover)}
+.su{display:grid;grid-template-columns:minmax(0,1fr) auto var(--icon-md);align-items:center;gap:var(--space-8);height:var(--row);border-bottom:var(--border-width) solid var(--line-soft);cursor:pointer;font-size:var(--fs-14)}
+.dgrid .card:not(.ov-stat):not(.flush)>.card-h+.su{margin-top:var(--space-4)} .dgrid .card:not(.ov-stat):not(.flush)>.su:last-child{margin-bottom:var(--space-8)} /* Card → Body with List rows: 4 · rows · 8 */
+.su.su-3{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto var(--icon-md);column-gap:var(--space-12)} /* List row → Activity without time: name · product · amount; in a narrow card name and product share the width */
+.su-n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.su-3 .su-n{font-weight:var(--fw-medium)}
+.su-m{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.su>.i,.mon-row>.i:last-child{color:var(--ink-3)} .su:hover>.i,.mon-row:hover>.i:last-child{color:var(--ink)}
+.su,.mon-row{position:relative;isolation:isolate}
+.su:hover::before,.mon-row:hover::before{content:'';position:absolute;inset:0 calc(-1 * var(--space-8));z-index:-1;background:var(--hover);border-radius:var(--r-sm)}
 .su:last-child{border-bottom:0}
-.su .sm{flex:1;min-width:0}
-.su .sm div:first-child{font-weight:500;font-size:var(--fs-14);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.su .sm div:last-child{font-size:var(--fs-12);color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8);margin-top:var(--space-16)}
 .ms{background:var(--surface-2);border-radius:var(--r);padding:var(--space-12)}
 .ms .kpi-l{font-size:var(--fs-12)}
@@ -4981,7 +4983,7 @@ DASHES['wallet-stats'] = {
     return chartCard(8, 'Deposits and withdrawals', { dates: d.dates, unit: d.unit, fmt: v => '€' + compact(v), series: [{ l: 'Deposits', data: series(d, 1.1e6, 'wd'), col: 'var(--c3)', area: 1 }, { l: 'Withdrawals', data: series(d, .84e6, 'ww'), col: 'var(--c5)' }] })
       + dcard(4, 'Balances by asset', ctag('Now'), mixRows(ASSETS.map(a => [a.c, sum(USERS.map(u => { const w = ud(u).wallets.find(x => x.c === a.c); return w ? w.amt * a.rate : 0; })), a.col]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]), v => '€' + compact(v * 40)))
       + dcard(4, 'Wallet size', ctag('Funded users'), barRows(buckets.map(([l, f]) => [l, USERS.filter(u => u.balance > 0 && f(u)).length])))
-      + dcard(4, 'Top holders', `<a class="btn btn-link" href="#/users">All ${icon('chevRight', 16)}</a>`, [...USERS].sort((a, b) => b.balance - a.balance).slice(0, 6).map(u => `<div class="su" data-uid="${u.id}"><div class="sm"><div>${esc(u.name || u.email)}</div><div>${esc(u.email)}</div></div><span class="num">${fmtEur(u.balance)}</span></div>`).join(''))
+      + dcard(4, 'Top holders', `<a class="btn btn-link" href="#/users">All ${icon('chevRight', 16)}</a>`, [...USERS].sort((a, b) => b.balance - a.balance).slice(0, 6).map(u => `<div class="su" data-uid="${u.id}"><span class="su-n">${esc(u.name || u.email)}</span><span class="num">${fmtEur(u.balance)}</span>${icon('chevRight', 16)}</div>`).join(''))
       + dcard(4, 'Fees earned', ctag('This period'), barRows([['Exchange fees', 41200], ['Card top-up fees', 26800], ['Withdrawal fees', 14900], ['Monthly card fees', 9400], ['IBAN fees', 5100]], v => '€' + compact(v)));
   },
 };
@@ -5004,7 +5006,7 @@ DASHES.staking = {
       + dcard(4, 'TVL by strategy', ctag('Now'), barRows(act.map(([s, x]) => [esc(s.name), x.tvl]), v => '€' + compact(v)))
       + dcard(4, 'Assets staked', ctag('Share of TVL'), mixRows(byAsset.map(([c, v], i) => [c, v, cols[i] || 'var(--neutral)']), v => '€' + compact(v)))
       + dcard(4, 'Upcoming payouts', `<a class="btn btn-link" href="#/payout-pools">All ${icon('chevRight', 16)}</a>`, next.map(p => `<button class="rk t-info" data-act="route" data-arg="payout-pools/${p.id}"><span class="rk-ic">${icon('payout', 16)}</span><span class="rk-l"><div>${esc(stratOf(p.sid).name)}</div><div>${fmtDateTime(p.at)}</div></span><span class="rk-v">${fmtAmt(p.rewards, p.c)}</span><span class="rk-go">${icon('chevRight', 16)}</span></button>`).join('') || emptyBlock('payout', 'Nothing scheduled', ''))
-      + dcard(4, 'Largest stakes', `<a class="btn btn-link" href="#/stakes">All ${icon('chevRight', 16)}</a>`, [...STAKES].filter(x => x.status === 'ACTIVE').sort((a, b) => b.amount * ASSET[b.c].rate - a.amount * ASSET[a.c].rate).slice(0, 6).map(x => `<div class="su" data-act="route" data-arg="stakes/${x.id}"><div class="sm"><div>${esc(byId(x.uid).name || byId(x.uid).email)}</div><div>${esc(stratOf(x.sid).name)}</div></div><span class="num">${fmtEur(x.amount * ASSET[x.c].rate)}</span></div>`).join(''));
+      + dcard(4, 'Largest stakes', `<a class="btn btn-link" href="#/stakes">All ${icon('chevRight', 16)}</a>`, [...STAKES].filter(x => x.status === 'ACTIVE').sort((a, b) => b.amount * ASSET[b.c].rate - a.amount * ASSET[a.c].rate).slice(0, 6).map(x => `<div class="su su-3" data-act="route" data-arg="stakes/${x.id}"><span class="su-n">${esc(byId(x.uid).name || byId(x.uid).email)}</span><span class="su-m">${esc(stratOf(x.sid).name)}</span><span class="num">${fmtEur(x.amount * ASSET[x.c].rate)}</span>${icon('chevRight', 16)}</div>`).join(''));
   },
 };
 /* ── Products · Card orders (physical cards on their way to the cardholder) ── */
@@ -5160,7 +5162,7 @@ DASHES.monitors = {
   cards: () => Object.entries(MON_KIND).map(([kind, M]) => { const L = monitorsOf(kind);
     return dcard(6, M.label, `<a class="btn btn-link" href="#/${M.page}">Open ${icon('chevRight', 16)}</a>`,
       `<div class="mon-d">${M.desc}</div><div class="mon-sum"><div><span>Total</span><b>${L.length}</b></div><div><span>Active</span><b>${L.filter(m => m.on).length}</b></div><div><span>Alerts</span><b class="${L.some(m => m.status === 'ALERT' || m.status === 'STALE') ? 'bad' : ''}">${L.filter(m => m.status === 'ALERT' || m.status === 'STALE').length}</b></div></div>`
-      + L.map(m => `<a class="mon-row" href="#/${M.page}/${m.id}"><i class="dot t-${MON_STATUS[m.status].tone}"></i><span class="mon-n">${esc(m.name)}</span><span class="num muted">${fmtAmt(m.bal, m.c)}</span>${monMeter(m)}</a>`).join(''));
+      + L.map(m => `<a class="mon-row" href="#/${M.page}/${m.id}"><i class="dot t-${MON_STATUS[m.status].tone}"></i><span class="mon-n">${esc(m.name)}</span><span class="num muted">${fmtAmt(m.bal, m.c)}</span>${monMeter(m)}${icon('chevRight', 16)}</a>`).join(''));
   }).join(''),
 };
 
