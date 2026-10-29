@@ -147,7 +147,7 @@ a{color:inherit;text-decoration:none}
 .me-h .me-n{font-weight:500;font-size:var(--fs-14)}
 .me-h .me-e{font-size:var(--fs-12);color:var(--ink-3)}
 .me-h .me-n,.me-h .me-e{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.seg.ic button{width:var(--control-sm);padding:0;justify-content:center}
+.seg.ic button{aspect-ratio:1;padding:0;justify-content:center}
 .me-theme{padding:0 4px 0 10px}
 
 .main-wrap{display:flex;flex-direction:column;min-width:0;height:100vh}
@@ -210,11 +210,11 @@ h1 .count{font-family:var(--font);font-size:var(--fs-14);font-weight:400;color:v
 .ghost-ic{width:28px;height:28px;border-radius:var(--r-sm);display:grid;place-items:center;color:var(--ink-2)}
 .ghost-ic:hover{background:var(--hover);color:var(--ink)}
 
-.seg{display:inline-flex;align-items:center;gap:0;padding:var(--space-4);background:var(--surface-2);border:var(--border-width) solid var(--line);border-radius:var(--r)}
-.seg button{height:var(--control-sm);padding:0 var(--space-8);border-radius:var(--r-sm);border:var(--border-width) solid transparent;font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);color:var(--ink-2);display:flex;align-items:center;gap:var(--space-4);white-space:nowrap}
+.seg{display:inline-flex;align-items:stretch;gap:0;height:var(--control-md);padding:calc(var(--space-2) - var(--border-width));background:var(--surface-2);border:var(--border-width) solid var(--line);border-radius:var(--r)}
+.seg button{padding:0 var(--space-8);border-radius:var(--r-sm);border:var(--border-width) solid transparent;font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);color:var(--ink-2);display:flex;align-items:center;gap:var(--space-4);white-space:nowrap}
 .seg button:hover{color:var(--ink)}
 .seg button.on{background:var(--surface);color:var(--ink);border-color:var(--line);box-shadow:var(--shadow-sm)}
-.seg.sm button{height:var(--control-sm);padding:0 var(--space-8);font-size:var(--fs-12)}
+
 
 .badge{display:inline-flex;align-items:center;gap:var(--space-4);height:var(--tag-h);padding:0 var(--space-8);border-radius:var(--r-xs);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);white-space:nowrap}
 .badge .dot{width:8px;height:8px}
@@ -492,7 +492,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .up-grid .card-b{padding:var(--space-4) var(--card-padding) var(--space-8)}
 .up-grid .card-b.pad{padding:var(--space-16) var(--card-padding)}
 .up-grid .card-tools{padding:var(--space-12) var(--card-padding);border-bottom:var(--border-width) solid var(--line)}
-.card-tools .seg button{height:var(--control-sm)}
+
 .card-t .ct{font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);color:var(--ink-3);margin-left:var(--space-4)}
 .ch-act{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .card-tools{display:flex;align-items:center;gap:var(--space-8);flex-wrap:wrap;padding:0 var(--card-padding) var(--space-16)}
