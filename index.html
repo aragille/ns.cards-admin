@@ -255,7 +255,7 @@ h1 .count{font-family:var(--mono);font-size:14px;font-weight:400;color:var(--ink
 .btn-dark{background:var(--inv);color:var(--on-inv)}
 .btn-dark:hover{background:var(--inv-hover)} .btn-dark:active{background:var(--neutral-1000)}
 .btn-ghost{background:var(--surface);border:1px solid var(--line);color:var(--ink)} .btn-ghost:active{background:var(--selected)}
-.btn-danger{background:var(--error);color:var(--on-color)} .btn-danger:hover{background:var(--error-ink)} .btn-danger:active{background:var(--red-700)} .btn-danger:focus-visible{box-shadow:var(--ring-error)}
+.btn-danger{background:var(--error);color:var(--on-color)} .btn-danger:hover{background:var(--error-ink)} .btn-danger:active{background:var(--red-700)} .btn.btn-danger:focus-visible{box-shadow:var(--ring-error)} /* beats the brand ring on .btn */
 .btn-ghost:hover{background:var(--hover)}
 .btn-sm{height:var(--control-md);padding:0 16px;font-size:14px;border-radius:var(--r-sm)} /* the system has one button size below modals: 32 */
 .modal-f .btn{height:var(--control-lg);padding:0 16px;border-radius:var(--r)} /* Large: modal footers, next to 40px fields; every button keeps 16px sides */
@@ -745,7 +745,7 @@ mark.hit{background:var(--hit);color:inherit;border-radius:3px;padding:0 1px;mar
 .modal{width:min(480px,100%);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-pop);animation:pop-in .16s ease;overflow:hidden}
 .modal-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:16px 16px 8px 24px;font-weight:600;font-size:16px;line-height:24px}
 .modal-b{padding:8px 24px 24px;display:flex;flex-direction:column;gap:16px}
-.modal-f{display:flex;justify-content:flex-end;gap:8px;padding:16px 24px;border-top:1px solid var(--line);background:var(--surface-2)}
+.modal-f{display:flex;justify-content:flex-end;gap:8px;padding:12px 24px;border-top:1px solid var(--line);background:var(--surface)}
 /* Confirmation step: sits above any open modal so a form behind it keeps its input */
 .cfm-wrap{z-index:78;padding-top:22vh}
 .modal.cfm{width:min(480px,100%)}
