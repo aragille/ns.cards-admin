@@ -231,7 +231,7 @@ h1 .count{font-family:var(--font);font-size:var(--fs-14);font-weight:400;color:v
 .stat{display:inline-flex;align-items:center;gap:var(--space-8);font-weight:var(--fw-medium);color:var(--ink);white-space:nowrap}
 .risk{display:inline-flex;align-items:center;gap:var(--space-8);color:var(--ink);white-space:nowrap}
 .flag{font-size:var(--fs-16);line-height:1;display:inline-flex;align-items:center;flex:none} /* flags render at 16px here — the same as inline currency icons */
-.flag-i{width:1.0667em;height:1.0667em;border-radius:50%;display:block}
+.flag-i{width:1em;height:1em;border-radius:50%;display:block}
 .flag-x{display:grid;place-items:center;width:1.0667em;height:1.0667em;border-radius:50%;background:var(--neutral-bg);box-shadow:inset 0 0 0 var(--border-width) var(--line);color:var(--ink-2);font-size:.42em;font-weight:600;letter-spacing:0}
 img.asset-ic{display:block;object-fit:cover}
 .ctry{display:inline-flex;align-items:center;gap:var(--space-8)}
@@ -664,6 +664,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .dp-f{display:flex;align-items:center;gap:var(--space-8);margin:0 calc(-1 * var(--space-4)) calc(-1 * var(--space-4));padding:var(--space-12) var(--space-16);border-top:var(--border-width) solid var(--line)}
 
 .pop-head{display:flex;align-items:center;gap:var(--space-8);height:var(--control-lg);padding:0 0 0 var(--space-8);font-weight:var(--fw-semibold);font-size:var(--fs-14);line-height:var(--lh-20)}
+.pop-head>.ghost-ic{width:var(--control-xs);height:var(--control-xs)} /* back sits in a 20 box like the row checkboxes, so the field icon and title line up with the flags and labels below */
 .pop-search{display:flex;align-items:center;gap:var(--space-8);height:var(--control-md);padding:0 var(--space-12);margin:calc(-1 * var(--space-4)) calc(-1 * var(--space-4)) var(--space-4);border-bottom:var(--border-width) solid var(--line-soft);color:var(--ink-3)}
 .pop-head+.pop-search{margin-top:0;border-top:var(--border-width) solid var(--line-soft)}
 .pop-search input{border:0;outline:0;flex:1;min-width:0;background:transparent;color:var(--ink);font-size:var(--fs-14)}
