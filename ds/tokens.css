@@ -121,7 +121,6 @@
   --line: var(--neutral-100);
   --line-soft: var(--neutral-75);
   --line-strong: var(--neutral-200);
-  --line-hover: var(--neutral-300);
   --focus: var(--brand-500);
   /* Color — brand */
   --brand: var(--brand-500);
@@ -254,7 +253,6 @@
   --line: var(--neutral-800);
   --line-soft: var(--neutral-850);
   --line-strong: var(--neutral-600);
-  --line-hover: var(--neutral-500);
   --brand-hover: var(--brand-400);
   --brand-pressed: var(--brand-600);
   --brand-subtle: var(--brand-950);
