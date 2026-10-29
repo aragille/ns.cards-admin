@@ -322,7 +322,7 @@ tbody tr{cursor:pointer}
 tbody tr:hover td{background:var(--hover)}
 tbody tr.sel td,tbody tr.sel:hover td{background:var(--selected)}
 tbody tr:last-child td{border-bottom:0}
-th.cbcell,td.cbcell{width:44px;padding:0 var(--space-4) 0 var(--space-16)}
+th.cbcell,td.cbcell{width:44px;padding:0 var(--space-12)}
 /* bulk-select column stays pinned on the left while the table scrolls sideways (mirrors the pinned row actions on the right) */
 th.cbcell,td.cbcell,.dt th.cbcell{position:sticky;left:0}
 td.cbcell{z-index:1;background:var(--surface)}
@@ -332,7 +332,7 @@ th.pin,td.pin{position:sticky;left:44px}
 td.pin{z-index:1;background:var(--surface)}
 th.pin{z-index:3;background:var(--bg)}
 .hs-wrap.hs-l th.pin,.hs-wrap.hs-l td.pin{box-shadow:inset -1px 0 0 var(--line)}
-th.act-h{width:84px}
+th.act-h{width:88px}
 td.act{position:sticky;right:0;z-index:1;padding:0!important;background:transparent!important;overflow:visible!important}
 tbody tr:hover td.act{z-index:5}
 .row-actions{position:absolute;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:flex-end;gap:var(--space-4);padding:0 var(--space-12) 0 var(--space-40);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .1s;
@@ -384,6 +384,8 @@ th[draggable="true"]:hover::before{opacity:1}
 .dgrid .card:not(.ov-stat):not(.flush)>.card-h~*{margin-left:var(--card-padding);margin-right:var(--card-padding)}
 .dgrid .card:not(.ov-stat):not(.flush)>.card-h+*{margin-top:var(--space-16)}
 .dgrid .card:not(.ov-stat):not(.flush)>:last-child{margin-bottom:var(--card-padding)}
+.dgrid .card:not(.ov-stat):not(.flush)>.card-h+:has(>.kv-r:first-child){margin-top:var(--space-4)}
+.dgrid .card:not(.ov-stat):not(.flush)>:last-child:has(>.kv-r:last-child){margin-bottom:var(--space-8)}
 .flags{display:inline-flex;align-items:center;gap:var(--space-4)}
 .flags .faint{font-size:var(--fs-12);margin-left:var(--space-4)}
 .col-rs{position:absolute;top:0;right:-5px;width:10px;height:100%;cursor:col-resize;z-index:3}
@@ -439,24 +441,27 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 
 /* board view */
 .board{display:flex;gap:var(--grid-gap);overflow-x:auto;align-items:flex-start;padding-bottom:var(--space-8)}
-.col{flex:0 0 290px;background:var(--surface-2);border:var(--border-width) solid var(--line);border-radius:var(--r-lg);display:flex;flex-direction:column;max-height:calc(100vh - 248px);transition:background .12s,border-color .12s}
-.col.over{background:var(--brand-subtle);border-color:var(--brand)}
-.col-h{display:flex;align-items:center;gap:var(--space-8);padding:var(--space-12) var(--space-16);font-weight:var(--fw-semibold);font-size:var(--fs-14);line-height:var(--lh-20)}
+.col{flex:0 0 290px;background:var(--surface-2);border:var(--border-width) solid var(--line);border-radius:var(--r-lg);display:flex;flex-direction:column;max-height:calc(100vh - 248px);padding-bottom:var(--space-8)}
+.col-h{display:flex;align-items:center;gap:var(--space-8);padding:var(--space-12) var(--space-16) var(--space-12) var(--space-24);font-weight:var(--fw-semibold);font-size:var(--fs-14);line-height:var(--lh-20)}
 .col-h .mono{font-weight:var(--fw-medium);color:var(--ink-3)}
-.col-b{padding:0 var(--space-8) var(--space-8);overflow-y:auto;display:flex;flex-direction:column;gap:var(--space-8);min-height:60px}
-.bcard{background:var(--surface);border:var(--border-width) solid var(--line);border-radius:var(--r);padding:var(--space-12);box-shadow:var(--shadow-sm);cursor:grab;transition:box-shadow .12s,transform .12s,border-color .12s}
+.col-b{padding:0 var(--space-8);overflow-y:auto;display:flex;flex-direction:column;gap:var(--space-8);min-height:60px}
+.bcard{flex:none;display:flex;flex-direction:column;gap:var(--space-12);background:var(--surface);border:var(--border-width) solid var(--line);border-radius:var(--r);padding:var(--space-12) var(--space-16);box-shadow:var(--shadow-sm);cursor:grab;transition:box-shadow .12s,border-color .12s}
 .bcard:hover{border-color:var(--line-strong);box-shadow:var(--shadow-md)}
-.bcard.dragging{opacity:.45;transform:rotate(1.5deg)}
+.bcard.dragging{opacity:.4} /* Origin: the card's trace while it is carried */
+.bslot{flex:none;border:var(--border-width) dashed var(--line-strong);border-radius:var(--r);background:var(--surface);display:grid;place-items:center;color:var(--ink-3);font-size:var(--fs-12);line-height:var(--lh-16)}
 .bcard.link{cursor:pointer}
 .bc-top{display:flex;align-items:center;gap:var(--space-8)}
 .bc-name{font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bc-email{font-size:var(--fs-12);color:var(--ink-2);margin:var(--space-4) 0 var(--space-12);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bc-head{display:flex;flex-direction:column;gap:var(--space-4);min-width:0}
+.bc-tags:empty{display:none}
+.bc-email{font-size:var(--fs-12);line-height:var(--lh-16);color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bc-tags{display:flex;flex-wrap:wrap;gap:var(--space-4)}
 .tag{display:inline-flex;align-items:center;gap:var(--space-4);height:var(--tag-h);padding:0 var(--space-8);border-radius:var(--r-xs);border:var(--border-width) solid var(--line);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);color:var(--ink-2);background:var(--surface)}
-.bc-foot{display:flex;justify-content:space-between;align-items:center;margin-top:var(--space-12);padding-top:var(--space-12);border-top:var(--border-width) dashed var(--line);font-size:var(--fs-12)}
-.col-empty{border:var(--border-width) dashed var(--line-strong);border-radius:var(--r);height:72px;display:grid;place-items:center;color:var(--ink-3);font-size:var(--fs-12)}
-.more-btn{height:var(--control-md);border-radius:var(--r-sm);color:var(--ink-2);font-size:var(--fs-12);font-weight:500}
-.more-btn:hover{background:var(--surface)}
+.bc-foot{display:flex;justify-content:space-between;align-items:center;padding-top:var(--space-12);border-top:var(--border-width) dashed var(--line);font-size:var(--fs-12);line-height:var(--lh-16)}
+.bc-foot .num{font-size:var(--fs-14);line-height:var(--lh-20)}
+.col-b:has(.bslot) .col-empty{display:none}
+.col-empty{flex:none;border:var(--border-width) dashed var(--line);border-radius:var(--r);height:72px;display:grid;place-items:center;color:var(--ink-3);font-size:var(--fs-12)}
+.col-more{padding:var(--space-8) var(--space-8) 0}
 
 /* floating bar (bulk actions + unsaved changes) */
 .bulk{position:fixed;left:50%;bottom:24px;transform:translate(-50%,140%);opacity:0;z-index:40;display:flex;align-items:center;gap:var(--space-4);padding:var(--space-4);background:var(--float);color:var(--ink);border-radius:var(--r);box-shadow:var(--shadow-lg);transition:transform .2s cubic-bezier(.2,.8,.2,1),opacity .2s;pointer-events:none}
@@ -2222,15 +2227,15 @@ function boardHTML(list) {
     return `<div class="col" data-col="${k}" data-field="${by}">
       <div class="col-h"><i class="dot t-${o.tone || 'neutral'}"></i>${o.label}<span class="mono">${items.length}</span></div>
       <div class="col-b">${items.slice(0, lim).map(u => bcardHTML(u, by)).join('')}
-        ${items.length > lim ? `<button class="more-btn" data-act="more" data-g="${k}">Show ${items.length - lim} more</button>` : ''}
-        ${!items.length ? '<div class="col-empty">Drop here</div>' : ''}</div>
+        ${!items.length ? '<div class="col-empty">Nothing here</div>' : ''}</div>
+      ${items.length > lim ? `<div class="col-more"><button class="btn btn-link" data-act="more" data-g="${k}">Show ${items.length - lim} more</button></div>` : ''}
     </div>`;
   }).join('')}</div>`;
 }
 function bcardHTML(u, by) {
   return `<div class="bcard" draggable="true" data-uid="${u.id}">
-    <div class="bc-top"><span class="bc-name">${esc(u.name || 'No profile yet')}</span><span class="mono faint" style="font-size:var(--fs-12)">#${u.id}</span></div>
-    <div class="bc-email">${esc(u.email)}</div>
+    <div class="bc-head"><div class="bc-top"><span class="bc-name">${esc(u.name || 'No profile yet')}</span><span class="mono faint" style="font-size:var(--fs-12)">#${u.id}</span></div>
+    <div class="bc-email">${esc(u.email)}</div></div>
     <div class="bc-tags">
       ${u.country ? `<span class="tag"><span class="flag" style="font-size:var(--fs-12)">${flag(COUNTRIES[u.country].cc)}</span>${u.country}</span>` : ''}
       ${by !== 'kyc' ? `<span class="tag"><i class="dot t-${KYC[u.kyc].tone}"></i>KYC ${KYC[u.kyc].label.toLowerCase()}</span>` : ''}
@@ -4210,13 +4215,13 @@ function lboardHTML(t, list, card) {
     const items = list.filter(r => F.get(r) === k), lim = more[k] || 25, o = F.options[k];
     return `<div class="col"><div class="col-h"><i class="dot t-${o.tone || 'neutral'}"></i>${esc(o.label)}<span class="mono">${items.length}</span></div>
       <div class="col-b">${items.slice(0, lim).map(r => card(r, by)).join('')}
-        ${items.length > lim ? `<button class="more-btn" data-act="lb-more" data-g="${esc(k)}">Show ${items.length - lim} more</button>` : ''}
-        ${!items.length ? `<div class="col-empty">Nothing here</div>` : ''}</div></div>`;
+        ${!items.length ? `<div class="col-empty">Nothing here</div>` : ''}</div>
+      ${items.length > lim ? `<div class="col-more"><button class="btn btn-link" data-act="lb-more" data-g="${esc(k)}">Show ${items.length - lim} more</button></div>` : ''}</div>`;
   }).join('')}</div>`;
 }
 const bcardTpl = ({ attr, title, id, sub, tags, num, when }) => `<div class="bcard link" ${attr}>
-    <div class="bc-top"><span class="bc-name">${title}</span>${id ? `<span class="mono faint" style="font-size:var(--fs-12)">#${id}</span>` : ''}</div>
-    ${sub ? `<div class="bc-email">${sub}</div>` : '<div style="height:10px"></div>'}
+    <div class="bc-head"><div class="bc-top"><span class="bc-name">${title}</span>${id ? `<span class="mono faint" style="font-size:var(--fs-12)">#${id}</span>` : ''}</div>
+    ${sub ? `<div class="bc-email">${sub}</div>` : ''}</div>
     <div class="bc-tags">${tags}</div>
     ${num || when ? `<div class="bc-foot"><span class="num">${num || ''}</span><span class="faint">${when ? rel(when) : ''}</span></div>` : ''}
   </div>`;
@@ -4327,7 +4332,7 @@ page({
   tiles: [allTile('All requests', L => `${L.filter(r => r.status === 'PENDING').length} pending`), tile('pending', 'Pending', { key: 'status', values: ['PENDING'] }, L => { const o = L.filter(r => r.status === 'PENDING').sort((a, b) => a.created - b.created)[0]; return o ? `oldest ${rel(o.created)}` : 'All clear'; }),
     tile('high', 'High value', { key: 'value', values: ['high'] }, () => '€10,000 and above'), tile('ok', 'Approved', { key: 'status', values: ['APPROVED'] }, share), tile('no', 'Rejected', { key: 'status', values: ['REJECTED'] }, share)],
   cols: [K.id(), K.user(), { k: 'type', l: 'Type', on: 1, cell: r => `<span class="txt">${icon(CONF_TYPE[r.type].icon, 16)}${CONF_TYPE[r.type].label}</span>` },
-    { k: 'amount', l: 'Amount', al: 'r', on: 1, dir: 'desc', val: r => r.eur, cell: r => r.type === 'LIMIT' ? `<span class="num">${fmtEur(r.eur)}</span>` : `<span class="num">${fmtAmt(r.amount, r.c)}</span>${r.c !== 'EUR' ? `<div class="code">${fmtEur(r.eur)}</div>` : ''}` },
+    { k: 'amount', l: 'Amount', al: 'r', on: 1, dir: 'desc', val: r => r.eur, cell: r => r.type === 'LIMIT' ? `<span class="num">${fmtEur(r.eur)}</span>` : `<span class="num">${fmtAmt(r.amount, r.c)}</span>` },
     { k: 'eur', l: 'In EUR', al: 'r', on: 1, dir: 'desc', val: r => r.eur, cell: r => r.type !== 'LIMIT' && r.c !== 'EUR' ? `<span class="num muted">${fmtEur(r.eur)}</span>` : dash },
     { k: 'dest', l: 'Destination', on: 1, cell: r => `<span class="num muted">${esc(r.dest)}</span>` },
     { k: 'risk', l: 'User risk', on: 1, dir: 'desc', val: r => RISK[byId(r.uid).risk].n, cell: r => riskCell(byId(r.uid).risk) },
@@ -5395,9 +5400,15 @@ new MutationObserver(refreshHints).observe($('#main'), { childList: true, subtre
 
 /* board drag & drop */
 let dragId = null;
-document.addEventListener('dragstart', e => { const c = e.target.closest?.('.bcard'); if (!c) return; dragId = +c.dataset.uid; c.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragId); });
-document.addEventListener('dragend', e => { e.target.closest?.('.bcard')?.classList.remove('dragging'); $$('.col.over').forEach(c => c.classList.remove('over')); });
-document.addEventListener('dragover', e => { const col = e.target.closest?.('.col'); if (!col || dragId == null) return; e.preventDefault(); $$('.col.over').forEach(c => c !== col && c.classList.remove('over')); col.classList.add('over'); });
+let bSlot = null;
+document.addEventListener('dragstart', e => { const c = e.target.closest?.('.bcard'); if (!c) return; dragId = +c.dataset.uid; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', dragId);
+  bSlot = Object.assign(document.createElement('div'), { className: 'bslot', textContent: 'Drop here' }); bSlot.style.height = c.offsetHeight + 'px';
+  setTimeout(() => c.classList.add('dragging')); }); // after the browser has taken the drag image
+document.addEventListener('dragend', e => { e.target.closest?.('.bcard')?.classList.remove('dragging'); bSlot?.remove(); bSlot = null; });
+document.addEventListener('dragover', e => { const col = e.target.closest?.('.col'); if (!col || dragId == null) return; e.preventDefault();
+  const b = col.querySelector('.col-b'), home = b.querySelector(`.bcard[data-uid="${dragId}"]`);
+  if (home) { bSlot?.remove(); return; } // over its own column: the trace already marks the place
+  if (bSlot.parentNode !== b) b.prepend(bSlot); });
 document.addEventListener('dragover', e => { const z = e.target.closest?.('#dropzone'); if (z) { e.preventDefault(); z.classList.add('over'); } });
 document.addEventListener('dragleave', e => { const z = e.target.closest?.('#dropzone'); if (z && !z.contains(e.relatedTarget)) z.classList.remove('over'); });
 document.addEventListener('drop', e => { const z = e.target.closest?.('#dropzone'); if (!z) return; e.preventDefault(); z.classList.remove('over'); const f = e.dataTransfer.files[0]; f && uploadDoc(f); });
@@ -5405,7 +5416,7 @@ document.addEventListener('drop', e => {
   const col = e.target.closest?.('.col'); if (!col || dragId == null) return; e.preventDefault();
   const u = byId(dragId), f = col.dataset.field, v = col.dataset.col; dragId = null;
   if (u[f] !== v) { u[f] = v; u.updated = NOW; toast(`${esc(u.name || u.email)} → ${FIELDS[f].options[v].label}`); afterDataChange(); }
-  else col.classList.remove('over');
+  else bSlot?.remove();
 });
 
 /* ════════════════════════════ Sign in · Sign up ════════════════════════════
