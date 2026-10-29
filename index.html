@@ -368,7 +368,7 @@ th[draggable="true"]:hover::before{opacity:1}
 .cdi-c.r{justify-content:flex-end} .cdi-c.c{justify-content:center}
 /* column chips in Display / Columns menus: grip to drag, solid = shown, dashed = hidden; a dashed slot opens where a dragged chip will land */
 .cchips{display:flex;flex-wrap:wrap;gap:var(--space-8)}
-.cchip{display:inline-flex;align-items:center;gap:var(--space-4);height:var(--control-md);padding:0 var(--space-8);border-radius:var(--r-sm);border:var(--border-width) solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:var(--fs-12);font-weight:500;cursor:grab;box-shadow:var(--shadow-sm);transition:border-color .12s,background .12s,color .12s,opacity .12s}
+.cchip{display:inline-flex;align-items:center;gap:var(--space-4);line-height:var(--lh-16);height:var(--control-md);padding:0 var(--space-8);border-radius:var(--r-sm);border:var(--border-width) solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:var(--fs-12);font-weight:500;cursor:grab;box-shadow:var(--shadow-sm);transition:border-color .12s,background .12s,color .12s,opacity .12s}
 .cchip:hover{border-color:var(--line-strong)}
 .cchip:active{cursor:grabbing}
 .cchip>.i:first-child{color:var(--ink-3)}
@@ -522,14 +522,14 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .txt{display:inline-flex;align-items:center;gap:var(--space-8)} .txt .i{color:var(--ink-3)}
 .num.pos{color:var(--success-ink)}
 .empty.sm{padding:var(--space-40) var(--space-24)}
-.fsel{height:var(--control-md);border-radius:var(--r-sm);border:var(--border-width) solid var(--line);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B9B98' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center/16px;padding:0 var(--space-40) 0 var(--space-12);font-size:var(--fs-14);color:var(--ink);appearance:none;-webkit-appearance:none;outline:0;cursor:pointer}
+.fsel{height:var(--control-md);border-radius:var(--r-sm);border:var(--border-width) solid var(--line);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B9B98' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right var(--space-8) center/16px;padding:0 var(--space-32) 0 var(--space-12);font-size:var(--fs-14);color:var(--ink);appearance:none;-webkit-appearance:none;outline:0;cursor:pointer}
 .fsel.sm{height:var(--control-md);font-size:var(--fs-12);border-radius:var(--r-sm)}
 .inp{height:var(--control-md);width:150px;border-radius:var(--r-sm);border:var(--border-width) solid var(--line);background:var(--surface);padding:0 var(--space-12);font-size:var(--fs-14);color:var(--ink);outline:0}
 .inp::placeholder{color:var(--ink-3)}
 .dd{text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px}
 .dd.dd-ph{color:var(--ink-3)}
 .dd .flag{margin-right:var(--space-8)}
-.dd-field{display:block;width:100%;max-width:none;height:var(--control-lg);border-radius:var(--r-sm);border:var(--border-width) solid var(--line);padding:0 var(--space-40) 0 var(--space-12);font-size:var(--fs-14);color:var(--ink);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B9B98' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center/14px}
+.dd-field{display:block;width:100%;max-width:none;height:var(--control-lg);border-radius:var(--r-sm);border:var(--border-width) solid var(--line);padding:0 var(--space-32) 0 var(--space-12);font-size:var(--fs-14);color:var(--ink);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B9B98' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right var(--space-8) center/16px}
 .dd:hover{border-color:var(--line-strong)}
 .dd.open,.dd:focus-visible{border-color:var(--focus);box-shadow:var(--focus-brand);outline:0}
 .fsel:hover,.inp:hover,.dd-field:hover,.field input:hover,.field select:hover{border-color:var(--line-strong)}
@@ -812,9 +812,9 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .ov-stat{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-12) var(--space-16)!important;color:inherit}
 .ov-stat>.i{margin-left:auto;color:var(--ink-3)}
 .ov-stat:hover>.i{color:var(--ink)}
-.os-ic{width:36px;height:36px;border-radius:var(--r-sm);display:grid;place-items:center;background:var(--neutral-bg);color:var(--ink);flex:none}
-.os-l{display:flex;flex-direction:column;gap:var(--space-2);font-size:var(--fs-12);color:var(--ink-2)}
-.os-l b{font-size:var(--fs-20);font-weight:600;color:var(--ink);letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.os-ic{width:var(--control-md);height:var(--control-md);border-radius:var(--r-sm);display:grid;place-items:center;background:var(--surface-2);color:var(--ink);flex:none}
+.os-l{display:flex;flex-direction:column;gap:var(--space-4);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+.os-l b{font-size:var(--fs-20);line-height:var(--lh-24);font-weight:var(--fw-semibold);color:var(--ink);letter-spacing:-.02em;text-transform:none;font-variant-numeric:tabular-nums}
  /* beats .dgrid .card.flush>.card-h: title centred in the header bar */
 .ovr{display:grid;grid-template-columns:32px minmax(0,1fr) 72px 16px;align-items:center;gap:var(--space-12);width:100%;height:44px;padding:0 var(--space-16) 0 var(--space-24);border-bottom:var(--border-width) solid var(--line-soft);text-align:left;font-size:var(--fs-14)}
 .ovr:last-child{border-bottom:0}
@@ -1934,7 +1934,7 @@ function renderDashboard() {
   const log = pgData(PAGES.logs).slice(0, 8);
   const go = (href, l) => `<a class="btn btn-link" href="${href}">${t(l)}${icon('chevRight', 14)}</a>`;
   $('#main').innerHTML = `<div class="page"><div class="dgrid">
-    ${stats.map(([l, ic, n, href]) => `<a class="card span-3 ov-stat" href="${href}"><span class="os-ic">${icon(ic, 18)}</span><span class="os-l">${t(l)}<b>${fmtInt(n)}</b></span>${icon('chevRight', 16)}</a>`).join('')}
+    ${stats.map(([l, ic, n, href]) => `<a class="card span-3 ov-stat" href="${href}"><span class="os-ic">${icon(ic, 16)}</span><span class="os-l">${t(l)}<b>${fmtInt(n)}</b></span>${icon('chevRight', 16)}</a>`).join('')}
     <div class="card span-6 flush ov"><div class="card-h"><span class="card-t">${t('Needs attention')}</span></div>
       ${queues.map(q => `<button class="ovr ${q.n ? '' : 'clear'}" data-act="ov-queue" data-id="${q.id}" data-v="${q.v}"><span class="os-ic">${icon(q.ic, 16)}</span><span class="ovr-l">${t(q.l)}</span><span class="ovr-n">${q.n ? fmtInt(q.n) : t('All clear')}</span>${icon('chevRight', 16)}</button>`).join('')}
     </div>
