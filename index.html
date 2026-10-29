@@ -684,6 +684,10 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .pop-lbl .btn-link{padding:0 var(--space-16);text-transform:none;letter-spacing:0}
 .pop-lbl .pop-acts>.btn-link:last-child,.pop-lbl>.btn-link:last-child{margin-right:var(--space-4)} /* actions end 12 from the popover edge */
 .pop-acts{display:flex}
+/* column resets under the chips: the first link's text starts on the chips' left edge */
+.pop-foot{display:flex;margin-top:var(--space-4)}
+.pop-foot .btn-link{padding:0 var(--space-16)}
+.pop-foot .btn-link:first-child{margin-left:calc(-1 * var(--space-12));padding-left:calc(var(--space-12) - var(--border-width))}
 /* a Link in a key–value row lines its label up with the values */
 .kv-r .btn-link{margin-right:calc(-1 * var(--space-16))}
 .pop-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);height:var(--control-md)}
@@ -2443,7 +2447,7 @@ function ctable(t, rows, empty, o = {}) {
   }), empty, { t, keys: [...(o.pre ? [null] : []), ...cols.map(c => c.k), ...(o.post ? [null] : [])] });
 }
 const colsBtn = t => `<button class="icon-btn" data-act="tcols" data-t="${t}" data-tip="Columns">${icon('columns', 16)}</button>`;
-const tcolsPop = t => `<div class="pop-sec"><div class="pop-lbl">Columns<button class="btn btn-link" data-act="tcols-reset" data-t="${t}">Reset columns</button></div>${colChips(t, 'tcol')}</div>`;
+const tcolsPop = t => `<div class="pop-sec"><div class="pop-lbl">Columns</div>${colChips(t, 'tcol')}<div class="pop-foot"><button class="btn btn-link" data-act="tcols-reset" data-t="${t}">Reset columns</button></div></div>`;
 // Reset columns: back to the table's default shown columns in their default order (widths have their own reset)
 const resetTcols = t => { delete (S.tcols ||= store.get('nsc.tcols2', {}))[t]; delete (S.tord ||= store.get('nsc.tord', {}))[t]; store.set('nsc.tcols2', S.tcols); store.set('nsc.tord', S.tord); };
 const tcard = (title, acts, body, tools = '') => `<div class="card flush"><div class="card-h"><span class="card-t">${title}</span>${acts ? `<div class="ch-act">${acts}</div>` : ''}</div>${tools ? `<div class="card-tools">${tools}</div>` : ''}${body}</div>`;
@@ -2934,7 +2938,7 @@ function displayPop() {
       <div class="seg" style="width:100%">${[['table', 'Table'], ['list', 'List'], ['board', 'Board']].map(([k, l]) => `<button style="flex:1;justify-content:center" class="${S.view === k ? 'on' : ''}" data-act="layout" data-v="${k}">${icon(k, 16)}${l}</button>`).join('')}</div>
     </div>
     ${S.view !== 'table' ? `<div class="pop-sec"><div class="pop-lbl">Group by</div><div class="pills">${groupOpts.map(k => `<button class="pill ${curGroup === k ? 'on' : ''}" data-act="disp-group" data-v="${k}">${gl(k)}</button>`).join('')}</div></div>` : ''}
-    ${S.view === 'table' ? `<div class="pop-sec"><div class="pop-lbl">Columns<span class="pop-acts"><button class="btn btn-link" data-act="reset-cols">Reset columns</button><button class="btn btn-link" data-act="reset-colw">Reset widths</button></span></div>${colChips('users', 'disp-col')}</div>` : ''}`;
+    ${S.view === 'table' ? `<div class="pop-sec"><div class="pop-lbl">Columns</div>${colChips('users', 'disp-col')}<div class="pop-foot"><button class="btn btn-link" data-act="reset-cols">Reset columns</button><button class="btn btn-link" data-act="reset-colw">Reset widths</button></div></div>` : ''}`;
 }
 const refreshDisplayPop = () => { if (popOpts.kind === 'display') { pop.innerHTML = displayPop(); positionPop(); } };
 
@@ -4201,7 +4205,7 @@ function listDisplayPop() {
   return `${bf.length ? `<div class="pop-sec"><div class="pop-lbl">Layout</div>
       <div class="seg" style="width:100%">${[['table', 'Table'], ['board', 'Board']].map(([k, l]) => `<button style="flex:1;justify-content:center" class="${L.view === k ? 'on' : ''}" data-act="ld-layout" data-v="${k}">${icon(k, 16)}${l}</button>`).join('')}</div></div>` : ''}
     ${lvView(X.t) === 'board' ? `<div class="pop-sec"><div class="pop-lbl">Group by</div><div class="pills">${bf.map(k => `<button class="pill ${boardBy(X.t, F) === k ? 'on' : ''}" data-act="ld-group" data-v="${k}">${F[k].label}</button>`).join('')}</div></div>`
-    : `<div class="pop-sec"><div class="pop-lbl">Columns<span class="pop-acts">${lnk('ld-cols-reset', 'Reset columns')}${lnk('ld-reset-colw', 'Reset widths')}</span></div>${colChips(X.t, 'ld-col')}</div>`}`;
+    : `<div class="pop-sec"><div class="pop-lbl">Columns</div>${colChips(X.t, 'ld-col')}<div class="pop-foot">${lnk('ld-cols-reset', 'Reset columns')}${lnk('ld-reset-colw', 'Reset widths')}</div></div>`}`;
 }
 /* Board layout for Companies and every PAGES list: one column per value of a short option field (Status unless picked otherwise), cards open the record.
    Unlike the Users board, cards can't be dragged: these status changes go through their own actions and confirmations. Layout and grouping are kept per list. */
