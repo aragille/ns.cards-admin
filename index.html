@@ -437,8 +437,6 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .lmeta>*{white-space:nowrap}
 .lmeta .bal{width:96px;text-align:right;color:var(--ink)}
 .lmeta .when{width:70px;text-align:right}
-.more-row{display:block;width:100%;height:42px;color:var(--ink-2);font-size:var(--fs-14);font-weight:500;border-bottom:var(--border-width) solid var(--line-soft)}
-.more-row:hover{background:var(--hover);color:var(--ink)}
 
 /* board view */
 .board{display:flex;gap:var(--grid-gap);overflow-x:auto;align-items:flex-start;padding-bottom:var(--space-8)}
@@ -2203,11 +2201,10 @@ function groupHead(by, key, o) {
 function listHTML(list) {
   const by = S.groupBy, gs = groupsOf(list, by);
   return `<div class="tcard compact"><div class="hs-wrap"><div class="tscroll hs">${gs.map(g => {
-    const lim = S.more[g.key] || 30, col = S.collapsed.has(g.key);
+    const col = S.collapsed.has(g.key); // a group shows all its rows (the count is in its header); long groups fold
     return `<div class="lg ${col ? 'collapsed' : ''}">
       ${by !== 'none' ? `<button class="lg-h" data-act="toggle-group" data-g="${g.key}">${icon('chevDown', 16)}${groupHead(by, g.key, g.o)}<span class="mono faint">${g.items.length}</span></button>` : ''}
-      <div class="lg-b">${g.items.slice(0, lim).map(u => lrowHTML(u, by)).join('')}
-      ${g.items.length > lim ? `<button class="more-row" data-act="more" data-g="${g.key}">Show ${g.items.length - lim} more</button>` : ''}</div>
+      <div class="lg-b">${g.items.map(u => lrowHTML(u, by)).join('')}</div>
     </div>`;
   }).join('')}</div></div></div>`;
 }
@@ -3148,7 +3145,6 @@ const ACT = {
   'sel-all': () => { S._list.forEach(u => S.selected.add(u.id)); renderResults(); renderFloat(); },
   'sel-clear': () => { S.selected.clear(); closePop(); renderResults(); renderFloat(); },
   'toggle-group': a => { const g = a.dataset.g; S.collapsed.has(g) ? S.collapsed.delete(g) : S.collapsed.add(g); a.closest('.lg').classList.toggle('collapsed'); },
-  'more': a => { const g = a.dataset.g; S.more[g] = (S.more[g] || (S.view === 'board' ? 25 : 30)) + 50; renderResults(); },
 
   'copy': a => { try { navigator.clipboard.writeText(a.dataset.copy); } catch {} closePop(); toast('Copied to clipboard', 'copy'); },
   'impersonate': a => { closePop(); const u = byId(+a.dataset.id); toast(`Opening session as ${esc(u.name || u.email)}`, 'login'); },
