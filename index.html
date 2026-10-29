@@ -115,7 +115,10 @@ a{color:inherit;text-decoration:none}
 /* attention dot: something on that page waits on an admin; on the icon's corner while the sidebar is collapsed */
 .nav{position:relative}
 .ndot{width:6px;height:6px;border-radius:var(--pill);background:var(--brand);margin-left:auto;flex:none}
-.app.collapsed .sidebar .ndot{position:absolute;left:28px;top:8px;margin:0;box-shadow:0 0 0 2px var(--surface)}
+.app.collapsed .sidebar .ndot{position:absolute;left:var(--space-24);top:calc(var(--space-8) + var(--space-2));margin:0;box-shadow:0 0 0 2px var(--surface)}
+.app.collapsed .sidebar .nav{width:var(--control-lg);margin-left:auto;margin-right:auto}
+.app.collapsed .sb-head{padding-left:calc(var(--space-24) - var(--space-2))}
+.app.collapsed .sb-foot .me-av{margin-left:calc(var(--space-4) + var(--space-2))} /* avatar centred in the rail (Sidebar → Collapsed=Yes → Account) */
 .nav>span{min-width:0;overflow:hidden;text-overflow:ellipsis} /* long labels truncate so the count badge always shows */
 .nav .nb{margin-left:auto;font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);font-style:normal;display:inline-flex;align-items:center;justify-content:center;height:var(--control-xs);min-width:var(--control-xs);color:var(--brand-ink);background:var(--brand-subtle);padding:0 var(--space-4);border-radius:var(--r-xs);flex:none;transition:opacity .16s}
 .ndot-c{display:none}
@@ -142,6 +145,7 @@ a{color:inherit;text-decoration:none}
 .me:hover{background:var(--hover)}
 .me-more{color:var(--ink-3)} .me:hover .me-more{color:var(--ink-2)}
 .me .em{font-size:var(--fs-14);line-height:var(--lh-20);overflow:hidden;text-overflow:ellipsis;flex:1;text-align:left}
+.me-ini{font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium)}
 .me-av{width:var(--avatar-md);height:var(--avatar-md);border-radius:var(--pill);background:var(--inv);color:var(--on-inv);display:grid;place-items:center;flex:none}
 .me-h{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-8) var(--space-8) var(--space-8) var(--space-12)}
 .me-h .me-av{background:var(--surface-2);color:var(--ink-3);box-shadow:inset 0 0 0 var(--border-width) var(--line)}
@@ -1608,7 +1612,7 @@ function navSection(n) {
     return `<button class="nav nav-fly ${cur ? 'active' : ''}" data-act="nav-fly" data-sec="${n.label}" data-tip="${t(row.label)}" data-tip-collapsed>${icon(row.icon, 16)}<span class="fade">${t(row.label)}</span>${dot ? '<i class="ndot"></i>' : ''}<span class="fade nf-chev">${icon('chevRight', 16)}</span></button>`;
   }
   const shut = secShut(n);
-  return `<div class="sb-sec ${shut ? 'closed' : ''}"><button class="sb-label fade" data-act="nav-sec" data-sec="${n.label}" aria-expanded="${!shut}"><span>${t(n.label)}</span>${dot ? `<i class="sb-dot" data-tip="Something here needs a look"></i>` : ''}${icon('chevDown', 12)}</button><div class="sb-items">${navShown(n.items).map(it => navLink(it)).join('')}</div></div>`;
+  return `<div class="sb-sec ${shut ? 'closed' : ''}"><button class="sb-label fade" data-act="nav-sec" data-sec="${n.label}" aria-expanded="${!shut}"><span>${t(n.label)}</span>${dot ? `<i class="sb-dot" data-tip="Something here needs a look"></i>` : ''}${icon('chevDown', 16)}</button><div class="sb-items">${navShown(n.items).map(it => navLink(it)).join('')}</div></div>`;
 }
 // Flyout panel for one section: its pages, opened on hover or click
 function openFly(row) {
@@ -1624,6 +1628,7 @@ document.addEventListener('mouseover', e => {
   if (popOpts.kind === 'fly' && !e.target.closest('#pop')) flyT = setTimeout(closePop, 280);
 });
 
+const initials = s => s.split(/[\s_.@-]+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
 function renderSidebar() {
   const col = $('#app').classList.contains('collapsed'), keep = $('#sidebar .sb-scroll')?.scrollTop || 0;
   $('#sidebar').innerHTML = `
@@ -1635,7 +1640,7 @@ function renderSidebar() {
       ${NAV.map(n => n.items ? navSection(n) : navLink(n)).join('')}
     </nav>
     <div class="sb-foot">
-      <button class="me" data-act="me" data-tip="Account" data-tip-collapsed><span class="me-av">${icon('user', 16)}</span><span class="em fade">${esc(S.me.email)}</span><span class="fade me-more">${icon('more', 16)}</span></button>
+      <button class="me" data-act="me" data-tip="Account" data-tip-collapsed><span class="me-av me-ini">${initials(S.me.name || S.me.email)}</span><span class="em fade">${esc(S.me.email)}</span><span class="fade me-more">${icon('more', 16)}</span></button>
     </div>`;
   // re-rendering resets the scroll: put it back, then nudge only if the current item is out of view
   const box = $('#sidebar .sb-scroll'), cur = $('.nav.active', box); box.scrollTop = keep;
