@@ -127,9 +127,9 @@ a{color:inherit;text-decoration:none}
 /* flyout variant: one row per section, its pages open in a panel beside the sidebar */
 .v-fly>.nav,.v-tabs>.nav{margin-bottom:var(--space-2)}
 .topbar.sec{height:auto;padding-top:var(--space-12);flex-direction:column;align-items:stretch;gap:0}
-.tb-row{height:var(--control-md);display:flex;align-items:center;gap:var(--space-8)} /* title row, then 4px, then the tabs */
+.tb-row{height:var(--control-lg);display:flex;align-items:center;gap:var(--space-8)} /* title row, then 4px, then the tabs */
 .tb-title{margin:0;font-size:var(--fs-16);line-height:var(--lh-24);font-weight:var(--fw-semibold);color:var(--ink);white-space:nowrap}
-.topbar .tb-tabs{padding:0;margin:var(--space-4) 0 0 calc(-1 * var(--space-8));height:var(--control-lg);flex:none}
+.topbar .tb-tabs{padding:0;margin:var(--space-4) 0 calc(-1 * var(--border-width)) calc(-1 * var(--space-8));height:var(--control-lg);flex:none;position:relative;z-index:1} /* the selected tab's line sits on the topbar's bottom line (Topbar → Section: 96) */
 .tb-tabs .tab{height:100%}
 .nav-fly{text-align:left}
 .nav-fly .nf-chev{margin-left:auto;display:flex;color:var(--ink-3)}
@@ -159,14 +159,14 @@ a{color:inherit;text-decoration:none}
 
 .main-wrap{display:flex;flex-direction:column;min-width:0;height:100vh}
 .topbar{height:var(--topbar);flex:none;display:flex;align-items:center;gap:var(--space-8);padding:0 var(--page-padding);border-bottom:var(--border-width) solid var(--line);background:var(--bg)}
-.crumbs{display:flex;align-items:center;gap:var(--space-12);font-size:var(--fs-16);line-height:var(--lh-24);flex:0 1 auto;overflow:hidden;padding:var(--space-4) var(--space-8);margin:0 calc(-1 * var(--space-8));color:var(--ink-2);min-width:0;white-space:nowrap}
+.crumbs{display:flex;align-items:center;gap:calc(var(--space-8) + var(--space-2));font-size:var(--fs-16);line-height:var(--lh-24);flex:0 1 auto;overflow:hidden;padding:var(--space-4) var(--space-8);margin:0 calc(-1 * var(--space-8));color:var(--ink-2);min-width:0;white-space:nowrap}
 .crumbs a{padding:var(--space-4) var(--space-8);margin:0 calc(-1 * var(--space-8));border-radius:var(--r-sm)}
 .crumbs a:focus-visible{outline:0;background:var(--surface);box-shadow:var(--focus-brand)}
 .crumbs a:hover{background:var(--hover);color:var(--ink)}
 .crumbs .cur{color:var(--ink);font-weight:var(--fw-semibold);overflow:hidden;text-overflow:ellipsis}
 .crumb-sep{color:var(--ink-disabled)}
 .tb-ctx{display:flex;align-items:center;gap:var(--space-8)}
-.tb-div{width:var(--border-width);height:var(--control-xs);background:var(--line);margin:0 var(--space-4);flex:none}
+.tb-div{width:var(--border-width);height:var(--control-xs);background:var(--line);flex:none} /* 8 to the buttons on both sides (the actions gap) */
 .crumbs .count{font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);color:var(--ink-3);margin-left:calc(-1 * var(--space-2))}
 .topbar .vsep{margin:0 var(--space-4)}
 kbd{font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);display:inline-flex;align-items:center;justify-content:center;height:var(--control-xs);min-width:var(--control-xs);color:var(--ink-2);background:var(--surface-2);border:var(--border-width) solid var(--line);border-radius:var(--r-xs);padding:0 var(--space-4)}
