@@ -1,0 +1,49 @@
+# Guards the prototype's design-system styles. It runs on every push and pull request and
+# turns red when index.html loses its link to ds/tokens.css, when an old (pre-DS) class or
+# variable comes back, or when a primitive colour is used directly — the usual signs that an
+# older copy of index.html was uploaded over the current one.
+name: Design system check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tokens file is present and linked
+        run: |
+          test -f ds/tokens.css || { echo "::error::ds/tokens.css is missing"; exit 1; }
+          grep -q 'href="ds/tokens.css"' index.html || { echo "::error file=index.html::index.html no longer links ds/tokens.css — an old copy was probably uploaded"; exit 1; }
+
+      - name: No pre-design-system names in index.html
+        run: |
+          fail=0
+          check() {
+            if grep -nE -- "$1" index.html > hits.txt; then
+              echo "::error file=index.html::'$2' is back — use $3 (see the prototype rules)"
+              head -5 hits.txt
+              fail=1
+            fi
+          }
+          check '\bbtn-dark\b'               'btn-dark'       'btn btn-secondary'
+          check '\bbtn-ghost\b'              'btn-ghost'      'btn btn-tertiary'
+          check '\blink-btn\b'               'link-btn'       'btn btn-link'
+          check '\btool-btn\b'               'tool-btn'       'btn btn-tertiary'
+          check '\bbtn-sm\b'                 'btn-sm'         'btn (32) or btn-lg (40)'
+          check 'var\(--hit\)'               '--hit'          '--highlight'
+          check '--head-bg'                  '--head-bg'      '--bg'
+          check '--(row|nav)-hover'          '--row-hover / --nav-hover' '--hover'
+          check '--nav-active'               '--nav-active'   '--selected'
+          check '--nav-ink'                  '--nav-ink'      '--ink-2'
+          check '--cb-border'                '--cb-border'    '--line-strong'
+          check '--line-hover'               '--line-hover'   '--line-strong'
+          check '--brand-line'               '--brand-line'   '--brand'
+          check '--shadow-pop'               '--shadow-pop'   '--shadow-lg'
+          check '--r-(tag|xl)\b'             '--r-tag / --r-xl' '--r-xs / --r-lg'
+          check 'var\(--mono\)'              '--mono'         '--font'
+          check 'var\(--(neutral|brand|orange|green|blue|red|purple|pink)-[0-9]+\)' 'a primitive colour' 'a semantic token (--ink, --line, --surface, --brand-subtle…)'
+          exit $fail
