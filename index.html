@@ -431,6 +431,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .lrow{display:flex;align-items:center;gap:var(--space-12);padding:0 var(--space-16);height:58px;border-bottom:var(--border-width) solid var(--line-soft);cursor:pointer}
 .compact .lrow{height:44px}
 .lrow:hover{background:var(--hover)}
+.lrow>.i:last-child{color:var(--ink-3);flex:none} .lrow:hover>.i:last-child{color:var(--ink)} /* the row opens the user */
 .lrow.sel{background:var(--selected)}
 .lmain{flex:1;min-width:0}
 .lname{font-weight:500;display:flex;align-items:center;gap:var(--space-8)}
@@ -2231,7 +2232,7 @@ function lrowHTML(u, by) {
       ${by !== 'risk' ? `<span class="hide-sm">${riskCell(u.risk)}</span>` : ''}
       <span class="bal num hide-sm ${u.balance ? '' : 'zero'}">${fmtEur(u.balance)}</span>
       <span class="when">${rel(u.created)}</span>
-    </div>
+    </div>${icon('chevRight', 16)}
   </div>`;
 }
 
