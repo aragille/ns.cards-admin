@@ -3542,7 +3542,8 @@ function paProds() {
   // a group is switched on and off with a checkbox: it can show "some on" (mixed), a toggle can't
   const groupCb = (st, g, label) => `<button class="cb ${st === 'off' ? '' : st}" data-act="pa-bulk" data-g="${g}" aria-label="${esc(label)}" data-tip="${st === 'on' ? 'Turn all off' : 'Turn all on'}">${st === 'on' ? icon('check', 11, 3) : ''}</button>`;
   const state = l => { const t = l.filter(x => mxOn(c, x.k)).length; return !t ? 'off' : t === l.length ? 'on' : 'mixed'; }; // mixed: some of a group are on
-  const sw = (st, attrs, label) => `<button class="sw-t ${st === 'off' ? '' : st}" ${attrs} aria-label="${esc(label)}" data-tip="${st === 'on' ? 'Turn off' : 'Turn on'}"></button>`;
+  // every product is a checkbox, like its group: the list reads as one multi-select
+  const itemCb = (st, attrs, label) => `<button class="cb ${st === 'on' ? 'on' : ''}" ${attrs} aria-label="${esc(label)}" aria-pressed="${st === 'on'}" data-tip="${st === 'on' ? 'Turn off' : 'Turn on'}">${st === 'on' ? icon('check', 11, 3) : ''}</button>`;
   const head = `<div class="pa-t"><a class="lnk" href="#/companies/${c.id}">${esc(c.name)}</a><span class="pa-ts">${mxCount(c)} of ${MX_ALL.length} products on</span></div>`;
   const groups = [['c', 'Card products', 'card'], ['i', 'IBAN accounts', 'bank']].map(([g, l, ic]) => {
     const gx = xs.filter(x => x.g === g); if (!gx.length) return '';
@@ -3552,7 +3553,7 @@ function paProds() {
         return `<div class="pa-ph"><span>${esc(pv)}</span></div>
         ${px.map(x => { const st = mxOn(c, x.k) ? 'on' : 'off', dirty = f.draft.has(c.id + '|' + x.k);
           return `<div class="pa-p ${dirty ? 'dirty' : ''}" data-act="pa-tog" data-k="${x.k}"><div class="pa-pn"><div>${esc(x.p.name)}</div><div class="code">${g === 'c' ? cap(x.p.kind) + ' card' : x.p.type + ' account'} · ${x.p.cur} · ID ${x.p.id}</div></div>
-            ${sw(st, `data-act="pa-tog" data-k="${x.k}"`, x.p.name)}</div>`; }).join('')}`; }).join('')}
+            ${itemCb(st, `data-act="pa-tog" data-k="${x.k}"`, x.p.name)}</div>`; }).join('')}`; }).join('')}
     </section>`;
   }).join('');
   el.innerHTML = `<div class="pa-top">${head}</div>
