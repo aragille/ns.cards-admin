@@ -842,21 +842,25 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .os-l{display:flex;flex-direction:column;gap:var(--space-4);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
 .os-l b{font-size:var(--fs-20);line-height:var(--lh-24);font-weight:var(--fw-semibold);color:var(--ink);letter-spacing:-.02em;text-transform:none;font-variant-numeric:tabular-nums}
  /* beats .dgrid .card.flush>.card-h: title centred in the header bar */
-.ovr{display:grid;grid-template-columns:var(--avatar-sm) minmax(0,1fr) 72px 16px;align-items:center;gap:var(--space-12);width:100%;height:var(--row);padding:0 var(--space-16) 0 var(--card-padding);border-bottom:var(--border-width) solid var(--line-soft);text-align:left;font-size:var(--fs-14)}
+.ovr{display:grid;grid-template-columns:var(--avatar-sm) minmax(0,1fr) auto var(--icon-md);align-items:center;gap:var(--space-8);width:100%;height:var(--row);padding:0;border-bottom:var(--border-width) solid var(--line-soft);text-align:left;font-size:var(--fs-14)}
 .ovr:last-child{border-bottom:0}
-.ovr:hover{background:var(--hover)}
+.ovr{position:relative;isolation:isolate}
+.ovr:hover::before{content:'';position:absolute;inset:0 calc(-1 * var(--space-8));z-index:-1;background:var(--hover);border-radius:var(--r-sm)} /* hover bleeds 8 past the text, the divider stays on the content line */
 .ovr .os-ic{width:var(--avatar-sm);height:var(--avatar-sm);border-radius:var(--r-sm)}
-.ovr-l{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ovr-n{justify-self:end;font-family:var(--font);font-size:var(--fs-14);font-weight:500;color:var(--brand-ink);background:var(--brand-subtle);padding:0 var(--space-8);line-height:20px;border-radius:var(--r-xs)}
+.ovr-l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ovr-n{justify-self:end;font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);color:var(--brand-ink);background:var(--brand-subtle);padding:var(--space-2) var(--space-4);min-width:var(--control-xs);text-align:center;border-radius:var(--r-xs)} /* Counter → Attention */
 .ovr.clear .ovr-n{font-family:var(--font);font-weight:400;color:var(--ink-3);background:none;padding:0}
 .ovr>.i{color:var(--ink-3)}
 .ovr:hover>.i{color:var(--ink)}
-.ovw{display:flex;align-items:center;justify-content:space-between;height:var(--row);padding:0 var(--card-padding);border-bottom:var(--border-width) solid var(--line-soft)}
+.ovw{display:flex;align-items:center;justify-content:space-between;height:var(--row);padding:0;border-bottom:var(--border-width) solid var(--line-soft)}
 .ovw:last-child{border-bottom:0}
 .ovw b{font-size:var(--fs-14);font-weight:var(--fw-medium)}
 
-.ovl{display:grid;grid-template-columns:96px 160px minmax(0,1fr) auto;gap:var(--space-12);align-items:center;height:var(--row);padding:0 var(--card-padding);border-bottom:var(--border-width) solid var(--line-soft);font-size:var(--fs-14)}
+.ovl{display:grid;grid-template-columns:96px 160px minmax(0,1fr) auto;gap:var(--space-12);align-items:center;height:var(--row);padding:0;border-bottom:var(--border-width) solid var(--line-soft);font-size:var(--fs-14)}
 .ovl:last-child{border-bottom:0}
+.card.ov>.ovr,.card.ov>.ovw,.card.ov>.ovl{width:calc(100% - 2 * var(--card-padding));margin:0 var(--card-padding)}
+.card.ov>.card-h+*{margin-top:var(--space-4)}
+.card.ov>:last-child{margin-bottom:var(--space-8)}
 .ovl-a{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* finance monitors: headroom bar (threshold mark in the middle) and the per-kind dashboard cards */
 .mon-m{display:inline-flex;align-items:center;gap:var(--space-8)}
