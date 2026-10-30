@@ -78,52 +78,73 @@ a{color:inherit;text-decoration:none}
 .app{display:grid;grid-template-columns:auto minmax(0,1fr);height:100vh}
 .sidebar{width:var(--sidebar);background:var(--surface);border-right:var(--border-width) solid var(--line);display:flex;flex-direction:column;overflow:hidden;z-index:20;transition:width .24s cubic-bezier(.2,.8,.2,1)}
 .app.collapsed .sidebar{width:var(--sidebar-collapsed)}
-.fade{transition:opacity .16s ease}
-.app.collapsed .fade{opacity:0;pointer-events:none}
+/* every moving part shares the width's duration and curve; labels fade out at once and back in a beat late, so text never shows while it is being cut */
+.fade{transition:opacity .16s ease .06s}
+.app.collapsed .fade{opacity:0;pointer-events:none;transition-delay:0s}
+.app.sb-anim .sidebar .nav>span,.app.sb-anim .me .em{text-overflow:clip} /* no ellipsis flicker mid-animation */
 /* header rows: 12px above and below the 36px controls; the sidebar logo shares the topbar's 30px line */
-.sb-head{position:relative;height:var(--topbar);display:flex;align-items:center;padding:0 var(--space-24);flex:none}
+.sb-head{position:relative;height:var(--topbar);display:flex;align-items:center;padding:0 var(--space-24) 0 var(--space-12);flex:none}
 .logo{display:flex;align-items:center;gap:5.6px;color:var(--ink);transition:opacity .15s}
+/* the logo's mark sits centred in a 40px slot 12 in, exactly like the nav squares below, so mark, icons, toggle and avatar share one axis (x 32) open and collapsed.
+   --mark-w: the width of the mark that stays when collapsed, set per logo in renderSidebar */
+.sb-head .logo{margin-left:calc(var(--control-lg) / 2 - var(--mark-w) / 2)}
 .lg-full{display:inline-flex;align-items:center}
 .lg-entry{gap:var(--space-8);margin-left:calc(-1 * var(--space-2))} .lg-lemon{position:relative}
 .lg-lemon .lm-mark{position:absolute;left:1px;opacity:0;transition:opacity .16s ease} .app.collapsed .lg-lemon .lm-mark{opacity:1}
 .lm-mark path,.lm-fruit{fill:currentColor} :root[data-theme="dark"] .lm-mark path,:root[data-theme="dark"] .lm-fruit{fill:#FFF357}
-.sb-toggle{position:absolute;right:var(--space-16);top:var(--space-12);width:var(--control-md);height:var(--control-md);border-radius:var(--r-sm);display:grid;place-items:center;color:var(--ink-2);transition:opacity .15s,right .24s cubic-bezier(.2,.8,.2,1)}
+/* custom logo (Profile settings → Branding): open it shows the logo, collapsed the 20px icon centred where the open logo's mark is (x 32), cross-fading so nothing moves */
+.lg-img{display:block;height:24px;max-width:180px;object-fit:contain;object-position:left center}
+.lg-img.auth{height:36px;max-width:260px;margin:0 auto}
+.lg-cust{position:relative;display:flex;align-items:center;min-height:24px}
+.lg-c-full{display:flex;align-items:center;transition:opacity .16s ease .06s}
+.lg-c-icon{position:absolute;left:calc(var(--mark-w) / 2 - 10px);top:50%;width:20px;height:20px;margin-top:-10px;border-radius:var(--r-inner);object-fit:cover;opacity:0;transition:opacity .16s ease}
+img.crop{object-fit:cover;object-position:left center}
+.app.collapsed .lg-c-full{opacity:0;transition-delay:0s}
+.app.collapsed .lg-c-icon{opacity:1;transition-delay:.06s}
+.sb-toggle{position:absolute;right:var(--space-16);top:calc((var(--topbar) - var(--control-md)) / 2);width:var(--control-md);height:var(--control-md);border-radius:var(--r-sm);display:grid;place-items:center;color:var(--ink-2);transition:opacity .15s,right .24s cubic-bezier(.2,.8,.2,1)}
 .sb-toggle:hover{background:var(--hover);color:var(--ink)}
 .sb-toggle{opacity:0} .sb-head:hover .sb-toggle,.sb-toggle:focus-visible{opacity:1}
-.app.collapsed .sb-toggle{right:18px;opacity:0;pointer-events:none}
+/* the toggle sits on the logo's centre line; collapsed it centres on the rail's icon column (x 32), like the nav squares and the avatar below it */
+.app.collapsed .sb-toggle{right:calc(var(--sidebar-collapsed) - var(--border-width) - var(--space-12) - var(--control-lg) / 2 - var(--control-md) / 2);opacity:0;pointer-events:none}
 .app.collapsed .sb-head:hover .sb-toggle{opacity:1;pointer-events:auto}
 .app.collapsed .sb-head:hover .logo{opacity:0}
-.sb-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:var(--space-8) var(--space-12) var(--space-12)}
+.sb-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:var(--space-8) var(--space-12) var(--space-12);transition:padding-right .24s cubic-bezier(.2,.8,.2,1)}
+/* collapsing, items keep their left edge (so icons and dots never move) and narrow with the sidebar into 40px squares: only the right padding eases 12 → 15 */
+.app.collapsed .sb-scroll{padding-right:calc(var(--sidebar-collapsed) - var(--border-width) - var(--space-12) - var(--control-lg))}
 .nav{display:flex;align-items:center;gap:var(--space-12);height:var(--control-lg);padding:0 var(--space-12);border-radius:var(--r);color:var(--ink-2);font-size:var(--fs-14);line-height:var(--lh-20);font-weight:var(--fw-medium);width:100%;white-space:nowrap;overflow:hidden;transition:background .12s}
 .nav:hover{background:var(--hover)}
 .nav .i{color:var(--ink-3)}
 .nav.active,.nav.active:hover{background:var(--selected);color:var(--ink)}
-/* section labels: small all-caps titles; collapsed they fold away (height animates with the width) so every icon is evenly spaced */
+/* section labels: small all-caps titles; collapsed, the title fades and a short rule takes its place at the same height, so no icon moves up or down */
 .sb-label{display:flex;align-items:center;gap:var(--space-8);width:100%;font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);padding:var(--space-16) var(--space-12) var(--space-8);white-space:nowrap;
-  max-height:var(--control-lg);overflow:hidden;transition:opacity .16s ease,max-height .24s cubic-bezier(.2,.8,.2,1),padding .24s cubic-bezier(.2,.8,.2,1)}
-.app.collapsed .sb-label{max-height:0;padding-top:0;padding-bottom:0}
+  overflow:hidden;transition:opacity .16s ease .06s}
+.sb-sec{position:relative}
+.sb-sec::before{content:'';position:absolute;left:var(--space-12);top:calc(var(--space-16) + var(--space-8));width:var(--icon-md);height:var(--border-width);background:var(--line-strong);opacity:0;transition:opacity .16s ease;pointer-events:none} /* the rail's section rule: icon-wide, on the icons' x, at the title's mid-line */
+.app.collapsed .sb-sec::before{opacity:1;transition-delay:.06s}
+.app.collapsed .sb-sec.closed:has(.sb-dot)::before{background:var(--brand)} /* folded section with something pending */
 /* sections fold from their title: the chevron shows on hover and stays (turned) while folded; a folded section with pending items gets a small brand dot */
 .sb-label .i{margin-left:auto;opacity:0;transition:opacity .12s,transform .15s}
 .sb-label:hover{color:var(--ink-2)} .sb-label:hover .i{opacity:1}
 .sb-dot{display:none;width:6px;height:6px;border-radius:var(--pill);background:var(--brand);flex:none}
 .sb-sec.closed .sb-label .i{transform:rotate(-90deg);opacity:1}
 .sb-sec.closed .sb-dot{display:block}
-.sb-sec.closed .sb-items{display:none}
-.app.collapsed .sb-sec.closed .sb-items{display:block}
+/* folding slides the items' height (0fr ↔ 1fr) instead of popping them; the inner box clips, widened 4px so focus rings aren't cut */
+.sb-items{display:grid;grid-template-rows:1fr;transition:grid-template-rows .24s cubic-bezier(.2,.8,.2,1)}
+.sb-items>div{min-height:0;overflow:hidden;margin:0 calc(-1 * var(--space-4));padding:0 var(--space-4)}
+.sb-sec.closed .sb-items{grid-template-rows:0fr} /* stays folded in the rail too, so nothing below shifts */
 .sb-scroll>.nav{margin-bottom:var(--space-2)}
 .nav.active .i{color:var(--ink)}
 /* attention dot: something on that page waits on an admin; on the icon's corner while the sidebar is collapsed */
 .nav{position:relative}
-.ndot{width:6px;height:6px;border-radius:var(--pill);background:var(--brand);margin-left:auto;flex:none}
-.app.collapsed .sidebar .ndot{position:absolute;left:var(--space-24);top:calc(var(--space-8) + var(--space-2));margin:0;box-shadow:0 0 0 2px var(--surface)}
-.app.collapsed .sidebar .nav{width:var(--control-lg);margin-left:auto;margin-right:auto}
-.app.collapsed .sb-head{padding-left:calc(var(--space-24) - var(--space-2))}
-.app.collapsed .sb-foot .me-av{margin-left:calc(var(--space-4) + var(--space-2))} /* avatar centred in the rail (Sidebar → Collapsed=Yes → Account) */
+.ndot{width:6px;height:6px;border-radius:var(--pill);background:var(--brand);margin-left:auto;flex:none;transition:opacity .16s ease .06s}
+/* the corner dot always sits on the icon's corner and cross-fades with the in-row dot/badge, so nothing changes place */
+.ndot-c{position:absolute;left:var(--space-24);top:calc(var(--space-8) + var(--space-2));margin:0;box-shadow:0 0 0 2px var(--surface);opacity:0;transition-delay:0s}
+.app.collapsed .sidebar .ndot-c{opacity:1;transition-delay:.06s}
+.app.collapsed .sidebar .ndot:not(.ndot-c){opacity:0;transition-delay:0s}
+.sb-foot .me-av{margin-left:var(--space-4)} /* centred on the icons' axis (x 32) in both states, so it never moves */
 .nav>span{min-width:0;overflow:hidden;text-overflow:ellipsis} /* long labels truncate so the count badge always shows */
-.nav .nb{margin-left:auto;font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);font-style:normal;display:inline-flex;align-items:center;justify-content:center;height:var(--control-xs);min-width:var(--control-xs);color:var(--brand-ink);background:var(--brand-subtle);padding:0 var(--space-4);border-radius:var(--r-xs);flex:none;transition:opacity .16s}
-.ndot-c{display:none}
-.app.collapsed .sidebar .nb{opacity:0}
-.app.collapsed .sidebar .ndot-c{display:block}
+.nav .nb{margin-left:auto;font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);font-style:normal;display:inline-flex;align-items:center;justify-content:center;height:var(--control-xs);min-width:var(--control-xs);color:var(--brand-ink);background:var(--brand-subtle);padding:0 var(--space-4);border-radius:var(--r-xs);flex:none;transition:opacity .16s ease .06s}
+.app.collapsed .sidebar .nb{opacity:0;transition-delay:0s}
 /* flyout variant: one row per section, its pages open in a panel beside the sidebar */
 .v-fly>.nav,.v-tabs>.nav{margin-bottom:var(--space-2)}
 .topbar.sec{height:auto;padding-top:var(--space-12);flex-direction:column;align-items:stretch;gap:0}
@@ -145,10 +166,9 @@ a{color:inherit;text-decoration:none}
 .me:hover{background:var(--hover)}
 .me-more{color:var(--ink-3)} .me:hover .me-more{color:var(--ink-2)}
 .me .em{font-size:var(--fs-14);line-height:var(--lh-20);overflow:hidden;text-overflow:ellipsis;flex:1;text-align:left}
-.me-ini{font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium)}
-.me-av{width:var(--avatar-md);height:var(--avatar-md);border-radius:var(--pill);background:var(--inv);color:var(--on-inv);display:grid;place-items:center;flex:none}
+/* Avatar (Sidebar → Account): 32 round, bg/surface-2, initials in Label/Small, text/secondary — same in the sidebar and the profile menu */
+.me-av{width:var(--avatar-md);height:var(--avatar-md);border-radius:var(--pill);background:var(--surface-2);color:var(--ink-2);display:grid;place-items:center;flex:none;font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);letter-spacing:0}
 .me-h{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-8) var(--space-8) var(--space-8) var(--space-12)}
-.me-h .me-av{background:var(--surface-2);color:var(--ink-3);box-shadow:inset 0 0 0 var(--border-width) var(--line)}
 .me-h .me-n{font-weight:500;font-size:var(--fs-14)}
 .me-h .me-e{font-size:var(--fs-12);color:var(--ink-3)}
 .me-h .me-n,.me-h .me-e{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -181,8 +201,9 @@ kbd{font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font
 .btn-secondary:hover{background:var(--inv-hover)} .btn-secondary:active{background:var(--inv-pressed)}
 .btn-tertiary{background:var(--surface);border-color:var(--line);color:var(--ink)}
 .btn-tertiary:hover{background:var(--hover)} .btn-tertiary:active{background:var(--selected)}
-.btn-link{color:var(--ink-2)}
-.btn-link:hover{background:var(--hover);color:var(--ink)} .btn-link:active{background:var(--selected);color:var(--ink)}
+/* Link (Figma Button → Variant=Link): text only — no padding, no fill in any state; text/secondary, text/primary on hover and press */
+.btn.btn-link,.topbar .btn.btn-link{padding:0;background:transparent;color:var(--ink-2)}
+.btn-link:hover,.btn-link:active{color:var(--ink)}
 .btn-danger{background:var(--error);color:var(--on-color)}
 .btn-danger:hover{background:var(--status-error-hover)} .btn-danger:active{background:var(--status-error-pressed)} .btn-danger:focus-visible{box-shadow:var(--focus-error)}
 .btn:disabled,.btn[aria-disabled="true"]{background:var(--surface-2);color:var(--ink-disabled);border-color:transparent;cursor:not-allowed;box-shadow:none}
@@ -193,7 +214,9 @@ kbd{font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font
 .icon-btn:focus-visible{outline:0;box-shadow:var(--focus-brand)}
 .icon-btn:disabled{background:var(--surface-2);border-color:var(--line);color:var(--ink-disabled);cursor:not-allowed}
 .icon-btn-link{border-color:transparent;background:transparent;color:var(--ink-2)}
-.icon-btn-link:hover:not(:disabled){color:var(--ink)} .icon-btn-link:disabled{background:transparent;border-color:transparent}
+/* Icon button → Link: no fill at rest; bg/hover on hover and focus, bg/selected when pressed */
+.icon-btn-link:hover:not(:disabled),.icon-btn-link:focus-visible{background:var(--hover);color:var(--ink)} .icon-btn-link:active:not(:disabled){background:var(--selected);color:var(--ink)}
+.icon-btn-link:disabled{background:transparent;border-color:transparent}
 .auth .field label .btn-link{height:auto;padding:0;font-size:var(--fs-12);font-weight:var(--fw-regular);color:var(--ink-2)}
 .pa-ph .btn-link{height:auto;padding:0;font-size:var(--fs-12);letter-spacing:0;text-transform:none}
 .icon-btn .dotn{position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;border-radius:var(--r-sm);background:var(--brand);color:var(--on-brand);font-size:var(--fs-12);font-weight:600;display:grid;place-items:center;border:2px solid var(--bg)}
@@ -271,6 +294,13 @@ img.asset-ic{display:block;object-fit:cover}
 .toolbar{display:flex;align-items:center;gap:var(--space-8);padding:var(--grid-gap) var(--page-padding)}
 .toolbar .search{flex:0 1 300px;min-width:160px}
 .toolbar #addFilter{margin-left:auto;flex:none}
+/* Filters: Wrapping / In columns — chips become toolbar items and wrap; the button and Clear follow the last chip as one unit */
+.toolbar.fv-flow{flex-wrap:wrap}
+.fv-flow .chips{display:contents}
+.fv-end{display:flex;align-items:center;gap:var(--space-8);flex:none}
+.fv-flow #addFilter{margin-left:0} .toolbar.fv-inline .search,.toolbar.is-empty{display:none} .toolbar #addFilter[hidden]{display:none} /* In columns: no Filter button */
+/* In columns hides the toolbar strip: keep the table a grid gap below the stats tiles, or a page padding from the top when there are none */
+.toolbar.is-empty + .results{padding-top:var(--grid-gap)} .toolbar.is-empty:first-child + .results{padding-top:var(--page-padding)}
 .search{display:flex;align-items:center;gap:var(--space-8);height:var(--control-md);padding:0 var(--space-8) 0 var(--space-12);width:300px;border-radius:var(--r-sm);background:var(--surface);border:var(--border-width) solid var(--line);color:var(--ink-3);transition:border-color .12s,box-shadow .12s}
 .search:hover{border-color:var(--line-strong)} .search:focus-within{border-color:var(--focus);box-shadow:var(--focus-brand)}
 .search input{border:0;outline:0;background:transparent;flex:1;min-width:0;color:var(--ink);font-size:var(--fs-14)}
@@ -320,6 +350,23 @@ th.r .th-in{flex-direction:row-reverse}
 th .srt{opacity:0;transition:opacity .1s}
 th.sortable:hover .srt{opacity:.45}
 th.sorted{color:var(--ink)} th.sorted .srt{opacity:1}
+/* Filters → In columns: a filter row under the header (Figma "Table" 279:15511): 40 tall, cells 4/8, a 32px control filling each column */
+.frow th{top:var(--row);padding:var(--space-4) var(--space-8);font-weight:var(--fw-regular);cursor:default}
+.fctl{display:flex;align-items:center;gap:var(--space-8);width:100%;min-width:0;height:var(--control-md);padding:0 var(--space-12);border:var(--border-width) solid var(--line);border-radius:var(--r-sm);background:var(--surface);font-size:var(--fs-14);line-height:var(--lh-20);font-weight:var(--fw-regular);color:var(--ink-3);text-align:left;cursor:pointer;transition:border-color .12s,box-shadow .12s}
+.fctl:hover{border-color:var(--line-strong)}
+.fctl:focus-within,.fsel-c:focus-visible{border-color:var(--focus);box-shadow:var(--focus-brand);outline:0}
+.fsel-c{padding-right:var(--space-8)} .fsel-c.on{color:var(--ink)}
+.fsel-c .fv{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fsel-c>.i{flex:none;color:var(--ink-3)}
+.fin{cursor:text} .fin>.i{flex:none;color:var(--ink)}
+.fin input{flex:1;min-width:0;width:100%;padding:0;border:0;outline:0;background:transparent;color:var(--ink);font:inherit}
+.fin input::placeholder{color:var(--ink-3)}
+.fctl .fx{flex:none;display:grid;place-items:center;width:var(--control-xs);height:var(--control-xs);margin-right:calc(-1 * var(--space-2));border-radius:var(--r-xs);color:var(--ink-3);cursor:pointer}
+.fctl .fx:hover{background:var(--hover);color:var(--ink)}
+.fclr{width:var(--control-xs);height:var(--control-xs);display:grid;place-items:center;border-radius:var(--r-xs);color:var(--ink-3)} .fclr:hover{background:var(--selected);color:var(--ink)} /* clear all: same 20px box as the row checkboxes above it */
+.frow-empty td{height:auto;padding:var(--space-24) var(--space-16)!important;color:var(--ink-2);font-size:var(--fs-14)} .frow-empty td>*{position:sticky;left:var(--space-16)}
+.frow-empty td .btn-link{margin-left:var(--space-8)}
+tbody tr.frow-empty:hover td{background:transparent}
 td{height:var(--row);padding:0 var(--space-12);border-bottom:var(--border-width) solid var(--line-soft);white-space:nowrap;font-size:var(--fs-14);line-height:var(--lh-20)}
 
 .compact .ucell .ue{display:none}
@@ -340,7 +387,7 @@ th.pin{z-index:3;background:var(--bg)}
 th.act-h{width:88px}
 td.act{position:sticky;right:0;z-index:1;padding:0!important;background:transparent!important;overflow:visible!important}
 tbody tr:hover td.act{z-index:5}
-.row-actions{position:absolute;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:flex-end;gap:var(--space-4);padding:0 var(--space-12) 0 var(--space-40);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .1s;
+.row-actions{position:absolute;top:0;right:0;bottom:0;left:calc(-1 * var(--space-32));display:flex;align-items:center;justify-content:flex-end;gap:var(--space-4);padding:0 var(--space-12) 0 0;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .1s;
   --rowbg:var(--hover);background:linear-gradient(to right,transparent,var(--rowbg) 32px)}
 tbody tr:hover .row-actions{opacity:1;pointer-events:auto}
 tbody tr.sel .row-actions{--rowbg:var(--selected)}
@@ -397,7 +444,7 @@ th.col-gap,td.col-gap{padding:0!important;border-bottom-color:transparent!import
 th:hover .col-rs::after{opacity:1}
 .col-rs:hover::after,.col-rs.on::after{opacity:1;top:0;bottom:0;left:4px;width:2px;background:var(--brand)}
 body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
-/* horizontal scroll hint */
+/* horizontal scroll hint: the edge with more columns blurs out */
 .hs-wrap{position:relative}
 .hs-wrap::before,.hs-wrap::after{content:"";position:absolute;top:0;bottom:0;width:96px;z-index:4;pointer-events:none;opacity:0;transition:opacity .2s;backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px)}
 .hs-wrap::after{right:0;-webkit-mask-image:linear-gradient(to right,transparent,#000 70%);mask-image:linear-gradient(to right,transparent,#000 70%)}
@@ -664,10 +711,13 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .dp-day.start,.dp-day.end,.dp-day.start:hover,.dp-day.end:hover{background:var(--inv);color:var(--on-inv);font-weight:var(--fw-medium)}
 .dp-f{display:flex;align-items:center;gap:var(--space-8);margin:0 calc(-1 * var(--space-4)) calc(-1 * var(--space-4));padding:var(--space-12) var(--space-16);border-top:var(--border-width) solid var(--line)}
 
-.pop-head{display:flex;align-items:center;gap:var(--space-8);height:var(--control-lg);padding:0 0 0 var(--space-8);font-weight:var(--fw-semibold);font-size:var(--fs-14);line-height:var(--lh-20)}
+.pop-head{display:flex;align-items:center;gap:var(--space-8);height:var(--control-lg);padding:0 0 0 var(--space-8);font-weight:var(--fw-semibold);font-size:var(--fs-14);line-height:var(--lh-20)} /* whatever leads (back, field icon or text) starts on the rows' content line, 12 inside the popover; no per-title offsets */
 .pop-head>.ghost-ic{width:var(--control-xs);height:var(--control-xs)} /* back sits in a 20 box like the row checkboxes, so the field icon and title line up with the flags and labels below */
-.pop-search{display:flex;align-items:center;gap:var(--space-8);height:var(--control-md);padding:0 var(--space-12);margin:calc(-1 * var(--space-4)) calc(-1 * var(--space-4)) var(--space-4);border-bottom:var(--border-width) solid var(--line-soft);color:var(--ink-3)}
-.pop-head+.pop-search{margin-top:0;border-top:var(--border-width) solid var(--line-soft)}
+/* Popover search (Figma "Filter by"): sits inside the popover's 4px top padding, full width, 32 tall; then the Popover divider — 4 · 1px border/soft · 4 */
+.pop-search{position:relative;display:flex;align-items:center;gap:var(--space-8);height:var(--control-md);padding:0 var(--space-12);margin:0 calc(-1 * var(--space-4)) calc(var(--space-8) + var(--border-width));color:var(--ink-3)}
+.pop-search::after{content:'';position:absolute;left:0;right:0;bottom:calc(-1 * (var(--space-4) + var(--border-width)));height:var(--border-width);background:var(--line-soft)}
+.pop-head+.pop-search{margin-top:calc(var(--space-8) + var(--border-width))} /* under a title: the same divider above it (Popover header → Popover divider) */
+.pop-head+.pop-search::before{content:'';position:absolute;left:0;right:0;top:calc(-1 * (var(--space-4) + var(--border-width)));height:var(--border-width);background:var(--line-soft)}
 .pop-search input{border:0;outline:0;flex:1;min-width:0;background:transparent;color:var(--ink);font-size:var(--fs-14)}
 .pop-list{max-height:300px;overflow-y:auto;margin:0 calc(-1 * var(--space-4));padding:0 var(--space-4)}
 .pi{display:flex;align-items:center;gap:var(--space-8);height:var(--control-md);padding:0 var(--space-8);border-radius:var(--r-sm);width:100%;font-size:var(--fs-14);line-height:var(--lh-20);color:var(--ink);white-space:nowrap}
@@ -686,15 +736,11 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .pop-sec+.pop-sec{padding-top:var(--space-12)}
 .pop-lbl{font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);min-height:var(--control-lg);margin:calc(-1 * var(--space-8)) calc(-1 * var(--space-4)) var(--space-8) 0;display:flex;align-items:center;justify-content:space-between}
 /* Popover header → Section: actions are Link buttons, medium */
-.pop-lbl .btn-link{padding:0 var(--space-16);text-transform:none;letter-spacing:0}
+.pop-lbl .btn-link{text-transform:none;letter-spacing:0}
 .pop-lbl .pop-acts>.btn-link:last-child,.pop-lbl>.btn-link:last-child{margin-right:var(--space-4)} /* actions end 12 from the popover edge */
-.pop-acts{display:flex}
+.pop-acts{display:flex;gap:var(--space-16)}
 /* column resets under the chips: the first link's text starts on the chips' left edge */
-.pop-foot{display:flex;margin-top:var(--space-4)}
-.pop-foot .btn-link{padding:0 var(--space-16)}
-.pop-foot .btn-link:first-child{margin-left:calc(-1 * var(--space-12));padding-left:calc(var(--space-12) - var(--border-width))}
 /* a Link in a key–value row lines its label up with the values */
-.kv-r .btn-link{margin-right:calc(-1 * var(--space-16))}
 .pop-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);height:var(--control-md)}
 .pop-row>span{color:var(--ink-2);font-size:var(--fs-14)}
 .pills{display:flex;flex-wrap:wrap;gap:var(--space-8)}
@@ -725,6 +771,10 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .modal-h{display:flex;align-items:center;justify-content:space-between;gap:var(--space-8);padding:var(--space-16) var(--space-16) var(--space-8) var(--space-24);font-weight:var(--fw-semibold);font-size:var(--fs-16);line-height:var(--lh-24)}
 .modal-b{padding:var(--space-8) var(--space-24) var(--space-24);display:flex;flex-direction:column;gap:var(--space-16)}
 .modal-f{display:flex;justify-content:flex-end;gap:var(--space-8);padding:var(--space-12) var(--space-24);border-top:var(--border-width) solid var(--line);background:var(--surface)}
+/* a modal never outgrows the window: the header and the action bar stay put and only the body scrolls */
+.modal{display:flex;flex-direction:column;max-height:calc(100dvh - 12vh - var(--space-16))}
+.modal-h,.modal-f{flex:none}
+.modal-b{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}
 /* Confirmation step: sits above any open modal so a form behind it keeps its input */
 .cfm-wrap{z-index:78;padding-top:22vh}
 .modal.cfm{width:min(var(--modal-w),100%)}
@@ -736,6 +786,8 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 /* Prototype config: floating button bottom-right, where support chat buttons usually sit */
 .pc-fab{position:fixed;right:20px;bottom:20px;z-index:70;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#FFFFFF;color:#111111;border:var(--border-width) solid rgba(17,17,17,.08);box-shadow:0 6px 18px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.08);transition:transform .14s ease,box-shadow .14s ease}
 .pc-fab:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.16),0 1px 3px rgba(0,0,0,.08)}
+:root[data-theme="dark"] .pc-fab{background:var(--selected);color:var(--ink);border-color:var(--neutral-line);box-shadow:0 6px 18px rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.3)} /* dark button in dark mode */
+:root[data-theme="dark"] .pc-fab:hover{background:var(--neutral-bg)}
 .modal.pc{width:min(620px,100%)} .pc .modal-b{gap:var(--space-24)}
 .pc-lbl{font-size:var(--fs-14);font-weight:600;margin-bottom:var(--space-4)} .pc-sub{font-size:var(--fs-12);color:var(--ink-2);margin-bottom:var(--space-12)}
 .pc-brands{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-12)}
@@ -986,6 +1038,41 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .bp-mail b{display:block;font-size:var(--fs-14);margin:var(--space-2) 0}
 .bp-mail .m{opacity:.6}
 .bp-cap{display:flex;justify-content:space-between;align-items:center;font-size:var(--fs-12);color:var(--ink-3);margin-top:var(--space-12)}
+/* Profile settings (#/settings) */
+.st-side{position:sticky;top:var(--page-padding)}
+.bf-r>label .bf-sub{display:block;margin-top:var(--space-2);font-size:var(--fs-12);line-height:var(--lh-16);color:var(--ink-3)}
+.bf-r .hint{margin-top:var(--space-8)}
+.bf-r .inp.bad{border-color:var(--error)} .bf-r .inp.bad:focus{box-shadow:var(--focus-error)}
+.st-sw{display:flex;flex-wrap:wrap;gap:var(--space-8);margin-top:var(--space-12)}
+.st-sw button{width:var(--control-sm);height:var(--control-sm);border-radius:var(--pill);background:var(--c);box-shadow:inset 0 0 0 var(--border-width) color-mix(in srgb,var(--ink) 14%,transparent)} /* edge shows on either theme, so black reads on dark */
+.st-sw button.on{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--c)}
+.st-file{display:flex;align-items:center;gap:var(--space-8);flex-wrap:wrap}
+.st-file>label{cursor:pointer}
+.st-th{height:var(--control-lg);min-width:96px;max-width:180px;padding:0 var(--space-12);border-radius:var(--r);border:var(--border-width) solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.st-th.light{background:#FFFFFF;color:#111111} .st-th.dark{background:#191918;color:#F5F5F4} /* fixed: the logo is checked against both sidebars whatever the current theme */
+.st-th img{display:block;max-height:24px;max-width:156px}
+.st-th.ic{min-width:0;width:var(--control-lg);padding:0;background:var(--surface-2)}
+.st-th.ic img{width:24px;height:24px;border-radius:var(--r-inner);object-fit:contain} .st-th.ic img.crop{object-fit:cover}
+.st-th .fade,.sp .fade{opacity:1!important} /* product logos inside thumbnails stay whole when the sidebar is collapsed */
+/* preview: a slice of the admin in the current theme, with the draft's accent */
+.sp{display:flex;flex-direction:column;gap:var(--space-12)}
+.sp-app{display:grid;grid-template-columns:minmax(0,1fr) 56px;border:var(--border-width) solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--bg)}
+.sp-side{background:var(--surface);border-right:var(--border-width) solid var(--line);padding:0 var(--space-8) var(--space-8);min-width:0}
+.sp-logo{height:48px;display:flex;align-items:center;padding:0 var(--space-12);overflow:hidden}
+.sp-logo .lg-img{height:20px;max-width:100%}
+.sp .nav{height:var(--control-md);cursor:default}
+.sp-rail{background:var(--surface);display:flex;flex-direction:column;align-items:center;gap:var(--space-4);padding-bottom:var(--space-8)}
+.sp-mark{height:48px;display:grid;place-items:center}
+.sp-mark img,.sp-fav img{width:20px;height:20px;border-radius:var(--r-inner);object-fit:contain;display:block} .sp-mark img.crop,.sp-fav img.crop{object-fit:cover}
+.sp-ri{position:relative;width:var(--control-md);height:var(--control-md);border-radius:var(--r-sm);display:grid;place-items:center;color:var(--ink-3)}
+.sp-ri.on{background:var(--selected);color:var(--ink)}
+.sp-ri .ndot{position:absolute;right:6px;top:6px;margin:0;box-shadow:0 0 0 2px var(--selected)}
+.sp-ctl{display:flex;align-items:center;gap:var(--space-8)}
+.sp-in{flex:1;min-width:0;height:var(--control-md);display:flex;align-items:center;padding:0 var(--space-12);border-radius:var(--r-sm);border:var(--border-width) solid var(--focus);box-shadow:var(--focus-brand);background:var(--surface);color:var(--ink-3);font-size:var(--fs-14);white-space:nowrap;overflow:hidden}
+.sp-ctl .btn{pointer-events:none;flex:none}
+.sp-tab{display:flex;align-items:center;gap:var(--space-8);height:var(--control-md);padding:0 var(--space-12);border-radius:var(--r-sm) var(--r-sm) 0 0;background:var(--surface-2);font-size:var(--fs-12);color:var(--ink-2);width:220px;max-width:100%}
+.sp-tab>span:nth-child(2){flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-fav img{width:16px;height:16px}
 /* exchange fee tiers: grouped two-row header */
 .dt.grp thead tr:first-child th{border-bottom:var(--border-width) solid var(--line-soft)}
 .dt.grp th.gs,.dt.grp td.gs{border-left:var(--border-width) solid var(--line-soft)}
@@ -1016,9 +1103,8 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
   .sidebar,.app.collapsed .sidebar{position:fixed;left:0;top:0;bottom:0;width:260px;transform:translateX(-100%);transition:transform .22s ease;box-shadow:var(--shadow-lg)}
   .app.mobile-open .sidebar{transform:none}
   .app.collapsed .fade{opacity:1;pointer-events:auto}
-  .app.collapsed .sidebar .nb{opacity:1} .app.collapsed .sidebar .ndot-c{display:none}
-  .app.collapsed .sb-label{max-height:var(--control-lg);padding:var(--space-16) var(--space-12) var(--space-8)}
-  .app.collapsed .sb-sec.closed .sb-items{display:none}
+  .app.collapsed .sidebar .nb,.app.collapsed .sidebar .ndot:not(.ndot-c){opacity:1} .app.collapsed .sidebar .ndot-c{opacity:0}
+  .app.collapsed .sb-scroll{padding-right:var(--space-12)} .app.collapsed .sb-sec::before{opacity:0}
   .sb-toggle,.app.collapsed .sb-toggle{display:none}
   .menu-btn{display:grid}
   .topbar{padding:0 var(--page-padding-mobile);gap:var(--space-8)}
@@ -1129,7 +1215,7 @@ const LOGO_SIGN = (h = 20, fill = 'currentColor', cls = '') => `<svg class="i ${
 const LOGO_WORD = (h = 20) => `<svg class="i fade" width="${(h * 115 / 20).toFixed(1)}" height="${h}" viewBox="36.5 0 115 20" role="img" aria-label="NS.CARDS">${WORD_D.map(d => `<path d="${d}" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/>`).join('')}</svg>`;
 // Logo — mirrors the DS «Logo» component: sign + wordmark scale together (gap = 0.4·h). Full is 7.6·h wide (121.6×16 in the sidebar).
 const LOGO = (h = 16, style = 'full') => style === 'sign' ? LOGO_SIGN(h) : `<span class="lg-full" style="gap:${(h * .4).toFixed(1)}px">${LOGO_SIGN(h)}${LOGO_WORD(h)}</span>`;
-// White-label products (Prototype config → Product): logo, favicon and accent per client. Accent tokens live in CSS under :root[data-brand].
+// White-label products (Prototype config → Product): logo, favicon and accent per client; markW = width of the mark that stays when the sidebar is collapsed (Lemon's 20px mark is drawn 1px in, so 22). Accent tokens live in CSS under :root[data-brand].
 const ENTRY_GLYPH = 'M8.9971 5.09863C8.9971 5.70196 9.4862 6.19727 10.0895 6.19727H10.6743C11.2706 6.19727 11.7539 6.68061 11.7539 7.27686C11.7539 7.8731 12.2373 8.35645 12.8335 8.35645H13.2572C13.8605 8.35645 14.3496 8.84554 14.3496 9.44886V10.2611C14.3496 10.8644 13.8605 11.3535 13.2572 11.3535H12.4889C11.8856 11.3535 11.3965 11.8426 11.3965 12.4459V12.9466C11.3965 13.55 10.9074 14.0391 10.3041 14.0391H9.9775C9.436 14.0391 8.9971 14.478 8.9971 15.0195C8.9971 15.561 8.5581 16 8.0166 16H7.0924C6.4891 16 6 15.5109 6 14.9076V14.0953C6 13.492 6.4891 13.0029 7.0924 13.0029H7.4189C7.9604 13.0029 8.3994 12.564 8.3994 12.0225C8.3994 11.481 8.8384 11.042 9.3799 11.042H10.4287C10.9389 11.042 11.3525 10.6284 11.3525 10.1182C11.3525 9.60795 10.9389 9.19434 10.4287 9.19434H9.8483C9.245 9.19434 8.7559 8.69903 8.7559 8.0957C8.7559 7.49238 8.2668 6.99707 7.6634 6.99707H7.0924C6.4891 6.99707 6 6.50798 6 5.90466V5.09242C6 4.48909 6.4891 4 7.0924 4H7.9047C8.508 4 8.9971 4.49531 8.9971 5.09863Z';
 const ENTRY_WORD = ["M53.3182 18C53.0924 18 52.8911 17.9812 52.7142 17.9435C52.5373 17.9097 52.415 17.8758 52.3472 17.8419L52.6859 16.6677C53.0096 16.7505 53.2956 16.7806 53.544 16.758C53.7924 16.7355 54.0126 16.6244 54.2045 16.425C54.4002 16.2293 54.579 15.9113 54.7408 15.4709L54.9892 14.7935L51.7827 6.07739H53.2279L55.6215 12.9871H55.7118L58.1053 6.07739H59.5505L55.8698 16.0129C55.7043 16.4607 55.4991 16.8314 55.2545 17.125C55.0099 17.4223 54.7257 17.6424 54.4021 17.7855C54.0822 17.9285 53.7209 18 53.3182 18Z", "M47.3955 14.7482V6.07726H48.6826V7.38694H48.7729C48.931 6.9579 49.217 6.60978 49.631 6.34258C50.045 6.07538 50.5117 5.94177 51.031 5.94177C51.1289 5.94177 51.2512 5.94366 51.398 5.94742C51.5447 5.95118 51.6558 5.95683 51.731 5.96435V7.31919C51.6859 7.3079 51.5824 7.29097 51.4205 7.26839C51.2625 7.24204 51.095 7.22887 50.9181 7.22887C50.4966 7.22887 50.1203 7.31731 49.7891 7.49419C49.4617 7.66731 49.202 7.90817 49.01 8.21677C48.8219 8.52161 48.7278 8.86973 48.7278 9.26113V14.7482H47.3955Z", "M46.5038 6.07742V7.20645H42.0103V6.07742H46.5038ZM43.3199 4H44.6522V12.2645C44.6522 12.6409 44.7068 12.9231 44.8159 13.1113C44.9288 13.2957 45.0718 13.4199 45.245 13.4839C45.4218 13.5441 45.6081 13.5742 45.8038 13.5742C45.9506 13.5742 46.071 13.5667 46.1651 13.5516C46.2592 13.5328 46.3345 13.5177 46.3909 13.5065L46.6619 14.7032C46.5716 14.7371 46.4455 14.771 46.2837 14.8048C46.1218 14.8425 45.9167 14.8613 45.6683 14.8613C45.292 14.8613 44.9232 14.7804 44.5619 14.6186C44.2044 14.4567 43.907 14.2102 43.6699 13.879C43.4366 13.5479 43.3199 13.1301 43.3199 12.6258V4Z", "M35.8782 9.53222V14.7483H34.5459V6.07738H35.833V7.43222H35.9459C36.1491 6.9919 36.4577 6.63813 36.8717 6.37093C37.2857 6.09996 37.8201 5.96448 38.475 5.96448C39.0621 5.96448 39.5758 6.08491 40.0161 6.32577C40.4564 6.56286 40.7989 6.92415 41.0435 7.40964C41.2882 7.89136 41.4105 8.50104 41.4105 9.23867V14.7483H40.0782V9.32899C40.0782 8.64781 39.9013 8.11717 39.5476 7.73706C39.1938 7.35319 38.7083 7.16125 38.0911 7.16125C37.6658 7.16125 37.2857 7.25346 36.9508 7.43786C36.6196 7.62227 36.358 7.89136 36.1661 8.24512C35.9741 8.59889 35.8782 9.02792 35.8782 9.53222Z", "M30.042 14.929C29.2065 14.929 28.4858 14.7446 27.8799 14.3758C27.2777 14.0032 26.8129 13.4838 26.4855 12.8177C26.1618 12.1478 26 11.3688 26 10.4806C26 9.59243 26.1618 8.80964 26.4855 8.13222C26.8129 7.45104 27.2683 6.92039 27.8516 6.54028C28.4387 6.15641 29.1237 5.96448 29.9065 5.96448C30.3581 5.96448 30.8041 6.03975 31.2444 6.19028C31.6847 6.34082 32.0855 6.58544 32.4468 6.92415C32.8081 7.2591 33.096 7.70319 33.3105 8.25641C33.5251 8.80964 33.6323 9.49082 33.6323 10.3V10.8645H26.9484V9.71286H32.2775C32.2775 9.22362 32.1796 8.78706 31.9839 8.40319C31.792 8.01932 31.5172 7.71636 31.1597 7.49432C30.806 7.27227 30.3882 7.16125 29.9065 7.16125C29.3758 7.16125 28.9167 7.29297 28.5291 7.55641C28.1452 7.81609 27.8497 8.1548 27.6428 8.57254C27.4358 8.99028 27.3323 9.43813 27.3323 9.91609V10.6838C27.3323 11.3387 27.4452 11.8938 27.671 12.3492C27.9006 12.8008 28.2186 13.1451 28.625 13.3822C29.0315 13.6156 29.5038 13.7322 30.042 13.7322C30.392 13.7322 30.7081 13.6833 30.9904 13.5854C31.2764 13.4838 31.5229 13.3333 31.7299 13.1338C31.9369 12.9306 32.0968 12.6785 32.2097 12.3774L33.4968 12.7387C33.3613 13.1752 33.1337 13.5591 32.8138 13.8903C32.4939 14.2177 32.0987 14.4736 31.6283 14.658C31.1578 14.8387 30.6291 14.929 30.042 14.929Z"];
 const LEMON_D = 'M19.2425 7.9796C19.2943 8.19762 19.3412 8.41991 19.3816 8.64654C19.4022 8.76189 19.4202 8.87681 19.4373 8.99105C19.4608 9.1042 19.4832 9.21869 19.5038 9.33413C19.7579 10.7581 19.7447 12.101 19.4641 13.3626C19.1834 14.6242 18.6882 15.7524 17.978 16.746C17.2579 17.7325 16.3543 18.5621 15.2677 19.2348C14.6028 19.6406 13.8868 19.9683 13.1212 20.2181C12.5251 20.918 11.6831 21.4606 11.6636 21.4732C11.65 21.4703 10.6318 21.2504 9.81947 20.785C9.09137 20.8018 8.37989 20.7436 7.68527 20.6101C6.43395 20.3615 5.30383 19.9008 4.29618 19.2275C3.28708 18.5458 2.43287 17.6625 1.73359 16.5787C1.03438 15.4949 0.55784 14.2409 0.303699 12.817C0.283206 12.7022 0.26452 12.5877 0.24757 12.4739C0.223922 12.3603 0.201737 12.2454 0.181034 12.1294C0.056376 11.431 -0.00380825 10.7518 0.000186475 10.0924L19.2425 7.9796ZM9.13219 0C9.14943 0.00371841 10.1651 0.223809 10.9758 0.688223C11.7041 0.671403 12.416 0.729059 13.1108 0.862604C14.362 1.11123 15.4914 1.57291 16.499 2.24615C17.508 2.92784 18.3627 3.81074 19.062 4.8945C19.3711 5.37361 19.6365 5.88616 19.8587 6.43177L1.2587 8.47452C1.28062 8.35255 1.30426 8.23111 1.33107 8.11063C1.61176 6.84912 2.10748 5.72123 2.81757 4.72769C3.53778 3.741 4.44154 2.9107 5.52836 2.23795C6.19317 1.83215 6.90891 1.50536 7.67439 1.25551C8.27174 0.554159 9.11589 0.0104698 9.13219 0Z';
@@ -1141,17 +1227,51 @@ const lemonMark = h => `<svg class="i lm-mark" width="${(h * 20 / 22).toFixed(1)
 const lemonLogo = (h, cls = '') => `<svg class="i ${cls}" width="${(h * 93 / 39).toFixed(1)}" height="${h}" viewBox="0 0 93 39" role="img" aria-label="Lemon Finance"><path class="lm-fruit" d="${LEMON_LOGO[0]}"/>${svgPaths(LEMON_LOGO.slice(1))}</svg>`;
 const favSvg = (vb, body) => 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}">${body}</svg>`);
 const BRANDS = {
-  ns: { name: 'NS.Cards', color: '#FC7C1A', side: () => LOGO(16), auth: () => LOGO(22), chip: () => LOGO(14),
+  ns: { name: 'NS.Cards', color: '#FC7C1A', markW: 16 * 28.5 / 20, side: () => LOGO(16), auth: () => LOGO(22), chip: () => LOGO(14),
     card: () => LOGO_SIGN(9), fav: () => favSvg('-6.1 -10.3 40.7 40.7', `<style>path{fill:#111}@media (prefers-color-scheme:dark){path{fill:#fff}}</style><path d="${SIGN_D}" fill-rule="evenodd"/>`) },
-  entry: { name: 'Entry', color: '#C2FB50', side: () => entryTile(24) + entryWord(24), auth: () => entryTile(32) + entryWord(32), chip: () => entryTile(22) + entryWord(22),
+  entry: { name: 'Entry', color: '#C2FB50', markW: 24, side: () => entryTile(24) + entryWord(24), auth: () => entryTile(32) + entryWord(32), chip: () => entryTile(22) + entryWord(22),
     card: () => `<svg class="i" width="7.7" height="11" viewBox="6 4 8.4 12" aria-hidden="true"><path d="${ENTRY_GLYPH}" fill="currentColor"/></svg>`,
     fav: () => favSvg('0 0 20 20', `<rect width="20" height="20" rx="4" fill="#C2FB50"/><path d="${ENTRY_GLYPH}" fill="#111"/>`) },
-  lemon: { name: 'Lemon Finance', color: '#FFF357', side: () => lemonMark(22) + lemonLogo(30, 'fade'), auth: () => lemonLogo(46), chip: () => lemonLogo(30),
+  lemon: { name: 'Lemon Finance', color: '#FFF357', markW: 22, side: () => lemonMark(22) + lemonLogo(30, 'fade'), auth: () => lemonLogo(46), chip: () => lemonLogo(30),
     card: () => `<svg class="i" width="10" height="11" viewBox="0 0 20 22" aria-hidden="true"><path d="${LEMON_D}" fill="currentColor"/></svg>`,
     fav: () => favSvg('0 0 20 20', `<rect width="20" height="20" rx="5" fill="#FFF357"/><path d="${LEMON_D}" fill="#111" transform="translate(4 3.6) scale(.6)"/>`) },
 };
 const brand = () => BRANDS[S.brand];
-function applyBrand() { document.documentElement.dataset.brand = S.brand; document.title = brand().name + ' Admin'; $('#favicon').href = brand().fav(); }
+// The admin's own branding (Profile settings → Branding): colour, logo and logo icon layered over the product picked in Prototype config.
+// Kept per product in nsc.custom; anything left empty falls back to the product's own.
+const cust = () => S.custom || {};
+const brandColor = () => cust().color || brand().color;
+function applyBrand() {
+  const root = document.documentElement, c = S.custom = store.get('nsc.custom', {})[S.brand] || {};
+  root.dataset.brand = S.brand; document.title = brand().name + ' Admin'; $('#favicon').href = c.icon || brand().fav();
+  if (c.color) root.dataset.custom = ''; else delete root.dataset.custom;
+  const css = v => Object.entries(v).map(([k, x]) => `${k}:${x}`).join(';');
+  ($('#customBrand') || document.head.appendChild(Object.assign(document.createElement('style'), { id: 'customBrand' }))).textContent = c.color
+    ? `:root:root[data-custom]{${css(brandVars(c.color, false))}}:root:root[data-custom][data-theme="dark"]{${css(brandVars(c.color, true))}}` : '';
+}
+// Accent tokens from one colour, the way the DS builds them: hover/pressed a step darker (lighter in dark), text-safe ink (4.5:1 on the surface), a soft tint, readable label colour
+function cHex(h) { return [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)); }
+function cMix(a, b, t) { const x = cHex(a), y = cHex(b); return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * t).toString(16).padStart(2, '0')).join('').toUpperCase(); }
+function cLum(h) { const c = cHex(h).map(v => v / 255).map(v => v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; }
+function cRatio(a, b) { const x = cLum(a), y = cLum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); }
+// Labels stay white unless the colour is light (the DS keeps white on the NS orange, 2.6:1); light accents like lime or lemon get near-black
+function onBrand(c) { return cRatio(c, '#FFFFFF') >= 2.5 ? '#FFFFFF' : '#111111'; }
+function brandVars(c, dark) {
+  const surf = dark ? '#191918' : '#FFFFFF', toward = dark ? '#FFFFFF' : '#111111';
+  let ink = c; for (let i = 1; i <= 10 && cRatio(ink, surf) < 4.5; i++) ink = cMix(c, toward, i * .09);
+  const on = onBrand(c), subtle = dark ? cMix(c, '#111111', .82) : cMix(c, '#FFFFFF', .86);
+  return { '--brand': c, '--focus': c, '--brand-hover': dark ? cMix(c, '#FFFFFF', .16) : cMix(c, '#000000', .12), '--brand-pressed': dark ? cMix(c, '#000000', .12) : cMix(c, '#000000', .24),
+    '--brand-ink': ink, '--on-brand': on, '--brand-subtle': subtle, '--selection': subtle, '--highlight': dark ? cMix(c, '#111111', .6) : cMix(c, '#FFFFFF', .7),
+    '--brand-edge': !dark && cLum(c) > .6 ? 'rgba(0,0,0,.08)' : 'transparent', '--focus-brand': `0 0 0 4px ${subtle}` };
+}
+// Sidebar logo: the custom logo (or the product's) open; collapsed, the custom icon — or, without one, the left square of the custom logo, which is usually its mark
+function sideLogo() {
+  const c = cust(); if (!c.logo && !c.icon) return brand().side();
+  const full = c.logo ? `<img class="lg-img" src="${esc(c.logo)}" alt="${esc(brand().name)}">` : brand().side();
+  const ic = c.icon || c.logo;
+  return `<span class="lg-cust"><span class="lg-c-full">${full}</span>${ic ? `<img class="lg-c-icon ${c.icon ? '' : 'crop'}" src="${esc(ic)}" alt="">` : ''}</span>`;
+}
+const authLogo = () => cust().logo ? `<img class="lg-img auth" src="${esc(cust().logo)}" alt="${esc(brand().name)}">` : brand().auth();
 
 /* ════════════════════════════ Icons (lucide-style) ════════════════════════════ */
 const ICONS = {
@@ -1616,10 +1736,10 @@ function navSection(n) {
   if (S.navV === 'fly') {
     const cur = navShown(n.items).find(navOn);
     const row = cur || n; // inside a section, its row shows the current page instead of the section
-    return `<button class="nav nav-fly ${cur ? 'active' : ''}" data-act="nav-fly" data-sec="${n.label}" data-tip="${t(row.label)}" data-tip-collapsed>${icon(row.icon, 16)}<span class="fade">${t(row.label)}</span>${dot ? '<i class="ndot"></i>' : ''}<span class="fade nf-chev">${icon('chevRight', 16)}</span></button>`;
+    return `<button class="nav nav-fly ${cur ? 'active' : ''}" data-act="nav-fly" data-sec="${n.label}" data-tip="${t(row.label)}" data-tip-collapsed>${icon(row.icon, 16)}<span class="fade">${t(row.label)}</span>${dot ? '<i class="ndot"></i>' : ''}<span class="fade nf-chev">${icon('chevRight', 16)}</span>${dot ? '<i class="ndot ndot-c"></i>' : ''}</button>`;
   }
   const shut = secShut(n);
-  return `<div class="sb-sec ${shut ? 'closed' : ''}"><button class="sb-label fade" data-act="nav-sec" data-sec="${n.label}" aria-expanded="${!shut}"><span>${t(n.label)}</span>${dot ? `<i class="sb-dot" data-tip="Something here needs a look"></i>` : ''}${icon('chevDown', 16)}</button><div class="sb-items">${navShown(n.items).map(it => navLink(it)).join('')}</div></div>`;
+  return `<div class="sb-sec ${shut ? 'closed' : ''}"><button class="sb-label fade" data-act="nav-sec" data-sec="${n.label}" aria-expanded="${!shut}"><span>${t(n.label)}</span>${dot ? `<i class="sb-dot" data-tip="Something here needs a look"></i>` : ''}${icon('chevDown', 16)}</button><div class="sb-items"><div>${navShown(n.items).map(it => navLink(it)).join('')}</div></div></div>`;
 }
 // Flyout panel for one section: its pages, opened on hover or click
 function openFly(row) {
@@ -1635,19 +1755,20 @@ document.addEventListener('mouseover', e => {
   if (popOpts.kind === 'fly' && !e.target.closest('#pop')) flyT = setTimeout(closePop, 280);
 });
 
-const initials = s => s.split(/[\s_.@-]+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+// Avatar initials: first letters of the first two words of the name ("Super admin" → SA), or of the email's name part
+const initials = s => s.split('@')[0].split(/[\s_.-]+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('') || '?';
 function renderSidebar() {
   const col = $('#app').classList.contains('collapsed'), keep = $('#sidebar .sb-scroll')?.scrollTop || 0;
   $('#sidebar').innerHTML = `
     <div class="sb-head">
-      <a class="logo lg-${S.brand}" href="#/dashboard" aria-label="${brand().name} home">${brand().side()}</a>
+      <a class="logo lg-${S.brand}" style="--mark-w:${cust().logo ? 20 : brand().markW}px" href="#/dashboard" aria-label="${brand().name} home">${sideLogo()}</a>
       <button class="sb-toggle" data-act="toggle-sidebar" data-tip="${col ? 'Expand' : 'Collapse'} sidebar  ⌘B">${icon(col ? 'panelOpen' : 'panelClose', 16)}</button>
     </div>
     <nav class="sb-scroll v-${S.navV}">
       ${NAV.map(n => n.items ? navSection(n) : navLink(n)).join('')}
     </nav>
     <div class="sb-foot">
-      <button class="me" data-act="me" data-tip="Account" data-tip-collapsed><span class="me-av me-ini">${initials(S.me.name || S.me.email)}</span><span class="em fade">${esc(S.me.email)}</span><span class="fade me-more">${icon('more', 16)}</span></button>
+      <button class="me" data-act="me" data-tip="Account" data-tip-collapsed><span class="me-av" aria-hidden="true">${esc(initials(S.me.name || S.me.email))}</span><span class="em fade">${esc(S.me.email)}</span><span class="fade me-more">${icon('more', 16)}</span></button>
     </div>`;
   // re-rendering resets the scroll: put it back, then nudge only if the current item is out of view
   const box = $('#sidebar .sb-scroll'), cur = $('.nav.active', box); box.scrollTop = keep;
@@ -1656,6 +1777,7 @@ function renderSidebar() {
 
 // Header = page title (breadcrumb) + that page's actions
 function crumbs() {
+  if (S.route === 'settings') return [['Profile settings']];
   if (S.route === 'users' && S.userId) { const u = byId(S.userId); return [['Users', '#/users'], u ? [u.name || u.email, '', '#' + u.id] : ['#' + S.userId]]; }
   if (S.route === 'companies' && S.coId) { const c = coById(S.coId); return [[navTitle('companies'), '#/companies'], c ? [c.name, '', '#' + c.id] : ['#' + S.coId]]; }
   const host = tabHost(S.route), pre = host ? [[host.label, '#/' + host.id]] : [];
@@ -1705,16 +1827,16 @@ function meMenu(view) {
     return `<div class="pop-head"><button class="ghost-ic" data-act="me-view" data-v="" aria-label="Back">${icon('chevLeft', 16)}</button>${t(title)}</div>`
       + menuItems(opts.map(([v, label]) => ({ act, data: { v }, label, on: cur === v }))); }
   const row = (v, ic, l, val) => ({ act: 'me-view', data: { v }, icon: ic, html: `<span class="pl">${t(l)}</span><span class="pv">${val}</span>${icon('chevRight', 16)}` });
-  return `<div class="me-h"><span class="me-av">${icon('user', 16)}</span><div style="min-width:0"><div class="me-n">${esc(S.me.name)}</div><div class="me-e" title="${esc(S.me.email)}">${esc(S.me.email)}</div></div></div>
+  return `<div class="me-h"><span class="me-av" aria-hidden="true">${esc(initials(S.me.name || S.me.email))}</span><div style="min-width:0"><div class="me-n">${esc(S.me.name)}</div><div class="me-e" title="${esc(S.me.email)}">${esc(S.me.email)}</div></div></div>
     <div class="pop-sep"></div>
-    ${menuItems([{ act: 'toast', data: { msg: t('Profile settings') }, icon: 'user', label: t('Profile settings') }, row('lang', 'globe', 'Language', S.lang === 'ru' ? 'Русский' : 'English'), { act: 'shortcuts', icon: 'keyboard', label: t('Keyboard shortcuts') }, { act: 'toast', data: { msg: 'Docs would open here' }, icon: 'help', label: t('Help & docs') }])}
+    ${menuItems([{ act: 'me-settings', icon: 'user', label: t('Profile settings') }, row('lang', 'globe', 'Language', S.lang === 'ru' ? 'Русский' : 'English'), { act: 'shortcuts', icon: 'keyboard', label: t('Keyboard shortcuts') }, { act: 'toast', data: { msg: 'Docs would open here' }, icon: 'help', label: t('Help & docs') }])}
     <div class="pop-row me-theme">${icon('palette', 16)}<span>${t('Theme')}</span><div class="seg sm ic" role="group" aria-label="${t('Theme')}"><button class="${dark ? '' : 'on'}" data-act="theme" data-v="light" aria-label="${t('Light')}" aria-pressed="${!dark}" data-tip="${t('Light')}">${icon('sun', 16)}</button><button class="${dark ? 'on' : ''}" data-act="theme" data-v="dark" aria-label="${t('Dark')}" aria-pressed="${dark}" data-tip="${t('Dark')}">${icon('moon', 16)}</button></div></div>
     <div class="pop-sep"></div>
     ${menuItems([{ act: 'sign-out', icon: 'logout', label: t('Sign out') }])}`;
 }
 // Prototype config: knobs for exploring the prototype, not product settings. Each choice applies at once and is kept in this browser.
 function protoModal() {
-  const D = S.pcDraft ||= { brand: S.brand, navV: S.navV };
+  const D = S.pcDraft ||= { brand: S.brand, navV: S.navV, filterV: S.filterV };
   const opt = (k, on, act, body, cls) => `<button class="${cls} ${on ? 'on' : ''}" data-act="${act}" data-v="${k}" aria-pressed="${on}">${body}</button>`;
   const html = `<div class="modal pc" role="dialog" aria-label="${t('Prototype config')}">
     <div class="modal-h">${t('Prototype config')}<button class="icon-btn icon-btn-link" data-act="modal-close" aria-label="${t('Close')}">${icon('x', 16)}</button></div>
@@ -1723,17 +1845,20 @@ function protoModal() {
         <div class="pc-brands">${Object.entries(BRANDS).map(([k, b]) => opt(k, k === D.brand, 'pc-pick-brand', `<span class="pc-logo"><span class="lg-${k}">${b.chip()}</span></span><span class="pc-meta"><span class="pc-n">${b.name}</span><span class="pc-c"><i style="background:${b.color}"></i>${b.color.slice(1)}</span></span>`, 'pc-brand')).join('')}</div></section>
       <section><div class="pc-lbl">${t('Navigation')}</div><div class="pc-sub">${t('How the sidebar groups pages.')}</div>
         <div class="pc-navs">${Object.entries(NAV_V).map(([k, [l, d]]) => opt(k, k === D.navV, 'pc-pick-nav', `<span class="pc-rad"></span><span><span class="pc-n">${t(l)}</span><span class="pc-d">${t(d)}</span></span>`, 'pc-nav')).join('')}</div></section>
+      <section><div class="pc-lbl">${t('Filters')}</div><div class="pc-sub">${t('How list pages show and add filters.')}</div>
+        <div class="pc-navs">${Object.entries(FILTER_V).map(([k, [l, d]]) => opt(k, k === D.filterV, 'pc-pick-filter', `<span class="pc-rad"></span><span><span class="pc-n">${t(l)}</span><span class="pc-d">${t(d)}</span></span>`, 'pc-nav pc-fil')).join('')}</div></section>
     </div>
     <div class="modal-f"><button class="btn btn-tertiary btn-lg" data-act="pc-defaults" style="margin-right:auto">${t('Reset to defaults')}</button><button class="btn btn-tertiary btn-lg" data-act="modal-close">${t('Cancel')}</button><button class="btn btn-primary btn-lg" data-act="pc-done">${t('Done')}</button></div>
   </div>`;
   openModal(html);
 }
 // Picking only moves the selection; re-rendering the modal would replay its open animation
-function pcMark() { const D = S.pcDraft; $$('.pc-brand, .pc-nav', modal).forEach(b => { const on = b.dataset.v === (b.classList.contains('pc-brand') ? D.brand : D.navV); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); }); }
-function applyProto({ brand: b, navV: n }) {
+function pcMark() { const D = S.pcDraft; $$('.pc-brand, .pc-nav', modal).forEach(b => { const on = b.dataset.v === (b.classList.contains('pc-brand') ? D.brand : b.classList.contains('pc-fil') ? D.filterV : D.navV); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); }); }
+function applyProto({ brand: b, navV: n, filterV: fv }) {
   S.brand = b; store.set('nsc.brand', b); applyBrand();
   if (n !== S.navV) { S.navV = n; store.set('nsc.navv', n); S.navPeek.clear(); }
-  if (S.me) { renderSidebar(); renderTopbar(); rerender(); } else route();
+  if (fv !== S.filterV) { S.filterV = fv; store.set('nsc.filterv', fv); closePop(); }
+  route(); // the whole page redraws, so page-owned topbar controls (Display) come back filled
 }
 function shortcutsModal() {
   const k = (...ks) => ks.map(x => `<kbd>${x}</kbd>`).join('');
@@ -1751,6 +1876,7 @@ function setTheme(t) { document.documentElement.dataset.theme = t; store.set('ns
 function toggleSidebar() {
   const app = $('#app');
   if (innerWidth <= 900) { app.classList.toggle('mobile-open'); return; }
+  app.classList.add('sb-anim'); clearTimeout(toggleSidebar.t); toggleSidebar.t = setTimeout(() => app.classList.remove('sb-anim'), 400); // labels clip, not ellipsis, while the width moves
   const col = app.classList.toggle('collapsed');
   store.set('nsc.sidebar', col ? 'collapsed' : 'open');
   const t = $('.sb-toggle'); t.innerHTML = icon(col ? 'panelOpen' : 'panelClose', 16); t.dataset.tip = `${col ? 'Expand' : 'Collapse'} sidebar  ⌘B`;
@@ -1762,7 +1888,7 @@ $('#sidebar').addEventListener('transitionend', e => { if (e.target.id === 'side
 function route() {
   if (authRoute()) return;
   const [id, sub] = location.hash.replace(/^#\/?/, '').split('/');
-  const r = NAV_FLAT.some(n => n.id === id) ? id : 'dashboard';
+  const r = id === 'settings' || NAV_FLAT.some(n => n.id === id) ? id : 'dashboard';
   const uid = r === 'users' && sub ? +sub : null;
   if (uid !== S.userId) { S.draft = {}; S.tx = txDefault(); S.openWallet = null; }
   if (!uid) S.userTab = 'overview';
@@ -1777,6 +1903,7 @@ function route() {
   S.navPeek.clear();
   const rid = PAGES[r] && sub ? decodeURIComponent(sub) : null;
   if (rid !== S.recId || r !== prevRoute) S.pgDraft = {};
+  if (r !== prevRoute) S.setDraft = {};
   S.recId = rid;
   closePop(); $('#app').classList.remove('mobile-open'); $('#tt').classList.remove('show');
   renderSidebar(); renderTopbar();
@@ -1786,13 +1913,14 @@ function route() {
   else if (r === 'companies') cid ? renderCompanyPage() : S.coView === 'access' ? renderAccess() : renderCompanies();
   else if (PAGES[r]) S.recId ? renderRec() : renderPg();
   else if (DASHES[r]) renderDashPage();
+  else if (r === 'settings') renderSettings();
   renderFloat();
 }
 window.addEventListener('hashchange', route);
 // Moving to another sidebar page starts every list fresh: no filters, search, loaded rows or selection (sort and columns stay).
 // Moving between a list and its own records keeps them, so Back and j / k work. Unsaved product-access changes are kept.
 function resetLists() {
-  Object.assign(S, { filters: [], search: '', page: 1 }); S.selected.clear();
+  Object.assign(S, { filters: [], search: '', page: 1, ctext: {} }); S.selected.clear();
   Object.assign(S.co, { filters: [], search: '', page: 1 }); S.co.sel.clear();
   Object.assign(S.mx, { kind: 'all', q: '', pq: '', co: null });
   Object.values(S.pg).forEach(st => { Object.assign(st, { filters: [], search: '', page: 1 }); st.sel.clear(); });
@@ -2062,7 +2190,7 @@ const fx = () => S.route === 'companies'
   : PAGES[S.route] ? pgFx(PAGES[S.route])
   : { F: FIELDS, items: USERS, get list() { return S.filters; }, set list(v) { S.filters = v; }, search: l => searchFilter(l, S.search), changed: filtersChanged };
 function getList() {
-  let list = searchFilter(applyFilters(USERS, S.filters), S.search);
+  let list = colTextFilter(searchFilter(applyFilters(USERS, S.filters), searchQ(S.search)), 'users');
   const col = COLS.find(c => c.key === S.sort.key), m = S.sort.dir === 'asc' ? 1 : -1;
   return [...list].sort((a, b) => { const x = col.val(a), y = col.val(b); return (x > y ? 1 : x < y ? -1 : b.id - a.id) * m; });
 }
@@ -2103,15 +2231,84 @@ function chipParts(f, X = fx()) {
   const vt = !vals.length ? '<span class="faint">Select…</span>' : vals.length <= 2 ? vals.map(v => optLabel(f.key, v, X.F)).join(', ') : `${vals.length} ${F.plural || 'values'}`;
   return { F, vt, op: F.date ? 'in' : vals.length > 1 ? 'is any of' : 'is' };
 }
+/* Filters layout (Prototype config → Filters), shared by Users, Companies and every list page:
+   bar    — applied filters in one row between the search and Filter; when they don't fit they fold into one group chip
+   wrap   — chips follow the search and wrap onto new lines; the Filter button follows the last chip
+   inline — each column header filters itself (Table only — List and Board have no headers, so they keep the bar);
+            there is no search and no Filter button; filters left on column-less fields still show as chips so they can be removed */
+const FILTER_V = { bar: ['Filter bar', 'One row, extras fold into a group'], wrap: ['Wrapping', 'Filters wrap onto new lines'], inline: ['In columns', 'Filter inside each column'] };
+S.filterV = FILTER_V[store.get('nsc.filterv', 'bar')] ? store.get('nsc.filterv', 'bar') : 'bar';
+const listTable = () => S.route === 'users' ? 'users' : S.route === 'companies' ? 'companies' : 'pg:' + S.route;
+const listView = () => S.route === 'users' ? S.view : lvView(listTable());
+const filterMode = () => S.filterV === 'inline' && listView() !== 'table' ? 'bar' : S.filterV;
+const colKeys = () => S.route === 'users' ? usersCols().map(c => c.key) : tVisible(listTable()).map(c => c.k);
+const offCol = (X = fx()) => { const ks = colKeys(); return Object.keys(X.F).filter(k => !ks.includes(k)); };
+// In columns: a filter row under the header, one control inside each column (Figma "Table" 279:15511). A column with a filter field gets a
+// dropdown (its values, or a date range); a text column (IDs, names, emails…) gets a "contains" box that filters as you type; others stay empty.
+S.ctext = {}; // per list table: { column key: text }
+const ctextOf = (t = listTable()) => S.ctext[t] ||= {};
+const ctextOn = (t = listTable()) => Object.entries(ctextOf(t)).filter(([, v]) => v.trim());
+const listColsAll = t => t === 'users' ? COLS.map(c => ({ k: c.key, val: c.val, label: c.label })) : (TCOLS[t] || []).map(c => ({ k: c.k, val: c.val, label: c.l }));
+const colTextFilter = (list, t) => { const q = S.filterV === 'inline' ? ctextOn(t) : []; if (!q.length) return list; const cols = listColsAll(t);
+  return list.filter(r => q.every(([k, v]) => { const c = cols.find(x => x.k === k); return !c || String(c.val(r) ?? '').toLowerCase().includes(v.trim().toLowerCase()); })); };
+function filterRow(cols, t, sample) {
+  if (filterMode() !== 'inline') return '';
+  const X = fx(), q = ctextOf(t);
+  const cell = c => { const F = X.F[c.k], pin = c.pin ? 'pin' : '';
+    // a column filtering the list swaps its chevron for a × that clears just that column
+    const clr = `<span class="fx" role="button" tabindex="-1" data-act="col-clear" data-key="${c.k}" data-tip="Clear" aria-label="Clear this filter">${icon('x', 16)}</span>`;
+    if (F) { const f = X.list.find(x => x.key === c.k && x.values.length);
+      return `<th class="fcell ${pin}"><button class="fctl fsel-c ${f ? 'on' : ''}" data-act="col-filter" data-key="${c.k}" aria-label="Filter by ${F.label}">${F.date ? icon('calendar', 16) : ''}<span class="fv">${f ? chipParts(f, X).vt : F.date ? 'Any time' : 'All'}</span>${f ? clr : icon('chevDown', 16)}</button></th>`; }
+    if (sample && (c.k === 'id' || typeof c.val(sample) === 'string'))
+      return `<th class="fcell ${pin}"><label class="fctl fin"><input data-ctext="${c.k}" value="${esc(q[c.k] || '')}" placeholder="Contains" aria-label="Filter ${esc(c.label || c.k)}" autocomplete="off" spellcheck="false">${(q[c.k] || '').trim() ? clr : ''}</label></th>`;
+    return `<th class="fcell ${pin}"></th>`; };
+  // clear everything from the row's first cell, under the checkboxes, while anything filters
+  const any = X.list.some(f => f.values.length) || ctextOn(t).length;
+  return `<tr class="frow"><th class="cbcell fcell">${any ? `<button class="fclr" data-act="clear-filters" data-tip="Clear all filters" aria-label="Clear all filters">${icon('x', 16)}</button>` : ''}</th>${cols.map(cell).join('')}<th class="act-h fcell"></th></tr>`;
+}
+// In columns has no general search above the table: the columns are the search, so a query typed earlier is set aside
+const searchQ = q => filterMode() === 'inline' ? '' : q;
+// nothing matches: the table (and the box being typed in) stays, with one line saying so
+const noMatchRow = (n, many) => filterMode() === 'inline' ? `<tr class="frow-empty"><td colspan="${n}"><span>No ${many} match these filters</span><button class="btn btn-link" data-act="clear-filters">Clear filters</button></td></tr>` : '';
+// footer: "6 of 320 users · Status is Active · Created in the last 30 days"
+const dateSum = v => /^last /i.test(v) ? 'in the ' + v.toLowerCase() : /^(today|yesterday|this )/i.test(v) ? v.toLowerCase() : /^all time/i.test(v) ? 'at any time' : 'in ' + v;
+function filterSummary() {
+  const X = fx(), out = X.list.filter(f => f.values.length).map(f => { const { F, vt, op } = chipParts(f, X), v = plainText(vt); return F.date ? `${F.label} ${dateSum(v)}` : `${F.label} ${op} ${v}`; });
+  const cols = listColsAll(listTable());
+  ctextOn().forEach(([k, v]) => out.push(`${cols.find(x => x.k === k)?.label || k} contains “${v.trim()}”`));
+  return out;
+}
+const listFoot = (list, rows, one, many, total) => { const sum = filterMode() === 'inline' ? filterSummary() : [];
+  if (!sum.length) return tfoot(list, rows, one, many);
+  return `<div class="tfoot">${fmtInt(list.length)} of ${fmtInt(total)} ${many}${rows.length < list.length ? ' · more load as you scroll' : ''} · ${sum.map(esc).join(' · ')}</div>`; };
+function colTextInput(t) {
+  const k = t.dataset.ctext, pos = t.selectionStart, left = t.closest('.tscroll')?.scrollLeft || 0;
+  ctextOf()[k] = t.value; fx().changed();
+  const el = $(`[data-ctext="${k}"]`); if (!el) return;
+  const sc = el.closest('.tscroll'); if (sc) sc.scrollLeft = left;
+  el.focus(); el.setSelectionRange(pos, pos);
+}
 function renderChips() {
   const X = fx(), el = $('#chips'); if (!el) return;
-  el.innerHTML = X.list.map(f => { const { F, vt, op } = chipParts(f, X);
+  const mode = filterMode(), btn = $('#addFilter'), off = mode === 'inline' ? offCol(X) : null;
+  const shown = off ? X.list.filter(f => off.includes(f.key)) : X.list, n = X.list.length + (mode === 'inline' ? ctextOn().length : 0);
+  el.dataset.sig = filterSig(); const bar = el.parentElement; bar.classList.toggle('fv-flow', mode !== 'bar'); bar.classList.toggle('fv-inline', mode === 'inline');
+  el.innerHTML = shown.map(f => { const { F, vt, op } = chipParts(f, X);
     return `<div class="chip" data-chip="${f.key}"><span class="cf">${icon(F.icon, 16)}${F.label}</span><span class="co">${op}</span><button class="cv" data-act="edit-filter" data-key="${f.key}">${vt}</button><button class="cx" data-act="rm-filter" data-key="${f.key}" aria-label="Remove filter">${icon('x', 16)}</button></div>`;
-  }).join('') + (X.list.length ? `<button class="btn btn-link" data-act="clear-filters">Clear</button>` : '');
-  if (X.list.length && el.scrollWidth > el.clientWidth + 1)
-    el.innerHTML = `<div class="chip chip-group"><button class="cv" data-act="filter-group">${icon('filter', 16)}${X.list.length} filter${X.list.length > 1 ? 's' : ''}${icon('chevDown', 16)}</button><button class="cx" data-act="clear-filters" aria-label="Clear filters" data-tip="Clear filters">${icon('x', 16)}</button></div>`;
+  }).join('');
+  const clear = n ? `<button class="btn btn-link" data-act="clear-filters">${shown.length < n ? `Clear ${n} filter${n > 1 ? 's' : ''}` : 'Clear'}</button>` : '';
+  // the button leaves the toolbar's end for the chips' flow: with Clear it wraps as one unit right after the last chip (or the search)
+  if (mode === 'bar') { el.insertAdjacentHTML('beforeend', clear); btn && el.after(btn); }
+  else { el.insertAdjacentHTML('beforeend', `<span class="fv-end">${clear}</span>`); btn && $('.fv-end', el).prepend(btn); }
+  if (btn) { btn.hidden = mode === 'inline'; btn.innerHTML = `${icon('filter', 16)}Filter`; } // In columns filters only inside the columns: no Filter button
+  bar.classList.toggle('is-empty', mode === 'inline'); // In columns: clearing lives in the filter row, so no strip above the table
+  if (mode === 'bar' && n && el.scrollWidth > el.clientWidth + 1)
+    el.innerHTML = `<div class="chip chip-group"><button class="cv" data-act="filter-group">${icon('filter', 16)}${n} filter${n > 1 ? 's' : ''}${icon('chevDown', 16)}</button><button class="cx" data-act="clear-filters" aria-label="Clear filters" data-tip="Clear filters">${icon('x', 16)}</button></div>`;
   if (popOpts.kind === 'fgroup') { if ($('.chip-group')) { pop.innerHTML = filterGroupPop(); reanchor(); } else closePop(); }
 }
+// The toolbar follows the table: a new layout or column set can change what the chips show. Same state → leave them (no re-animating on scroll)
+const filterSig = () => [filterMode(), colKeys().join(), JSON.stringify(fx().list), JSON.stringify(ctextOf())].join('|');
+const syncChips = () => { const el = $('#chips'); if (el && el.dataset.sig !== filterSig()) renderChips(); };
 const filterGroupPop = () => `<div class="pop-sec"><div class="pop-lbl">Applied filters<button class="btn btn-link" data-act="clear-filters">Clear all</button></div>
   ${fx().list.map(f => { const { F, vt, op } = chipParts(f); return `<div class="fg-row"><button class="fg-v" data-act="edit-filter" data-key="${f.key}">${icon(F.icon, 16)}<span class="fg-l">${F.label}</span><span class="fg-o">${op}</span><b>${vt}</b></button><button class="icon-btn icon-btn-link" data-act="rm-filter" data-key="${f.key}" aria-label="Remove filter">${icon('x', 16)}</button></div>`; }).join('')}</div>`;
 // Display button shows the current layout icon; layout itself is switched inside the Display popover
@@ -2121,10 +2318,11 @@ function renderLayoutSeg() {
 function renderResults() {
   const list = getList(); S._list = list;
   const el = $('#results');
-  if (!list.length) {
+  if (!list.length && filterMode() !== 'inline') {
     el.innerHTML = `<div class="tcard"><div class="empty"><div class="em-ic">${icon('search', 24)}</div><h3>No users match</h3><p>Try a different search or remove a filter.</p><button class="btn btn-tertiary" data-act="clear-all">Clear search and filters</button></div></div>`;
     return;
   }
+  syncChips();
   el.innerHTML = S.view === 'table' ? tableHTML(list) : S.view === 'list' ? listHTML(list) : boardHTML(list);
   if (S.view === 'table') fitColumns();
   markHits(el.querySelector('tbody') || el, S.search);
@@ -2156,12 +2354,12 @@ function tableHTML(list) {
     <colgroup><col style="width:44px">${cols.map(c => `<col data-col="${c.key}" ${fixed ? `style="width:${S.colW[c.key]}px"` : ''}>`).join('')}<col></colgroup>
     <thead><tr><th class="cbcell"><button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="sel-page" aria-label="Select loaded rows">${icon('check', 11, 3)}</button></th>
     ${cols.map(c => { const on = S.sort.key === c.key; return `<th class="sortable ${on ? 'sorted' : ''} ${c.right ? 'r' : ''} ${c.pin ? 'pin' : ''}" data-act="sort" data-key="${c.key}" ${dragAttrs('users', c.key, c.pin)}><span class="th-in">${c.label}<span class="srt">${icon(on && S.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 12, 2)}</span></span><span class="col-rs" data-rs="${c.key}" data-tip="Drag to resize · double-click to fit"></span></th>`; }).join('')}
-    <th class="act-h"></th></tr></thead>
+    <th class="act-h"></th></tr>${filterRow(cols.map(c => ({ k: c.key, pin: c.pin, val: c.val, label: c.label })), 'users', list[0] || USERS[0])}</thead>
     <tbody>${rows.map(u => `<tr data-uid="${u.id}" class="${S.selected.has(u.id) ? 'sel' : ''}">
       <td class="cbcell"><button class="cb ${S.selected.has(u.id) ? 'on' : ''}" data-act="sel" data-id="${u.id}" aria-label="Select">${icon('check', 11, 3)}</button></td>
       ${cols.map(c => `<td class="${c.right ? 'r' : ''} ${c.pin ? 'pin' : ''}">${c.cell(u)}</td>`).join('')}
       <td class="act"><div class="row-actions"><button class="ghost-ic" data-act="impersonate" data-id="${u.id}" data-tip="Login as user">${icon('login', 16)}</button><button class="ghost-ic" data-act="row-more" data-id="${u.id}" data-tip="More">${icon('more', 16)}</button></div></td>
-    </tr>`).join('')}</tbody></table></div></div>${tfoot(list, rows, 'user', 'users')}</div>`;
+    </tr>`).join('') || noMatchRow(cols.length + 2, 'users')}</tbody></table></div></div>${listFoot(list, rows, 'user', 'users', USERS.length)}</div>`;
 }
 /* Infinite scroll instead of pages: a list shows its first CHUNK rows and loads the next CHUNK as the scroll nears the end.
    `page` in each list's state counts the chunks loaded, so every place that resets it to 1 starts the list from the top again. */
@@ -2279,6 +2477,7 @@ function bcardHTML(u, by) {
 function renderFloat() {
   const el = $('#bulk');
   if (S.route === 'companies') { coFloat(el); return; }
+  if (S.route === 'settings') { stFloat(el); return; }
   if (PAGES[S.route]) { pgFloat(el); return; }
   if (DASHES[S.route]) { el.classList.remove('show'); return; }
   if (S.route === 'users' && S.userId) {
@@ -2468,7 +2667,7 @@ function ctable(t, rows, empty, o = {}) {
   }), empty, { t, keys: [...(o.pre ? [null] : []), ...cols.map(c => c.k), ...(o.post ? [null] : [])] });
 }
 const colsBtn = t => `<button class="icon-btn" data-act="tcols" data-t="${t}" data-tip="Columns">${icon('columns', 16)}</button>`;
-const tcolsPop = t => `<div class="pop-sec"><div class="pop-lbl">Columns</div>${colChips(t, 'tcol')}<div class="pop-foot"><button class="btn btn-link" data-act="tcols-reset" data-t="${t}">Reset columns</button></div></div>`;
+const tcolsPop = t => `<div class="pop-sec"><div class="pop-lbl">Columns<span class="pop-acts"><button class="btn btn-link" data-act="tcols-reset" data-t="${t}">Reset columns</button></span></div>${colChips(t, 'tcol')}</div>`;
 // Reset columns: back to the table's default shown columns in their default order (widths have their own reset)
 const resetTcols = t => { delete (S.tcols ||= store.get('nsc.tcols2', {}))[t]; delete (S.tord ||= store.get('nsc.tord', {}))[t]; store.set('nsc.tcols2', S.tcols); store.set('nsc.tord', S.tord); };
 const tcard = (title, acts, body, tools = '') => `<div class="card flush"><div class="card-h"><span class="card-t">${title}</span>${acts ? `<div class="ch-act">${acts}</div>` : ''}</div>${tools ? `<div class="card-tools">${tools}</div>` : ''}${body}</div>`;
@@ -2925,7 +3124,7 @@ const ddItems = (sel, q = '') => [...sel.options].filter(o => o.text.toLowerCase
 new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => n.nodeType === 1 && enhanceSelects(n.tagName === 'SELECT' ? n.parentNode : n)))).observe(document.body, { childList: true, subtree: true });
 
 /* filter popovers */
-const fieldItems = (q = '', X = fx()) => Object.entries(X.F).filter(([, F]) => F.label.toLowerCase().includes(q.toLowerCase())).map(([k, F]) => `<button class="pi" data-act="pick-field" data-key="${k}">${icon(F.icon, 16)}<span class="pl">${F.label}</span>${X.list.some(f => f.key === k) ? `<span class="dot" style="--tone:var(--brand)"></span>` : ''}${icon('chevRight', 16)}</button>`).join('') || '<div class="pi faint">No matches</div>';
+const fieldItems = (q = '', X = fx()) => Object.entries(X.F).filter(([k, F]) => (filterMode() !== 'inline' || !colKeys().includes(k)) && F.label.toLowerCase().includes(q.toLowerCase())).map(([k, F]) => `<button class="pi" data-act="pick-field" data-key="${k}">${icon(F.icon, 16)}<span class="pl">${F.label}</span>${X.list.some(f => f.key === k) ? `<span class="dot" style="--tone:var(--brand)"></span>` : ''}${icon('chevRight', 16)}</button>`).join('') || '<div class="pi faint">No matches</div>';
 const fieldsPop = () => `<div class="pop-search">${icon('search', 16)}<input id="popQ" placeholder="Filter by…" autocomplete="off"></div><div class="pop-list" id="popFields">${fieldItems()}</div>`;
 function facetCounts(key) {
   const X = fx(), base = X.search(applyFilters(X.items, X.list, key, X.F)), F = X.F[key], c = {};
@@ -2941,7 +3140,7 @@ function valueItems(key, q = '') {
   }).join('') || '<div class="pi faint">No matches</div>';
 }
 // Title row of a filter's popover (values list or date picker). back: true = to the field list, 'fg-back' = to the folded filters list
-const filterHead = (F, back) => `<div class="pop-head">${back ? `<button class="ghost-ic" data-act="${back === true ? 'pop-back' : back}" aria-label="Back">${icon('chevLeft', 16)}</button>` : `<span style="width:6px"></span>`}${icon(F.icon, 16)}${F.label}</div>`;
+const filterHead = (F, back) => `<div class="pop-head">${back ? `<button class="ghost-ic" data-act="${back === true ? 'pop-back' : back}" aria-label="Back">${icon('chevLeft', 16)}</button>` : ''}${icon(F.icon, 16)}${F.label}</div>`;
 function valuesPop(key, back) {
   const F = fx().F[key], many = Object.keys(F.options).length > 8;
   return `${filterHead(F, back)}
@@ -2959,7 +3158,7 @@ function displayPop() {
       <div class="seg" style="width:100%">${[['table', 'Table'], ['list', 'List'], ['board', 'Board']].map(([k, l]) => `<button style="flex:1;justify-content:center" class="${S.view === k ? 'on' : ''}" data-act="layout" data-v="${k}">${icon(k, 16)}${l}</button>`).join('')}</div>
     </div>
     ${S.view !== 'table' ? `<div class="pop-sec"><div class="pop-lbl">Group by</div><div class="pills">${groupOpts.map(k => `<button class="pill ${curGroup === k ? 'on' : ''}" data-act="disp-group" data-v="${k}">${gl(k)}</button>`).join('')}</div></div>` : ''}
-    ${S.view === 'table' ? `<div class="pop-sec"><div class="pop-lbl">Columns</div>${colChips('users', 'disp-col')}<div class="pop-foot"><button class="btn btn-link" data-act="reset-cols">Reset columns</button><button class="btn btn-link" data-act="reset-colw">Reset widths</button></div></div>` : ''}`;
+    ${S.view === 'table' ? `<div class="pop-sec"><div class="pop-lbl">Columns<span class="pop-acts"><button class="btn btn-link" data-act="reset-cols">Reset columns</button><button class="btn btn-link" data-act="reset-colw">Reset widths</button></span></div>${colChips('users', 'disp-col')}</div>` : ''}`;
 }
 const refreshDisplayPop = () => { if (popOpts.kind === 'display') { pop.innerHTML = displayPop(); positionPop(); } };
 
@@ -3100,6 +3299,7 @@ const ACT = {
   'theme': a => { setTheme(a.dataset.v); if (popOpts.kind === 'me') { pop.innerHTML = meMenu(); positionPop(); } },
   'me': a => openPop(a, meMenu(), { width: 260, kind: 'me' }),
   'me-view': a => { pop.innerHTML = meMenu(a.dataset.v); positionPop(); },
+  'me-settings': () => { closePop(); location.hash = '#/settings'; },
   'shortcuts': () => { closePop(); shortcutsModal(); },
   'toast': a => { closePop(); toast(a.dataset.msg); },
   'dash-range': a => openDatePicker(a, S.range, r => { S.range = r; renderTopbar(); renderDashPage(); }, { noAll: 1, align: 'right' }),
@@ -3138,6 +3338,9 @@ const ACT = {
 
   'add-filter': a => openPop(a, fieldsPop(), { width: 260, align: 'right', onMount: p => $('#popQ', p).focus() }),
   'filter-group': a => openPop(a, filterGroupPop(), { width: 340, kind: 'fgroup', anchorSel: '.chip-group .cv' }),
+  'col-filter': a => { const k = a.dataset.key, F = fx().F[k], sel = `.frow [data-key="${k}"]`;
+    if (F.date) { openDatePicker(a, fx().list.find(f => f.key === k)?.values[0] || { key: '7d' }, r => setDateFilter(k, r), { anchorSel: sel, keep: 1, head: filterHead(F) }); return; }
+    openPop(a, valuesPop(k), { width: 280, keep: 1, anchorSel: sel, onMount: p => $('#popVQ', p)?.focus() }); },
   'fg-back': () => { const g = $('.chip-group .cv'); g ? openPop(g, filterGroupPop(), { width: 340, kind: 'fgroup', keep: 1, anchorSel: '.chip-group .cv' }) : closePop(); },
   'pick-field': a => { const k = a.dataset.key; if (fx().F[k].date) { openDatePicker($('#addFilter'), fx().list.find(f => f.key === k)?.values[0] || { key: '7d' }, r => setDateFilter(k, r), { keep: 1, align: 'right', head: filterHead(fx().F[k], true) }); return; } openPop($('#addFilter'), valuesPop(k, true), { width: 280, keep: 1, align: 'right', onMount: p => $('#popVQ', p)?.focus() }); },
   'pop-back': () => openPop($('#addFilter'), fieldsPop(), { width: 260, keep: 1, align: 'right', onMount: p => $('#popQ', p).focus() }),
@@ -3149,8 +3352,9 @@ const ACT = {
     $('#popVals').innerHTML = valueItems(k, $('#popVQ')?.value || '');
   },
   'rm-filter': a => { const X = fx(); X.list = X.list.filter(f => f.key !== a.dataset.key); if (popOpts.kind !== 'fgroup') closePop(); X.changed(); }, // the folded list stays open while you remove filters from it
-  'clear-filters': () => { const X = fx(); X.list = []; closePop(); X.changed(); },
-  'clear-all': () => { S.filters = []; S.search = ''; $('#uSearch').value = ''; filtersChanged(); },
+  'clear-filters': () => { const X = fx(); X.list = []; S.ctext[listTable()] = {}; closePop(); X.changed(); },
+  'col-clear': a => { const k = a.dataset.key, X = fx(); X.list = X.list.filter(f => f.key !== k); delete ctextOf()[k]; closePop(); X.changed(); },
+  'clear-all': () => { S.filters = []; S.ctext.users = {}; S.search = ''; $('#uSearch').value = ''; filtersChanged(); },
 
   'sel': a => { const id = +a.dataset.id; S.selected.has(id) ? S.selected.delete(id) : S.selected.add(id); renderResults(); renderFloat(); },
   'sel-page': () => { const rows = loaded(S._list, S.page), all = rows.every(u => S.selected.has(u.id)); rows.forEach(u => all ? S.selected.delete(u.id) : S.selected.add(u.id)); renderResults(); renderFloat(); },
@@ -3164,7 +3368,7 @@ const ACT = {
   'open-user': (a, e) => { closePop(); goUser(+a.dataset.id, e); },
   'toggle-block': a => { closePop(); const u = byId(+a.dataset.id); u.status = u.status === 'blocked' ? 'active' : 'blocked'; u.updated = NOW; delete S.draft.status; toast(`${esc(u.name || u.email)} ${u.status === 'blocked' ? 'blocked' : 'unblocked'}`, u.status === 'blocked' ? 'ban' : 'check'); afterDataChange(); },
 
-  'bulk-set': a => { const f = a.dataset.field, opts = { status: STATUS, level: LEVEL, risk: RISK }[f]; openPop(a, `<div class="pop-head" style="padding-left:var(--space-12)">Set ${f}</div>` + menuItems(Object.entries(opts).map(([k, o]) => ({ act: 'apply-bulk', data: { field: f, v: k }, html: `<span class="pl" style="display:flex;align-items:center;gap:var(--space-8)"><i class="dot t-${o.tone}"></i>${o.label}</span>` }))), { width: 200 }); },
+  'bulk-set': a => { const f = a.dataset.field, opts = { status: STATUS, level: LEVEL, risk: RISK }[f]; openPop(a, `<div class="pop-head">Set ${f}</div>` + menuItems(Object.entries(opts).map(([k, o]) => ({ act: 'apply-bulk', data: { field: f, v: k }, html: `<span class="pl" style="display:flex;align-items:center;gap:var(--space-8)"><i class="dot t-${o.tone}"></i>${o.label}</span>` }))), { width: 200 }); },
   'apply-bulk': a => { const { field, v } = a.dataset; S.selected.forEach(id => { const u = byId(id); u[field] = v; u.updated = NOW; }); closePop(); toast(`Updated ${S.selected.size} users`); afterDataChange(); },
   'bulk-export': () => exportCSV(USERS.filter(u => S.selected.has(u.id)), 'users-selected'),
   'bulk-block': () => { S.selected.forEach(id => byId(id).status = 'blocked'); toast(`Blocked ${S.selected.size} users`, 'ban'); S.selected.clear(); afterDataChange(); },
@@ -3314,8 +3518,9 @@ const ACT = {
   'proto-cfg': () => { closePop(); S.pcDraft = null; protoModal(); },
   'pc-pick-brand': a => { S.pcDraft.brand = a.dataset.v; pcMark(); },
   'pc-pick-nav': a => { S.pcDraft.navV = a.dataset.v; pcMark(); },
-  'pc-defaults': () => { S.pcDraft = { brand: 'ns', navV: 'classic' }; pcMark(); },
-  'pc-done': () => { const d = S.pcDraft; closeModal(); if (d.brand !== S.brand || d.navV !== S.navV) { applyProto(d); toast(t('Prototype config applied'), 'sliders'); } },
+  'pc-pick-filter': a => { S.pcDraft.filterV = a.dataset.v; pcMark(); },
+  'pc-defaults': () => { S.pcDraft = { brand: 'ns', navV: 'classic', filterV: 'bar' }; pcMark(); },
+  'pc-done': () => { const d = S.pcDraft; closeModal(); if (d.brand !== S.brand || d.navV !== S.navV || d.filterV !== S.filterV) { applyProto(d); toast(t('Prototype config applied'), 'sliders'); } },
 };
 
 /* ════════════════════════════ Companies ════════════════════════════ */
@@ -3501,7 +3706,7 @@ const CO_TILES = [
 ];
 function coList() {
   const f = S.co, col = TCOLS.companies.find(c => c.k === f.sort.k), m = f.sort.dir === 'asc' ? 1 : -1;
-  return coSearchFilter(applyFilters(COMPANIES, f.filters, null, CO_FIELDS), f.search)
+  return colTextFilter(coSearchFilter(applyFilters(COMPANIES, f.filters, null, CO_FIELDS), searchQ(f.search)), 'companies')
     .sort((a, b) => { const x = col.val(a), y = col.val(b); return (x > y ? 1 : x < y ? -1 : b.id - a.id) * m; });
 }
 function renderCompanies() {
@@ -3523,8 +3728,8 @@ function coStats() {
 }
 function coResults() {
   const el = $('#coResults'); if (!el) return;
-  const f = S.co, list = coList(); S._coList = list;
-  if (!list.length) { el.innerHTML = `<div class="tcard"><div class="empty"><div class="em-ic">${icon('search', 24)}</div><h3>No companies match</h3><p>Try a different search or remove a filter.</p><button class="btn btn-tertiary" data-act="co-clear-all">Clear search and filters</button></div></div>`; return; }
+  const f = S.co, list = coList(); S._coList = list; syncChips();
+  if (!list.length && filterMode() !== 'inline') { el.innerHTML = `<div class="tcard"><div class="empty"><div class="em-ic">${icon('search', 24)}</div><h3>No companies match</h3><p>Try a different search or remove a filter.</p><button class="btn btn-tertiary" data-act="co-clear-all">Clear search and filters</button></div></div>`; return; }
   if (lvView('companies') === 'board') { el.innerHTML = lboardHTML('companies', list, coCard); markHits(el, f.search); return; }
   const cols = tVisible('companies'), fixed = cols.every(c => S.coColW[c.k]), rows = loaded(list, f.page);
   const all = rows.every(c => f.sel.has(c.id)), some = rows.some(c => f.sel.has(c.id));
@@ -3532,12 +3737,12 @@ function coResults() {
     <colgroup><col style="width:44px">${cols.map(c => `<col data-col="${c.k}" ${fixed ? `style="width:${S.coColW[c.k]}px"` : ''}>`).join('')}<col></colgroup>
     <thead><tr><th class="cbcell"><button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="co-sel-page" aria-label="Select loaded rows">${icon('check', 11, 3)}</button></th>
     ${cols.map(c => { const on = f.sort.k === c.k; return `<th class="sortable ${on ? 'sorted' : ''} ${c.al === 'r' ? 'r' : ''} ${c.pin ? 'pin' : ''}" data-act="co-sort" data-k="${c.k}" data-key="${c.k}" ${dragAttrs('companies', c.k, c.pin)}><span class="th-in">${c.l}<span class="srt">${icon(on && f.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 12, 2)}</span></span><span class="col-rs" data-rs="${c.k}" data-tip="Drag to resize · double-click to fit"></span></th>`; }).join('')}
-    <th class="act-h"></th></tr></thead>
+    <th class="act-h"></th></tr>${filterRow(cols.map(c => ({ k: c.k, pin: c.pin, val: c.val, label: c.l })), 'companies', list[0] || COMPANIES[0])}</thead>
     <tbody>${rows.map(c => `<tr data-cid="${c.id}" class="${f.sel.has(c.id) ? 'sel' : ''}">
       <td class="cbcell"><button class="cb ${f.sel.has(c.id) ? 'on' : ''}" data-act="co-sel" data-id="${c.id}" aria-label="Select">${icon('check', 11, 3)}</button></td>
       ${cols.map(x => `<td class="${x.al === 'r' ? 'r' : ''} ${x.pin ? 'pin' : ''}">${x.cell(c)}</td>`).join('')}
       <td class="act"><div class="row-actions"><button class="ghost-ic" data-act="co-open-tab" data-id="${c.id}" data-v="products" data-tip="Products">${icon('cardProduct', 16)}</button><button class="ghost-ic" data-act="co-row-more" data-id="${c.id}" data-tip="More">${icon('more', 16)}</button></div></td>
-    </tr>`).join('')}</tbody></table></div></div>${tfoot(list, rows, 'company', 'companies')}</div>`;
+    </tr>`).join('') || noMatchRow(cols.length + 2, 'companies')}</tbody></table></div></div>${listFoot(list, rows, 'company', 'companies', COMPANIES.length)}</div>`;
   fitColumns(); markHits($('tbody', el), f.search);
 }
 const coCSV = (l, name) => {
@@ -3823,6 +4028,131 @@ function brandInput(t) {
   renderFloat();
 }
 
+/* ════════════════════════════ Profile settings (#/settings) ════════════════════════════
+   The signed-in admin's account (name, email, password) and their own branding. Account and branding edits stage in S.setDraft
+   and save from the floating bar like every other page; the password has its own button since it never sits in a draft. */
+S.setDraft = {};
+const ST_MAX = 1 << 20; // 1 MB per image: both are kept in this browser
+const stBase = () => ({ name: S.me.name, email: S.me.email, color: cust().color || '', logo: cust().logo || '', icon: cust().icon || '' });
+const stVals = () => ({ ...stBase(), ...S.setDraft });
+function stSet(k, v) { if (v === stBase()[k]) delete S.setDraft[k]; else S.setDraft[k] = v; renderFloat(); }
+function stFloat(el) {
+  const n = Object.keys(S.setDraft).length;
+  if (!n) return el.classList.remove('show');
+  el.innerHTML = `<span class="bk-n"><b>${n}</b>unsaved change${n > 1 ? 's' : ''}</span><span class="sep"></span><button data-act="st-discard">Discard</button><button class="bk-save" data-act="st-save">${icon('check', 16, 2)}Save changes</button>`;
+  el.classList.add('show');
+}
+// Light and dark tiles: a logo has to read on both sidebars
+const stThumbs = d => ['light', 'dark'].map(m => `<span class="st-th ${m}" data-tip="${m === 'light' ? 'Light' : 'Dark'} theme">${d.logo ? `<img src="${esc(d.logo)}" alt="">` : `<span class="lg-${S.brand}">${brand().chip()}</span>`}</span>`).join('');
+const stIconTh = d => `<span class="st-th ic">${d.icon ? `<img src="${esc(d.icon)}" alt="">` : d.logo ? `<img class="crop" src="${esc(d.logo)}" alt="">` : `<img src="${brand().fav()}" alt="">`}</span>`;
+const stHint = c => { const on = onBrand(c) === '#FFFFFF' ? ['white', '#FFFFFF'] : ['black', '#111111'], r = cRatio(c, on[1]);
+  return `Button labels in ${on[0]} · ${r.toFixed(1)}:1 · <span class="${r >= 4.5 ? 'ok' : r >= 3 ? '' : 'warn'}">${r >= 4.5 ? 'passes WCAG AA' : r >= 3 ? 'OK for large text only' : 'hard to read'}</span>`; };
+// Preview in the current theme, with the draft's tokens set on the box so only it changes until you save
+function stPreview(d) {
+  const c = d.color || brand().color, v = brandVars(c, document.documentElement.dataset.theme === 'dark');
+  const logo = d.logo ? `<img class="lg-img" src="${esc(d.logo)}" alt="">` : `<span class="lg-${S.brand}">${brand().chip()}</span>`;
+  const mark = d.icon || d.logo ? `<img class="${d.icon ? '' : 'crop'}" src="${esc(d.icon || d.logo)}" alt="">` : `<img src="${brand().fav()}" alt="">`;
+  return `<div class="sp" style="${Object.entries(v).map(([k, x]) => `${k}:${x}`).join(';')}">
+    <div class="sp-app">
+      <div class="sp-side">
+        <div class="sp-logo">${logo}</div>
+        <div class="nav">${icon('dashboard', 16)}<span>Overview</span></div>
+        <div class="nav active">${icon('users', 16)}<span>Users</span><em class="nb">69</em></div>
+        <div class="nav">${icon('card', 16)}<span>Card orders</span><i class="ndot"></i></div>
+      </div>
+      <div class="sp-rail"><span class="sp-mark">${mark}</span><span class="sp-ri">${icon('dashboard', 16)}</span><span class="sp-ri on">${icon('users', 16)}<i class="ndot"></i></span><span class="sp-ri">${icon('card', 16)}</span></div>
+    </div>
+    <div class="sp-ctl"><span class="sp-in">Search users…</span><span class="btn btn-primary">${icon('plus', 16, 2)}New user</span></div>
+    <div class="sp-tab"><span class="sp-fav">${mark}</span><span>${esc(brand().name)} Admin</span>${icon('x', 12)}</div>
+  </div>`;
+}
+function renderSettings() {
+  const main = $('#main'), keep = main.scrollTop, d = stVals(), dirty = k => k in S.setDraft ? 'dirty' : '', c = d.color || brand().color;
+  const row = (l, inner, sub = '') => `<div class="bf-r"><label>${l}${sub ? `<span class="bf-sub">${sub}</span>` : ''}</label><div>${inner}</div></div>`;
+  const txt = (k, type, ac) => `<input class="inp w ${dirty(k)}" data-st="${k}" type="${type}" value="${esc(d[k])}" autocomplete="${ac}" spellcheck="false">`;
+  const pw = (id, ac) => `<div class="pw"><input class="inp w" id="${id}" type="password" autocomplete="${ac}"><button type="button" class="ghost-ic" data-act="au-eye" data-tip="${t('Show password')}" aria-label="${t('Show password')}">${icon('eye', 16)}</button></div>`;
+  const up = (id, has, k) => `<label class="btn btn-tertiary btn-lg">${icon('upload', 16)}${has ? 'Replace' : 'Upload'}<input type="file" id="${id}" hidden accept="image/png,image/svg+xml,image/jpeg,image/webp"></label>${has ? `<button class="btn btn-link" data-act="st-rm" data-v="${k}">Remove</button>` : ''}`;
+  const custom = d.color || d.logo || d.icon;
+  main.innerHTML = `<div class="page"><div class="up-grid">
+    <div class="up-main">
+      <div class="card"><div class="card-h"><span class="card-t">Account</span></div><div class="card-b">
+        ${row('Name', txt('name', 'text', 'name'))}
+        ${row('Email', txt('email', 'email', 'email'), 'You sign in with it')}
+      </div></div>
+      <div class="card"><div class="card-h"><span class="card-t">Password</span><div class="ch-act"><button class="btn btn-secondary" data-act="st-pw">Update password</button></div></div><div class="card-b">
+        ${row('Current password', pw('stPw0', 'current-password'))}
+        ${row('New password', pw('stPw1', 'new-password'), 'At least 8 characters')}
+        ${row('Confirm new password', pw('stPw2', 'new-password'))}
+      </div></div>
+      <div class="card"><div class="card-h"><span class="card-t">Branding</span><div class="ch-act">${custom ? `<button class="btn btn-link" data-act="st-reset-brand">Use ${esc(brand().name)} defaults</button>` : ''}</div></div><div class="card-b">
+        ${row('Brand colour', `<div class="clr"><input type="color" data-st="color" value="${c.toLowerCase()}" aria-label="Pick colour"><input class="inp ${dirty('color')}" data-st="color" value="${c}" maxlength="7" spellcheck="false" autocomplete="off"></div>
+          <div class="st-sw">${[brand().color, ...BRAND_COLORS.filter(x => x !== brand().color)].slice(0, 8).map(x => `<button style="--c:${x}" class="${x === c ? 'on' : ''}" data-act="st-color" data-v="${x}" data-tip="${x}${x === brand().color ? ' · default' : ''}" aria-label="${x}"></button>`).join('')}</div>
+          <div class="hint" id="stHint">${stHint(c)}</div>`, 'Buttons, counters, focus')}
+        ${row('Logo', `<div class="st-file">${stThumbs(d)}${up('stLogo', d.logo, 'logo')}</div><div class="hint">SVG or PNG, 32px tall or more, up to 1 MB. Check it reads on both themes.</div>`, 'Sidebar and sign-in page')}
+        ${row('Logo icon', `<div class="st-file">${stIconTh(d)}${up('stIcon', d.icon, 'icon')}</div><div class="hint">Square, 64×64 or larger. ${d.icon ? '' : d.logo ? 'Without one, the left of your logo is used.' : ''}</div>`, 'Collapsed sidebar and browser tab')}
+      </div></div>
+    </div>
+    <aside class="up-side st-side"><div class="card"><div class="card-h"><span class="card-t">Preview</span><span class="code">${document.documentElement.dataset.theme === 'dark' ? 'Dark' : 'Light'} theme</span></div><div class="card-b pad" id="stPreview">${stPreview(d)}</div></div></aside>
+  </div></div>`;
+  main.scrollTop = keep;
+}
+// Typing keeps focus: only dirty marks, the preview and the colour hint redraw
+function stInput(t) {
+  const k = t.dataset.st; let v = t.value;
+  if (k === 'color') {
+    v = v.trim().toUpperCase(); if (v && v[0] !== '#') v = '#' + v;
+    if (!hexOk(v)) return;
+    $$('[data-st="color"]').forEach(el => el !== t && (el.value = el.type === 'color' ? v.toLowerCase() : v));
+    $$('.st-sw button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+    $('#stHint').innerHTML = stHint(v);
+    if (v === brand().color) v = '';
+  }
+  stSet(k, k === 'color' ? v : v.trim() === stBase()[k] ? stBase()[k] : v);
+  $$(`.inp[data-st="${k}"]`).forEach(el => el.classList.toggle('dirty', k in S.setDraft));
+  t.classList.remove('bad'); t.closest('.bf-r')?.querySelector('.f-err')?.remove();
+  $('#stPreview').innerHTML = stPreview(stVals());
+}
+function stFile(t) {
+  const f = t.files[0], k = t.id === 'stLogo' ? 'logo' : 'icon'; t.value = '';
+  if (!f) return;
+  if (!/^image\//.test(f.type)) return toast('Choose an image file', 'alert');
+  if (f.size > ST_MAX) return toast('Use an image under 1 MB', 'alert');
+  const fr = new FileReader(); fr.onload = () => { stSet(k, fr.result); renderSettings(); toast(`${k === 'logo' ? 'Logo' : 'Logo icon'} added — save to apply`, 'upload'); }; fr.readAsDataURL(f);
+}
+const stBad = (el, msg) => { el.classList.add('bad'); el.closest('.bf-r > div').insertAdjacentHTML('beforeend', `<div class="f-err">${msg}</div>`); };
+function stSave() {
+  $$('#main .bf-r .f-err').forEach(e => e.remove()); $$('#main .inp.bad').forEach(e => e.classList.remove('bad'));
+  const d = stVals(), name = d.name.trim(), email = d.email.trim().toLowerCase();
+  if (!name) stBad($('.inp[data-st="name"]'), 'Enter your name');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) stBad($('.inp[data-st="email"]'), 'Enter a valid email address');
+  const bad = $('#main .inp.bad'); if (bad) return bad.focus();
+  const all = store.get('nsc.custom', {}), mine = Object.fromEntries(['color', 'logo', 'icon'].filter(k => d[k]).map(k => [k, d[k]]));
+  if (Object.keys(mine).length) all[S.brand] = mine; else delete all[S.brand];
+  store.set('nsc.custom', all);
+  if (JSON.stringify(store.get('nsc.custom', {})[S.brand] || {}) !== JSON.stringify(mine)) return toast('Couldn’t keep the images in this browser — try smaller files', 'alert');
+  S.me = { ...S.me, name, email }; ME = name; store.set('nsc.me', S.me);
+  S.setDraft = {}; applyBrand(); renderSidebar(); renderSettings(); renderFloat(); toast('Profile settings saved');
+}
+function stPassword() {
+  $$('#main .pw').forEach(p => { p.querySelector('input').classList.remove('bad'); p.parentElement.querySelector('.f-err')?.remove(); });
+  const [a, b, c] = ['#stPw0', '#stPw1', '#stPw2'].map(id => $(id));
+  if (!a.value) stBad(a, 'Enter your current password');
+  if (b.value.length < 8) stBad(b, 'Use at least 8 characters');
+  else if (b.value === a.value) stBad(b, 'Choose a password you haven’t used here');
+  if (c.value !== b.value) stBad(c, 'Passwords don’t match');
+  const bad = $('#main .pw .bad'); if (bad) return bad.focus();
+  [a, b, c].forEach(i => i.value = ''); toast('Password updated', 'lock');
+}
+Object.assign(ACT, {
+  'st-save': stSave,
+  'st-discard': () => { S.setDraft = {}; renderSettings(); renderFloat(); },
+  'st-pw': stPassword,
+  'st-color': a => { stSet('color', a.dataset.v === brand().color ? '' : a.dataset.v); renderSettings(); },
+  'st-rm': a => { stSet(a.dataset.v, ''); renderSettings(); },
+  'st-reset-brand': () => { ['color', 'logo', 'icon'].forEach(k => stSet(k, '')); renderSettings(); },
+});
+document.addEventListener('input', e => { const i = e.target; if (i.classList?.contains('bad') && i.closest('#main .pw')) { i.classList.remove('bad'); i.closest('.bf-r > div').querySelector('.f-err')?.remove(); } });
+
 /* Dialogs used by the companies pages */
 function newCompanyModal() {
   const opts = o => Object.entries(o).map(([k, x]) => `<option value="${k}">${x.label || x}</option>`).join('');
@@ -3916,7 +4246,7 @@ Object.assign(ACT, {
     coFiltersChanged();
   },
   'co-sort': a => { const c = TCOLS.companies.find(x => x.k === a.dataset.k); S.co.sort = S.co.sort.k === c.k ? { k: c.k, dir: S.co.sort.dir === 'asc' ? 'desc' : 'asc' } : { k: c.k, dir: c.dir }; coResults(); },
-  'co-clear-all': () => { S.co.filters = []; S.co.search = ''; $('#coSearch').value = ''; coFiltersChanged(); },
+  'co-clear-all': () => { S.co.filters = []; S.ctext.companies = {}; S.co.search = ''; $('#coSearch').value = ''; coFiltersChanged(); },
   'co-sel': a => { const id = +a.dataset.id, s = S.co.sel; s.has(id) ? s.delete(id) : s.add(id); coResults(); renderFloat(); },
   'co-sel-page': () => { const rows = loaded(S._coList, S.co.page), all = rows.every(c => S.co.sel.has(c.id)); rows.forEach(c => all ? S.co.sel.delete(c.id) : S.co.sel.add(c.id)); coResults(); renderFloat(); },
   'co-sel-all': () => { S._coList.forEach(c => S.co.sel.add(c.id)); coResults(); renderFloat(); },
@@ -3929,9 +4259,9 @@ Object.assign(ACT, {
     toast(`${esc(c.name)} ${c.status === 'blocked' ? 'blocked — its users can’t sign in' : 'unblocked'}`, c.status === 'blocked' ? 'ban' : 'check');
     S.coId ? renderCompanyPage() : (coStats(), coResults());
   },
-  'co-bulk-status': a => openPop(a, `<div class="pop-head" style="padding-left:var(--space-12)">Set status</div>` + menuItems(Object.entries(STATUS).map(([k, o]) => ({ act: 'co-bulk-status-do', data: { v: k }, html: `<span class="pl" style="display:flex;align-items:center;gap:var(--space-8)"><i class="dot t-${o.tone}"></i>${o.label}</span>` }))), { width: 200 }),
+  'co-bulk-status': a => openPop(a, `<div class="pop-head">Set status</div>` + menuItems(Object.entries(STATUS).map(([k, o]) => ({ act: 'co-bulk-status-do', data: { v: k }, html: `<span class="pl" style="display:flex;align-items:center;gap:var(--space-8)"><i class="dot t-${o.tone}"></i>${o.label}</span>` }))), { width: 200 }),
   'co-bulk-status-do': a => { S.co.sel.forEach(id => { const c = coById(id); c.status = a.dataset.v; c.updated = new Date(NOW); }); closePop(); toast(`Updated ${S.co.sel.size} companies`); coStats(); coResults(); },
-  'co-bulk-grant': a => openPop(a, `<div class="pop-head" style="padding-left:var(--space-12)">Grant product to ${S.co.sel.size} compan${S.co.sel.size > 1 ? 'ies' : 'y'}</div>` + menuItems([
+  'co-bulk-grant': a => openPop(a, `<div class="pop-head">Grant product to ${S.co.sel.size} compan${S.co.sel.size > 1 ? 'ies' : 'y'}</div>` + menuItems([
     ...CARD_PRODUCTS.map(p => ({ act: 'co-bulk-grant-do', data: { k: 'c:' + p.id }, icon: 'card', html: `<span class="pl">${esc(p.name)}</span><span class="pc">${p.provider}</span>` })), '-',
     ...IBAN_PRODUCTS.map(p => ({ act: 'co-bulk-grant-do', data: { k: 'i:' + p.id }, icon: 'bank', html: `<span class="pl">${esc(p.name)}</span><span class="pc">${p.provider}</span>` }))]), { width: 320 }),
   'co-bulk-grant-do': a => { const k = a.dataset.k; let n = 0; S.co.sel.forEach(id => setP(coById(id), k, true) && n++); closePop(); toast(n ? `${esc(pOf(k).name)} granted to ${n} compan${n > 1 ? 'ies' : 'y'}` : 'All selected companies already have it', 'cardProduct'); coStats(); coResults(); },
@@ -4107,7 +4437,7 @@ function page(P) {
 function pgFiltersChanged() { const st = pgS(S.route); st.page = 1; st.sel.clear(); pgStats(); renderChips(); pgResults(); renderFloat(); reanchor(); }
 function pgList(P = pg()) {
   const st = pgS(P.id), col = P.cols.find(c => c.k === st.sort.k) || P.cols[0], m = st.sort.dir === 'asc' ? 1 : -1;
-  return pgSearchF(P, applyFilters(pgData(P), st.filters, null, P.fields), st.search).sort((a, b) => { const x = col.val(a), y = col.val(b); return (x > y ? 1 : x < y ? -1 : 0) * m; });
+  return colTextFilter(pgSearchF(P, applyFilters(pgData(P), st.filters, null, P.fields), searchQ(st.search)), 'pg:' + P.id).sort((a, b) => { const x = col.val(a), y = col.val(b); return (x > y ? 1 : x < y ? -1 : 0) * m; });
 }
 function pgRefresh() { if (S.recId) renderRec(); else if (pg()) { pgStats(); pgResults(); renderFloat(); } renderTopbar(); renderSidebar(); }
 
@@ -4131,8 +4461,8 @@ function pgStats() {
 }
 function pgResults() {
   const el = $('#pgResults'); if (!el) return;
-  const P = pg(), st = pgS(P.id), list = pgList(P), any = pgData(P).length; S._pgList = list;
-  if (!list.length) { el.innerHTML = `<div class="tcard"><div class="empty"><div class="em-ic">${icon(any ? 'search' : P.icon, 24)}</div><h3>${any ? `No ${P.nouns} match` : `No ${P.nouns} yet`}</h3><p>${any ? 'Try a different search or remove a filter.' : ''}</p>${any ? `<button class="btn btn-tertiary" data-act="pg-clear-all">Clear search and filters</button>` : ''}</div></div>`; return; }
+  const P = pg(), st = pgS(P.id), list = pgList(P), any = pgData(P).length; S._pgList = list; syncChips();
+  if (!list.length && (!any || filterMode() !== 'inline')) { el.innerHTML = `<div class="tcard"><div class="empty"><div class="em-ic">${icon(any ? 'search' : P.icon, 24)}</div><h3>${any ? `No ${P.nouns} match` : `No ${P.nouns} yet`}</h3><p>${any ? 'Try a different search or remove a filter.' : ''}</p>${any ? `<button class="btn btn-tertiary" data-act="pg-clear-all">Clear search and filters</button>` : ''}</div></div>`; return; }
   if (lvView('pg:' + P.id) === 'board') { el.innerHTML = lboardHTML('pg:' + P.id, list, pgCard(P)); markHits(el, st.search); return; }
   const cols = tVisible('pg:' + P.id), W = pgW(P.id), fixed = cols.every(c => W[c.k]), rows = loaded(list, st.page), keys = rows.map(r => pgKey(P, r));
   const all = keys.every(k => st.sel.has(k)), some = keys.some(k => st.sel.has(k)), al = c => c.al === 'r' ? 'r' : c.al === 'c' ? 'c' : '';
@@ -4140,12 +4470,12 @@ function pgResults() {
     <colgroup><col style="width:44px">${cols.map(c => `<col data-col="${c.k}" ${fixed ? `style="width:${W[c.k]}px"` : ''}>`).join('')}<col></colgroup>
     <thead><tr><th class="cbcell"><button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="pg-sel-page" aria-label="Select loaded rows">${icon('check', 11, 3)}</button></th>
     ${cols.map(c => { const on = st.sort.k === c.k; return `<th class="sortable ${on ? 'sorted' : ''} ${al(c)} ${c.pin ? 'pin' : ''}" data-act="pg-sort" data-k="${c.k}" data-key="${c.k}" ${dragAttrs('pg:' + P.id, c.k, c.pin)}><span class="th-in">${c.l}<span class="srt">${icon(on && st.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 12, 2)}</span></span><span class="col-rs" data-rs="${c.k}" data-tip="Drag to resize · double-click to fit"></span></th>`; }).join('')}
-    <th class="act-h"></th></tr></thead>
+    <th class="act-h"></th></tr>${filterRow(cols.map(c => ({ k: c.k, pin: c.pin, val: c.val, label: c.l })), 'pg:' + P.id, list[0] || pgData(P)[0])}</thead>
     <tbody>${rows.map((r, i) => { const k = esc(keys[i]), q = P.quick?.(r), on = st.sel.has(keys[i]); return `<tr data-rid="${k}" class="${on ? 'sel' : ''}">
       <td class="cbcell"><button class="cb ${on ? 'on' : ''}" data-act="pg-sel" data-rid="${k}" aria-label="Select">${icon('check', 11, 3)}</button></td>
       ${cols.map(c => `<td class="${al(c)} ${c.pin ? 'pin' : ''}">${c.cell(r)}</td>`).join('')}
       <td class="act"><div class="row-actions">${q ? `<button class="ghost-ic" data-act="${q.act}" data-rid="${k}" ${Object.entries(q.data || {}).map(([a, v]) => `data-${a}="${esc(v)}"`).join(' ')} data-tip="${q.tip}">${icon(q.icon, 16)}</button>` : ''}<button class="ghost-ic" data-act="pg-row-more" data-rid="${k}" data-tip="More">${icon('more', 16)}</button></div></td>
-    </tr>`; }).join('')}</tbody></table></div></div>${tfoot(list, rows, P.noun, P.nouns)}</div>`;
+    </tr>`; }).join('') || noMatchRow(cols.length + 2, P.nouns)}</tbody></table></div></div>${listFoot(list, rows, P.noun, P.nouns, pgData(P).length)}</div>`;
   fitColumns(); markHits($('tbody', el), st.search);
 }
 function pgFloat(el) {
@@ -4225,7 +4555,7 @@ function listDisplayPop() {
   return `${bf.length ? `<div class="pop-sec"><div class="pop-lbl">Layout</div>
       <div class="seg" style="width:100%">${[['table', 'Table'], ['board', 'Board']].map(([k, l]) => `<button style="flex:1;justify-content:center" class="${L.view === k ? 'on' : ''}" data-act="ld-layout" data-v="${k}">${icon(k, 16)}${l}</button>`).join('')}</div></div>` : ''}
     ${lvView(X.t) === 'board' ? `<div class="pop-sec"><div class="pop-lbl">Group by</div><div class="pills">${bf.map(k => `<button class="pill ${boardBy(X.t, F) === k ? 'on' : ''}" data-act="ld-group" data-v="${k}">${F[k].label}</button>`).join('')}</div></div>`
-    : `<div class="pop-sec"><div class="pop-lbl">Columns</div>${colChips(X.t, 'ld-col')}<div class="pop-foot">${lnk('ld-cols-reset', 'Reset columns')}${lnk('ld-reset-colw', 'Reset widths')}</div></div>`}`;
+    : `<div class="pop-sec"><div class="pop-lbl">Columns<span class="pop-acts">${lnk('ld-cols-reset', 'Reset columns')}${lnk('ld-reset-colw', 'Reset widths')}</span></div>${colChips(X.t, 'ld-col')}</div>`}`;
 }
 /* Board layout for Companies and every PAGES list: one column per value of a short option field (Status unless picked otherwise), cards open the record.
    Unlike the Users board, cards can't be dragged: these status changes go through their own actions and confirmations. Layout and grouping are kept per list. */
@@ -5177,7 +5507,7 @@ Object.assign(ACT, {
     pgFiltersChanged();
   },
   'pg-sort': a => { const P = pg(), st = pgS(P.id), c = P.cols.find(x => x.k === a.dataset.k); st.sort = st.sort.k === c.k ? { k: c.k, dir: st.sort.dir === 'asc' ? 'desc' : 'asc' } : { k: c.k, dir: c.dir }; pgResults(); },
-  'pg-clear-all': () => { const st = pgS(S.route); st.filters = []; st.search = ''; $('#pgSearch').value = ''; pgFiltersChanged(); },
+  'pg-clear-all': () => { const st = pgS(S.route); st.filters = []; S.ctext['pg:' + S.route] = {}; st.search = ''; $('#pgSearch').value = ''; pgFiltersChanged(); },
   'pg-sel': a => { const s = pgS(S.route).sel, k = a.dataset.rid; s.has(k) ? s.delete(k) : s.add(k); pgResults(); renderFloat(); },
   'pg-sel-page': () => { const P = pg(), st = pgS(P.id), keys = loaded(S._pgList, st.page).map(r => pgKey(P, r)), all = keys.every(k => st.sel.has(k)); keys.forEach(k => all ? st.sel.delete(k) : st.sel.add(k)); pgResults(); renderFloat(); },
   'pg-sel-all': () => { const P = pg(); S._pgList.forEach(r => pgS(P.id).sel.add(pgKey(P, r))); pgResults(); renderFloat(); },
@@ -5252,12 +5582,14 @@ function onChange(t) {
   else if (t.dataset.kyc != null) { const u = byId(S.userId); u.kyc = t.value; u.idv = t.value === 'approved'; u.updated = new Date(NOW); toast(`KYC status set to ${KYC[t.value].label}`); renderUserPage(); }
   else if (t.id === 'docFile' && t.files[0]) uploadDoc(t.files[0]);
   else if (t.id === 'formStatus') { S.formStatus = t.value; renderUserPage(); }
+  else if (t.id === 'stLogo' || t.id === 'stIcon') stFile(t);
   else coChange(t);
 }
 document.addEventListener('change', e => onChange(e.target));
 document.addEventListener('input', e => {
   const t = e.target;
   if (t.dataset.ie) { edInput(t); return; }
+  if (t.dataset.ctext) { colTextInput(t); return; }
   if (t.id === 'ieQ') { edFilterList(t.value); return; }
   if (t.dataset.tx === 'ref') { S.tx.ref = t.value; S.tx.page = 1; refreshTx(); return; }
   if (t.id === 'adjBankAmt' || t.id === 'adjBankFee') { const net = Math.max(0, (+$('#adjBankAmt').value || 0) - (+$('#adjBankFee').value || 0)); $('#adjNet').textContent = `Credited to the EUR wallet: ${fmtEur(net, 2)}`; t.style.borderColor = ''; }
@@ -5267,6 +5599,7 @@ document.addEventListener('input', e => {
   else if (t.id === 'ddQ') $('#ddList').innerHTML = ddItems(S._dd, t.value);
   else if (t.id === 'dpFrom' || t.id === 'dpTo') dpTyped(t);
   else if (t.id === 'popVQ') $('#popVals').innerHTML = valueItems(t.dataset.key, t.value);
+  else if (t.dataset.st) stInput(t);
   else if (t.id === 'pgSearch') { const st = pgS(S.route); st.search = t.value; st.page = 1; pgStats(); pgResults(); renderFloat(); }
   else coInput(t);
 });
@@ -5482,7 +5815,7 @@ function renderAuth(up) {
     ? `<div class="pw"><input id="${id}" type="password" autocomplete="${ac}" placeholder="${ph}"><button type="button" class="ghost-ic" data-act="au-eye" data-tip="${t('Show password')}" aria-label="${t('Show password')}">${icon('eye', 16)}</button></div>`
     : `<input id="${id}" type="${type}" autocomplete="${ac}" placeholder="${ph}" spellcheck="false">`}</div>`;
   $('#auth').innerHTML = `<div class="auth-box">
-    <div class="auth-logo lg-${S.brand}">${brand().auth()}</div>
+    <div class="auth-logo lg-${S.brand}">${authLogo()}</div>
     <div class="auth-card">
       <h1>${t(up ? 'Create an account' : 'Sign in')}</h1>
       <p class="auth-sub">${t(up ? 'Get access to the {b} admin panel' : 'Welcome back to the {b} admin panel').replace('{b}', brand().name)}</p>
