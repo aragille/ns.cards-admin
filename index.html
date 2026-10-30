@@ -298,7 +298,13 @@ img.asset-ic{display:block;object-fit:cover}
 .toolbar.fv-flow{flex-wrap:wrap}
 .fv-flow .chips{display:contents}
 .fv-end{display:flex;align-items:center;gap:var(--space-8);flex:none}
-.fv-flow #addFilter{margin-left:0} .toolbar.fv-inline .search,.toolbar.is-empty{display:none} .toolbar #addFilter[hidden]{display:none} /* In columns: no Filter button */
+.fv-flow #addFilter{margin-left:0}
+/* Wrapping: one dropdown per filter field (Figma 186:200) — 32 tall, 12 / 8 sides, grey label until set, then "Label: values" in ink */
+.toolbar.fv-flow:not(.fv-inline) .search{flex:0 0 240px;width:240px}
+.fdd{display:inline-flex;align-items:center;gap:var(--space-8);height:var(--control-md);padding:0 var(--space-8) 0 var(--space-12);border:var(--border-width) solid var(--line);border-radius:var(--r-sm);background:var(--surface);font-size:var(--fs-14);line-height:var(--lh-20);font-weight:var(--fw-regular);color:var(--ink-3);white-space:nowrap;flex:none;transition:border-color .12s,box-shadow .12s}
+.fdd:hover{border-color:var(--line-strong)} .fdd:focus-visible{outline:0;border-color:var(--focus);box-shadow:var(--focus-brand)}
+.fdd.on{color:var(--ink)} .fdd>.i{flex:none;color:var(--ink-3)}
+.fdd>span{max-width:280px;overflow:hidden;text-overflow:ellipsis} .toolbar.fv-inline .search,.toolbar.is-empty{display:none} .toolbar #addFilter[hidden]{display:none} /* In columns: no Filter button */
 /* In columns hides the toolbar strip: keep the table a grid gap below the stats tiles, or a page padding from the top when there are none */
 .toolbar.is-empty + .results{padding-top:var(--grid-gap)} .toolbar.is-empty:first-child + .results{padding-top:var(--page-padding)}
 .search{display:flex;align-items:center;gap:var(--space-8);height:var(--control-md);padding:0 var(--space-8) 0 var(--space-12);width:300px;border-radius:var(--r-sm);background:var(--surface);border:var(--border-width) solid var(--line);color:var(--ink-3);transition:border-color .12s,box-shadow .12s}
@@ -2233,7 +2239,7 @@ function chipParts(f, X = fx()) {
 }
 /* Filters layout (Prototype config → Filters), shared by Users, Companies and every list page:
    bar    — applied filters in one row between the search and Filter; when they don't fit they fold into one group chip
-   wrap   — chips follow the search and wrap onto new lines; the Filter button follows the last chip
+   wrap   — the search, then a dropdown for every filter field (set or not), wrapping onto new lines; Clear follows the last
    inline — each column header filters itself (Table only — List and Board have no headers, so they keep the bar);
             there is no search and no Filter button; filters left on column-less fields still show as chips so they can be removed */
 const FILTER_V = { bar: ['Filter bar', 'One row, extras fold into a group'], wrap: ['Wrapping', 'Filters wrap onto new lines'], inline: ['In columns', 'Filter inside each column'] };
@@ -2293,14 +2299,17 @@ function renderChips() {
   const mode = filterMode(), btn = $('#addFilter'), off = mode === 'inline' ? offCol(X) : null;
   const shown = off ? X.list.filter(f => off.includes(f.key)) : X.list, n = X.list.length + (mode === 'inline' ? ctextOn().length : 0);
   el.dataset.sig = filterSig(); const bar = el.parentElement; bar.classList.toggle('fv-flow', mode !== 'bar'); bar.classList.toggle('fv-inline', mode === 'inline');
-  el.innerHTML = shown.map(f => { const { F, vt, op } = chipParts(f, X);
+  // Wrapping (Figma toolbar 186:200): every filter field is always there as a dropdown — grey label when unset, "Label: values" once set
+  const dd = ([k, F]) => { const f = X.list.find(x => x.key === k && x.values.length);
+    return `<button class="fdd ${f ? 'on' : ''}" data-act="col-filter" data-key="${k}" aria-label="Filter by ${F.label}">${F.date ? icon('calendar', 16) : ''}<span>${f ? `${F.label}: ${chipParts(f, X).vt}` : F.label}</span>${icon('chevDown', 16)}</button>`; };
+  el.innerHTML = mode === 'wrap' ? Object.entries(X.F).map(dd).join('') : shown.map(f => { const { F, vt, op } = chipParts(f, X);
     return `<div class="chip" data-chip="${f.key}"><span class="cf">${icon(F.icon, 16)}${F.label}</span><span class="co">${op}</span><button class="cv" data-act="edit-filter" data-key="${f.key}">${vt}</button><button class="cx" data-act="rm-filter" data-key="${f.key}" aria-label="Remove filter">${icon('x', 16)}</button></div>`;
   }).join('');
-  const clear = n ? `<button class="btn btn-link" data-act="clear-filters">${shown.length < n ? `Clear ${n} filter${n > 1 ? 's' : ''}` : 'Clear'}</button>` : '';
+  const clear = n ? `<button class="btn btn-link" data-act="clear-filters">${mode === 'bar' || shown.length >= n ? 'Clear' : `Clear ${n} filter${n > 1 ? 's' : ''}`}</button>` : '';
   // the button leaves the toolbar's end for the chips' flow: with Clear it wraps as one unit right after the last chip (or the search)
   if (mode === 'bar') { el.insertAdjacentHTML('beforeend', clear); btn && el.after(btn); }
   else { el.insertAdjacentHTML('beforeend', `<span class="fv-end">${clear}</span>`); btn && $('.fv-end', el).prepend(btn); }
-  if (btn) { btn.hidden = mode === 'inline'; btn.innerHTML = `${icon('filter', 16)}Filter`; } // In columns filters only inside the columns: no Filter button
+  if (btn) { btn.hidden = mode !== 'bar'; btn.innerHTML = `${icon('filter', 16)}Filter`; } // Wrapping lists every filter, In columns filters inside the columns: no Filter button in either
   bar.classList.toggle('is-empty', mode === 'inline'); // In columns: clearing lives in the filter row, so no strip above the table
   if (mode === 'bar' && n && el.scrollWidth > el.clientWidth + 1)
     el.innerHTML = `<div class="chip chip-group"><button class="cv" data-act="filter-group">${icon('filter', 16)}${n} filter${n > 1 ? 's' : ''}${icon('chevDown', 16)}</button><button class="cx" data-act="clear-filters" aria-label="Clear filters" data-tip="Clear filters">${icon('x', 16)}</button></div>`;
@@ -3338,7 +3347,7 @@ const ACT = {
 
   'add-filter': a => openPop(a, fieldsPop(), { width: 260, align: 'right', onMount: p => $('#popQ', p).focus() }),
   'filter-group': a => openPop(a, filterGroupPop(), { width: 340, kind: 'fgroup', anchorSel: '.chip-group .cv' }),
-  'col-filter': a => { const k = a.dataset.key, F = fx().F[k], sel = `.frow [data-key="${k}"]`;
+  'col-filter': a => { const k = a.dataset.key, F = fx().F[k], sel = `[data-act="col-filter"][data-key="${k}"]`;
     if (F.date) { openDatePicker(a, fx().list.find(f => f.key === k)?.values[0] || { key: '7d' }, r => setDateFilter(k, r), { anchorSel: sel, keep: 1, head: filterHead(F) }); return; }
     openPop(a, valuesPop(k), { width: 280, keep: 1, anchorSel: sel, onMount: p => $('#popVQ', p)?.focus() }); },
   'fg-back': () => { const g = $('.chip-group .cv'); g ? openPop(g, filterGroupPop(), { width: 340, kind: 'fgroup', keep: 1, anchorSel: '.chip-group .cv' }) : closePop(); },
