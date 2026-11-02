@@ -68,6 +68,7 @@ input,select,textarea{font:inherit;color:inherit}
 a{color:inherit;text-decoration:none}
 .i{flex:none;display:block}
 .mono{font-family:var(--font);font-size:var(--fs-12);font-variant-numeric:tabular-nums}
+td .mono{font-size:var(--fs-14)} /* codes inside table cells (country codes…) match the 14px cell text */
 .muted{color:var(--ink-2)} .faint{color:var(--ink-3)}
 .r{text-align:right}
 ::selection{background:var(--brand-subtle)}
@@ -240,8 +241,9 @@ h1 .count{font-family:var(--font);font-size:var(--fs-14);font-weight:400;color:v
 .ghost-ic{width:28px;height:28px;border-radius:var(--r-sm);display:grid;place-items:center;color:var(--ink-2)}
 .ghost-ic:hover{background:var(--hover);color:var(--ink)}
 
+/* Segmented control: one size — 28px segments filling a 32px track (2px inset), radii 6 (radius/inner) inside 8 (radius/sm); labels 14/20 medium */
 .seg{display:inline-flex;align-items:stretch;gap:0;height:var(--control-md);padding:calc(var(--space-2) - var(--border-width));background:var(--surface-2);border:var(--border-width) solid var(--line);border-radius:var(--r-sm)}
-.seg button{padding:0 var(--space-8);border-radius:var(--r-inner);border:var(--border-width) solid transparent;font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);color:var(--ink-2);display:flex;align-items:center;gap:var(--space-4);white-space:nowrap}
+.seg button{padding:0 var(--space-8);border-radius:var(--r-inner);border:var(--border-width) solid transparent;font-size:var(--fs-14);line-height:var(--lh-20);font-weight:var(--fw-medium);color:var(--ink-2);display:flex;align-items:center;gap:var(--space-4);white-space:nowrap}
 .seg button:hover{color:var(--ink)}
 .seg button.on{background:var(--surface);color:var(--ink);border-color:var(--line);box-shadow:var(--shadow-sm)}
 
@@ -427,7 +429,7 @@ th.col-gap,td.col-gap{padding:0!important;border-bottom-color:transparent!import
 .cdi-c.r{justify-content:flex-end} .cdi-c.c{justify-content:center}
 /* column chips in Display / Columns menus: grip to drag, solid = shown, dashed = hidden; a dashed slot opens where a dragged chip will land */
 .cchips{display:flex;flex-wrap:wrap;gap:var(--space-8)}
-.cchip{display:inline-flex;align-items:center;gap:var(--space-4);line-height:var(--lh-16);height:var(--control-md);padding:0 var(--space-8);border-radius:var(--r-sm);border:var(--border-width) solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:var(--fs-12);font-weight:500;cursor:grab;box-shadow:var(--shadow-sm);transition:border-color .12s,background .12s,color .12s,opacity .12s}
+.cchip{display:inline-flex;align-items:center;gap:var(--space-4);line-height:var(--lh-20);height:var(--control-md);padding:0 var(--space-8);border-radius:var(--r-sm);border:var(--border-width) solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:var(--fs-14);font-weight:500;cursor:grab;box-shadow:var(--shadow-sm);transition:border-color .12s,background .12s,color .12s,opacity .12s}
 .cchip:hover{border-color:var(--line-strong)}
 .cchip:active{cursor:grabbing}
 .cchip>.i:first-child{color:var(--ink-3)}
@@ -517,7 +519,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .bc-foot{display:flex;justify-content:space-between;align-items:center;padding-top:var(--space-12);border-top:var(--border-width) dashed var(--line);font-size:var(--fs-12);line-height:var(--lh-16)}
 .bc-foot .num{font-size:var(--fs-14);line-height:var(--lh-20)}
 .col-b:has(.bslot) .col-empty{display:none}
-.col-empty{flex:none;border:var(--border-width) dashed var(--line);border-radius:var(--r);height:72px;display:grid;place-items:center;color:var(--ink-3);font-size:var(--fs-12)}
+.col-empty{flex:none;border:var(--border-width) dashed var(--line);border-radius:var(--r);height:72px;display:grid;place-items:center;color:var(--ink-3);font-size:var(--fs-14);line-height:var(--lh-20)}
 
 /* floating bar (bulk actions + unsaved changes) */
 .bulk{position:fixed;left:50%;bottom:24px;transform:translate(-50%,140%);opacity:0;z-index:40;display:flex;align-items:center;gap:var(--space-4);padding:var(--space-4);background:var(--float);color:var(--ink);border-radius:var(--r);box-shadow:var(--shadow-lg);transition:transform .2s cubic-bezier(.2,.8,.2,1),opacity .2s;pointer-events:none}
@@ -578,7 +580,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .dt tbody tr{cursor:default}
 .dt.fx{table-layout:fixed} .dt.fx td,.dt.fx td>div{overflow:hidden;text-overflow:ellipsis}
 .card.flush .tfoot{border-top:var(--border-width) solid var(--line)}
-.code{font-size:var(--fs-12);color:var(--ink-3);font-weight:400}
+.code{font-size:var(--fs-14);line-height:var(--lh-20);color:var(--ink-3);font-weight:400} /* codes (operation codes, IDs, captions) read at body size */
 .code .copy{color:var(--ink-3)}
 .txt{display:inline-flex;align-items:center;gap:var(--space-8)} .txt .i{color:var(--ink-3)}
 .num.pos{color:var(--success-ink)}
@@ -750,7 +752,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .pop-row{display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);height:var(--control-md)}
 .pop-row>span{color:var(--ink-2);font-size:var(--fs-14)}
 .pills{display:flex;flex-wrap:wrap;gap:var(--space-8)}
-.pill{height:var(--control-md);padding:0 var(--space-12);border-radius:var(--r-sm);border:var(--border-width) solid var(--line);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);color:var(--ink-2);display:inline-flex;align-items:center;gap:var(--space-4)}
+.pill{height:var(--control-md);padding:0 var(--space-12);border-radius:var(--r-sm);border:var(--border-width) solid var(--line);font-size:var(--fs-14);line-height:var(--lh-20);font-weight:var(--fw-medium);color:var(--ink-2);display:inline-flex;align-items:center;gap:var(--space-4)}
 .pill:hover{color:var(--ink);border-color:var(--line-strong)}
 .pill.on{background:var(--inv);border-color:var(--inv);color:var(--on-inv)}
 
@@ -1836,7 +1838,7 @@ function meMenu(view) {
   return `<div class="me-h"><span class="me-av" aria-hidden="true">${esc(initials(S.me.name || S.me.email))}</span><div style="min-width:0"><div class="me-n">${esc(S.me.name)}</div><div class="me-e" title="${esc(S.me.email)}">${esc(S.me.email)}</div></div></div>
     <div class="pop-sep"></div>
     ${menuItems([{ act: 'me-settings', icon: 'user', label: t('Profile settings') }, row('lang', 'globe', 'Language', S.lang === 'ru' ? 'Русский' : 'English'), { act: 'shortcuts', icon: 'keyboard', label: t('Keyboard shortcuts') }, { act: 'toast', data: { msg: 'Docs would open here' }, icon: 'help', label: t('Help & docs') }])}
-    <div class="pop-row me-theme">${icon('palette', 16)}<span>${t('Theme')}</span><div class="seg sm ic" role="group" aria-label="${t('Theme')}"><button class="${dark ? '' : 'on'}" data-act="theme" data-v="light" aria-label="${t('Light')}" aria-pressed="${!dark}" data-tip="${t('Light')}">${icon('sun', 16)}</button><button class="${dark ? 'on' : ''}" data-act="theme" data-v="dark" aria-label="${t('Dark')}" aria-pressed="${dark}" data-tip="${t('Dark')}">${icon('moon', 16)}</button></div></div>
+    <div class="pop-row me-theme">${icon('palette', 16)}<span>${t('Theme')}</span><div class="seg ic" role="group" aria-label="${t('Theme')}"><button class="${dark ? '' : 'on'}" data-act="theme" data-v="light" aria-label="${t('Light')}" aria-pressed="${!dark}" data-tip="${t('Light')}">${icon('sun', 16)}</button><button class="${dark ? 'on' : ''}" data-act="theme" data-v="dark" aria-label="${t('Dark')}" aria-pressed="${dark}" data-tip="${t('Dark')}">${icon('moon', 16)}</button></div></div>
     <div class="pop-sep"></div>
     ${menuItems([{ act: 'sign-out', icon: 'logout', label: t('Sign out') }])}`;
 }
@@ -2345,10 +2347,23 @@ const colCtx = () => S.route === 'companies'
   : { t: 'users', cols: usersCols().map(c => c.key), w: S.colW, key: 'nsc.colw', sel: '#results table.ut', redraw: renderResults };
 const tableW = (X = colCtx()) => X.cols.reduce((s, k) => s + X.w[k], 0) + 44 + 84;
 function fitColumns() {
-  const X = colCtx(), t = $(X.sel); if (!t || t.classList.contains('fixed')) return;
-  $$('th[data-key]', t).forEach(th => { const k = th.dataset.key; if (!X.w[k]) X.w[k] = Math.ceil(th.getBoundingClientRect().width) + 4; }); // +4 keeps sub-pixel content from clipping
-  store.set(X.key, X.w); applyColW(t);
+  const X = colCtx(), t = $(X.sel); if (!t) return;
+  let grew = false;
+  if (!t.classList.contains('fixed')) { $$('th[data-key]', t).forEach(th => { const k = th.dataset.key; if (!X.w[k]) X.w[k] = Math.ceil(th.getBoundingClientRect().width) + 4; }); grew = true; } // +4 keeps sub-pixel content from clipping
+  // a column is never narrower than its header: widths saved under a smaller header type grow once to fit, then stay put
+  $$('th[data-key]', t).forEach(th => { const k = th.dataset.key, tin = $('.th-in', th); if (!tin || !X.w[k]) return;
+    const cs = getComputedStyle(th), need = Math.ceil(tin.scrollWidth + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight)) + 4;
+    if (need > X.w[k]) { X.w[k] = need; grew = true; } });
+  // text grew since these widths were saved (FIT_V): give each column room for the rows on screen, once
+  const fv = store.get('nsc.fitv', {});
+  if (fv[X.key] !== FIT_V) {
+    const ths = $$('thead tr:first-child th', t);
+    $$('tbody tr', t).forEach(tr => [...tr.cells].forEach((td, i) => { const k = ths[i]?.dataset.key; if (k && X.w[k] && td.scrollWidth > td.clientWidth + 1) { X.w[k] = Math.max(X.w[k], td.scrollWidth + 4); grew = true; } }));
+    fv[X.key] = FIT_V; store.set('nsc.fitv', fv);
+  }
+  if (grew) { store.set(X.key, X.w); applyColW(t); }
 }
+const FIT_V = 2; // bump when the type scale changes: every saved column width is re-checked against its content once (2: 12 → 14px codes)
 function applyColW(t) {
   const X = colCtx();
   $$('col[data-col]', t).forEach(col => col.style.width = X.w[col.dataset.col] + 'px');
@@ -2650,7 +2665,7 @@ const tabCount = n => n ? ` <span class="tab-n">${n}</span>` : '';
 // Text columns (names, addresses…) get no width and share what is left; long values end in "…".
 const DT_W = [[/^(ID|#)$/, 100], [/ ID$/, 160], [/^(Created|Updated|Added|Expires|Expiry|Last used|Started|When|Requested|Request updated|Operation date|Date of birth)$/, 170],
   [/^(Status|KYC|Outcome|Risk)$/, 160], [/^(Pair|Kind|Region|Source|Version|Frozen|Active|Default|Residency)$/, 120],
-  [/^(Currency|Crypto currency|Type|Card type|Role|Network)$/, 170], [/^(Code|Country|Nationality|City|Post code|Provider|Masked number)$/, 150]];
+  [/^(Currency|Crypto currency|Type|Card type|Role|Network)$/, 170], [/^Code$/, 240], [/^(Country|Nationality|City|Post code|Provider|Masked number)$/, 150]];
 const dtColW = h => h.al === 'a' ? 0 : DT_W.find(([re]) => re.test(h.l))?.[1] ?? (h.al === 'c' ? 110 : h.al === 'r' ? 130 : null);
 function dtable(heads, rows, empty = '', drag) {
   if (!rows.length) return empty;
@@ -3812,7 +3827,7 @@ function paProds() {
   el.innerHTML = `<div class="pa-top">${head}</div>
     <div class="pa-tools">
       <label class="search">${icon('search', 16)}<input id="paQ" placeholder="Find product, provider or ID" value="${esc(f.pq)}" autocomplete="off"></label>
-      <div class="seg sm">${[['all', 'All'], ['cards', 'Cards'], ['iban', 'IBAN']].map(([k, l]) => `<button class="${f.kind === k ? 'on' : ''}" data-act="mx-kind" data-v="${k}">${l}</button>`).join('')}</div>
+      <div class="seg">${[['all', 'All'], ['cards', 'Cards'], ['iban', 'IBAN']].map(([k, l]) => `<button class="${f.kind === k ? 'on' : ''}" data-act="mx-kind" data-v="${k}">${l}</button>`).join('')}</div>
     </div>
     <div class="pa-body">${groups || emptyBlock('search', 'No products match', 'Try another name, provider or ID.')}</div>`;
   $('.pa-body', el).scrollTop = keep; markHits($('.pa-body', el), f.pq);
