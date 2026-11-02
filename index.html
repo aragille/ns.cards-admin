@@ -369,8 +369,8 @@ th.sorted{color:var(--ink)} th.sorted .srt{opacity:1}
 .fin{cursor:text} .fin>.i{flex:none;color:var(--ink)}
 .fin input{flex:1;min-width:0;width:100%;padding:0;border:0;outline:0;background:transparent;color:var(--ink);font:inherit}
 .fin input::placeholder{color:var(--ink-3)}
-.fctl .fx{flex:none;display:grid;place-items:center;width:var(--control-xs);height:var(--control-xs);margin-right:calc(-1 * var(--space-2));border-radius:var(--r-xs);color:var(--ink-3);cursor:pointer}
-.fctl .fx:hover{background:var(--hover);color:var(--ink)}
+.fctl .fx,.fdd .fx{flex:none;display:grid;place-items:center;width:var(--control-xs);height:var(--control-xs);margin-right:calc(-1 * var(--space-2));border-radius:var(--r-xs);color:var(--ink-3);cursor:pointer}
+.fctl .fx:hover,.fdd .fx:hover{background:var(--hover);color:var(--ink)}
 .fclr{width:var(--control-xs);height:var(--control-xs);display:grid;place-items:center;border-radius:var(--r-xs);color:var(--ink-3)} .fclr:hover{background:var(--selected);color:var(--ink)} /* clear all: same 20px box as the row checkboxes above it */
 .frow-empty td{height:auto;padding:var(--space-24) var(--space-16)!important;color:var(--ink-2);font-size:var(--fs-14)} .frow-empty td>*{position:sticky;left:var(--space-16)}
 .frow-empty td .btn-link{margin-left:var(--space-8)}
@@ -2279,8 +2279,10 @@ function renderChips() {
   const shown = off ? X.list.filter(f => off.includes(f.key)) : X.list, n = X.list.length + (mode === 'inline' ? ctextOn().length : 0);
   el.dataset.sig = filterSig(); const bar = el.parentElement; bar.classList.toggle('fv-flow', mode !== 'bar'); bar.classList.toggle('fv-inline', mode === 'inline');
   // Wrapping (Figma toolbar 186:200): every filter field is always there as a dropdown — grey label when unset, "Label: values" once set
+  // a set dropdown swaps its chevron for a × that clears just that filter (as in the In columns row)
+  const ddClr = k => `<span class="fx" role="button" tabindex="-1" data-act="col-clear" data-key="${k}" data-tip="Clear" aria-label="Clear this filter">${icon('x', 16)}</span>`;
   const dd = ([k, F]) => { const f = X.list.find(x => x.key === k && x.values.length);
-    return `<button class="fdd ${f ? 'on' : ''}" data-act="col-filter" data-key="${k}" aria-label="Filter by ${F.label}">${F.date ? icon('calendar', 16) : ''}<span>${f ? `${F.label}: ${chipParts(f, X).vt}` : F.label}</span>${icon('chevDown', 16)}</button>`; };
+    return `<button class="fdd ${f ? 'on' : ''}" data-act="col-filter" data-key="${k}" aria-label="Filter by ${F.label}">${F.date ? icon('calendar', 16) : ''}<span>${f ? `${F.label}: ${chipParts(f, X).vt}` : F.label}</span>${f ? ddClr(k) : icon('chevDown', 16)}</button>`; };
   el.innerHTML = mode === 'wrap' ? Object.entries(X.F).map(dd).join('') : shown.map(f => { const { F, vt, op } = chipParts(f, X);
     return `<div class="chip" data-chip="${f.key}"><span class="cf">${icon(F.icon, 16)}${F.label}</span><span class="co">${op}</span><button class="cv" data-act="edit-filter" data-key="${f.key}">${vt}</button><button class="cx" data-act="rm-filter" data-key="${f.key}" aria-label="Remove filter">${icon('x', 16)}</button></div>`;
   }).join('');
