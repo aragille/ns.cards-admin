@@ -620,7 +620,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .kv2{display:grid;grid-template-columns:1fr 1fr;column-gap:var(--space-32)}
 .kv2 .kv-r:nth-last-child(2):nth-child(odd){border-bottom:0}
 .lnk{color:var(--ink);text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px;font-weight:500}
-.lnk:hover{text-decoration-color:var(--ink-3)} /* every name / company link: hover = a grey line, nothing else */
+.lnk:hover{text-decoration-color:currentColor} /* every name / company link: hover = a grey line, nothing else */
 .sel-btn{display:inline-flex;align-items:center;gap:var(--space-8);height:32px;padding:0 var(--space-8) 0 var(--space-12);border-radius:var(--r-sm);border:var(--border-width) solid transparent;font-weight:500;margin-right:calc(-1 * var(--space-8))}
 .sel-btn:hover,.sel-btn.popped{background:var(--hover);border-color:var(--line)}
 .sel-btn.popped>.i:last-child{transform:rotate(180deg)}
@@ -1110,6 +1110,8 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 /* Table cell (Figma ❖ Data display → Table cell): one class per Type — see TC in the script. Text-ish left, Number / Number muted right */
 .tc-strong{font-weight:var(--fw-medium);color:var(--ink)}
 .tc-empty{color:var(--ink-2)}
+.tc-tb{display:flex;align-items:center;gap:var(--space-8);min-width:0}.tc-tb>.tc-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} /* Text + Show badge */
+.tc-badges{display:inline-flex;align-items:center;gap:var(--space-8)} /* Badge + Show badge 2 */
 .tc-card{display:inline-flex;align-items:center;gap:var(--space-8);white-space:nowrap}
 .tc-card .mc{width:36px;height:var(--icon-lg);border-radius:var(--r-xs);display:grid;place-items:center;flex:none;background:var(--inv);color:var(--on-inv)}
 .tc-card .mc.phys{background:var(--brand);color:var(--on-color)}
@@ -1189,7 +1191,8 @@ const CUR_IMG = {
   USD: 'data:image/png;base64,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',
   GBP: 'data:image/png;base64,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',
 };
-const flag = cc => !cc ? '' : FLAG_IMG[cc.toUpperCase()] ? `<img class="flag-i" src="${FLAG_IMG[cc.toUpperCase()]}" alt="">` : `<span class="flag-x">${cc.toUpperCase()}</span>`;
+const ccName = cc => { try { ccName.m ||= Object.fromEntries(Object.values(WORLD).map(w => [w.cc, w.name])); } catch (e) { return cc.toUpperCase(); } return ccName.m[cc.toUpperCase()] || cc.toUpperCase(); }; // country name for a flag's tooltip
+const flag = cc => !cc ? '' : FLAG_IMG[cc.toUpperCase()] ? `<img class="flag-i" src="${FLAG_IMG[cc.toUpperCase()]}" alt="${ccName(cc)}" data-tip="${ccName(cc)}">` : `<span class="flag-x" data-tip="${ccName(cc)}">${cc.toUpperCase()}</span>`;
 const NOW = new Date('2026-10-21T10:30:00');
 const fmtDate = d => d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 const fmtDateTime = d => fmtDate(d) + ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
@@ -2651,8 +2654,8 @@ const fmtAmt = (v, c, signed) => {
   const a = ASSET[c] || { dp: 2 }, s = Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: a.fiat ? 2 : 0, maximumFractionDigits: a.dp });
   return (signed ? (v > 0 ? '+' : v < 0 ? '−' : '') : '') + s + ' ' + c;
 };
-const assetIc = (c, s = 16) => CUR_IMG[c] ? `<img class="asset-ic" src="${CUR_IMG[c]}" style="width:${s}px;height:${s}px" alt="">` // inline size: .asset-ic's own 34px would win over attributes
-  : `<span class="asset-ic" style="width:${s}px;height:${s}px;font-size:${Math.round(s * .42)}px;background:${ASSET[c]?.col || 'var(--neutral)'}">${ASSET[c]?.s || { GBP: '£', CHF: '₣' }[c] || c[0]}</span>`;
+const assetIc = (c, s = 16) => CUR_IMG[c] ? `<img class="asset-ic" src="${CUR_IMG[c]}" style="width:${s}px;height:${s}px" alt="${ASSET[c]?.n || c}" data-tip="${ASSET[c]?.n || c}">` // inline size: .asset-ic's own 34px would win over attributes
+  : `<span class="asset-ic" data-tip="${ASSET[c]?.n || c}" style="width:${s}px;height:${s}px;font-size:${Math.round(s * .42)}px;background:${ASSET[c]?.col || 'var(--neutral)'}">${ASSET[c]?.s || { GBP: '£', CHF: '₣' }[c] || c[0]}</span>`;
 const curCell = c => `<span class="ctry">${assetIc(c, 16)}${c}</span>`; // a currency code with its icon, wherever a column holds one
 const yes = v => `<span class="yn ${v ? 'ok' : 'no'}" role="img" aria-label="${v ? 'Yes' : 'No'}">${icon(v ? 'checkCircle' : 'minusCircle', 16)}</span>`;
 const dash = '<span class="tc-empty">—</span>';
@@ -2846,7 +2849,7 @@ const TCOLS = {
     { k: 'reason', l: 'Reject reason', cell: f => muted(f.reason) }, { k: 'requested', l: 'Requested', on: 1, cell: f => muted(rel(f.date)) },
     { k: 'rupdated', l: 'Request updated', cell: f => muted(rel(f.updated)) }, { k: 'fid', l: 'Form ID', on: 1, cell: f => numM(FORM_TYPES[f.type].id) },
     { k: 'title', l: 'Title', on: 1, cell: f => FORM_TYPES[f.type].title }, { k: 'desc', l: 'Description', on: 1, cell: f => muted(FORM_TYPES[f.type].desc) },
-    { k: 'version', l: 'Version', cell: f => numM('v' + FORM_TYPES[f.type].version) }, { k: 'type', l: 'Type', on: 1, cell: f => `<span class="code">${f.type}</span>` },
+    { k: 'version', l: 'Version', cell: f => numM('v' + FORM_TYPES[f.type].version) }, { k: 'type', l: 'Type', on: 1, cell: f => TC.muted(f.type) },
     { k: 'fstatus', l: 'Form status', cell: () => badge({ label: 'Active', tone: 'success' }) }, { k: 'fcreated', l: 'Form created', cell: f => muted(fmtDay(FORM_TYPES[f.type].created)) },
     { k: 'email', l: 'User email', cell: () => muted(byId(S.userId).email) },
   ],
@@ -2907,7 +2910,7 @@ const feeStr = f => { const p = []; if (f.pct) p.push(+(f.pct * 100).toFixed(3) 
 const fixedStr = o => Object.entries(o || {}).filter(([, v]) => v).map(([c, v]) => `${v} ${c}`).join(', ');
 const parseFixed = s => Object.fromEntries(s.split(',').map(x => x.trim().split(/\s+/)).filter(p => p.length === 2 && !isNaN(+p[0])).map(([v, c]) => [c.toUpperCase(), +v]));
 const editBtn = (act, i) => `<button class="ghost-ic" data-act="${act}" data-i="${i}" data-tip="Edit">${icon('pencil', 16)}</button>`;
-const opCells = (op, extra = '') => [`<span style="display:flex;align-items:center;gap:var(--space-8)">${opLabel(op)}${extra}</span>`, `<span class="code">${op}</span>`]; // operation + its code, one line each
+const opCells = (op, extra = '') => [TC.text(opLabel(op), extra), TC.muted(op)]; // operation + its code, one line each
 function feesTab(u, D) {
   const lim = v => v ? `<span class="num">${fmtInt(v)}</span>` : TC.numMuted('0');
   return tcard('Fees', '<span class="code">App users vs API clients</span>', dtable(['Operation', 'Code', 'App fee', 'API fee', '|a'],
@@ -3578,7 +3581,7 @@ function setP(c, k, on) {
 }
 const money = (v, cur = 'EUR') => ({ EUR: '€', USD: '$', GBP: '£' }[cur] || cur + ' ') + (+v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const volFmt = v => v >= 1e9 ? v / 1e9 + 'B' : v >= 1e6 ? v / 1e6 + 'M' : v >= 1e3 ? v / 1e3 + 'K' : String(v);
-const prodCell = c => { const a = c.cp.length, b = c.ip.length; return !a && !b ? badge({ label: 'Not set up', tone: 'warning' }) : `<span class="pchips">${a ? badge({ label: a, icon: 'card', tip: `${a} card product${a > 1 ? 's' : ''}` }) : ''}${b ? badge({ label: b, icon: 'bank', tip: `${b} IBAN product${b > 1 ? 's' : ''}` }) : ''}</span>`; };
+const prodCell = c => { const a = c.cp.length, b = c.ip.length; return !a && !b ? badge({ label: 'Not set up', tone: 'warning' }) : `<span class="tc-badges">${a ? badge({ label: a, icon: 'card', tip: `${a} card product${a > 1 ? 's' : ''}` }) : ''}${b ? badge({ label: b, icon: 'bank', tip: `${b} IBAN product${b > 1 ? 's' : ''}` }) : ''}</span>`; };
 const kycCell = v => v ? TC.text(LEVEL[v].label) : TC.muted('Not required');
 const lum = h => { const c = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(v => v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; };
 const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
@@ -3614,7 +3617,7 @@ Object.assign(TCOLS, {
     { k: 'cost', l: 'Cost', al: 'r', on: 1, cell: a => a.cost ? `<span class="num">${money(a.cost, PROD_BY.c[a.pid].cur)}</span>` : TC.numMuted('Free') },
     { k: 'discount', l: 'Discount', al: 'r', on: 1, cell: a => a.discount ? `<span class="num">${a.discount}%</span>` : dash },
     { k: 'material', l: 'Material ID', cell: a => a.material ? numM(a.material) : dash },
-    { k: 'group', l: 'Payment group', on: 1, cell: a => `<span class="code">${a.group}</span>` },
+    { k: 'group', l: 'Payment group', on: 1, cell: a => TC.muted(a.group) },
     { k: 'limit', l: 'Monthly limit', al: 'r', on: 1, cell: a => `<span class="num">${money(a.limit, PROD_BY.c[a.pid].cur).replace(/\.00$/, '')}</span>` },
     { k: 'funded', l: 'Company funded', on: 1, cell: a => yes(a.funded) },
     { k: 'maxFunded', l: 'Max funded per user', al: 'r', cell: a => a.funded ? numM(a.maxFunded) : dash },
@@ -3961,13 +3964,13 @@ function coKeysTab(c, D) {
 function coDirTab(c, D) {
   const btn = `<button class="btn btn-secondary" data-act="dir-add">${icon('plus', 16)}Add person</button>`, own = D.directors.reduce((s, p) => s + p.own, 0);
   return tcard(`Directors & owners${D.directors.length ? ` <span class="ct">${own}% ownership declared</span>` : ''}`, D.directors.length ? btn : '', dtable(['Name', 'Role', 'Nationality', 'Date of birth', 'Ownership|r', 'KYC', 'Added|r', '|a'], D.directors.map((p, i) => [
-    `${TC.strong(esc(p.name))}`, muted(DIR_ROLE[p.role]), `<span class="ctry"><span class="flag">${flag(COUNTRIES[p.nat].cc)}</span>${COUNTRIES[p.nat].name}</span>`,
+    `${TC.strong(esc(p.name))}`, muted(DIR_ROLE[p.role]), TC.country(p.nat, COUNTRIES[p.nat].name),
     `<span class="num">${fmtDay(p.dob)}</span>`, p.own ? `<span class="num">${p.own}%</span>` : dash, badge(KYC[p.kyc]), muted(fmtDay(p.added)),
     (p.kyc !== 'approved' ? `<button class="ghost-ic" data-act="dir-kyc" data-i="${i}" data-tip="Send KYC link">${icon('send', 16)}</button>` : '') + `<button class="ghost-ic" data-act="dir-rm" data-i="${i}" data-tip="Remove">${icon('trash', 16)}</button>`]),
     emptyBlock('idcard', 'No directors or owners', c.type === 'single' ? 'Single-user companies usually don’t need them, but you can still add people for KYB.' : 'Add the company’s directors and beneficial owners for KYB.', btn)));
 }
 function coRatesTab(c, D) {
-  const sub = S.coSub.rates, R = S.rate, custom = x => x.custom ? ' <span class="badge t-info">Custom</span>' : '';
+  const sub = S.coSub.rates, R = S.rate, custom = x => x.custom ? badge({ label: 'Custom', tone: 'info' }) : '';
   const seg = subSeg('rates', [['bank', 'Bank deposit / withdrawal'], ['spread', 'Exchange spread'], ['exfees', 'Exchange fees'], ['cards', 'Card products']]);
   const lvl = `<span class="tools-sep"></span><select class="fsel" data-rate="level">${Object.entries(LEVEL).map(([k, o]) => `<option value="${k}" ${R.level === k ? 'selected' : ''}>${o.label} level</option>`).join('')}</select>`;
   const init = `<select class="fsel" data-rate="init">${[['user', 'Company user'], ['api', 'API']].map(([k, l]) => `<option value="${k}" ${R.init === k ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
@@ -3975,12 +3978,12 @@ function coRatesTab(c, D) {
   if (sub === 'bank') return tcard('Sell rates', note, dtable(['Operation', 'Code', 'Provider', 'Currency', 'Fee|r', 'Fixed|r', 'Minimum|r', '|a'], bankRows(D, R.level, R.init).map((x, i) => [
     ...opCells(x.op, custom(x)), x.provider, curCell(x.cur), `<span class="num">${x.pct}%</span>`, x.fixed ? `<span class="num">${money(x.fixed, x.cur)}</span>` : dash, `<span class="num">${money(x.min, x.cur)}</span>`, editBtn('rate-bank', i)])), seg + lvl + init);
   if (sub === 'spread') return tcard('Sell rates', note, dtable(['Pair', 'System|r', 'Client|r', 'Total|r', '|a'], D.spread.map((x, i) => [
-    `${TC.strong(x.pair)}${custom(x)}`, numM(x.sys + '%'), `<span class="num">${x.client}%</span>`, `<span class="num" style="font-weight:600">${+(x.sys + x.client).toFixed(2)}%</span>`, editBtn('rate-spread', i)])), seg);
+    TC.text(x.pair, custom(x)), numM(x.sys + '%'), `<span class="num">${x.client}%</span>`, `<span class="num" style="font-weight:600">${+(x.sys + x.client).toFixed(2)}%</span>`, editBtn('rate-spread', i)])), seg);
   if (sub === 'exfees') {
     const vol = v => v == null ? TC.muted('and above') : TC.num('€' + volFmt(v)), n = v => TC.num(v + '%'), tip = '<span data-tip="30-day trading volume">';
     // one header row (no API / User group header): From ≥ · To < · API maker · API taker · User maker · User taker
     return tcard('Sell rates', note, dtable([`${tip}From ≥</span>`, `${tip}To &lt;</span>`, 'API maker|r', 'API taker|r', 'User maker|r', 'User taker|r', '|a'],
-      exRows(D, R.level).map((x, i) => [vol(x.from) + custom(x), vol(x.to), n(x.apiM), n(x.apiT), n(x.userM), n(x.userT), editBtn('rate-ex', i)])), seg + lvl);
+      exRows(D, R.level).map((x, i) => [TC.text('€' + volFmt(x.from), custom(x)), vol(x.to), n(x.apiM), n(x.apiT), n(x.userM), n(x.userT), editBtn('rate-ex', i)])), seg + lvl);
   }
   return tcard('Sell rates', c.cp.length ? linkBtn('co-tab', 'products', 'Edit prices in Products') : '', dtable(['ID', 'Provider', 'Name', 'Virtual issuing|r', 'Physical issuing|r', 'Monthly user fee|r', 'Cardholder', 'Active', 'Type'], c.cp.map(a => {
     const p = PROD_BY.c[a.pid], phys = p.kind === 'physical', fee = v => v ? `<span class="num">${money(v, p.cur)}</span>` : TC.numMuted('Free');
@@ -4003,7 +4006,7 @@ function coCurTab(c, D) {
   return tcard('Currencies', D.currencies.length ? `<select class="fsel sm" data-curprov="1"><option value="">All providers</option>${provs.map(p => `<option value="${p}" ${S.curProv === p ? 'selected' : ''}>${p}</option>`).join('')}</select>${btn}` : '',
     dtable(['ID', 'Currency', 'Network', 'Type', 'Network ID', 'Provider ID', 'Provider', 'Created', 'Updated|r', '|a'], list.map(x => {
       const a = ASSET[x.c];
-      return [numM(x.id), `<span class="ctry">${assetIc(x.c, 16)}<span>${x.c} <span class="muted">${a.n}</span></span></span>`, muted(a.net), a.fiat ? 'Fiat' : 'Crypto', `<span class="code">${NET_ID[x.c]}</span>`,
+      return [numM(x.id), TC.currency(x.c, a.n), muted(a.net), a.fiat ? 'Fiat' : 'Crypto', `<span class="muted">${NET_ID[x.c]}</span>`,
         copyVal(x.providerId), x.provider, muted(fmtDay(x.created)), muted(rel(x.updated)), `<button class="ghost-ic" data-act="cur-rm" data-id="${x.id}" data-tip="Remove">${icon('trash', 16)}</button>`];
     }), D.currencies.length ? emptyBlock('search', 'No currencies for this provider', 'Pick another provider.') : emptyBlock('coins', 'No currencies enabled', 'Enable the assets this company’s users can hold and exchange.', btn)));
 }
@@ -4623,9 +4626,9 @@ const refreshLD = () => { colCtx().redraw(); if (popOpts.kind === 'ldisplay') { 
 
 /* Building blocks for page configs */
 const dotCell = o => `<span class="stat"><i class="dot t-${o.tone || 'neutral'}"></i>${o.label}</span>`;
-const userLink = u => u ? `<a class="lnk" href="#/users/${u.id}">${esc(u.name || u.email)}</a>` : dash;
-const coLink = c => c ? `<a class="lnk" href="#/companies/${c.id}">${esc(c.name)}</a>` : dash;
-const recLink = (p, id, l) => `<a class="lnk" href="#/${p}/${encodeURIComponent(id)}">${esc(l)}</a>`;
+const userLink = u => u ? TC.link(`#/users/${u.id}`, esc(u.name || u.email)) : dash;
+const coLink = c => c ? TC.link(`#/companies/${c.id}`, esc(c.name)) : dash;
+const recLink = (p, id, l) => TC.link(`#/${p}/${encodeURIComponent(id)}`, esc(l));
 const fE = (label, icon, options, get, more = {}) => ({ label, icon, options, get, ...more });
 const fD = (label, get) => ({ label, icon: 'calendar', date: 1, options: {}, test: (r, v) => inRange(get(r), v[0]) });
 const optsOf = (o, f = v => v) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, typeof v === 'string' ? { label: v } : f(v)]));
@@ -4639,7 +4642,7 @@ const TC_DASH = '<span class="tc-empty">—</span>';
 const tcCell = (c, right) => c === undefined || c === null || c === '' ? TC_DASH : /^\s*</.test(String(c)) ? c : right ? TC.num(c) : TC.text(c);
 const tcE = v => v === undefined || v === null || v === '';
 const TC = {
-  text: v => tcE(v) ? TC_DASH : `<span class="tc-text">${v}</span>`,                                     // Text — Body/Medium, text/primary
+  text: (v, b) => tcE(v) ? TC_DASH : b ? `<span class="tc-tb"><span class="tc-text">${v}</span>${b}</span>` : `<span class="tc-text">${v}</span>`, // Text (+ Show badge: a Badge at the end of the cell)                                     // Text — Body/Medium, text/primary
   strong: v => tcE(v) ? TC_DASH : `<span class="tc-strong">${v}</span>`,                                 // Text strong — Label/Medium: the row's main name
   iconText: (ic, v) => tcE(v) ? TC_DASH : `<span class="txt">${icon(ic, 16)}<span>${v}</span></span>`,    // Icon + text — icon 16 in text/tertiary, gap 8
   muted: v => tcE(v) ? TC_DASH : `<span class="muted">${v}</span>`,                                      // Text muted — text/secondary (also empty values)
@@ -4647,14 +4650,15 @@ const TC = {
   numMuted: v => tcE(v) ? TC_DASH : `<span class="num muted">${v}</span>`,                               // Number muted — dates, zeros
   meter: (p, tone, scale = 200, label) => meterEl(p, tone, scale, label),                               // Meter — headroom to a threshold
   copy: (v, shown) => tcE(v) ? TC_DASH : copyVal(v, shown),                                              // Copy — value + copy icon
-  country: code => ctryCell(code),                                                                       // Country — flag + ISO-3
-  countries: (ccs, total = ccs.length) => !ccs.length ? TC_DASH : `<span class="tc-flags"><span class="ics">${ccs.slice(0, 4).map(cc => `<span class="flag" title="${cc}">${flag(cc)}</span>`).join('')}</span>${total > 4 ? `<span class="muted">+${total - 4}</span>` : ''}</span>`, // Countries — up to 4 flags + «+N»
-  currency: c => tcE(c) ? TC_DASH : curCell(c),                                                          // Currency — icon + ticker
+  country: (code, name) => name ? `<span class="ctry"><span class="flag">${flag(COUNTRIES[code]?.cc || code)}</span>${name}</span>` : ctryCell(code), // name: the full name instead of the ISO code                                                                       // Country — flag + ISO-3
+  countries: (ccs, total = ccs.length) => !ccs.length ? TC_DASH : `<span class="tc-flags"><span class="ics">${ccs.slice(0, 4).map(cc => `<span class="flag">${flag(cc)}</span>`).join('')}</span>${total > 4 ? `<span class="muted">+${total - 4}</span>` : ''}</span>`, // Countries — up to 4 flags + «+N»
+  currency: (c, name) => tcE(c) ? TC_DASH : name ? `<span class="ctry">${assetIc(c, 16)}${name}</span>` : curCell(c), // name: the full name instead of the ticker                                                          // Currency — icon + ticker
   currencies: cs => !cs.length ? TC_DASH : `<span class="tc-curs"><span class="ics">${cs.slice(0, 3).map(c => assetIc(c, 16)).join('')}</span><span class="muted">${cs.join(', ')}</span></span>`, // Currencies — up to 3 icons + tickers
   card: (last4, physical) => `<span class="tc-card"><span class="mc ${physical ? 'phys' : ''}">${brand().card()}</span>•••• ${last4}</span>`, // Card — .Mini card + last 4
   yes: v => yes(v),                                                                                      // Yes / No
   status: o => o ? dotCell(o) : TC_DASH,                                                                 // Status — dot + label
-  badge: o => o ? badge(o) : TC_DASH,                                                                    // Badge
+  badge: o => !o ? TC_DASH : Array.isArray(o) ? `<span class="tc-badges">${o.map(x => badge(x)).join('')}</span>` : badge(o), // Badge (+ Show badge 2: pass two)
+  link: (href, l) => tcE(l) ? TC_DASH : `<a class="lnk" href="${href}">${l}</a>`, // Link — another record, in tables on a record page                                                                    // Badge
   risk: r => r ? riskCell(r) : TC_DASH,                                                                  // Risk
   toggle: (on, attrs = '', tip = '') => `<button class="sw-t ${on ? 'on' : ''}" ${attrs}${tip ? ` data-tip="${tip}"` : ''}></button>`, // Toggle — left, like every slot type
   check: (on, attrs = '') => `<button class="cb ${on ? 'on' : ''}" ${attrs}>${icon('check', 12, 2.5)}</button>`, // Checkbox
@@ -4667,7 +4671,7 @@ const K = {
   badge: (E, k, l, on = 1) => ({ k, l, on, val: r => Object.keys(E).indexOf(r[k]), cell: r => TC.badge(E[r[k]]) }),
   text: (k, l, on = 1) => ({ k, l, on, val: r => String(r[k] ?? '').toLowerCase(), cell: r => TC.text(r[k] ? esc(r[k]) : '') }),
   muted: (k, l, on = 1) => ({ k, l, on, val: r => String(r[k] ?? '').toLowerCase(), cell: r => TC.muted(r[k] ? esc(r[k]) : '') }),
-  code: (k, l, on = 1) => ({ k, l, on, cell: r => r[k] ? `<span class="code">${esc(r[k])}</span>` : dash }),
+  code: (k, l, on = 1) => ({ k, l, on, cell: r => TC.muted(r[k] ? esc(r[k]) : '') }), // codes read as Text muted
   copy: (k, l, on = 1) => ({ k, l, on, cell: r => TC.copy(r[k]) }),
   num: (k, l, f = fmtInt, on = 1) => ({ k, l, al: 'r', on, dir: 'desc', val: r => r[k] || 0, cell: r => r[k] ? TC.num(f(r[k])) : TC.numMuted(f(0)) }),
   eur: (k, l, on = 1) => K.num(k, l, v => fmtEur(v), on),
@@ -5286,7 +5290,7 @@ page({
   },
   rec: { title: l => l.name, sub: l => `<span>${LIST_SCOPE[l.scope]}</span><span class="faint">·</span><span>${l.list.length} countries</span>`, badges: l => badge(LIST_TYPE[l.type]),
     sections: l => tcard(`Countries <span class="ct">${l.list.length}</span>`, `<button class="btn btn-secondary" data-act="cl-add" data-rid="${l.id}">${icon('plus', 16)}Add country</button>`,
-      dtable(['Country', 'Code', 'Region', '|a'], [...l.list].sort((a, b) => WORLD[a].name.localeCompare(WORLD[b].name)).map(k => [`<span class="ctry"><span class="flag">${flag(WORLD[k].cc)}</span>${WORLD[k].name}</span>`, `<span class="num muted">${k}</span>`, muted(COUNTRIES[k]?.eea ? 'EEA' : 'Non-EEA'), `<button class="ghost-ic" data-act="cl-rm" data-rid="${l.id}" data-c="${k}" data-tip="Remove">${icon('trash', 16)}</button>`]),
+      dtable(['Country', 'Code', 'Region', '|a'], [...l.list].sort((a, b) => WORLD[a].name.localeCompare(WORLD[b].name)).map(k => [TC.country(WORLD[k].cc, WORLD[k].name), TC.muted(k), muted(COUNTRIES[k]?.eea ? 'EEA' : 'Non-EEA'), `<button class="ghost-ic" data-act="cl-rm" data-rid="${l.id}" data-c="${k}" data-tip="Remove">${icon('trash', 16)}</button>`]),
       emptyBlock('globe', 'No countries yet', 'Add the countries this list applies to.'))) },
 });
 page({
@@ -5405,7 +5409,7 @@ page({
   tiles: [allTile('All events', L => `${L.filter(l => NOW - l.at < DAY).length} in 24 hours`), tile('auth', 'Sign-ins', { key: 'group', values: ['AUTH'] }, share), tile('fin', 'Financial', { key: 'group', values: ['FINANCIAL'] }, share),
     tile('set', 'Settings changes', { key: 'group', values: ['SETTINGS', 'RISK'] }, share), tile('den', 'Denied', { key: 'result', values: ['DENIED'] }, () => 'Missing permission')],
   cols: [K.when('at', 'Time'), K.text('admin', 'Administrator'), { k: 'label', l: 'Action', on: 1, cell: l => `<span class="txt">${icon(LOG_GROUP[l.group].icon, 16)}${l.label}</span>` }, K.code('code', 'Event code'),
-    { k: 'entity', l: 'Entity', on: 1, cell: l => l.href ? `<a class="lnk" href="${l.href}">${esc(l.entity)}</a>` : muted(l.entity) }, K.code('ip', 'IP address', 0), K.status(LOG_RESULT, 'result', 'Result'), K.id('Event ID')],
+    { k: 'entity', l: 'Entity', on: 1, cell: l => l.href ? TC.link(l.href, esc(l.entity)) : TC.muted(esc(l.entity)) }, K.code('ip', 'IP address', 0), K.status(LOG_RESULT, 'result', 'Result'), K.id('Event ID')],
   sort: { k: 'at', dir: 'desc' },
   menu: l => l.href ? [{ act: 'route', data: { arg: l.href.slice(2) }, icon: 'link', label: `Open ${l.entity}` }] : [],
   rec: { title: l => l.label, sub: l => `<span>${esc(l.admin)}</span><span class="faint">·</span><span>${fmtDateTime(l.at)}</span>`, badges: l => badge(LOG_RESULT[l.result]) + `<span class="badge t-neutral">${LOG_GROUP[l.group].label}</span>`,
