@@ -586,9 +586,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .card .tfoot{padding:0 var(--card-padding)}
 .tfoot{justify-content:space-between;gap:var(--space-16)} .tf-c{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tf-pg{display:flex;align-items:center;gap:var(--space-16);flex:none} .tf-per{display:flex;align-items:center;gap:var(--space-8)}
-.tf-sel{height:var(--control-md);font-size:var(--fs-14)} .tf-pages{display:flex;align-items:center;gap:var(--space-4)}
-.pn{display:inline-grid;place-items:center;min-width:var(--control-md);height:var(--control-md);padding:0 var(--space-8);border-radius:var(--r-sm);font-size:var(--fs-14);font-weight:var(--fw-medium);color:var(--ink-2);font-variant-numeric:tabular-nums}
-.pn:hover{background:var(--hover);color:var(--ink)} .pn.on{background:var(--inv);color:var(--on-inv)} .pn-gap{color:var(--ink-3);padding:0 var(--space-4)} /* footer follows the table edge: 24 on its own, 16 in a card */
+.tf-per .dd{width:76px} .tf-pages{display:flex;align-items:center;gap:var(--space-4)} .tf-pages .pill{justify-content:center;min-width:var(--control-md);font-variant-numeric:tabular-nums} .pn-gap{color:var(--ink-3);padding:0 var(--space-4)}
 .code{font-size:var(--fs-14);line-height:var(--lh-20);color:var(--ink-3);font-weight:400} /* codes (operation codes, IDs, captions) read at body size */
 .code .copy{color:var(--ink-3)}
 .txt{display:inline-flex;align-items:center;gap:var(--space-8)} .txt .i{color:var(--ink-3)}
@@ -2382,7 +2380,7 @@ function applyColW(t) {
 }
 function tableHTML(list) {
   const cols = usersCols();
-  const rows = loaded(list, S.page);
+  const rows = loaded(list, S.page, 'users');
   const all = rows.every(u => S.selected.has(u.id)), some = rows.some(u => S.selected.has(u.id));
   const fixed = cols.every(c => S.colW[c.key]);
   return `<div class="tcard compact"><div class="hs-wrap"><div class="tscroll hs" ${moreAttr(list, rows, 'users')}><table class="ut ${fixed ? 'fixed' : ''}" style="${fixed ? `width:${tableW()}px` : ''}">
@@ -2396,31 +2394,38 @@ function tableHTML(list) {
       <td class="act"><div class="row-actions"><button class="ghost-ic" data-act="impersonate" data-id="${u.id}" data-tip="Login as user">${icon('login', 16)}</button><button class="ghost-ic" data-act="row-more" data-id="${u.id}" data-tip="More">${icon('more', 16)}</button></div></td>
     </tr>`).join('') || noMatchRow(cols.length + 2, 'users')}</tbody></table></div></div>${listFoot(list, rows, 'user', 'users', USERS.length, 'users', S.page)}</div>`;
 }
-/* Pages: a list shows PER rows per page (10–50, 30 by default as in the live admin; the choice is remembered) and the footer
-   carries «Rows per page» and the page buttons. `page` in each list's state is the current page, so every place that resets it to 1 starts from the first page. */
+/* Pages + infinite scroll: a list opens on a page of PER rows (10–50, 30 by default as in the live admin; remembered).
+   Scrolling to the end loads the next PER rows under it, so one admin can jump to «page 5» and another can just keep scrolling.
+   `page` in each list's state is the page the view starts on; EXTRA[k] counts the pages loaded under it (dropped when the list, its page or the route changes). */
 const PER_OPTS = [10, 20, 30, 40, 50];
 let PER = PER_OPTS.includes(+store.get('nsc.perPage', 30)) ? +store.get('nsc.perPage', 30) : 30;
+const EXTRA = {}, PG_LAST = {};
 const pagesOf = list => Math.max(1, Math.ceil(list.length / PER));
-const loaded = (list, page) => { const p = Math.min(Math.max(1, page || 1), pagesOf(list)); return list.slice((p - 1) * PER, p * PER); };
-const moreAttr = () => ''; // infinite scroll is off: lists page instead
+const loaded = (list, page, k) => { const p = Math.min(Math.max(1, page || 1), pagesOf(list)), sig = `${S.route}|${list.length}|${p}|${PER}`, e = EXTRA[k];
+  const n = e && e.sig === sig ? Math.min(e.n, pagesOf(list) - p) : 0; if (k) PG_LAST[k] = { sig, n, p };
+  return list.slice((p - 1) * PER, (p + n) * PER); };
+const moreAttr = (list, rows, k) => { const L = PG_LAST[k]; return L && (L.p + L.n) < pagesOf(list) ? `data-more="${k}"` : ''; };
 const pagerHTML = (k, p, pages) => { const nums = [];
   for (let i = 1; i <= pages; i++) if (i === 1 || i === pages || Math.abs(i - p) <= 1) nums.push(i); else if (nums[nums.length - 1] !== '…') nums.push('…');
-  return `<span class="tf-pg"><span class="tf-per"><span>Rows per page</span><button class="fdd on tf-sel" data-act="per-page" data-k="${k}">${PER}${icon('chevDown', 16)}</button></span>`
-    + `<span class="tf-pages"><button class="ghost-ic" data-act="go-page" data-k="${k}" data-p="${p - 1}" data-tip="Previous page" ${p <= 1 ? 'disabled' : ''}>${icon('chevLeft', 16)}</button>`
-    + nums.map(n => n === '…' ? '<span class="pn-gap">…</span>' : `<button class="pn ${n === p ? 'on' : ''}" data-act="go-page" data-k="${k}" data-p="${n}">${n}</button>`).join('')
-    + `<button class="ghost-ic" data-act="go-page" data-k="${k}" data-p="${p + 1}" data-tip="Next page" ${p >= pages ? 'disabled' : ''}>${icon('chevRight', 16)}</button></span></span>`; };
-// Table footer: «31–60 of 320 users» (+ filter summary) on the left, Rows per page + pages on the right once the list is longer than a page
-const tfoot = (list, rows, one, many, k, page, sum = '') => { const n = list.length, pages = pagesOf(list), p = Math.min(Math.max(1, page || 1), pages), start = (p - 1) * PER;
+  // DS parts: Select (native select → .dd.fsel), Icon button Link for ‹ ›, Pill for page numbers (current = Pill On)
+  return `<span class="tf-pg"><span class="tf-per"><span>Rows per page</span><select class="fsel" data-per="${k}" aria-label="Rows per page">${PER_OPTS.map(n => `<option value="${n}" ${n === PER ? 'selected' : ''}>${n}</option>`).join('')}</select></span>`
+    + `<span class="tf-pages"><button class="icon-btn icon-btn-link" data-act="go-page" data-k="${k}" data-p="${p - 1}" data-tip="Previous page" ${p <= 1 ? 'disabled' : ''}>${icon('chevLeft', 16)}</button>`
+    + nums.map(n => n === '…' ? '<span class="pn-gap">…</span>' : `<button class="pill ${n === p ? 'on' : ''}" data-act="go-page" data-k="${k}" data-p="${n}">${n}</button>`).join('')
+    + `<button class="icon-btn icon-btn-link" data-act="go-page" data-k="${k}" data-p="${p + 1}" data-tip="Next page" ${p >= pages ? 'disabled' : ''}>${icon('chevRight', 16)}</button></span></span>`; };
+document.addEventListener('change', e => { const sel = e.target.closest?.('select[data-per]'); if (!sel) return; PER = +sel.value; store.set('nsc.perPage', PER); PAGE[sel.dataset.per]?.(1); });
+// Table footer: «31–90 of 320 users» (+ filter summary) on the left; Rows per page + pages on the right once the list is longer than a page.
+// The highlighted page is the last one loaded, so it follows the scroll.
+const tfoot = (list, rows, one, many, k, page, sum = '') => { const n = list.length, pages = pagesOf(list), L = PG_LAST[k], p = L ? L.p : Math.min(Math.max(1, page || 1), pages), start = (p - 1) * PER;
   const count = pages > 1 ? `${fmtInt(start + 1)}–${fmtInt(start + rows.length)} of ${fmtInt(n)} ${many}` : `${fmtInt(n)} ${n === 1 ? one : many}`;
-  return `<div class="tfoot"><span class="tf-c">${count}${sum}</span>${k && pages > 1 ? pagerHTML(k, p, pages) : ''}</div>`; };
-const PAGE = {
-  users: p => { S.page = p; renderResults(); },
-  co: p => { S.co.page = p; coResults(); },
-  pg: p => { pgS(S.route).page = p; pgResults(); },
-  tx: p => { S.tx.page = p; refreshTx(); },
-  cou: p => { S.coUserPage = p; $('#coUsersBody').innerHTML = coUsersBody(coById(S.coId)); markHits($('#coUsersBody tbody'), S.coUserQ); },
+  const more = L && k !== 'users' && k !== 'co' && k !== 'pg' ? moreAttr(list, rows, k) : ''; // record-page tables scroll with #main: the footer carries data-more
+  return `<div class="tfoot" ${more}><span class="tf-c">${count}${sum}</span>${k && pages > 1 ? pagerHTML(k, L ? L.p + L.n : p, pages) : ''}</div>`; };
+const RENDER = {
+  users: () => renderResults(), co: () => coResults(), pg: () => pgResults(), tx: () => refreshTx(),
+  cou: () => { $('#coUsersBody').innerHTML = coUsersBody(coById(S.coId)); markHits($('#coUsersBody tbody'), S.coUserQ); },
 };
-const MORE = {};
+const SETPAGE = { users: p => { S.page = p; }, co: p => { S.co.page = p; }, pg: p => { pgS(S.route).page = p; }, tx: p => { S.tx.page = p; }, cou: p => { S.coUserPage = p; } };
+const PAGE = Object.fromEntries(Object.keys(RENDER).map(k => [k, p => { delete EXTRA[k]; SETPAGE[k](p); RENDER[k](); }]));
+const MORE = Object.fromEntries(Object.keys(RENDER).map(k => [k, () => { const L = PG_LAST[k]; if (!L) return; EXTRA[k] = { sig: L.sig, n: L.n + 1 }; RENDER[k](); }]));
 // List tables scroll inside .tscroll (data-more on it); record-page tables scroll with #main (data-more on their footer)
 document.addEventListener('scroll', e => {
   const sc = e.target; if (!(sc instanceof Element)) return;
@@ -2903,7 +2908,7 @@ function txTab(u, D) {
 function txBody(D) {
   const f = S.tx, list = txFiltered(D);
   if (!list.length) return D.history.length ? emptyBlock('search', 'No transactions match', 'Try a wider date range or clear a filter.') : emptyBlock('arrows', 'No transactions yet', 'Deposits, exchanges and card spend will show up here.');
-  const rows = loaded(list, f.page);
+  const rows = loaded(list, f.page, 'tx');
   const all = rows.every(h => f.sel.has(h.id)), some = rows.some(h => f.sel.has(h.id));
   const table = f.view === 'agg'
     ? ctable('txa', rows, '', { rowCls: h => f.sel.has(h.id) ? 'sel' : '',
@@ -3414,7 +3419,7 @@ const ACT = {
   'clear-all': () => { S.filters = []; S.ctext.users = {}; S.search = ''; $('#uSearch').value = ''; filtersChanged(); },
 
   'sel': a => { const id = +a.dataset.id; S.selected.has(id) ? S.selected.delete(id) : S.selected.add(id); renderResults(); renderFloat(); },
-  'sel-page': () => { const rows = loaded(S._list, S.page), all = rows.every(u => S.selected.has(u.id)); rows.forEach(u => all ? S.selected.delete(u.id) : S.selected.add(u.id)); renderResults(); renderFloat(); },
+  'sel-page': () => { const rows = loaded(S._list, S.page, 'users'), all = rows.every(u => S.selected.has(u.id)); rows.forEach(u => all ? S.selected.delete(u.id) : S.selected.add(u.id)); renderResults(); renderFloat(); },
   'sel-all': () => { S._list.forEach(u => S.selected.add(u.id)); renderResults(); renderFloat(); },
   'sel-clear': () => { S.selected.clear(); closePop(); renderResults(); renderFloat(); },
   'toggle-group': a => { const g = a.dataset.g; S.collapsed.has(g) ? S.collapsed.delete(g) : S.collapsed.add(g); a.closest('.lg').classList.toggle('collapsed'); },
@@ -3483,7 +3488,7 @@ const ACT = {
   'tx-view': a => { S.tx.view = a.dataset.v; S.tx.page = 1; S.tx.sel.clear(); renderUserPage(); },
   'tx-range': a => openDatePicker(a, S.tx.range, r => { S.tx.range = r; S.tx.page = 1; S.tx.sel.clear(); renderUserPage(); }),
   'tx-sel': a => { const id = +a.dataset.id; S.tx.sel.has(id) ? S.tx.sel.delete(id) : S.tx.sel.add(id); renderUserPage(); },
-  'tx-sel-page': () => { const D = ud(byId(S.userId)), l = loaded(txFiltered(D), S.tx.page), all = l.every(h => S.tx.sel.has(h.id)); l.forEach(h => all ? S.tx.sel.delete(h.id) : S.tx.sel.add(h.id)); renderUserPage(); },
+  'tx-sel-page': () => { const D = ud(byId(S.userId)), l = loaded(txFiltered(D), S.tx.page, 'tx'), all = l.every(h => S.tx.sel.has(h.id)); l.forEach(h => all ? S.tx.sel.delete(h.id) : S.tx.sel.add(h.id)); renderUserPage(); },
   'tx-sel-all': () => { txFiltered(ud(byId(S.userId))).forEach(h => S.tx.sel.add(h.id)); renderUserPage(); },
   'tx-sel-clear': () => { S.tx.sel.clear(); renderUserPage(); },
   'tx-export-sel': () => {
@@ -3794,7 +3799,7 @@ function coResults() {
   const f = S.co, list = coList(); S._coList = list; syncChips();
   if (!list.length && filterMode() !== 'inline') { el.innerHTML = `<div class="tcard"><div class="empty"><div class="em-ic">${icon('search', 24)}</div><h3>No companies match</h3><p>Try a different search or remove a filter.</p><button class="btn btn-tertiary" data-act="co-clear-all">Clear search and filters</button></div></div>`; return; }
   if (lvView('companies') === 'board') { el.innerHTML = lboardHTML('companies', list, coCard); markHits(el, f.search); return; }
-  const cols = tVisible('companies'), fixed = cols.every(c => S.coColW[c.k]), rows = loaded(list, f.page);
+  const cols = tVisible('companies'), fixed = cols.every(c => S.coColW[c.k]), rows = loaded(list, f.page, 'co');
   const all = rows.every(c => f.sel.has(c.id)), some = rows.some(c => f.sel.has(c.id));
   el.innerHTML = `<div class="tcard compact"><div class="hs-wrap"><div class="tscroll hs" ${moreAttr(list, rows, 'co')}><table class="ut ${fixed ? 'fixed' : ''}" style="${fixed ? `width:${tableW()}px` : ''}">
     <colgroup><col style="width:52px">${cols.map(c => `<col data-col="${c.k}" ${fixed ? `style="width:${S.coColW[c.k]}px"` : ''}>`).join('')}<col></colgroup>
@@ -3967,7 +3972,7 @@ function coUsersBody(c) {
   const all = coUsers(c), q = S.coUserQ.trim().toLowerCase(), list = q ? all.filter(u => `${u.name} ${u.email} ${u.id} ${u.uid}`.toLowerCase().includes(q)) : all;
   if (!all.length) return emptyBlock('users', 'No users yet', 'Create users one by one or import them from a CSV.', `<div style="display:flex;gap:var(--space-8);justify-content:center"><button class="btn btn-tertiary" data-act="co-tab" data-v="imports">${icon('upload', 16)}Import users</button><button class="btn btn-secondary" data-act="co-new-user">${icon('plus', 16)}Create user</button></div>`);
   if (!list.length) return emptyBlock('search', 'No users match', 'Try a different name, email or ID.');
-  const rows = loaded(list, S.coUserPage);
+  const rows = loaded(list, S.coUserPage, 'cou');
   return `<div class="hs-wrap"><div class="dt-wrap hs"><table class="dt"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Residency</th><th>Status</th><th>KYC</th><th>Risk</th><th class="r">Balance</th><th class="r">Created</th></tr></thead>
     <tbody>${rows.map(u => `<tr data-uid="${u.id}" style="cursor:pointer"><td>${numM(u.id)}</td><td>${u.name ? TC.strong(esc(u.name)) : TC.muted('No profile yet')}</td><td>${muted(u.email)}</td><td>${ctryCell(u.country)}</td><td>${statusCell(u.status)}</td><td>${badge(KYC[u.kyc])}</td><td>${riskCell(u.risk)}</td><td class="r"><span class="num ${u.balance ? '' : 'muted'}">${fmtEur(u.balance)}</span></td><td class="r"><span class="muted">${rel(u.created)}</span></td></tr>`).join('')}</tbody></table></div></div>
     ${tfoot(list, rows, 'user', 'users', 'cou', S.coUserPage)}`;
@@ -4310,7 +4315,7 @@ Object.assign(ACT, {
   'co-sort': a => { const c = TCOLS.companies.find(x => x.k === a.dataset.k); S.co.sort = S.co.sort.k === c.k ? { k: c.k, dir: S.co.sort.dir === 'asc' ? 'desc' : 'asc' } : { k: c.k, dir: c.dir }; coResults(); },
   'co-clear-all': () => { S.co.filters = []; S.ctext.companies = {}; S.co.search = ''; $('#coSearch').value = ''; coFiltersChanged(); },
   'co-sel': a => { const id = +a.dataset.id, s = S.co.sel; s.has(id) ? s.delete(id) : s.add(id); coResults(); renderFloat(); },
-  'co-sel-page': () => { const rows = loaded(S._coList, S.co.page), all = rows.every(c => S.co.sel.has(c.id)); rows.forEach(c => all ? S.co.sel.delete(c.id) : S.co.sel.add(c.id)); coResults(); renderFloat(); },
+  'co-sel-page': () => { const rows = loaded(S._coList, S.co.page, 'co'), all = rows.every(c => S.co.sel.has(c.id)); rows.forEach(c => all ? S.co.sel.delete(c.id) : S.co.sel.add(c.id)); coResults(); renderFloat(); },
   'co-sel-all': () => { S._coList.forEach(c => S.co.sel.add(c.id)); coResults(); renderFloat(); },
   'co-sel-clear': () => { S.co.sel.clear(); closePop(); coResults(); renderFloat(); },
   'co-open-tab': (a, e) => { S.coTab = a.dataset.v; goCo(+a.dataset.id, e); },
@@ -4526,7 +4531,7 @@ function pgResults() {
   const P = pg(), st = pgS(P.id), list = pgList(P), any = pgData(P).length; S._pgList = list; syncChips();
   if (!list.length && (!any || filterMode() !== 'inline')) { el.innerHTML = `<div class="tcard"><div class="empty"><div class="em-ic">${icon(any ? 'search' : P.icon, 24)}</div><h3>${any ? `No ${P.nouns} match` : `No ${P.nouns} yet`}</h3><p>${any ? 'Try a different search or remove a filter.' : ''}</p>${any ? `<button class="btn btn-tertiary" data-act="pg-clear-all">Clear search and filters</button>` : ''}</div></div>`; return; }
   if (lvView('pg:' + P.id) === 'board') { el.innerHTML = lboardHTML('pg:' + P.id, list, pgCard(P)); markHits(el, st.search); return; }
-  const cols = tVisible('pg:' + P.id), W = pgW(P.id), fixed = cols.every(c => W[c.k]), rows = loaded(list, st.page), keys = rows.map(r => pgKey(P, r));
+  const cols = tVisible('pg:' + P.id), W = pgW(P.id), fixed = cols.every(c => W[c.k]), rows = loaded(list, st.page, 'pg'), keys = rows.map(r => pgKey(P, r));
   const all = keys.every(k => st.sel.has(k)), some = keys.some(k => st.sel.has(k)), al = c => c.al === 'r' ? 'r' : c.al === 'c' ? 'c' : '';
   el.innerHTML = `<div class="tcard compact"><div class="hs-wrap"><div class="tscroll hs" ${moreAttr(list, rows, 'pg')}><table class="ut ${fixed ? 'fixed' : ''}" style="${fixed ? `width:${tableW()}px` : ''}">
     <colgroup><col style="width:52px">${cols.map(c => `<col data-col="${c.k}" ${fixed ? `style="width:${W[c.k]}px"` : ''}>`).join('')}<col></colgroup>
@@ -5671,7 +5676,7 @@ Object.assign(ACT, {
   'pg-sort': a => { const P = pg(), st = pgS(P.id), c = P.cols.find(x => x.k === a.dataset.k); st.sort = st.sort.k === c.k ? { k: c.k, dir: st.sort.dir === 'asc' ? 'desc' : 'asc' } : { k: c.k, dir: c.dir }; pgResults(); },
   'pg-clear-all': () => { const st = pgS(S.route); st.filters = []; S.ctext['pg:' + S.route] = {}; st.search = ''; $('#pgSearch').value = ''; pgFiltersChanged(); },
   'pg-sel': a => { const s = pgS(S.route).sel, k = a.dataset.rid; s.has(k) ? s.delete(k) : s.add(k); pgResults(); renderFloat(); },
-  'pg-sel-page': () => { const P = pg(), st = pgS(P.id), keys = loaded(S._pgList, st.page).map(r => pgKey(P, r)), all = keys.every(k => st.sel.has(k)); keys.forEach(k => all ? st.sel.delete(k) : st.sel.add(k)); pgResults(); renderFloat(); },
+  'pg-sel-page': () => { const P = pg(), st = pgS(P.id), keys = loaded(S._pgList, st.page, 'pg').map(r => pgKey(P, r)), all = keys.every(k => st.sel.has(k)); keys.forEach(k => all ? st.sel.delete(k) : st.sel.add(k)); pgResults(); renderFloat(); },
   'pg-sel-all': () => { const P = pg(); S._pgList.forEach(r => pgS(P.id).sel.add(pgKey(P, r))); pgResults(); renderFloat(); },
   'pg-sel-clear': () => { pgS(S.route).sel.clear(); closePop(); pgResults(); renderFloat(); },
   'pg-bulk': a => { const P = pg(), st = pgS(P.id), rows = pgData(P).filter(r => st.sel.has(pgKey(P, r))); toast(P.bulk[+a.dataset.i].run(rows)); st.sel.clear(); pgRefresh(); },
