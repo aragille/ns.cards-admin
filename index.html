@@ -2920,9 +2920,9 @@ function addrTab(u, D) {
 /* Verification — KYC provider records, CreditCo and requested forms */
 function verifTab(u, D) {
   const C = D.creditco, kv = (l, v) => `<div class="kv-r"><span>${l}</span>${v || dash}</div>`;
-  // KYC (live admin → user → kyc): one row per identity-verification provider (Sumsub, Ondato). Status is a Badge; the status change (the live admin's
-  // statuses) and Resend live in the card header's Actions menu, like CreditCo — a row-level action column was hidden behind the last column.
-  const kyc = tcard('KYC', `<button class="btn btn-tertiary" data-act="kyc-actions">Actions${icon('chevDown', 16)}</button>`, dtable(['ID', 'Provider', 'Status', 'IDV verified', 'KYC verified', 'KYC downloaded', 'Default provider', 'Created|r', 'Updated|r'], D.kyc.map(k => [
+  // KYC (live admin → user → kyc): one row per identity-verification provider (Sumsub, Ondato). Status is a Badge in the row; the card header holds
+  // Resend verification and a select-button with the live admin's statuses (New, Waiting for documents, Active, Rejected).
+  const kyc = tcard('KYC', `<button class="btn btn-tertiary" data-act="toast" data-msg="Identity verification link sent">${icon('send', 16)}Resend verification</button><button class="fdd on" data-act="kyc-status"><span>Status: ${KYC[u.kyc].label}</span>${icon('chevDown', 16)}</button>`, dtable(['ID', 'Provider', 'Status', 'IDV verified', 'KYC verified', 'KYC downloaded', 'Default provider', 'Created|r', 'Updated|r'], D.kyc.map(k => [
     TC.numMuted(k.id), TC.text(cap(String(k.provider).toLowerCase())), TC.badge(KYC[u.kyc]),
     TC.yes(u.idv), TC.yes(u.kyc === 'approved'), TC.yes(k.downloaded), TC.yes(k.def), TC.numMuted(fmtDateTime(k.created)), TC.numMuted(fmtDateTime(k.updated))])));
   const cc = `<div class="card">
@@ -3508,7 +3508,7 @@ const ACT = {
   },
   'addr-rm': a => { ud(byId(S.userId)).addresses.splice(+a.dataset.i, 1); toast('Address removed', 'trash'); renderUserPage(); },
   // user page · verification
-  'kyc-actions': a => { const u = byId(S.userId); openPop(a, `<div class="pop-sec"><div class="pop-lbl">KYC status</div></div>` + menuItems([...['new', 'pending', 'approved', 'rejected'].map(v => ({ act: 'kyc-set', data: { v }, label: KYC[v].label, on: u.kyc === v })), '-', { act: 'toast', data: { msg: 'Identity verification link sent' }, icon: 'send', label: 'Resend identity verification' }]), { align: 'right', width: 260 }); },
+  'kyc-status': a => { const u = byId(S.userId); openPop(a, menuItems(['new', 'pending', 'approved', 'rejected'].map(v => ({ act: 'kyc-set', data: { v }, label: KYC[v].label, on: u.kyc === v }))), { align: 'right', width: 220 }); },
   'kyc-set': a => { closePop(); const u = byId(S.userId), v = a.dataset.v; u.kyc = v; u.idv = v === 'approved'; u.updated = new Date(NOW); toast(`KYC status set to ${KYC[v].label}`); renderUserPage(); },
   'cc-actions': a => openPop(a, menuItems([['Request access', 'key'], ['Resend proof of address', 'send'], ['Update KYC personal data', 'idcard'], ['Resend Ondato report', 'send'], ['Fetch KYC status', 'refresh']].map(([l, ic]) => ({ act: 'cc-do', data: { l }, icon: ic, label: l }))), { align: 'right', width: 250 }),
   'cc-do': a => {
