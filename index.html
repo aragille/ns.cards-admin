@@ -2787,8 +2787,8 @@ function walletsTab(u, D) {
   // No Freeze (not in the live admin); balance adjustments stay in the card header (the live BALANCE tab as a dialog).
   const short = a => `${a.slice(0, 6)}…${a.slice(-4)}`;
   const rows = [...D.wallets].sort((x, y) => eurOf(y) - eurOf(x)).map(w => { const a = ASSET[w.c];
-    return [TC.currency(w.c), TC.muted(a.net), w.amt ? TC.num(fmtAmt(w.amt, w.c)) : TC.numMuted(fmtAmt(0, w.c)), TC.numMuted(fmtEur(eurOf(w), 2)), w.address ? TC.copy(w.address, short(w.address)) : TC.muted(a.net)]; });
-  return tcard(`Wallets <span class="ct">${fmtEur(u.balance, 2)}</span>`, `<button class="btn btn-tertiary" data-act="adj-open">${icon('sliders', 16)}Adjust balance</button>`, dtable(['Currency', 'Network', 'Balance|r', 'In EUR|r', 'Deposit address'], rows));
+    return [TC.currency(w.c), TC.muted(a.net), w.address ? TC.copy(w.address, short(w.address)) : TC.muted(a.net), w.amt ? TC.num(fmtAmt(w.amt, w.c)) : TC.numMuted(fmtAmt(0, w.c)), TC.numMuted(fmtEur(eurOf(w), 2))]; });
+  return tcard(`Wallets <span class="ct">${fmtEur(u.balance, 2)}</span>`, `<button class="btn btn-tertiary" data-act="adj-open">${icon('sliders', 16)}Adjust balance</button>`, dtable(['Currency', 'Network', 'Deposit address', 'Balance|r', 'In EUR|r'], rows));
 }
 
 const txType = h => `<span class="txt">${icon(TX[h.type].icon, 16)}${TX[h.type].label}</span>`;
