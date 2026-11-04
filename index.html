@@ -468,7 +468,7 @@ body.resizing,body.resizing *{cursor:col-resize!important;user-select:none}
 .zero{color:var(--ink-3)}
 /* list footer: the count, and while more rows are still to load, how many are showing */
 mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1px;margin:0 -1px}
-.tfoot{display:flex;align-items:center;flex:none;height:var(--row);padding:0 var(--space-16);border-top:var(--border-width) solid var(--line);background:var(--surface);font-size:var(--fs-12);line-height:var(--lh-16);color:var(--ink-2)}
+.tfoot{display:flex;align-items:center;flex:none;height:var(--row);padding:0 var(--space-24);border-top:var(--border-width) solid var(--line);background:var(--surface);font-size:var(--fs-12);line-height:var(--lh-16);color:var(--ink-2)}
 .pg .pn{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 var(--space-8);border-radius:var(--r-sm);font-size:var(--fs-14);font-variant-numeric:tabular-nums;color:var(--ink-2)}
 .pg .pn:hover{background:var(--hover);color:var(--ink)}
 .pg .pn.on{background:var(--inv);color:var(--on-inv)}
@@ -583,6 +583,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .dt tbody tr{cursor:default}
 .dt.fx{table-layout:fixed} .dt.fx td,.dt.fx td>div{overflow:hidden;text-overflow:ellipsis}
 .card.flush .tfoot{border-top:var(--border-width) solid var(--line)}
+.card .tfoot{padding:0 var(--card-padding)} /* footer follows the table edge: 24 on its own, 16 in a card */
 .code{font-size:var(--fs-14);line-height:var(--lh-20);color:var(--ink-3);font-weight:400} /* codes (operation codes, IDs, captions) read at body size */
 .code .copy{color:var(--ink-3)}
 .txt{display:inline-flex;align-items:center;gap:var(--space-8)} .txt .i{color:var(--ink-3)}
