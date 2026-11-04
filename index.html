@@ -598,18 +598,6 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .fsel:hover,.inp:hover,.dd-field:hover,.field input:hover,.field select:hover{border-color:var(--line-strong)}
 .fsel:focus,.inp:focus{border-color:var(--focus);box-shadow:var(--focus-brand)}
 .inp:disabled,.fsel:disabled,.field input:disabled,.field select:disabled{background-color:var(--surface-2);border-color:var(--line);color:var(--ink-disabled);cursor:not-allowed}
-.wrow{display:flex;align-items:center;gap:var(--space-12);height:62px;padding:0 var(--space-24);border-bottom:var(--border-width) solid var(--line-soft);cursor:pointer}
-.wrow:hover{background:var(--hover)}
-.wrow .wn{flex:1;min-width:0}
-.wrow .wn>div:first-child{font-weight:500;display:flex;align-items:center;gap:var(--space-8)}
-.wrow .wa{text-align:right}
-.wrow.zero .wn>div:first-child,.wrow.zero .wa .num{color:var(--ink-3)}
-.wchev{color:var(--ink-3);transition:transform .15s} .wrow.open .wchev{transform:rotate(180deg)}
-.wdet{display:grid;grid-template-columns:repeat(2,minmax(0,1fr)) minmax(max-content,1fr) auto;gap:var(--space-16);align-items:start;padding:var(--space-16) var(--space-24) var(--space-16) var(--space-48);background:var(--hover);border-bottom:var(--border-width) solid var(--line-soft)}
-.wdet .kl{font-size:var(--fs-12);color:var(--ink-3);margin-bottom:var(--space-4)}
-.wdet-act{display:flex;gap:var(--space-8);align-self:center}
-.wdet .copy{white-space:nowrap}
-.wlist>:last-child{border-bottom:0}
 .mini-card{width:36px;height:24px;border-radius:var(--r-xs);background:linear-gradient(135deg,#2C2C2C,#111);color:#fff;display:grid;place-items:center;flex:none}
 .mini-card.alt{background:var(--card-alt);color:var(--card-alt-ink)}
 .docs{padding:var(--space-16) var(--space-24) var(--space-24);border-top:var(--border-width) solid var(--line);display:flex;flex-direction:column;gap:var(--space-12)}
@@ -634,7 +622,8 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .lnk{color:var(--ink);text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px;font-weight:500}
 .lnk:hover{text-decoration-color:var(--ink-3)} /* every name / company link: hover = a grey line, nothing else */
 .sel-btn{display:inline-flex;align-items:center;gap:var(--space-8);height:32px;padding:0 var(--space-8) 0 var(--space-12);border-radius:var(--r-sm);border:var(--border-width) solid transparent;font-weight:500;margin-right:calc(-1 * var(--space-8))}
-.sel-btn:hover{background:var(--hover);border-color:var(--line)}
+.sel-btn:hover,.sel-btn.popped{background:var(--hover);border-color:var(--line)}
+.sel-btn.popped>.i:last-child{transform:rotate(180deg)}
 .sel-btn.dirty{background:var(--brand-subtle);border-color:var(--brand-subtle)}
 .sel-btn>.i{color:var(--ink-3)}
 /* inline editing: values look plain until hovered or focused; a changed field tints like the Users dropdowns */
@@ -650,9 +639,10 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .ie-sfx{color:var(--ink-3);font-size:var(--fs-12);flex:none}
 .sw-t.dirty{box-shadow:var(--focus-brand)}
 .ie-cal{padding:var(--space-8) var(--space-8) var(--space-4)}
-.ver-ic{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:none}
-.ver-ic.ok{background:var(--success-bg);color:var(--success-ink)}
-.ver-ic.no{background:var(--neutral-bg);color:var(--ink-3)}
+/* Yes / No (Figma .Yes / No): one 16px icon, no tile — Yes check-circle in status/success/text, No minus-circle in text/tertiary */
+.yn{display:inline-flex;flex:none;vertical-align:middle}
+.yn.ok{color:var(--success-ink)}
+.yn.no{color:var(--ink-3)}
 .ver-l{display:flex;align-items:center;gap:var(--space-12)}
 .w-total{display:flex;align-items:baseline;gap:var(--space-8);margin:0 0 var(--space-8)}
 .w-total b{font-size:var(--fs-28);font-weight:600;letter-spacing:-.02em}
@@ -827,10 +817,10 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .kpi-l{font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
 .kpi-v{font-size:var(--fs-20);font-weight:var(--fw-semibold);letter-spacing:-.02em;margin-top:var(--space-4);line-height:var(--lh-24);white-space:nowrap}
 .kpi-f{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-8);margin-top:auto;padding-top:var(--space-12)} /* the trend row sits on the card's bottom edge, with or without a sparkline */
-.delta{display:inline-flex;align-items:center;gap:var(--space-4);font-size:var(--fs-12);font-weight:500;padding:var(--space-2) var(--space-8) var(--space-2) var(--space-4);border-radius:var(--r-xs);white-space:nowrap}
+.delta{display:inline-flex;align-items:center;gap:var(--space-4);height:var(--control-sm);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);padding:0 var(--space-8);border-radius:var(--r-xs);white-space:nowrap}
 .delta.up{color:var(--success-ink);background:var(--success-bg)}
 .delta.down{color:var(--error-ink);background:var(--error-bg)}
-.spark{width:86px;height:30px;flex:none}
+.spark{width:120px;height:32px;flex:0 1 auto;min-width:64px} /* Sparkline 120×32 */
 .dgrid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:var(--grid-gap);padding:var(--page-padding)}
 /* sign in / sign up: shown instead of the app while signed out */
 .auth{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:var(--space-32) var(--space-16);background:var(--bg);overflow:auto}
@@ -859,41 +849,72 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .card-h{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-8);margin-bottom:var(--space-16);min-height:var(--control-md)}
 .card-t{font-weight:var(--fw-semibold);font-size:var(--fs-14);line-height:var(--lh-20)}
 .card-tag{font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-regular);color:var(--ink-3)}
-.big{display:flex;align-items:baseline;gap:var(--space-12);margin:calc(-1 * var(--space-4)) 0 var(--space-16)}
-.big b{font-size:var(--fs-28);font-weight:600;letter-spacing:-.03em}
-.legend{display:flex;align-items:center;gap:var(--space-16);font-size:var(--fs-12);color:var(--ink-2);flex-wrap:wrap}
+.card-tag.bad{color:var(--error-ink)}
+.card-act{display:flex;align-items:center;gap:var(--space-16)} /* Card header → Actions: meta · link */
+.big{display:flex;align-items:center;justify-content:space-between;gap:var(--space-16);flex-wrap:wrap;margin:0 0 var(--space-16)} .big-v{display:flex;align-items:center;gap:var(--space-12)}
+.big b{font-size:var(--fs-28);line-height:var(--lh-32);font-weight:var(--fw-semibold);letter-spacing:-.02em;font-variant-numeric:tabular-nums} /* Number/Large */
+.legend{display:flex;align-items:center;gap:var(--space-16);font-size:var(--fs-12);line-height:var(--lh-16);color:var(--ink-2);flex-wrap:wrap} /* Chart legend item: marker · Body/Small */
 .legend span{display:inline-flex;align-items:center;gap:var(--space-8)}
-.lg-line{width:14px;height:2px;border-radius:2px;background:var(--c1)}
-.lg-dash{width:14px;height:0;border-top:2px dashed var(--prev)}
+.lg-line{width:16px;height:2px;border-radius:1px;background:var(--c1)}
+.lg-dash{width:16px;height:2px;background:repeating-linear-gradient(90deg,var(--prev) 0 3px,transparent 3px 5px)}
 .chart-card{display:flex;flex-direction:column}
-.chart{position:relative;flex:1 1 0;min-height:200px}
+.chart{position:relative;flex:1 1 0;min-height:248px} /* plot 216 + 16 gap + X axis 16 */
 .chart svg{position:absolute;inset:0}
 .chart svg{display:block;overflow:visible}
 .ax{font-family:var(--font);font-size:var(--fs-12);fill:var(--ink-3)}
-.stack{display:flex;gap:var(--space-2);height:28px;border-radius:var(--r-xs);overflow:hidden;margin:var(--space-4) 0 var(--space-16)}
-.stack i{display:block;height:100%;transition:opacity .12s}
-.stack i:first-child{border-radius:var(--r-xs) 0 0 var(--r-xs)}.stack i:last-child{border-radius:0 var(--r-xs) var(--r-xs) 0}
+/* List row (Figma ❖ Data display → List row): 40 tall, Key (lead + label) left, Trailing (values, chevron; gap 8) right, divider between rows; a row link gets an 8px-bleed hover band.
+   Types: Text / Chevron (icon tile + Counter) · Activity (time · person · action · value) · Bar (bar chart row) · Legend (series dot · value · %) · Meter (status dot · value · meter) */
+.lis{display:flex;flex-direction:column}
+.dgrid .card:not(.ov-stat):not(.flush)>.card-h+.lis,.dgrid .card:not(.ov-stat):not(.flush)>.card-h+.stack{margin-top:var(--space-4)} .dgrid .card:not(.ov-stat):not(.flush)>.lis:last-child{margin-bottom:var(--space-8)}
+.li{position:relative;isolation:isolate;display:flex;align-items:center;justify-content:space-between;gap:var(--space-16);width:100%;height:var(--row);border-bottom:var(--border-width) solid var(--line-soft);font-size:var(--fs-14);line-height:var(--lh-20);color:var(--ink);text-align:left}
+.li:last-child{border-bottom:0}
+.li.go{cursor:pointer}
+.li.go:hover::before{content:'';position:absolute;inset:0 calc(-1 * var(--space-8));z-index:-1;background:var(--hover);border-radius:var(--r-sm)}
+.li-k{display:flex;align-items:center;gap:var(--space-8);flex:1 1 auto;min-width:0}
+.li-t{display:flex;align-items:center;gap:var(--space-8);flex:none}
+.li-lead{flex:none;display:grid;place-items:center;width:var(--icon-md);height:var(--icon-md);color:var(--ink-2)}
+.li-tile{flex:none;display:grid;place-items:center;width:var(--control-sm);height:var(--control-sm);border-radius:var(--r-sm);background:var(--surface-2);color:var(--ink)}
+.li-sw{flex:none;width:8px;height:8px;border-radius:2px} /* .Chart dot */
+.li-l{flex:0 1 auto;min-width:var(--space-32);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li-l.sub{color:var(--ink-2)}
+.li-tag{flex:0 1000 auto;max-width:45%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;height:var(--control-xs);line-height:var(--control-xs);padding:0 var(--space-8);border-radius:var(--r-xs);background:var(--surface-2);color:var(--ink-2);font-size:var(--fs-12);font-weight:var(--fw-medium)}
+.li-v{font-weight:var(--fw-medium);font-variant-numeric:tabular-nums;white-space:nowrap}
+.li-vm{color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.li-vm.m5{font-weight:var(--fw-medium)}
+.li-x{min-width:40px;text-align:right;color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.li-none{color:var(--ink-3)}
+/* Counter (Tone=Attention): 12/16 medium on brand/subtle */
+.li-cnt{display:inline-flex;align-items:center;justify-content:center;min-width:var(--control-xs);padding:var(--space-2) var(--space-4);border-radius:var(--r-xs);background:var(--brand-subtle);color:var(--brand-ink);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);font-variant-numeric:tabular-nums}
+.lis:has(.go) .li:not(.go):not(.bar)>.li-t::after{content:'';flex:none;width:var(--icon-md)} /* a row without a link keeps the chevron's slot, so values line up */
+.li-t>.i:last-child{flex:none;color:var(--ink-3)} .li.go:hover .li-t>.i:last-child{color:var(--ink)}
+.li.zero .li-l,.li.zero .li-v{color:var(--ink-3)}
+/* Activity: time 96 · person 160 · action fills · value */
+.li-ev{display:flex;align-items:center;gap:var(--space-12);flex:1 1 auto;min-width:0}
+.li-time{flex:0 0 96px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li-who{flex:0 1 160px;min-width:0;font-weight:var(--fw-medium);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li-who:last-child{flex:1 1 auto}
+.lis{container-type:inline-size} @container (max-width:420px){.li-who{flex-basis:auto;max-width:60%} .li-time{flex-basis:auto}} /* in a narrow card the person column hugs the name, so the action keeps room */
+.li-what{flex:1 1 0;min-width:0;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li-link{font-weight:var(--fw-medium);color:var(--ink);text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px;white-space:nowrap}
+.li-link:hover{text-decoration-color:currentColor}
+/* Bar (.Bar chart row): a 32px neutral bar sized by share, label inside, value outside; no divider */
+.li.bar{border-bottom:0;gap:var(--space-12)}
+.li-track{position:relative;isolation:isolate;flex:1 1 auto;min-width:0;height:32px;display:flex;align-items:center;gap:var(--space-8);padding:0 var(--space-8)}
+.li-track>i{position:absolute;left:0;top:0;bottom:0;z-index:-1;background:var(--neutral-bg);border-radius:var(--r-sm);min-width:var(--space-4)}
+.li.bar:hover .li-track>i{background:var(--line)}
+.li-track>.li-l{flex:0 1 auto}
+.li-bv{flex:none;font-variant-numeric:tabular-nums;white-space:nowrap}
+/* .Meter: 72×4 track, tone fill, threshold marker (Scale 200% = middle, 120% = 100% at 5/6), % in 52 */
+.li-meter{display:inline-flex;align-items:center;gap:var(--space-8)}
+.li-meter .mt{position:relative;width:72px;height:4px;border-radius:var(--pill);background:var(--surface-2)}
+.li-meter .mt i{position:absolute;left:0;top:0;bottom:0;border-radius:var(--pill)}
+.li-meter .mt b{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:var(--surface);box-shadow:0 0 0 var(--border-width) var(--ink-3);border-radius:1px}
+.li-meter .mt-v{width:52px;text-align:right;color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+/* Breakdown: 24px bar of shares, 2px gaps, radius 4 */
+.stack{display:flex;gap:var(--space-2);height:24px;border-radius:var(--r-xs);overflow:hidden;margin:var(--space-4) 0 0}
+.stack i{display:block;height:100%;min-width:2px;transition:opacity .12s}
 .stack:hover i{opacity:.55} .stack i:hover{opacity:1}
-.lrows .lr{display:flex;align-items:center;gap:var(--space-12);height:36px;font-size:var(--fs-14);border-bottom:var(--border-width) solid var(--line-soft)}
-.lrows .lr:last-child{border-bottom:0}
-.lr .sw,.legend .sw{width:10px;height:10px;border-radius:3px;flex:none;display:inline-block}
-.lr .lr-l{flex:1;color:var(--ink)}
-.lr .lr-v{font-family:var(--font);font-size:var(--fs-12)}
-.lr .lr-p{font-family:var(--font);font-size:var(--fs-12);color:var(--ink-3);width:40px;text-align:right}
-.barlist .bl{position:relative;height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 var(--space-12);margin-bottom:var(--space-8);font-size:var(--fs-14);border-radius:var(--r-sm)}
-.barlist .bl i{position:absolute;left:0;top:0;bottom:0;background:var(--neutral-bg);border-radius:var(--r-sm);z-index:0}
-.barlist .bl>span{position:relative;z-index:1;display:flex;align-items:center;gap:var(--space-8)}
-.barlist .bl:hover i{background:var(--line)}
-.barlist .bl-p{color:var(--ink-3);font-size:var(--fs-12);min-width:36px;text-align:right}
-.rk{display:flex;align-items:center;gap:var(--space-12);height:56px;border-bottom:var(--border-width) solid var(--line-soft);width:100%}
-.rk:last-child{border-bottom:0}
-.rk:hover .rk-go{color:var(--ink);transform:translateX(2px)}
-.rk-ic{width:32px;height:32px;border-radius:var(--r-sm);display:grid;place-items:center;background:var(--neutral-bg);color:var(--ink);flex:none}
-.rk-l{flex:1;font-size:var(--fs-14)}
-.rk-l div:last-child{font-size:var(--fs-12);color:var(--ink-2)}
-.rk-v{font-family:var(--font);font-size:var(--fs-16);font-weight:500}
-.rk-go{color:var(--ink-3);transition:transform .12s,color .12s}
-.res{padding:var(--space-8) 0}
+.legend .sw{width:8px;height:8px;border-radius:2px;flex:none;display:inline-block}
 /* Overview */
 .ov-stat{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-12) var(--space-16)!important;color:inherit}
 .ov-stat>.i{margin-left:auto;color:var(--ink-3)}
@@ -902,54 +923,8 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .os-l{display:flex;flex-direction:column;gap:var(--space-4);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
 .os-l b{font-size:var(--fs-20);line-height:var(--lh-24);font-weight:var(--fw-semibold);color:var(--ink);letter-spacing:-.02em;text-transform:none;font-variant-numeric:tabular-nums}
  /* beats .dgrid .card.flush>.card-h: title centred in the header bar */
-.ovr{display:grid;grid-template-columns:var(--avatar-sm) minmax(0,1fr) auto var(--icon-md);align-items:center;gap:var(--space-8);width:100%;height:var(--row);padding:0;border-bottom:var(--border-width) solid var(--line-soft);text-align:left;font-size:var(--fs-14)}
-.ovr:last-child{border-bottom:0}
-.ovr{position:relative;isolation:isolate}
-.ovr:hover::before{content:'';position:absolute;inset:0 calc(-1 * var(--space-8));z-index:-1;background:var(--hover);border-radius:var(--r-sm)} /* hover bleeds 8 past the text, the divider stays on the content line */
-.ovr .os-ic{width:var(--avatar-sm);height:var(--avatar-sm);border-radius:var(--r-sm)}
-.ovr-l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ovr-n{justify-self:end;font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);color:var(--brand-ink);background:var(--brand-subtle);padding:var(--space-2) var(--space-4);min-width:var(--control-xs);text-align:center;border-radius:var(--r-xs)} /* Counter → Attention */
-.ovr.clear .ovr-n{font-family:var(--font);font-weight:400;color:var(--ink-3);background:none;padding:0}
-.ovr>.i{color:var(--ink-3)}
-.ovr:hover>.i{color:var(--ink)}
-.ovw{display:flex;align-items:center;justify-content:space-between;height:var(--row);padding:0;border-bottom:var(--border-width) solid var(--line-soft)}
-.ovw:last-child{border-bottom:0}
-.ovw b{font-size:var(--fs-14);font-weight:var(--fw-medium)}
 
-.ovl{display:grid;grid-template-columns:96px 160px minmax(0,1fr) auto;gap:var(--space-12);align-items:center;height:var(--row);padding:0;border-bottom:var(--border-width) solid var(--line-soft);font-size:var(--fs-14)}
-.ovl:last-child{border-bottom:0}
-.card.ov>.ovr,.card.ov>.ovw,.card.ov>.ovl{width:calc(100% - 2 * var(--card-padding));margin:0 var(--card-padding)}
-.card.ov>.card-h+*{margin-top:var(--space-4)}
-.card.ov>:last-child{margin-bottom:var(--space-8)}
-.ovl-a{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* finance monitors: headroom bar (threshold mark in the middle) and the per-kind dashboard cards */
-.mon-m{display:inline-flex;align-items:center;gap:var(--space-8)}
-.mon-m .meter{width:72px;overflow:visible}
-.mon-m .meter b{position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:var(--surface);box-shadow:0 0 0 var(--border-width) var(--ink-3);border-radius:1px}
-.mon-m .num{width:40px;text-align:right;font-size:var(--fs-12);color:var(--ink-2)}
-.mon-d{font-size:var(--fs-14);color:var(--ink-2);margin:calc(-1 * var(--space-8)) 0 var(--space-16)}
-.mon-sum{display:flex;gap:var(--space-32);margin-bottom:var(--space-12)}
-.mon-sum span{display:block;font-size:var(--fs-12);color:var(--ink-3);margin-bottom:var(--space-2)}
-.mon-sum b{font-family:var(--font);font-size:var(--fs-20);font-weight:500}
-.mon-sum b.bad{color:var(--error)}
-.mon-row{display:flex;align-items:center;gap:var(--space-12);height:var(--row);border-top:var(--border-width) solid var(--line-soft);font-size:var(--fs-14)}
-.mon-row .mon-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
-.res-h{display:flex;justify-content:space-between;align-items:center;font-size:var(--fs-14);margin-bottom:var(--space-8)}
-.res-h .rn{display:flex;align-items:center;gap:var(--space-8);font-weight:500}
-.res .meter{height:6px;overflow:visible}
-.res .meter i{background:var(--tone)}
-.res-v{display:inline-flex;align-items:center;gap:var(--space-8)}
-.res .meter .par{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--surface);box-shadow:0 0 0 var(--border-width) var(--ink-3);border-radius:1px;z-index:1}
-.su{display:grid;grid-template-columns:minmax(0,1fr) auto var(--icon-md);align-items:center;gap:var(--space-8);height:var(--row);border-bottom:var(--border-width) solid var(--line-soft);cursor:pointer;font-size:var(--fs-14)}
-.dgrid .card:not(.ov-stat):not(.flush)>.card-h+.su{margin-top:var(--space-4)} .dgrid .card:not(.ov-stat):not(.flush)>.su:last-child{margin-bottom:var(--space-8)} /* Card → Body with List rows: 4 · rows · 8 */
-.su.su-3{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto var(--icon-md);column-gap:var(--space-12)} /* List row → Activity without time: name · product · amount; in a narrow card name and product share the width */
-.su-n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.su-3 .su-n{font-weight:var(--fw-medium)}
-.su-m{color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.su>.i,.mon-row>.i:last-child{color:var(--ink-3)} .su:hover>.i,.mon-row:hover>.i:last-child{color:var(--ink)}
-.su,.mon-row{position:relative;isolation:isolate}
-.su:hover::before,.mon-row:hover::before{content:'';position:absolute;inset:0 calc(-1 * var(--space-8));z-index:-1;background:var(--hover);border-radius:var(--r-sm)}
-.su:last-child{border-bottom:0}
 .mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-8);margin-top:var(--space-16)}
 .ms{background:var(--surface-2);border-radius:var(--r);padding:var(--space-12)}
 .ms .kpi-l{font-size:var(--fs-12)}
@@ -1129,7 +1104,6 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
   .lmeta{gap:var(--space-12)}.lmeta .hide-sm{display:none}
   .tscroll{max-height:none}
   .kv2{grid-template-columns:1fr}
-  .wdet{grid-template-columns:1fr 1fr;padding-left:var(--space-24)}
   .card-tools .inp{width:100%}
   .kv2 .kv-r:nth-last-child(2):nth-child(odd){border-bottom:var(--border-width) solid var(--line-soft)}
 }
@@ -1348,6 +1322,9 @@ const ICONS = {
 };
 /* Solar "Linear" icons by 480 Design (CC BY 4.0), embedded from @iconify-json/solar. Single colour: they draw with currentColor. */
 const SOLAR = {
+  checkCircle: `<g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="m8.5 12.5l2 2l5-5"/></g>`,
+  minusCircle: `<g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M15 12H9"/></g>`,
+  inbox: `<g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2s7.071 0 8.535 1.464C22 4.93 22 7.286 22 12s0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12Z"/><path stroke-linecap="round" d="M2 13h3.16c.905 0 1.358 0 1.756.183s.692.527 1.281 1.214l.606.706c.589.687.883 1.031 1.281 1.214s.85.183 1.756.183h.32c.905 0 1.358 0 1.756-.183s.692-.527 1.281-1.214l.606-.706c.589-.687.883-1.031 1.281-1.214S17.934 13 18.84 13H22M8 7h8m-6 3.5h4"/></g>`,
   palette: `<g fill="currentColor"><path d="M1.25 12.0264C1.25 6.07701 6.06093 1.25 12 1.25C17.9391 1.25 22.75 6.07598 22.75 12.0273C22.7499 14.172 22.213 15.6103 21.1748 16.459C20.1609 17.2877 18.8496 17.3976 17.6865 17.3418C17.0931 17.3133 16.4929 17.2385 15.9395 17.167C15.3741 17.094 14.8652 17.0261 14.4033 16.998C13.9374 16.9698 13.583 16.9876 13.3242 17.0557C13.0843 17.1188 12.9687 17.2129 12.8975 17.3262L12.8965 17.3271C12.858 17.3883 12.8307 17.4836 12.9004 17.6768C12.9746 17.882 13.1366 18.119 13.3477 18.3311C13.8016 18.7865 14.0566 19.4038 14.0566 20.0469C14.0566 20.6899 13.8026 21.3072 13.3486 21.7627C12.6982 22.4156 11.7683 22.848 10.7607 22.7314C5.40533 22.115 1.25018 17.5559 1.25 12.0264ZM2.75 12.0264C2.75018 16.7884 6.32948 20.7115 10.9336 21.2412C11.3959 21.2945 11.8907 21.1011 12.2861 20.7041C12.4597 20.5298 12.5566 20.2928 12.5566 20.0469C12.5566 19.8009 12.4597 19.5649 12.2861 19.3906C11.9746 19.0779 11.6615 18.6609 11.4902 18.1875C11.3258 17.7326 11.2771 17.1687 11.5654 16.6338L11.627 16.5273C11.9498 16.0139 12.4345 15.7392 12.9424 15.6055C13.4314 15.4768 13.9736 15.4694 14.4941 15.501C15.0189 15.5328 15.5871 15.6093 16.1318 15.6797C16.6887 15.7516 17.2325 15.8185 17.7578 15.8438C18.8321 15.8953 19.66 15.7601 20.2256 15.2979C20.7667 14.8555 21.2499 13.9574 21.25 12.0273C21.25 6.9007 17.1069 2.75 12 2.75C6.89307 2.75 2.75 6.90173 2.75 12.0264Z"/><circle cx="17.5" cy="11.5" r="1.5"/><circle cx="6.5" cy="11.5" r="1.5"/><circle cx="9.585" cy="7" r="1.5"/><circle cx="14.5" cy="7" r="1.5"/></g>`,
   search: `<g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11.5" cy="11.5" r="9.5"/><path stroke-linecap="round" d="M18.5 18.5L22 22"/></g>`,
   dashboard: `<path fill="none" stroke="currentColor" stroke-width="1.5" d="M2.5 6.5a4 4 0 1 1 8 0a4 4 0 0 1-8 0Zm11 11a4 4 0 1 1 8 0a4 4 0 0 1-8 0Zm8-11c0-1.886 0-2.828-.586-3.414S19.386 2.5 17.5 2.5s-2.828 0-3.414.586S13.5 4.614 13.5 6.5s0 2.828.586 3.414s1.528.586 3.414.586s2.828 0 3.414-.586s.586-1.528.586-3.414Zm-11 11c0-1.886 0-2.828-.586-3.414S8.386 13.5 6.5 13.5s-2.828 0-3.414.586S2.5 15.614 2.5 17.5s0 2.828.586 3.414s1.528.586 3.414.586s2.828 0 3.414-.586s.586-1.528.586-3.414Z"/>`,
@@ -1611,17 +1588,17 @@ const COLS = [
   { key: 'country', label: 'Residency', val: u => u.country || 'ZZZ', dir: 'asc', cell: u => ctryCell(u.country) },
   { key: 'status', label: 'Status', val: u => Object.keys(STATUS).indexOf(u.status), dir: 'asc', cell: u => statusCell(u.status) },
   { key: 'kyc', label: 'KYC', val: u => Object.keys(KYC).indexOf(u.kyc), dir: 'asc', cell: u => badge(KYC[u.kyc]) },
-  { key: 'kycVerified', label: 'KYC verified', val: u => +(u.kyc === 'approved'), dir: 'desc', cell: u => u.kyc === 'approved' ? `<span style="color:var(--success-ink)">${icon('check', 16, 2.2)}</span>` : '<span class="faint">—</span>' },
-  { key: 'idv', label: 'IDV verified', val: u => +u.idv, dir: 'desc', cell: u => u.idv ? `<span style="color:var(--success-ink)">${icon('check', 16, 2.2)}</span>` : '<span class="faint">—</span>' },
-  { key: 'emailVerified', label: 'Email verified', val: u => +u.emailVerified, dir: 'desc', cell: u => u.emailVerified ? `<span style="color:var(--success-ink)">${icon('check', 16, 2.2)}</span>` : '<span class="faint">—</span>' },
+  { key: 'kycVerified', label: 'KYC verified', val: u => +(u.kyc === 'approved'), dir: 'desc', cell: u => yes(u.kyc === 'approved') },
+  { key: 'idv', label: 'IDV verified', val: u => +u.idv, dir: 'desc', cell: u => yes(u.idv) },
+  { key: 'emailVerified', label: 'Email verified', val: u => +u.emailVerified, dir: 'desc', cell: u => yes(u.emailVerified) },
   { key: 'risk', label: 'Risk', val: u => RISK[u.risk].n, dir: 'desc', cell: u => riskCell(u.risk) },
   { key: 'riskPoints', label: 'Risk points', val: u => u.riskPoints ?? -1, dir: 'desc', right: 1, cell: u => u.riskPoints == null ? '<span class="faint">—</span>' : `<span class="num">${u.riskPoints}</span>` },
   { key: 'level', label: 'Level', val: u => Object.keys(LEVEL).indexOf(u.level), dir: 'desc', cell: u => `<span class="muted">${LEVEL[u.level].label}</span>` },
   { key: 'type', label: 'Type', val: u => u.type, dir: 'asc', cell: u => `<span class="muted">${TYPE[u.type].label}</span>` },
   { key: 'balance', label: 'Balance', val: u => u.balance, dir: 'desc', right: 1, cell: u => `<span class="num ${u.balance ? '' : 'zero'}">${fmtEur(u.balance)}</span>` },
   { key: 'cards', label: 'Cards', val: u => u.cards, dir: 'desc', right: 1, cell: u => `<span class="num ${u.cards ? '' : 'zero'}">${u.cards}</span>` },
-  { key: 'twofa', label: '2FA', val: u => +u.twofa, dir: 'desc', cell: u => u.twofa ? `<span style="color:var(--success-ink)">${icon('check', 16, 2.2)}</span>` : '<span class="faint">—</span>' },
-  { key: 'tempPassword', label: 'Temporary password', val: u => +u.tempPassword, dir: 'desc', cell: u => u.tempPassword ? `<span style="color:var(--success-ink)">${icon('check', 16, 2.2)}</span>` : '<span class="faint">—</span>' },
+  { key: 'twofa', label: '2FA', val: u => +u.twofa, dir: 'desc', cell: u => yes(u.twofa) },
+  { key: 'tempPassword', label: 'Temporary password', val: u => +u.tempPassword, dir: 'desc', cell: u => yes(u.tempPassword) },
   { key: 'lang', label: 'Language', val: u => u.lang, dir: 'asc', cell: u => `<span class="muted">${u.lang}</span>` },
   { key: 'referral', label: 'Referral code', val: u => u.referral, dir: 'asc', cell: u => `<span class="num muted">${u.referral}</span>` },
   { key: 'invitedBy', label: 'Invited by', val: u => u.invitedBy || 0, dir: 'desc', cell: u => u.invitedBy ? `<span class="num">#${u.invitedBy}</span>` : '<span class="faint">—</span>' },
@@ -1665,6 +1642,7 @@ const monitorsDue = kind => monitorsOf(kind).filter(m => m.status === 'ALERT' ||
 const waiting = (id, key, values) => () => { const P = PAGES[id]; return applyFilters(pgData(P), [{ key, values }], null, P.fields).length; };
 const NAV = [
   { id: 'dashboard', label: 'Overview', icon: 'dashboard' }, // the homepage sits above every section
+  { id: 'requests', label: 'Requests', icon: 'inbox', attn: waiting('requests', 'status', ['NEW']), why: 'new' }, // what WL operators ask NS.Cards for
   { label: 'Clients', icon: 'users', items: [{ id: 'users', label: 'Users', icon: 'users', attn: () => USERS.filter(u => ['pending', 'review'].includes(u.kyc)).length, why: 'with KYC to review' },
     { id: 'companies', label: 'Company list', icon: 'building', on: () => S.route === 'companies' && S.coView !== 'access', attn: () => COMPANIES.filter(c => !c.cp.length && !c.ip.length).length, why: 'not set up' },
     { id: 'companies', href: '#/companies/access', label: 'Product access', icon: 'table', on: () => S.route === 'companies' && S.coView === 'access' }] },
@@ -1692,7 +1670,7 @@ const NAV_FLAT = NAV.flatMap(n => n.items || [n]).filter((n, i, a) => a.findInde
 const navTitle = id => NAV_FLAT.find(x => x.id === id).label;
 /* Interface language. The shell (sidebar, page titles, tabs, profile menu, Overview) follows it; page content stays English in the prototype. */
 const RU = {
-  Clients: 'Клиенты', Overview: 'Обзор', Users: 'Пользователи', Companies: 'Компании', 'Company list': 'Список компаний', 'Product access': 'Доступ к продуктам', 'Cards & accounts': 'Карты и счета', Cards: 'Карты', 'Card orders': 'Заказы карт', 'IBAN accounts': 'Счета IBAN',
+  Clients: 'Клиенты', Overview: 'Обзор', Requests: 'Запросы', Users: 'Пользователи', Companies: 'Компании', 'Company list': 'Список компаний', 'Product access': 'Доступ к продуктам', 'Cards & accounts': 'Карты и счета', Cards: 'Карты', 'Card orders': 'Заказы карт', 'IBAN accounts': 'Счета IBAN',
   Products: 'Продукты', 'Card products': 'Карточные продукты', 'IBAN products': 'Продукты IBAN', Staking: 'Стейкинг', 'Staking dashboard': 'Дашборд стейкинга', Stakes: 'Стейки', 'Payout pools': 'Пулы выплат', Strategies: 'Стратегии', Sections: 'Разделы',
   Operations: 'Операции', 'External transactions': 'Внешние транзакции', 'Fund movements': 'Движения средств', 'Operation confirmations': 'Подтверждения операций', 'SBP links': 'Ссылки СБП',
   Compliance: 'Проверки', Documents: 'Документы', 'KYC checks': 'Проверки KYC', 'KYT rules': 'Правила KYT', Finance: 'Финансы', 'Wallet statistics': 'Статистика кошельков', 'Operation statistics': 'Статистика операций', Reserves: 'Резервы',
@@ -1898,7 +1876,7 @@ function route() {
   const [id, sub] = location.hash.replace(/^#\/?/, '').split('/');
   const r = id === 'settings' || NAV_FLAT.some(n => n.id === id) ? id : 'dashboard';
   const uid = r === 'users' && sub ? +sub : null;
-  if (uid !== S.userId) { S.draft = {}; S.tx = txDefault(); S.openWallet = null; }
+  if (uid !== S.userId) { S.draft = {}; S.tx = txDefault(); }
   if (!uid) S.userTab = 'overview';
   const cid = r === 'companies' && sub && sub !== 'access' ? +sub : null, prevRoute = S.route;
   if (cid !== S.coId) { S.coDraft = {}; S.brandDraft = {}; S.coUserQ = ''; S.coUserPage = 1; S.curProv = ''; }
@@ -2101,14 +2079,14 @@ function renderDashboard() {
   const go = (href, l) => `<a class="btn btn-link" href="${href}">${t(l)}${icon('chevRight', 16)}</a>`;
   $('#main').innerHTML = `<div class="page"><div class="dgrid">
     ${stats.map(([l, ic, n, href]) => `<a class="card span-3 ov-stat" href="${href}"><span class="os-ic">${icon(ic, 16)}</span><span class="os-l">${t(l)}<b>${fmtInt(n)}</b></span>${icon('chevRight', 16)}</a>`).join('')}
-    <div class="card span-6 flush ov"><div class="card-h"><span class="card-t">${t('Needs attention')}</span></div>
-      ${queues.map(q => `<button class="ovr ${q.n ? '' : 'clear'}" data-act="ov-queue" data-id="${q.id}" data-v="${q.v}"><span class="os-ic">${icon(q.ic, 16)}</span><span class="ovr-l">${t(q.l)}</span><span class="ovr-n">${q.n ? fmtInt(q.n) : t('All clear')}</span>${icon('chevRight', 16)}</button>`).join('')}
+    <div class="card span-6"><div class="card-h"><span class="card-t">${t('Needs attention')}</span></div>
+      ${lis(queues.map(q => li({ tile: icon(q.ic, 16), l: t(q.l), cnt: liCnt(q.n), act: `data-act="ov-queue" data-id="${q.id}" data-v="${q.v}"` })))}
     </div>
-    <div class="card span-6 flush ov"><div class="card-h"><span class="card-t">${t('Wallet funds')}</span>${go('#/reserves', 'Provider reserves')}</div>
-      ${funds.map(([c, v]) => `<div class="ovw"><span class="ctry">${assetIc(c, 16)}${c}</span><b class="num">${fmtAmt(v, c)}</b></div>`).join('')}
+    <div class="card span-6"><div class="card-h"><span class="card-t">${t('Wallet funds')}</span>${go('#/reserves', 'Provider reserves')}</div>
+      ${lis(funds.map(([c, v]) => li({ lead: assetIc(c, 16), l: c, v: fmtAmt(v, c) })))}
     </div>
-    <div class="card span-12 flush ov"><div class="card-h"><span class="card-t">${t('Recent changes')}</span>${go('#/logs', 'Full log')}</div>
-      ${log.map(l => `<div class="ovl"><span class="muted ovl-t" title="${fmtDateTime(l.at)}">${rel(l.at)}</span><span class="ovl-a">${esc(l.admin)}</span><span>${esc(l.label)}</span>${l.href ? `<a class="lnk muted" href="${l.href}">${esc(l.entity)}</a>` : `<span class="muted">${esc(l.entity || '')}</span>`}</div>`).join('')}
+    <div class="card span-12"><div class="card-h"><span class="card-t">${t('Recent changes')}</span>${go('#/logs', 'Full log')}</div>
+      ${lis(log.map(l => liAct({ time: `<span title="${fmtDateTime(l.at)}">${rel(l.at)}</span>`, who: esc(l.admin), what: esc(l.label), v: esc(l.entity || ''), link: l.href, muted: !l.href })))}
     </div>
   </div></div>`;
 }
@@ -2128,21 +2106,20 @@ let chartN = 0;
 function drawSeries(el, spec) {
   if (!el) return;
   const { dates, unit, fmt } = spec, L = spec.series, n = dates.length, gid = 'ag' + ++chartN;
-  const W = el.clientWidth, H = el.clientHeight || 220, pl = 52, pr = 10, pt = 10, pb = 28;
+  const W = el.clientWidth, H = el.clientHeight || 248, pl = 56, pr = 0, pt = 8, pb = 32; // Y axis 48 + 8 gap; X axis row 16 below a 16 gap
   const max = niceMax(Math.max(...L.flatMap(s => s.data), 0) * 1.05 || 1);
   const x = i => pl + (n === 1 ? 0 : i * (W - pl - pr) / (n - 1)), y = v => pt + (1 - v / max) * (H - pt - pb);
   const hh = dt => String(dt.getHours()).padStart(2, '0') + ':00';
   const lbl = dt => unit === 'hour' ? hh(dt) : unit === 'month' ? dt.toLocaleDateString('en-GB', { month: 'short' }) : dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   const step = Math.max(1, Math.ceil(n / 6));
-  const grid = [0, .25, .5, .75, 1].map(f => `<line x1="${pl}" x2="${W - pr}" y1="${y(max * f)}" y2="${y(max * f)}" stroke="var(--line)" ${f ? 'stroke-dasharray="2 4"' : ''}/><text class="ax" x="${pl - 10}" y="${y(max * f) + 3.5}" text-anchor="end">${f ? fmt(max * f).replace('.00', '') : '0'}</text>`).join('');
-  const xl = dates.map((dt, i) => (i % step === 0 || i === n - 1) && !(i !== n - 1 && n - 1 - i < step / 2) ? `<text class="ax" x="${x(i)}" y="${H - 8}" text-anchor="${i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'}">${lbl(dt)}</text>` : '').join('');
+  const grid = [0, .25, .5, .75, 1].map(f => `<line x1="${pl}" x2="${W - pr}" y1="${y(max * f)}" y2="${y(max * f)}" stroke="${f ? 'var(--line-soft)' : 'var(--line)'}" ${f ? 'stroke-dasharray="2 3"' : ''}/><text class="ax" x="${pl - 8}" y="${y(max * f) + 4}" text-anchor="end">${f ? fmt(max * f).replace(/(\.\d*?)0+(?=\D*$)/, '$1').replace(/\.(?=\D*$)/, '') : '0'}</text>`).join(''); // ticks drop trailing zeros: €1.5M, €500K
+  const xl = dates.map((dt, i) => (i % step === 0 || i === n - 1) && !(i !== n - 1 && n - 1 - i < step / 2) ? `<text class="ax" x="${x(i)}" y="${H - 4}" text-anchor="${i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'}">${lbl(dt)}</text>` : '').join('');
   const path = s => smoothPath(s.data.map((v, i) => [x(i), y(v)]));
   const order = [...L.filter(s => s.dash), ...L.filter(s => !s.dash)];
   el.innerHTML = `<svg width="${W}" height="${H}" role="img" aria-label="${esc(L[0].l)} over time">
-    <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${L[0].col}" stop-opacity=".16"/><stop offset="1" stop-color="${L[0].col}" stop-opacity="0"/></linearGradient></defs>
     ${grid}${xl}
-    ${L.filter(s => s.area).map(s => `<path d="${path(s)}L${x(n - 1)} ${y(0)}L${x(0)} ${y(0)}Z" fill="url(#${gid})"/>`).join('')}
-    ${order.map(s => s.dash ? `<path d="${path(s)}" fill="none" stroke="${s.col}" stroke-width="1.5" stroke-dasharray="4 4"/>` : `<path d="${path(s)}" fill="none" stroke="${s.col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`).join('')}
+    ${L.filter(s => s.area).map(s => `<path d="${path(s)}L${x(n - 1)} ${y(0)}L${x(0)} ${y(0)}Z" fill="${s.col}" fill-opacity=".1"/>`).join('')}
+    ${order.map(s => s.dash ? `<path d="${path(s)}" fill="none" stroke="${s.col}" stroke-width="1.5" stroke-dasharray="4 3"/>` : `<path d="${path(s)}" fill="none" stroke="${s.col}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`).join('')}
     <g class="xh" style="display:none"><line class="xhl" y1="${pt}" y2="${H - pb}" stroke="var(--ink-3)" stroke-width="1"/>
       ${order.map(s => s.dash ? `<circle data-s="${L.indexOf(s)}" r="4" fill="var(--surface)" stroke="${s.col}" stroke-width="1.5"/>` : `<circle data-s="${L.indexOf(s)}" r="4.5" fill="${s.col}" stroke="var(--surface)" stroke-width="2"/>`).join('')}</g>
     <rect x="${pl}" y="0" width="${W - pl - pr}" height="${H}" fill="transparent" class="hit"/>
@@ -2654,7 +2631,7 @@ const fmtAmt = (v, c, signed) => {
 const assetIc = (c, s = 16) => CUR_IMG[c] ? `<img class="asset-ic" src="${CUR_IMG[c]}" style="width:${s}px;height:${s}px" alt="">` // inline size: .asset-ic's own 34px would win over attributes
   : `<span class="asset-ic" style="width:${s}px;height:${s}px;font-size:${Math.round(s * .42)}px;background:${ASSET[c]?.col || 'var(--neutral)'}">${ASSET[c]?.s || { GBP: '£', CHF: '₣' }[c] || c[0]}</span>`;
 const curCell = c => `<span class="ctry">${assetIc(c, 16)}${c}</span>`; // a currency code with its icon, wherever a column holds one
-const yes = v => `<span class="ver-ic ${v ? 'ok' : 'no'}" style="margin:0 auto">${icon(v ? 'check' : 'minus', 12, 2.5)}</span>`;
+const yes = v => `<span class="yn ${v ? 'ok' : 'no'}" role="img" aria-label="${v ? 'Yes' : 'No'}">${icon(v ? 'checkCircle' : 'minusCircle', 16)}</span>`;
 const dash = '<span class="faint">—</span>';
 const copyVal = (v, shown = v) => `<button class="copy num" data-act="copy" data-copy="${esc(v)}">${esc(shown)}${icon('copy', 12)}</button>`;
 const emptyBlock = (ic, t, p, btn = '') => `<div class="empty sm"><div class="em-ic">${icon(ic, 24)}</div><h3>${t}</h3><p>${p}</p>${btn}</div>`;
@@ -2674,6 +2651,27 @@ function dtable(heads, rows, empty = '', drag) {
   return `<div class="hs-wrap"><div class="dt-wrap hs"><table class="dt fx" style="min-width:${Math.max(720, minW)}px"><colgroup>${W.map(w => `<col${w == null ? '' : ` style="width:${w}px"`}>`).join('')}</colgroup><thead><tr>${H.map((h, i) => `<th class="${h.al}" ${drag?.keys[i] ? `draggable="true" data-t="${drag.t}" data-drag="${drag.keys[i]}"` : ''}>${h.l}</th>`).join('')}</tr></thead>
     <tbody>${rows.map(r => { const cells = Array.isArray(r) ? r : r.cells; return `<tr class="${r.cls || ''}">${cells.map((c, i) => (H[i].al === 'a' ? `<td class="act"><div class="row-actions">${c}</div></td>` : `<td class="${H[i].al}">${c}</td>`)).join('')}</tr>`; }).join('')}</tbody></table></div></div>`;
 }
+// List row (Figma ❖ Data display → List row) — every short list in a card. A row link (go = route, act = data attrs) gets the hover band and a chevron.
+// li: Text / Chevron / Legend / Meter types — Key: tile (16px icon in a 24px tile) · lead (16px icon or asset) · dot (status tone) · sw (series colour) · l label (sub: secondary) · tag (chip);
+//     Trailing: cnt (Counter) · vm (muted value) · v (value) · meter (meterEl) · x (40px aux, e.g. share %)
+const liWrap = (inner, { go, act, cls = '', tt }) => { const a = tt ? ` data-tt="${tt}"` : ''; return go ? `<a class="li go ${cls}" href="#/${go}"${a}>${inner}</a>` : act ? `<button class="li go ${cls}" ${act}${a}>${inner}</button>` : `<div class="li ${cls}"${a}>${inner}</div>`; };
+const liChev = o => o.menu ? icon('more', 16) : o.go || o.act ? icon('chevRight', 16) : ''; // a row that opens a menu (menu: 1) ends in ⋯, a row that navigates in a chevron
+const li = o => {
+  const { tile = '', lead = '', dot, sw, l = '', sub, tag = '', tagCls = '', cnt, vm = '', v = '', meter = '', x = '' } = o;
+  const key = `<span class="li-k">${tile ? `<span class="li-tile">${tile}</span>` : ''}${lead ? `<span class="li-lead">${lead}</span>` : ''}${dot ? `<i class="dot t-${dot}"></i>` : ''}${sw ? `<i class="li-sw" style="background:${sw}"></i>` : ''}<span class="li-l ${sub ? 'sub' : ''}">${l}</span>${tag !== '' ? `<span class="li-tag ${tagCls}" title="${plainText(String(tag))}">${tag}</span>` : ''}</span>`;
+  return liWrap(`${key}<span class="li-t">${cnt != null ? cnt : ''}${vm !== '' ? `<span class="li-vm">${vm}</span>` : ''}${v !== '' ? `<span class="li-v">${v}</span>` : ''}${meter}${x !== '' ? `<span class="li-x">${x}</span>` : ''}${liChev(o)}</span>`, o);
+};
+const liCnt = n => n ? `<span class="li-cnt">${fmtInt(n)}</span>` : `<span class="li-none">${t('All clear')}</span>`; // Counter, Tone=Attention
+// Activity: time (96) · who (160, medium) · what (secondary, fills) · value — link: an underlined entity link; muted: secondary value
+const liAct = o => { const { time, who = '', what, v = '', link, muted } = o;
+  return liWrap(`<span class="li-ev">${time != null ? `<span class="li-time">${time}</span>` : ''}<span class="li-who">${who}</span>${what != null ? `<span class="li-what">${what}</span>` : ''}</span>`
+    + `<span class="li-t">${link ? `<a class="li-link" href="${link}">${v}</a>` : v !== '' ? `<span class="${muted ? 'li-vm m5' : 'li-v'}">${v}</span>` : ''}${liChev(o)}</span>`, { ...o, cls: 'act ' + (o.cls || '') }); };
+// Bar (.Bar chart row): w = share of the longest bar, %
+const liBar = ({ lead = '', l, v, w, tt }) => `<div class="li bar"${tt ? ` data-tt="${tt}"` : ''}><span class="li-track"><i style="width:${Math.max(0, Math.min(100, w))}%"></i>${lead ? `<span class="li-lead">${lead}</span>` : ''}<span class="li-l">${l}</span></span><span class="li-bv">${v}</span></div>`;
+// .Meter: p = percent of the threshold; scale 200 puts the threshold mid-track, 120 at 5/6 (Reserve coverage); tone success / warning / error
+const meterEl = (p, tone, scale = 200, label = Math.round(p) + '%') => `<span class="li-meter"><span class="mt"><i style="width:${Math.min(100, p / scale * 100)}%;background:var(--${tone})"></i><b style="left:${100 / scale * 100}%"></b></span><span class="mt-v">${label}</span></span>`;
+const lis = rows => `<div class="lis">${rows.join('')}</div>`;
+const soon = d => { const h = (d - NOW) / 36e5; return h < 1 ? `in ${Math.max(1, Math.round(h * 60))}m` : h < 24 ? `in ${Math.round(h)}h` : `in ${Math.round(h / 24)}d`; }; // upcoming, as short as rel()
 /* Column chooser for user-page tables: TCOLS[table] = [{ k, l, al, on, cell(row) }]; each table remembers its visible columns */
 // Column order and visibility are stored apart, so a hidden column keeps its place: S.tord[table] = every column key in display order,
 // S.tcols[table] = the visible keys (missing = defaults from TCOLS). Users keeps the same pair in S.colOrder / S.hidden.
@@ -2740,7 +2738,7 @@ function renderUserPage() {
 
 function userTab(u, d, D) {
   const kv = (l, v) => `<div class="kv-r"><span>${l}</span>${v}</div>`, X = edCtx();
-  const ver = (l, ok, v, extra = '') => `<div class="kv-r"><span class="ver-l"><span class="ver-ic ${ok ? 'ok' : 'no'}">${icon(ok ? 'check' : 'minus', 12, 2.5)}</span><span style="color:var(--ink)">${l}</span></span><span style="display:flex;align-items:center;gap:var(--space-8)">${extra}${v}</span></div>`;
+  const ver = (l, ok, v, extra = '') => `<div class="kv-r"><span class="ver-l">${yes(ok)}<span style="color:var(--ink)">${l}</span></span><span style="display:flex;align-items:center;gap:var(--space-8)">${extra}${v}</span></div>`;
   switch (S.userTab) {
     case 'overview': return `
       <div class="card"><div class="card-h"><span class="card-t">Profile</span></div><div class="kv2 card-b">
@@ -2768,27 +2766,11 @@ function userTab(u, d, D) {
   }
 }
 
-/* Wallets — every supported asset, expandable for address, available / locked and actions */
+/* Wallets — every supported asset as a list row (asset · network chip · balance · in EUR); the row opens Adjust / Freeze / Copy address */
 function walletsTab(u, D) {
-  const rows = [...D.wallets].sort((x, y) => eurOf(y) - eurOf(x)).map(w => {
-    const a = ASSET[w.c], open = S.openWallet === w.c;
-    return `<div class="wrow ${w.amt ? '' : 'zero'} ${open ? 'open' : ''}" data-act="wallet-toggle" data-c="${w.c}">
-      ${assetIc(w.c, 16)}
-      <div class="wn"><div>${a.n}${w.frozen ? ' <span class="badge t-info">Frozen</span>' : ''}</div><div class="code">${w.c} · ${a.net}</div></div>
-      <div class="wa"><div class="num">${fmtAmt(w.amt, w.c)}</div><div class="code">${fmtEur(eurOf(w), 2)}</div></div>
-      <span class="wchev">${icon('chevDown', 16)}</span>
-    </div>
-    ${open ? `<div class="wdet">
-      <div><div class="kl">Available</div><div class="num">${fmtAmt(w.amt - w.locked, w.c)}</div></div>
-      <div><div class="kl">Locked</div><div class="num">${fmtAmt(w.locked, w.c)}</div></div>
-      <div><div class="kl">${a.fiat ? 'Rail' : 'Deposit address'}</div>${w.address ? copyVal(w.address, `${w.address.slice(0, 10)}…${w.address.slice(-6)}`) : `<span>${a.net}</span>`}</div>
-      <div class="wdet-act">
-        <button class="btn btn-tertiary" data-act="adj-open" data-c="${w.c}">${icon('sliders', 16)}Adjust</button>
-        <button class="btn btn-tertiary" data-act="wallet-freeze" data-c="${w.c}">${icon(w.frozen ? 'refresh' : 'lock', 16)}${w.frozen ? 'Unfreeze' : 'Freeze'}</button>
-      </div>
-    </div>` : ''}`;
-  }).join('');
-  return tcard(`Wallets <span class="ct">${fmtEur(u.balance, 2)}</span>`, `<button class="btn btn-tertiary" data-act="adj-open">${icon('sliders', 16)}Adjust balance</button>`, `<div class="wlist">${rows}</div>`);
+  const rows = [...D.wallets].sort((x, y) => eurOf(y) - eurOf(x)).map(w => li({ lead: assetIc(w.c, 16), l: ASSET[w.c].n + (w.frozen ? ' <span class="badge t-info">Frozen</span>' : ''), tag: ASSET[w.c].net,
+    v: fmtAmt(w.amt, w.c), x: fmtEur(eurOf(w), 2), act: `data-act="wallet-menu" data-c="${w.c}"`, menu: 1, cls: w.amt ? '' : 'zero' }));
+  return tcard(`Wallets <span class="ct">${fmtEur(u.balance, 2)}</span>`, `<button class="btn btn-tertiary" data-act="adj-open">${icon('sliders', 16)}Adjust balance</button>`, `<div class="card-b">${lis(rows)}</div>`);
 }
 
 const txType = h => `<span class="txt">${icon(TX[h.type].icon, 16)}${TX[h.type].label}</span>`;
@@ -2821,7 +2803,7 @@ const TCOLS = {
     { k: 'emboss', l: 'Emboss name', cell: c => muted(c.emboss) }, { k: 'line4', l: 'Fourth line text', cell: c => muted(c.line4) },
     { k: 'exp', l: 'Expiry', on: 1, cell: c => `<span class="num">${c.exp}</span>` }, { k: 'masked', l: 'Masked number', cell: c => `<span class="num">${c.bin}•• •••• ${c.last4}</span>` },
     { k: 'type', l: 'Card type', on: 1, cell: c => c.physical ? 'Physical' : 'Virtual' }, { k: 'template', l: 'Template ID', cell: c => numM(c.templateId) },
-    { k: 'design', l: 'Design code', cell: c => muted(c.design) }, { k: 'activated', l: 'Activated', al: 'c', on: 1, cell: c => yes(c.activated) },
+    { k: 'design', l: 'Design code', cell: c => muted(c.design) }, { k: 'activated', l: 'Activated', on: 1, cell: c => yes(c.activated) },
     { k: 'status', l: 'Status', on: 1, cell: c => badge(c.frozen ? { label: 'Frozen', tone: 'info' } : { label: 'Active', tone: 'success' }) },
     { k: 'lastItem', l: 'Last item ID', cell: c => numM(c.lastItem) },
     { k: 'created', l: 'Created', on: 1, cell: c => muted(fmtDateTime(c.created)) }, { k: 'updated', l: 'Updated', cell: c => muted(rel(c.updated)) },
@@ -2920,7 +2902,7 @@ function addrTab(u, D) {
 /* Verification — KYC provider records, CreditCo and requested forms */
 function verifTab(u, D) {
   const C = D.creditco, kv = (l, v) => `<div class="kv-r"><span>${l}</span>${v || dash}</div>`;
-  const kyc = tcard('KYC', '', dtable(['ID', 'Provider', 'Status', 'IDV|c', 'KYC verified|c', 'Downloaded|c', 'Default|c', 'Created', 'Updated', '|a'], D.kyc.map((k, i) => [
+  const kyc = tcard('KYC', '', dtable(['ID', 'Provider', 'Status', 'IDV', 'KYC verified', 'Downloaded', 'Default', 'Created', 'Updated', '|a'], D.kyc.map((k, i) => [
     `<span class="num muted">${k.id}</span>`, k.provider,
     `<select class="fsel sm" data-kyc="${i}">${Object.entries(KYC).map(([v, o]) => `<option value="${v}" ${u.kyc === v ? 'selected' : ''}>${o.label}</option>`).join('')}</select>`,
     yes(u.idv), yes(u.kyc === 'approved'), yes(k.downloaded), yes(k.def), `<span class="muted">${fmtDateTime(k.created)}</span>`, `<span class="muted">${fmtDateTime(k.updated)}</span>`,
@@ -3011,7 +2993,7 @@ function edSet(X, k, v) { if (edSame(v) === edSame(edGet(X, k))) delete X.draft[
 const edLook = o => `${o.flag ? `<span class="flag">${o.flag}</span>` : o.tone ? `<i class="dot t-${o.tone}"></i>` : ''}<span class="ie-v">${esc(o.label)}</span>`;
 function edMultiInner(X, k) {
   const on = new Set((edVal(X, k) || []).map(String)), L = edOpts(X, k).filter(([v]) => on.has(v)).map(([, o]) => o.label);
-  return `<span class="ie-v ${L.length ? '' : 'faint'}">${L.length ? esc(L.slice(0, 2).join(', ')) + (L.length > 2 ? ` <span class="faint">+${L.length - 2}</span>` : '') : 'None'}</span>${icon('chevsUD', 16)}`;
+  return `<span class="ie-v ${L.length ? '' : 'faint'}">${L.length ? esc(L.slice(0, 2).join(', ')) + (L.length > 2 ? ` <span class="faint">+${L.length - 2}</span>` : '') : 'None'}</span>${icon('chevDown', 16)}`;
 }
 // The control for one field, or null when the spec says this record can't change it (the caller then shows the plain value)
 function edField(X, k) {
@@ -3020,9 +3002,9 @@ function edField(X, k) {
   switch (f.t) {
     case 'text': case 'num': return `<span class="ie-box ${dirty}"><input class="ie-in" data-ie="${k}" value="${esc(v ?? '')}" placeholder="${esc(f.ph || 'Empty')}" ${f.t === 'num' ? 'inputmode="decimal"' : ''} autocomplete="off" spellcheck="false" aria-label="${esc(f.l || k)}">${f.sfx ? `<span class="ie-sfx">${f.sfx}</span>` : ''}</span>`;
     case 'sel': { const o = edOpts(X, k).find(([x]) => x === String(v ?? ''));
-      return `<button class="sel-btn ${dirty}" data-act="ie-sel" data-ie="${k}">${f.show && v != null ? f.show(v) : o ? edLook(o[1]) : `<span class="faint">${f.none || 'Not set'}</span>`}${icon('chevsUD', 16)}</button>`; }
+      return `<button class="sel-btn ${dirty}" data-act="ie-sel" data-ie="${k}">${f.show && v != null ? f.show(v) : o ? edLook(o[1]) : `<span class="faint">${f.none || 'Not set'}</span>`}${icon('chevDown', 16)}</button>`; }
     case 'multi': return `<button class="sel-btn ${dirty}" data-act="ie-multi" data-ie="${k}">${edMultiInner(X, k)}</button>`;
-    case 'date': return `<button class="sel-btn ${dirty}" data-act="ie-date" data-ie="${k}">${icon('calendar', 16)}<span class="ie-v">${v ? fmtDateTime(v) : '<span class="faint">Not set</span>'}</span>${icon('chevsUD', 16)}</button>`;
+    case 'date': return `<button class="sel-btn ${dirty}" data-act="ie-date" data-ie="${k}">${icon('calendar', 16)}<span class="ie-v">${v ? fmtDateTime(v) : '<span class="faint">Not set</span>'}</span>${icon('chevDown', 16)}</button>`;
     case 'bool': return `<button class="sw-t ${v ? 'on' : ''} ${dirty}" data-act="ie-bool" data-ie="${k}" aria-pressed="${!!v}" aria-label="${esc(f.l || k)}"></button>`;
   }
 }
@@ -3107,7 +3089,7 @@ const pop = $('#pop'); let popAnchor = null, popOpts = {};
 function openPop(anchor, html, opts = {}) {
   if (popAnchor === anchor && pop.classList.contains('open') && !opts.keep) { closePop(); return; }
   if (popOpts.onClose && popOpts !== opts) popOpts.onClose();
-  popAnchor = anchor; popOpts = opts; $('#tt').classList.remove('show');
+  popAnchor?.classList.remove('popped'); popAnchor = anchor; anchor.classList?.add('popped'); popOpts = opts; $('#tt').classList.remove('show');
   pop.innerHTML = html; pop.style.width = opts.width ? opts.width + 'px' : ''; pop.classList.add('open');
   positionPop(); opts.onMount && opts.onMount(pop);
 }
@@ -3118,11 +3100,11 @@ function positionPop() {
   let t = popOpts.side ? Math.min(r.top - 7, innerHeight - ph - 8) : r.bottom + 6; if (!popOpts.side && t + ph > innerHeight - 8) t = Math.max(8, r.top - ph - 6);
   pop.style.left = l + 'px'; pop.style.top = t + 'px';
 }
-function reanchor() { if (popOpts.anchorSel) { const a = $(popOpts.anchorSel); if (a) { popAnchor = a; positionPop(); } } }
+function reanchor() { if (popOpts.anchorSel) { const a = $(popOpts.anchorSel); if (a) { popAnchor = a; a.classList.add('popped'); positionPop(); } } }
 function closePop() {
   $$('.dd.open').forEach(b => b.classList.remove('open'));
   if (!pop.classList.contains('open')) return;
-  pop.classList.remove('open'); popAnchor = null; popOpts.onClose?.(); popOpts = {};
+  pop.classList.remove('open'); popAnchor?.classList.remove('popped'); popAnchor = null; popOpts.onClose?.(); popOpts = {};
   const before = S.filters.length; S.filters = S.filters.filter(f => f.values.length);
   if (before !== S.filters.length && S.route === 'users' && !S.userId) { renderChips(); renderStats(); }
   const cb = S.co.filters.length; S.co.filters = S.co.filters.filter(f => f.values.length);
@@ -3436,9 +3418,10 @@ const ACT = {
 
 
   // user page · wallets & balance
-  'wallet-toggle': a => { S.openWallet = S.openWallet === a.dataset.c ? null : a.dataset.c; renderUserPage(); },
   'wallet-freeze': a => { const w = ud(byId(S.userId)).wallets.find(x => x.c === a.dataset.c); w.frozen = !w.frozen; toast(`${w.c} wallet ${w.frozen ? 'frozen' : 'unfrozen'}`, w.frozen ? 'lock' : 'check'); renderUserPage(); },
   'adj-open': a => { closePop(); adjustModal(a.dataset.c || null); },
+  'wallet-menu': a => { const w = ud(byId(S.userId)).wallets.find(x => x.c === a.dataset.c); openPop(a, menuItems([{ act: 'adj-open', data: { c: w.c }, icon: 'sliders', label: 'Adjust balance' },
+    { act: 'wallet-freeze', data: { c: w.c }, icon: w.frozen ? 'refresh' : 'lock', label: w.frozen ? 'Unfreeze' : 'Freeze' }, ...(w.address ? [{ act: 'copy', data: { copy: w.address }, icon: 'copy', label: 'Copy deposit address' }] : [])]), { align: 'right' }); },
   'adj-mode': a => { $$('#adjMode button').forEach(b => b.classList.toggle('on', b === a)); $$('.adj-pane').forEach(p => p.classList.toggle('on', p.dataset.pane === a.dataset.v)); $(`.adj-pane.on input`)?.focus(); },
   'adj-dir': a => $$('#adjDir button').forEach(b => b.classList.toggle('on', b === a)),
   'adj-submit': adjSubmit,
@@ -3605,9 +3588,9 @@ Object.assign(TCOLS, {
     { k: 'material', l: 'Material ID', cell: a => a.material ? numM(a.material) : dash },
     { k: 'group', l: 'Payment group', on: 1, cell: a => `<span class="code">${a.group}</span>` },
     { k: 'limit', l: 'Monthly limit', al: 'r', on: 1, cell: a => `<span class="num">${money(a.limit, PROD_BY.c[a.pid].cur).replace(/\.00$/, '')}</span>` },
-    { k: 'funded', l: 'Company funded', al: 'c', on: 1, cell: a => yes(a.funded) },
+    { k: 'funded', l: 'Company funded', on: 1, cell: a => yes(a.funded) },
     { k: 'maxFunded', l: 'Max funded per user', al: 'r', cell: a => a.funded ? numM(a.maxFunded) : dash },
-    { k: 'purchase', l: 'Purchase allowed', al: 'c', on: 1, cell: a => yes(a.purchase) },
+    { k: 'purchase', l: 'Purchase allowed', on: 1, cell: a => yes(a.purchase) },
     { k: 'created', l: 'Added', al: 'r', cell: a => muted(fmtDay(a.created)) },
   ],
   coIban: [
@@ -3897,7 +3880,7 @@ function coSide(c, D) {
   return `<aside class="up-side">
     <div class="card"><div class="card-h"><span class="card-t">Setup</span><span class="code">${done} of ${steps.length} done</span><i class="card-prog" style="width:${done / steps.length * 100}%"></i></div>
       <div class="card-b">
-      ${steps.map(([l, ok, tab]) => `<button class="su-step ${ok ? 'done' : ''}" data-act="co-tab" data-v="${tab}"><span class="ver-ic ${ok ? 'ok' : 'no'}">${icon(ok ? 'check' : 'minus', 12, 2.5)}</span><span class="pl">${l}</span>${icon('chevRight', 16)}</button>`).join('')}</div>
+      ${steps.map(([l, ok, tab]) => `<button class="su-step ${ok ? 'done' : ''}" data-act="co-tab" data-v="${tab}">${yes(ok)}<span class="pl">${l}</span>${icon('chevRight', 16)}</button>`).join('')}</div>
     </div>
     <div class="card"><div class="card-h"><span class="card-t">Branding</span>${linkBtn('co-tab', 'branding', 'Edit')}</div><div class="card-b pad">${brandPreview(c.brand, true)}</div></div>
   </aside>`;
@@ -3972,7 +3955,7 @@ function coRatesTab(c, D) {
       <tr><th>From ≥</th><th>To &lt;</th><th class="r gs">Maker</th><th class="r">Taker</th><th class="r gs">Maker</th><th class="r">Taker</th><th class="a"></th></tr></thead>
       <tbody>${exRows(D, R.level).map((x, i) => `<tr><td>${vol(x.from)}${custom(x)}</td><td>${vol(x.to)}</td><td class="r gs">${n(x.apiM)}</td><td class="r">${n(x.apiT)}</td><td class="r gs">${n(x.userM)}</td><td class="r">${n(x.userT)}</td><td class="act"><div class="row-actions">${editBtn('rate-ex', i)}</div></td></tr>`).join('')}</tbody></table></div></div>`, seg + lvl);
   }
-  return tcard('Sell rates', c.cp.length ? linkBtn('co-tab', 'products', 'Edit prices in Products') : '', dtable(['ID', 'Provider', 'Name', 'Virtual issuing|r', 'Physical issuing|r', 'Monthly user fee|r', 'Cardholder', 'Active|c', 'Type'], c.cp.map(a => {
+  return tcard('Sell rates', c.cp.length ? linkBtn('co-tab', 'products', 'Edit prices in Products') : '', dtable(['ID', 'Provider', 'Name', 'Virtual issuing|r', 'Physical issuing|r', 'Monthly user fee|r', 'Cardholder', 'Active', 'Type'], c.cp.map(a => {
     const p = PROD_BY.c[a.pid], phys = p.kind === 'physical', fee = v => v ? `<span class="num">${money(v, p.cur)}</span>` : '<span class="faint">Free</span>';
     return [numM(p.id), p.provider, esc(p.name), phys ? dash : fee(a.cost), phys ? fee(a.cost) : dash, fee(a.monthly), muted(c.type === 'single' ? 'Individual' : 'Company'), yes(a.active), phys ? 'Physical' : 'Virtual'];
   }), emptyBlock('cardProduct', 'No card products', 'Assign card products to this company to see their prices here.', `<button class="btn btn-secondary" data-act="co-tab" data-v="products">Assign a product</button>`)), seg);
@@ -4636,7 +4619,7 @@ const K = {
   pct: (k, l, on = 1) => K.num(k, l, v => +(+v).toFixed(2) + '%', on),
   amt: (k = 'amount', l = 'Amount', ck = 'c', on = 1) => ({ k, l, al: 'r', on, dir: 'desc', val: r => r[k] * (ASSET[r[ck]]?.rate || 1), cell: r => `<span class="num">${fmtAmt(r[k], r[ck])}</span>` }),
   asset: (k = 'c', l = 'Currency') => ({ k, l, on: 1, cell: r => txCur({ c: r[k] }) }),
-  yes: (k, l, on = 1) => ({ k, l, al: 'c', on, dir: 'desc', val: r => +!!r[k], cell: r => yes(r[k]) }),
+  yes: (k, l, on = 1) => ({ k, l, on, dir: 'desc', val: r => +!!r[k], cell: r => yes(r[k]) }),
   sw: (k, l, act) => ({ k, l, al: 'c', on: 1, dir: 'desc', val: r => +!!r[k], cell: r => `<button class="sw-t ${r[k] ? 'on' : ''}" data-act="${act}" data-rid="${esc(pgKey(pg(), r))}" data-tip="${r[k] ? 'Turn off' : 'Turn on'}" aria-label="${l}"></button>`, kv: r => r[k] ? 'On' : '<span class="faint">Off</span>' }),
   date: (k = 'created', l = 'Created', on = 1) => ({ k, l, al: 'r', on, dir: 'desc', val: r => r[k] ? r[k].getTime() : 0, cell: r => r[k] ? `<span class="muted" title="${fmtDateTime(r[k])}">${rel(r[k])}</span>` : dash, kv: r => r[k] ? fmtDateTime(r[k]) : dash }),
   when: (k, l, on = 1) => ({ k, l, on, dir: 'desc', val: r => r[k] ? r[k].getTime() : 0, cell: r => r[k] ? fmtDateTime(r[k]) : dash }),
@@ -4663,16 +4646,23 @@ function renderDashPage() {
 const drawCharts = () => S._charts.forEach((spec, i) => drawSeries($('#ch' + i), spec));
 // spec: { dates, unit, fmt, series: [{ l, data, col, dash?, area? }] } — first series is the headline
 function chartCard(span, title, spec, tag = '') {
+  // Line chart (Figma ❖ Charts): Card header (title) · Summary (value + delta | legend) · plot. Previous = dashed legend marker.
+  let k = 0; spec.series.forEach(s => { s.col = s.dash ? 'var(--prev)' : CHART[k++]; });
   const i = S._charts.push(spec) - 1, [a, b] = spec.series, t = sum(a.data);
-  return `<div class="card span-${span} chart-card"><div class="card-h"><span class="card-t">${title}</span><div class="legend">${spec.series.map(s => `<span>${s.dash ? '<i class="lg-dash"></i>' : `<i class="lg-line" style="background:${s.col}"></i>`}${s.l}</span>`).join('')}${tag}</div></div>
-    <div class="big"><b>${spec.total ? spec.total : spec.fmt(spec.last ? a.data[a.data.length - 1] : t)}</b>${b && b.dash ? deltaPill(pct(spec.last ? a.data[a.data.length - 1] : t, spec.last ? b.data[b.data.length - 1] : sum(b.data))) : ''}</div>
+  return `<div class="card span-${span} chart-card"><div class="card-h"><span class="card-t">${title}</span>${tag}</div>
+    <div class="big"><span class="big-v"><b>${spec.total ? spec.total : spec.fmt(spec.last ? a.data[a.data.length - 1] : t)}</b>${b && b.dash ? deltaPill(pct(spec.last ? a.data[a.data.length - 1] : t, spec.last ? b.data[b.data.length - 1] : sum(b.data))) : ''}</span>${spec.series.length > 1 ? `<span class="legend">${spec.series.map(s => `<span>${s.dash ? '<i class="lg-dash"></i>' : `<i class="lg-line" style="background:${s.col}"></i>`}${s.l}</span>`).join('')}</span>` : ''}</div>
     <div class="chart" id="ch${i}"></div></div>`;
 }
 const dcard = (span, title, tag, body) => `<div class="card span-${span}"><div class="card-h"><span class="card-t">${title}</span>${tag}</div>${body}</div>`;
 const ctag = t => `<span class="card-tag">${t}</span>`;
-const barRows = (rows, fmt = fmtInt) => { const mx = Math.max(...rows.map(x => x[1]), 1), tot = sum(rows.map(x => x[1])) || 1; return `<div class="barlist">${rows.map(([l, v, tt]) => `<div class="bl" data-tt="${plainText(l)}|${fmt(v)}|${tt || (v / tot * 100).toFixed(1) + '% of total'}"><i style="width:${v / mx * 100}%"></i><span>${l}</span><span class="num">${fmt(v)}</span></div>`).join('')}</div>`; };
-const mixRows = (rows, fmt = fmtInt) => { const tot = sum(rows.map(x => x[1])) || 1; return `<div class="stack">${rows.map(([l, v, c]) => `<i style="width:${v / tot * 100}%;background:${c}" data-tt="${l}|${fmt(v)}|${(v / tot * 100).toFixed(0)}%"></i>`).join('')}</div>
-  <div class="lrows">${rows.map(([l, v, c]) => `<div class="lr"><i class="sw" style="background:${c}"></i><span class="lr-l">${l}</span><span class="lr-v">${fmt(v)}</span><span class="lr-p">${(v / tot * 100).toFixed(0)}%</span></div>`).join('')}</div>`; };
+const barRows = (rows, fmt = fmtInt) => { const mx = Math.max(...rows.map(x => x[1]), 1), tot = sum(rows.map(x => x[1])) || 1; return lis(rows.map(([l, v, tt, lead]) => liBar({ lead, l, v: fmt(v), w: v / mx * 100, tt: `${plainText(l)}|${fmt(v)}|${tt || (v / tot * 100).toFixed(1) + '% of total'}` }))); };
+const CHART = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)', 'var(--c5)'];
+// Breakdown + Legend rows (Figma ❖ Charts → Breakdown): shares ranked largest first in chart/1–5; anything past five folds into Other (chart/other)
+const mixRows = (rows, fmt = fmtInt) => { const tot = sum(rows.map(x => x[1])) || 1, R = [...rows].sort((a, b) => b[1] - a[1]);
+  const top = (R.length > 6 ? R.slice(0, 5) : R).map(([l, v], i) => [l, v, CHART[i] || 'var(--c-other)']), rest = R.length > 6 ? R.slice(5) : [];
+  if (rest.length) top.push(['Other', sum(rest.map(x => x[1])), 'var(--c-other)', rest.map(x => plainText(String(x[0]))).join(', ')]);
+  return `<div class="stack">${top.map(([l, v, c]) => `<i style="width:${v / tot * 100}%;background:${c}" data-tt="${l}|${fmt(v)}|${(v / tot * 100).toFixed(0)}%"></i>`).join('')}</div>
+  ${lis(top.map(([l, v, c, more]) => li({ sw: c, l: more ? `<span title="${more}">${l}</span>` : l, v: fmt(v), x: (v / tot * 100).toFixed(0) + '%' })))}`; };
 const series = (d, base, seed, mult) => genSeries(d.dates, base * (d.unit === 'month' ? 30.4 : d.unit === 'hour' ? 1 / 24 : 1) * (mult || 1), hash((S.range.key || '') + seed), d.unit);
 const cumulative = a => a.reduce((o, v, i) => (o.push((o[i - 1] || 0) + v), o), []);
 
@@ -4681,6 +4671,63 @@ const ADMIN_NAMES = ['Super admin', 'Anna Kowalski', 'Lukas Weber', 'Mariam Hako
 const REVIEWERS = ADMIN_NAMES.slice(1, 6);
 const AUsers = () => USERS.filter(u => u.kyc === 'approved');
 const youth = r => r.created ? NOW - r.created : 0;
+
+/* ── Requests — what WL operators send to NS.Cards; the author, WL provider and company are kept from when it was sent ── */
+const REQ_TYPE = { PRODUCT: { label: 'Products', icon: 'cardProduct' }, LIMITS: { label: 'Limits', icon: 'sliders' }, FEES: { label: 'Fees', icon: 'coins' }, BRANDING: { label: 'Branding', icon: 'palette' }, INTEGRATION: { label: 'API & integration', icon: 'link' }, COMPLIANCE: { label: 'Compliance', icon: 'shieldCheck' } };
+const REQ_STATUS = { NEW: { label: 'New', tone: 'info' }, IN_PROGRESS: { label: 'In progress', tone: 'warning' }, WAITING: { label: 'Waiting on WL', tone: 'neutral' }, RESOLVED: { label: 'Resolved', tone: 'success' }, REJECTED: { label: 'Rejected', tone: 'error' } };
+const REQ_SUBJ = {
+  PRODUCT: ['New virtual card product for EU users', 'Enable Apple Pay on the physical EUR card', 'Add a USD IBAN product', 'Second card product for business clients'],
+  LIMITS: ['Raise the monthly withdrawal limit to €250,000', 'Lower ATM limits for new users', 'Temporary limit increase for a VIP client', 'Daily top-up limit for USDT'],
+  FEES: ['Waive the card issuing fee for the Q4 campaign', 'Change the FX markup to 1.2%', 'Review top-up fees for USDT', 'Monthly fee for dormant cards'],
+  BRANDING: ['New card design for the Gold tier', 'New logo for the app and emails', 'Change the sender name on emails', 'Update brand colour'],
+  INTEGRATION: ['Webhook retries failing since Monday', 'Sandbox API keys for a new developer', 'Update the callback IP allowlist', 'Missing fields in the transactions export'],
+  COMPLIANCE: ['KYC requirements for UA residents', 'Enable the CreditCo flow for company users', 'Document retention period', 'Proof of address older than 3 months'],
+};
+const REQ_BODY = { PRODUCT: 'Our users keep asking for it — can you set it up for us and tell us the timeline?', LIMITS: 'Several clients hit the current limit last week. Please review and confirm the new values.', FEES: 'Commercial team approved this on our side. Please confirm when it can go live.', BRANDING: 'Assets are attached in the shared folder. Please apply them on the next release.', INTEGRATION: 'Our engineers checked the logs on our side; request IDs are in the attached file.', COMPLIANCE: 'Our compliance officer needs a written answer before we onboard more users.' };
+const reqSet = (rows, from, to, done, ic) => { const o = rows.filter(r => from.includes(r.status)); o.forEach(r => { r.status = to; r.updated = new Date(NOW); r.assignee ||= ME; if (to === 'IN_PROGRESS') { r.taken = new Date(NOW); r.closed = null; } else if (to !== 'WAITING') r.closed = new Date(NOW); }); return o.length ? `${o.length} request${o.length > 1 ? 's' : ''} ${done}` : `Nothing to change in the selection`; };
+page({
+  id: 'requests', noun: 'request', nouns: 'requests', icon: 'inbox', searchPh: 'Search number, subject, company or author…',
+  data: () => {
+    const g = gen(907), WL = COMPANIES.filter(c => c.id !== 47 && !/test/i.test(c.name));
+    return Array.from({ length: 76 }, (_, i) => {
+      const c = g.pk(WL), type = g.wp({ PRODUCT: 18, LIMITS: 22, FEES: 14, BRANDING: 12, INTEGRATION: 20, COMPLIANCE: 14 });
+      const status = i < 9 ? 'NEW' : i < 23 ? 'IN_PROGRESS' : i < 31 ? 'WAITING' : g.wp({ RESOLVED: 80, REJECTED: 20 });
+      const created = new Date(NOW.getTime() - (i < 9 ? g.r() * 1.5 : 1 + i * .45 + g.r()) * DAY), taken = status === 'NEW' ? null : new Date(created.getTime() + (1 + g.r() * 20) * 36e5);
+      const closed = ['RESOLVED', 'REJECTED'].includes(status) ? new Date(taken.getTime() + (2 + g.r() * 70) * 36e5) : null;
+      const subject = g.pk(REQ_SUBJ[type]);
+      return { id: 2400 - i, subject, type, coId: c.id, source: c.source, author: `${g.pk(['anna', 'mark', 'julia', 'sam', 'omar', 'lina', 'victor', 'eva'])}@${coSlug(c.name).replace(/-/g, '')}.com`,
+        assignee: taken ? g.pk(REVIEWERS) : '', status, created, taken, closed, updated: closed || (taken && status !== 'NEW' ? new Date(Math.min(NOW.getTime(), taken.getTime() + g.r() * 30 * 36e5)) : created), body: `${subject}.\n\n${REQ_BODY[type]}` };
+    });
+  },
+  search: r => `${r.id} ${r.subject} ${coById(r.coId).name} ${CO_SOURCES[r.source]} ${r.author}`,
+  fields: {
+    status: fE('Status', 'activity', REQ_STATUS, r => r.status), type: fE('Type', 'layers', REQ_TYPE, r => r.type),
+    provider: fE('WL provider', 'tag', optsOf(CO_SOURCES), r => r.source), company: fE('Company', 'building', optsOf(Object.fromEntries(COMPANIES.map(c => [c.id, c.name]))), r => String(r.coId)),
+    created: fD('Created', r => r.created),
+  },
+  tiles: [allTile('All requests', L => `${L.filter(r => !['RESOLVED', 'REJECTED'].includes(r.status)).length} open`), tile('new', 'New', { key: 'status', values: ['NEW'] }, L => { const o = L.filter(r => r.status === 'NEW').sort((a, b) => a.created - b.created)[0]; return o ? `oldest ${rel(o.created)}` : 'All clear'; }),
+    tile('prog', 'In progress', { key: 'status', values: ['IN_PROGRESS'] }, share), tile('wait', 'Waiting on WL', { key: 'status', values: ['WAITING'] }, share), tile('done', 'Resolved', { key: 'status', values: ['RESOLVED'] }, share)],
+  cols: [K.id('Number'), { k: 'subject', l: 'Subject', on: 1, val: r => r.subject.toLowerCase(), cell: r => esc(r.subject) },
+    { k: 'type', l: 'Type', on: 1, val: r => REQ_TYPE[r.type].label, cell: r => `<span class="txt">${icon(REQ_TYPE[r.type].icon, 16)}${REQ_TYPE[r.type].label}</span>` },
+    { k: 'company', l: 'Company', on: 1, val: r => coById(r.coId).name.toLowerCase(), cell: r => esc(coById(r.coId).name), kv: r => coLink(coById(r.coId)) },
+    { k: 'provider', l: 'WL provider', on: 1, val: r => CO_SOURCES[r.source], cell: r => srcTag(r.source) },
+    K.muted('author', 'Author'), K.muted('assignee', 'Assignee'), K.status(REQ_STATUS), K.date('created', 'Created'), K.date('updated', 'Updated', 0)],
+  sort: { k: 'created', dir: 'desc' },
+  quick: r => r.status === 'NEW' ? { act: 'req-take', icon: 'user', tip: 'Take' } : ['IN_PROGRESS', 'WAITING'].includes(r.status) ? { act: 'req-done', icon: 'check', tip: 'Mark resolved' } : { act: 'req-reopen', icon: 'refresh', tip: 'Reopen' },
+  menu: r => r.status === 'NEW' ? [{ act: 'req-take', data: { rid: r.id }, icon: 'user', label: 'Take' }, { act: 'req-reject', data: { rid: r.id }, icon: 'ban', label: 'Reject' }]
+    : ['IN_PROGRESS', 'WAITING'].includes(r.status) ? [{ act: 'req-done', data: { rid: r.id }, icon: 'check', label: 'Mark resolved' }, ...(r.status === 'IN_PROGRESS' ? [{ act: 'req-wait', data: { rid: r.id }, icon: 'send', label: 'Ask the WL for details' }] : []), { act: 'req-reject', data: { rid: r.id }, icon: 'ban', label: 'Reject' }]
+    : [{ act: 'req-reopen', data: { rid: r.id }, icon: 'refresh', label: 'Reopen' }],
+  bulk: [{ icon: 'user', label: 'Take', run: rows => reqSet(rows, ['NEW'], 'IN_PROGRESS', 'taken') }, { icon: 'check', label: 'Mark resolved', run: rows => reqSet(rows, ['NEW', 'IN_PROGRESS', 'WAITING'], 'RESOLVED', 'resolved') }],
+  rec: {
+    title: r => `${r.subject} #${r.id}`, sub: r => `${coLink(coById(r.coId))}<span class="faint">·</span>${srcTag(r.source)}<span class="faint">·</span><span>${esc(r.author)}</span>`,
+    badges: r => badge(REQ_STATUS[r.status]) + `<span class="badge t-neutral">${icon(REQ_TYPE[r.type].icon, 12)}${REQ_TYPE[r.type].label}</span>`,
+    acts: r => r.status === 'NEW' ? `<button class="btn btn-secondary" data-act="req-take" data-rid="${r.id}">${icon('user', 16)}Take</button><button class="btn btn-tertiary" data-act="req-reject" data-rid="${r.id}">${icon('ban', 16)}Reject</button>`
+      : ['IN_PROGRESS', 'WAITING'].includes(r.status) ? `<button class="btn btn-secondary" data-act="req-done" data-rid="${r.id}">${icon('check', 16, 2)}Mark resolved</button>` : `<button class="btn btn-tertiary" data-act="req-reopen" data-rid="${r.id}">${icon('refresh', 16)}Reopen</button>`,
+    sections: r => tcard('Message', '', `<div class="card-b pad" style="font-size:var(--fs-14);line-height:var(--lh-20);white-space:pre-line">${esc(r.body)}</div>`),
+    events: r => [r.closed && { ic: r.status === 'REJECTED' ? 'ban' : 'check', t: `${REQ_STATUS[r.status].label} by ${r.assignee}`, s: fmtDateTime(r.closed), when: rel(r.closed) }, r.status === 'WAITING' && { ic: 'send', t: `${r.assignee} asked the WL for details`, s: fmtDateTime(r.updated), when: rel(r.updated) },
+      r.taken && { ic: 'user', t: `Taken by ${r.assignee}`, s: fmtDateTime(r.taken), when: rel(r.taken) }, { ic: 'inbox', t: `Sent by ${r.author}`, s: `${coById(r.coId).name} · ${CO_SOURCES[r.source]} · ${fmtDateTime(r.created)}`, when: rel(r.created) }].filter(Boolean),
+  },
+});
 
 /* ── Customers · Confirmations ── */
 const CONF_TYPE = { WITHDRAW: { label: 'Crypto withdrawal', icon: 'arrowUp' }, BANK_WITHDRAW: { label: 'Bank withdrawal', icon: 'bank' }, EXCHANGE: { label: 'Large exchange', icon: 'arrows' }, CARD_ORDER: { label: 'Physical card order', icon: 'card' }, LIMIT: { label: 'Limit increase', icon: 'sliders' } };
@@ -5313,7 +5360,7 @@ DASHES.reserves = {
     return [{ l: 'Reserves held', v: '€' + compact(Rs), d: 1.9 }, { l: 'Customer liabilities', v: '€' + compact(L), d: 2.3 }, { l: 'Coverage', v: (Rs / L * 100).toFixed(1) + '%', d: -.4, unit: 'pp' }, { l: 'Hot wallet share', v: '8.6%', note: 'Target ≤ 10%' }, { l: 'Last attestation', v: fmtDay(new Date(NOW.getTime() - 9 * DAY), false), note: 'Monthly · Armanino' }]; },
   cards: () => { const R = DASHES.reserves.rows(), tone = p => p >= 102 ? ['success', 'Healthy'] : p >= 100 ? ['warning', 'Thin buffer'] : ['error', 'Under-backed'];
     return `<div class="card span-8 flush"><div class="card-h"><span class="card-t">Coverage by asset</span><span class="card-tag">Snapshot · ${fmtDateTime(NOW)}</span></div>${dtable(['Asset', 'Liabilities|r', 'Reserves|r', 'Surplus|r', 'Coverage|r', 'Status'], R.map(x => { const [t, l] = tone(x.cov); return [`<span class="ctry">${assetIc(x.a.c, 16)}<b style="font-weight:500">${x.a.c}</b> <span class="muted">${x.a.n}</span></span>`, `<span class="num">${fmtEur(x.liab)}</span>`, `<span class="num">${fmtEur(x.res)}</span>`, `<span class="num ${x.res >= x.liab ? 'pos' : ''}">${x.res >= x.liab ? '+' : '−'}${fmtEur(Math.abs(x.res - x.liab))}</span>`, `<span class="num">${x.cov.toFixed(1)}%</span>`, dotCell({ label: l, tone: t })]; }))}</div>`
-      + dcard(4, 'Reserve coverage', ctag('Marker = 100%'), R.map(x => { const [t, l] = tone(x.cov); return `<div class="res"><div class="res-h"><span class="rn">${assetIc(x.a.c, 16)}${x.a.c}</span><span class="num res-v t-${t}"><i class="dot"></i>${x.cov.toFixed(1)}%</span></div><div class="meter t-${t}" data-tt="${x.a.c} · ${l}|${x.cov.toFixed(1)}% backed|Marker = 100% of liabilities"><i style="width:${Math.min(x.cov, 120) / 120 * 100}%"></i><span class="par" style="left:${100 / 120 * 100}%"></span></div></div>`; }).join(''))
+      + dcard(4, 'Reserve coverage', ctag('Marker = 100%'), lis(R.map(x => { const [t, l] = tone(x.cov); return li({ lead: assetIc(x.a.c, 16), l: x.a.c, vm: l, meter: meterEl(x.cov, t, 120, x.cov.toFixed(1) + '%'), tt: `${x.a.c} · ${l}|${x.cov.toFixed(1)}% backed|Marker = 100% of liabilities` }); })))
       + dcard(6, 'Where reserves are held', ctag('Share of reserves'), barRows([['Fireblocks · cold storage', 58.4], ['BitGo · custody', 21.2], ['Banking Circle · safeguarding', 11.8], ['Hot wallets', 8.6]], v => v.toFixed(1) + '%'))
       + dcard(6, 'Attestations', ctag('Proof of reserves'), `<div class="card-b" style="padding:0">${timeline([0, 1, 2, 3].map(i => ({ ic: 'shieldCheck', t: `${new Date(NOW.getFullYear(), NOW.getMonth() - i, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })} attestation`, s: `Armanino · ${(103.6 - i * .7).toFixed(1)}% coverage`, when: rel(new Date(NOW.getTime() - (9 + i * 30) * DAY)) })))}</div>`);
   },
@@ -5328,7 +5375,7 @@ DASHES['activity-stats'] = {
     + chartCard(6, 'Transactions', { dates: d.dates, unit: d.unit, fmt: v => fmtInt(v), series: [{ l: 'Card payments', data: series(d, 2100, 'cp'), col: 'var(--c1)' }, { l: 'Exchanges', data: series(d, 900, 'ex'), col: 'var(--c2)' }, { l: 'Transfers', data: series(d, 700, 'tr'), col: 'var(--c3)' }] })
     + dcard(4, 'Sign-ups by source', ctag('This period'), mixRows(Object.entries(SOURCES).map(([k, l], i) => [l, USERS.filter(u => u.source === k).length, ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)'][i]])))
     + dcard(4, 'Platforms', ctag('Sessions'), mixRows([['iOS', 46, 'var(--c1)'], ['Android', 38, 'var(--c2)'], ['Web', 16, 'var(--c3)']], v => v + '%'))
-    + dcard(4, 'Top countries', ctag('Sign-ups'), barRows(Object.entries(COUNTRIES).map(([k, c]) => [`<span class="flag">${flag(c.cc)}</span>${c.name}`, USERS.filter(u => u.country === k).length]).sort((a, b) => b[1] - a[1]).slice(0, 6))),
+    + dcard(4, 'Top countries', ctag('Sign-ups'), barRows(Object.entries(COUNTRIES).map(([k, c]) => [c.name, USERS.filter(u => u.country === k).length, '', `<span class="flag">${flag(c.cc)}</span>`]).sort((a, b) => b[1] - a[1]).slice(0, 6))),
 };
 DASHES['wallet-stats'] = {
   kpis: d => { const dep = series(d, 1.1e6, 'wd'), wd = series(d, .84e6, 'ww'), bal = sum(USERS.map(u => u.balance));
@@ -5338,7 +5385,7 @@ DASHES['wallet-stats'] = {
     return chartCard(8, 'Deposits and withdrawals', { dates: d.dates, unit: d.unit, fmt: v => '€' + compact(v), series: [{ l: 'Deposits', data: series(d, 1.1e6, 'wd'), col: 'var(--c3)', area: 1 }, { l: 'Withdrawals', data: series(d, .84e6, 'ww'), col: 'var(--c5)' }] })
       + dcard(4, 'Balances by asset', ctag('Now'), mixRows(ASSETS.map(a => [a.c, sum(USERS.map(u => { const w = ud(u).wallets.find(x => x.c === a.c); return w ? w.amt * a.rate : 0; })), a.col]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]), v => '€' + compact(v * 40)))
       + dcard(4, 'Wallet size', ctag('Funded users'), barRows(buckets.map(([l, f]) => [l, USERS.filter(u => u.balance > 0 && f(u)).length])))
-      + dcard(4, 'Top holders', `<a class="btn btn-link" href="#/users">All ${icon('chevRight', 16)}</a>`, [...USERS].sort((a, b) => b.balance - a.balance).slice(0, 6).map(u => `<div class="su" data-uid="${u.id}"><span class="su-n">${esc(u.name || u.email)}</span><span class="num">${fmtEur(u.balance)}</span>${icon('chevRight', 16)}</div>`).join(''))
+      + dcard(4, 'Top holders', `<a class="btn btn-link" href="#/users">All ${icon('chevRight', 16)}</a>`, lis([...USERS].sort((a, b) => b.balance - a.balance).slice(0, 6).map(u => li({ l: esc(u.name || u.email), v: fmtEur(u.balance), go: 'users/' + u.id }))))
       + dcard(4, 'Fees earned', ctag('This period'), barRows([['Exchange fees', 41200], ['Card top-up fees', 26800], ['Withdrawal fees', 14900], ['Monthly card fees', 9400], ['IBAN fees', 5100]], v => '€' + compact(v)));
   },
 };
@@ -5360,8 +5407,8 @@ DASHES.staking = {
     return chartCard(8, 'Total value locked', { dates: d.dates, unit: d.unit, fmt: v => '€' + compact(v), last: 1, series: [{ l: 'This period', data: tvlS, col: 'var(--c1)', area: 1 }, { l: 'Previous', data: tvlP, col: 'var(--prev)', dash: 1 }] })
       + dcard(4, 'TVL by strategy', ctag('Now'), barRows(act.map(([s, x]) => [esc(s.name), x.tvl]), v => '€' + compact(v)))
       + dcard(4, 'Assets staked', ctag('Share of TVL'), mixRows(byAsset.map(([c, v], i) => [c, v, cols[i] || 'var(--neutral)']), v => '€' + compact(v)))
-      + dcard(4, 'Upcoming payouts', `<a class="btn btn-link" href="#/payout-pools">All ${icon('chevRight', 16)}</a>`, next.map(p => `<button class="rk t-info" data-act="route" data-arg="payout-pools/${p.id}"><span class="rk-ic">${icon('payout', 16)}</span><span class="rk-l"><div>${esc(stratOf(p.sid).name)}</div><div>${fmtDateTime(p.at)}</div></span><span class="rk-v">${fmtAmt(p.rewards, p.c)}</span><span class="rk-go">${icon('chevRight', 16)}</span></button>`).join('') || emptyBlock('payout', 'Nothing scheduled', ''))
-      + dcard(4, 'Largest stakes', `<a class="btn btn-link" href="#/stakes">All ${icon('chevRight', 16)}</a>`, [...STAKES].filter(x => x.status === 'ACTIVE').sort((a, b) => b.amount * ASSET[b.c].rate - a.amount * ASSET[a.c].rate).slice(0, 6).map(x => `<div class="su su-3" data-act="route" data-arg="stakes/${x.id}"><span class="su-n">${esc(byId(x.uid).name || byId(x.uid).email)}</span><span class="su-m">${esc(stratOf(x.sid).name)}</span><span class="num">${fmtEur(x.amount * ASSET[x.c].rate)}</span>${icon('chevRight', 16)}</div>`).join(''));
+      + dcard(4, 'Upcoming payouts', `<a class="btn btn-link" href="#/payout-pools">All ${icon('chevRight', 16)}</a>`, next.length ? lis(next.map(p => liAct({ time: `${fmtDay(p.at, false)}, ${p.at.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`, who: esc(stratOf(p.sid).name), v: fmtAmt(p.rewards, p.c), go: 'payout-pools/' + p.id }))) : emptyBlock('payout', 'Nothing scheduled', ''))
+      + dcard(4, 'Largest stakes', `<a class="btn btn-link" href="#/stakes">All ${icon('chevRight', 16)}</a>`, lis([...STAKES].filter(x => x.status === 'ACTIVE').sort((a, b) => b.amount * ASSET[b.c].rate - a.amount * ASSET[a.c].rate).slice(0, 6).map(x => liAct({ who: esc(byId(x.uid).name || byId(x.uid).email), what: esc(stratOf(x.sid).name), v: fmtEur(x.amount * ASSET[x.c].rate), go: 'stakes/' + x.id }))));
   },
 };
 /* ── Products · Card orders (physical cards on their way to the cardholder) ── */
@@ -5464,8 +5511,8 @@ page({
 
 /* ── Finance monitors · one list per kind, plus a dashboard across them ── */
 // headroom: the balance against its alert threshold; the threshold sits at the middle of the bar
-const monTone = m => m.bal < m.min ? 'var(--error)' : m.bal < m.min * 1.25 ? 'var(--warning)' : 'var(--success)';
-const monMeter = m => `<span class="mon-m"><span class="meter"><i style="width:${Math.min(100, m.bal / m.min * 50)}%;background:${monTone(m)}"></i><b></b></span><span class="num">${Math.round(m.bal / m.min * 100)}%</span></span>`;
+const monTone = m => m.bal < m.min ? 'error' : m.bal < m.min * 1.25 ? 'warning' : 'success';
+const monMeter = m => meterEl(m.bal / m.min * 100, monTone(m)); // .Meter, Scale 200%
 Object.entries(MON_KIND).forEach(([kind, M]) => page({
   id: M.page, noun: 'monitor', nouns: 'monitors', icon: M.icon, live: 1, searchPh: 'Search monitor or provider…',
   data: () => monitorsOf(kind), search: m => `${m.name} ${m.provider} ${m.c}`,
@@ -5515,9 +5562,10 @@ DASHES.monitors = {
       { l: 'No fresh data', v: L.filter(m => m.status === 'STALE').length, note: 'Over 6 hours old' }, { l: 'Tracked balance', v: '€' + compact(sum(on.map(m => m.bal * ASSET[m.c].rate))), note: 'Active monitors' },
       { l: 'Lowest headroom', v: Math.round(low.bal / low.min * 100) + '%', note: esc(low.name) }]; },
   cards: () => Object.entries(MON_KIND).map(([kind, M]) => { const L = monitorsOf(kind);
-    return dcard(6, M.label, `<a class="btn btn-link" href="#/${M.page}">Open ${icon('chevRight', 16)}</a>`,
-      `<div class="mon-d">${M.desc}</div><div class="mon-sum"><div><span>Total</span><b>${L.length}</b></div><div><span>Active</span><b>${L.filter(m => m.on).length}</b></div><div><span>Alerts</span><b class="${L.some(m => m.status === 'ALERT' || m.status === 'STALE') ? 'bad' : ''}">${L.filter(m => m.status === 'ALERT' || m.status === 'STALE').length}</b></div></div>`
-      + L.map(m => `<a class="mon-row" href="#/${M.page}/${m.id}"><i class="dot t-${MON_STATUS[m.status].tone}"></i><span class="mon-n">${esc(m.name)}</span><span class="num muted">${fmtAmt(m.bal, m.c)}</span>${monMeter(m)}${icon('chevRight', 16)}</a>`).join(''));
+    // Card + Card header (title · Count · meta · link) + List rows Type=Meter — the same parts as every other dashboard card
+    const alerts = L.filter(m => m.status === 'ALERT' || m.status === 'STALE').length;
+    return `<div class="card span-6"><div class="card-h"><span class="card-t" title="${esc(M.desc)}">${M.label}<span class="ct">${L.length}</span></span><span class="card-act"><span class="card-tag ${alerts ? 'bad' : ''}">${alerts ? `${alerts} alert${alerts > 1 ? 's' : ''}` : 'No alerts'}</span><a class="btn btn-link" href="#/${M.page}">Open ${icon('chevRight', 16)}</a></span></div>`
+      + lis(L.map(m => li({ dot: MON_STATUS[m.status].tone, l: esc(m.name), vm: fmtAmt(m.bal, m.c), meter: monMeter(m), go: `${M.page}/${m.id}` }))) + '</div>';
   }).join(''),
 };
 
@@ -5561,6 +5609,9 @@ Object.assign(ACT, {
   'ld-reset-colw': () => { const X = colCtx(); Object.keys(X.w).forEach(k => delete X.w[k]); store.set(X.key, X.w); refreshLD(); toast('Column widths fitted to this page', 'columns'); },
   // page-specific actions
   'conf-ok': doRows(rows => confDecide(rows, true)), 'conf-no': doRows(rows => confDecide(rows, false), 'ban'),
+  'req-take': doRows(rows => reqSet(rows, ['NEW'], 'IN_PROGRESS', 'taken'), 'user'), 'req-done': doRows(rows => reqSet(rows, ['NEW', 'IN_PROGRESS', 'WAITING'], 'RESOLVED', 'resolved')),
+  'req-wait': doRows(rows => reqSet(rows, ['IN_PROGRESS'], 'WAITING', 'sent back to the WL'), 'send'), 'req-reject': doRows(rows => reqSet(rows, ['NEW', 'IN_PROGRESS', 'WAITING'], 'REJECTED', 'rejected'), 'ban'),
+  'req-reopen': doRows(rows => reqSet(rows, ['RESOLVED', 'REJECTED'], 'IN_PROGRESS', 'reopened'), 'refresh'),
   'doc-ok': doRows(rows => docDecide(rows, true)), 'doc-no': doRows(rows => docDecide(rows, false), 'ban'), 'doc-dl': doRows(rows => `Downloading ${rows[0].file}`, 'download'),
   'cc-fetch': doRows(rows => `CreditCo KYC status: ${CC_KYC[ccKyc(rows[0])].label.toLowerCase()}`, 'refresh'),
   'cc-req': doRows(rows => { const C = rows[0].C; C.status = 'ACCESS_REQUESTED'; C.created ||= new Date(NOW); C.updated = new Date(NOW); return 'Access requested from CreditCo'; }, 'key'),
