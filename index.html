@@ -1601,7 +1601,7 @@ function riskIcon(r) {
   return `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">${bars}</svg>`;
 }
 const riskCell = r => `<span class="risk">${riskIcon(r)}<span class="${r === 'unknown' ? 'faint' : ''}">${RISK[r].label}</span></span>`;
-const ctryCell = c => c ? `<span class="ctry"><span class="flag">${flag(COUNTRIES[c].cc)}</span><span class="mono">${c}</span></span>` : '<span class="tc-empty">—</span>';
+const ctryCell = c => c ? `<span class="ctry" data-tip="${COUNTRIES[c].name}"><span class="flag">${noTip(flag(COUNTRIES[c].cc))}</span><span class="mono">${c}</span></span>` : '<span class="tc-empty">—</span>';
 
 const DEFAULT_HIDDEN = ['kycVerified', 'idv', 'emailVerified', 'riskPoints', 'type', 'cards', 'twofa', 'tempPassword', 'lang', 'referral', 'invitedBy', 'source', 'companyId', 'companyName', 'companyRef', 'companySource', 'updated'];
 const COLS = [
@@ -2107,7 +2107,7 @@ function renderDashboard() {
       ${lis(queues.map(q => li({ tile: icon(q.ic, 16), l: t(q.l), cnt: liCnt(q.n), act: `data-act="ov-queue" data-id="${q.id}" data-v="${q.v}"` })))}
     </div>
     <div class="card span-6"><div class="card-h"><span class="card-t">${t('Wallet funds')}</span>${go('#/reserves', 'Provider reserves')}</div>
-      ${lis(funds.map(([c, v]) => li({ lead: assetIc(c, 16), l: c, v: fmtAmt(v, c) })))}
+      ${lis(funds.map(([c, v]) => li({ lead: noTip(assetIc(c, 16)), l: c, tip: assetName(c), v: fmtAmt(v, c) })))}
     </div>
     <div class="card span-12"><div class="card-h"><span class="card-t">${t('Recent changes')}</span>${go('#/logs', 'Audit log')}</div>
       ${lis(log.map(l => liAct({ time: `<span title="${fmtDateTime(l.at)}">${rel(l.at)}</span>`, who: esc(l.admin), what: esc(l.label), v: esc(l.entity || ''), link: l.href, muted: !l.href })))}
@@ -2656,7 +2656,9 @@ const fmtAmt = (v, c, signed) => {
 };
 const assetIc = (c, s = 16) => CUR_IMG[c] ? `<img class="asset-ic" src="${CUR_IMG[c]}" style="width:${s}px;height:${s}px" alt="${ASSET[c]?.n || c}" data-tip="${ASSET[c]?.n || c}">` // inline size: .asset-ic's own 34px would win over attributes
   : `<span class="asset-ic" data-tip="${ASSET[c]?.n || c}" style="width:${s}px;height:${s}px;font-size:${Math.round(s * .42)}px;background:${ASSET[c]?.col || 'var(--neutral)'}">${ASSET[c]?.s || { GBP: '£', CHF: '₣' }[c] || c[0]}</span>`;
-const curCell = c => `<span class="ctry">${assetIc(c, 16)}${c}</span>`; // a currency code with its icon, wherever a column holds one
+const noTip = h => h.replace(/ data-tip="[^"]*"/g, ''); // the cell carries the tooltip, not each icon inside it
+const assetName = c => ASSET[c]?.n || c;
+const curCell = c => `<span class="ctry" data-tip="${assetName(c)}">${noTip(assetIc(c, 16))}${c}</span>`; // a currency code with its icon, wherever a column holds one
 const yes = v => `<span class="yn ${v ? 'ok' : 'no'}" role="img" aria-label="${v ? 'Yes' : 'No'}">${icon(v ? 'checkCircle' : 'minusCircle', 16)}</span>`;
 const dash = '<span class="tc-empty">—</span>';
 const copyVal = (v, shown = v) => `<button class="copy num" data-act="copy" data-copy="${esc(v)}">${esc(shown)}${icon('copy', 12)}</button>`;
@@ -2683,8 +2685,8 @@ function dtable(heads, rows, empty = '', drag) {
 const liWrap = (inner, { go, act, cls = '', tt }) => { const a = tt ? ` data-tt="${tt}"` : ''; return go ? `<a class="li go ${cls}" href="#/${go}"${a}>${inner}</a>` : act ? `<button class="li go ${cls}" ${act}${a}>${inner}</button>` : `<div class="li ${cls}"${a}>${inner}</div>`; };
 const liChev = o => o.menu ? icon('more', 16) : o.go || o.act ? icon('chevRight', 16) : ''; // a row that opens a menu (menu: 1) ends in ⋯, a row that navigates in a chevron
 const li = o => {
-  const { tile = '', lead = '', dot, sw, l = '', sub, tag = '', tagCls = '', cnt, vm = '', v = '', meter = '', x = '' } = o;
-  const key = `<span class="li-k">${tile ? `<span class="li-tile">${tile}</span>` : ''}${lead ? `<span class="li-lead">${lead}</span>` : ''}${dot ? `<i class="dot t-${dot}"></i>` : ''}${sw ? `<i class="li-sw" style="background:${sw}"></i>` : ''}<span class="li-l ${sub ? 'sub' : ''}">${l}</span>${tag !== '' ? `<span class="li-tag ${tagCls}" title="${plainText(String(tag))}">${tag}</span>` : ''}</span>`;
+  const { tile = '', lead = '', dot, sw, l = '', sub, tag = '', tagCls = '', cnt, vm = '', v = '', meter = '', x = '' } = o, tip = o.tip ?? (!o.tt && ASSET[l] ? ASSET[l].n : ''); // a ticker label explains itself in a tooltip
+  const key = `<span class="li-k"${tip ? ` data-tip="${tip}"` : ''}>${tile ? `<span class="li-tile">${tile}</span>` : ''}${lead ? `<span class="li-lead">${lead}</span>` : ''}${dot ? `<i class="dot t-${dot}"></i>` : ''}${sw ? `<i class="li-sw" style="background:${sw}"></i>` : ''}<span class="li-l ${sub ? 'sub' : ''}">${l}</span>${tag !== '' ? `<span class="li-tag ${tagCls}" title="${plainText(String(tag))}">${tag}</span>` : ''}</span>`;
   return liWrap(`${key}<span class="li-t">${cnt != null ? cnt : ''}${vm !== '' ? `<span class="li-vm">${vm}</span>` : ''}${v !== '' ? `<span class="li-v">${v}</span>` : ''}${meter}${x !== '' ? `<span class="li-x">${x}</span>` : ''}${liChev(o)}</span>`, o);
 };
 const liCnt = n => n ? `<span class="li-cnt">${fmtInt(n)}</span>` : `<span class="li-none">${t('All clear')}</span>`; // Counter, Tone=Attention
@@ -4650,10 +4652,10 @@ const TC = {
   numMuted: v => tcE(v) ? TC_DASH : `<span class="num muted">${v}</span>`,                               // Number muted — dates, zeros
   meter: (p, tone, scale = 200, label) => meterEl(p, tone, scale, label),                               // Meter — headroom to a threshold
   copy: (v, shown) => tcE(v) ? TC_DASH : copyVal(v, shown),                                              // Copy — value + copy icon
-  country: (code, name) => name ? `<span class="ctry"><span class="flag">${flag(COUNTRIES[code]?.cc || code)}</span>${name}</span>` : ctryCell(code), // name: the full name instead of the ISO code                                                                       // Country — flag + ISO-3
-  countries: (ccs, total = ccs.length) => !ccs.length ? TC_DASH : `<span class="tc-flags"><span class="ics">${ccs.slice(0, 4).map(cc => `<span class="flag">${flag(cc)}</span>`).join('')}</span>${total > 4 ? `<span class="muted">+${total - 4}</span>` : ''}</span>`, // Countries — up to 4 flags + «+N»
-  currency: (c, name) => tcE(c) ? TC_DASH : name ? `<span class="ctry">${assetIc(c, 16)}${name}</span>` : curCell(c), // name: the full name instead of the ticker                                                          // Currency — icon + ticker
-  currencies: cs => !cs.length ? TC_DASH : `<span class="tc-curs"><span class="ics">${cs.slice(0, 3).map(c => assetIc(c, 16)).join('')}</span><span class="muted">${cs.join(', ')}</span></span>`, // Currencies — up to 3 icons + tickers
+  country: (code, name) => name ? `<span class="ctry" data-tip="${name}"><span class="flag">${noTip(flag(COUNTRIES[code]?.cc || code))}</span>${name}</span>` : ctryCell(code), // name: the full name instead of the ISO code                                                                       // Country — flag + ISO-3
+  countries: (ccs, total = ccs.length) => !ccs.length ? TC_DASH : `<span class="tc-flags" data-tip="${ccs.map(ccName).join(', ')}"><span class="ics">${ccs.slice(0, 4).map(cc => `<span class="flag">${noTip(flag(cc))}</span>`).join('')}</span>${total > 4 ? `<span class="muted">+${total - 4}</span>` : ''}</span>`, // Countries — up to 4 flags + «+N»
+  currency: (c, name) => tcE(c) ? TC_DASH : name ? `<span class="ctry" data-tip="${name}">${noTip(assetIc(c, 16))}${name}</span>` : curCell(c), // name: the full name instead of the ticker                                                          // Currency — icon + ticker
+  currencies: cs => !cs.length ? TC_DASH : `<span class="tc-curs" data-tip="${cs.map(assetName).join(', ')}"><span class="ics">${cs.slice(0, 3).map(c => noTip(assetIc(c, 16))).join('')}</span><span class="muted">${cs.join(', ')}</span></span>`, // Currencies — up to 3 icons + tickers
   card: (last4, physical) => `<span class="tc-card"><span class="mc ${physical ? 'phys' : ''}">${brand().card()}</span>•••• ${last4}</span>`, // Card — .Mini card + last 4
   yes: v => yes(v),                                                                                      // Yes / No
   status: o => o ? dotCell(o) : TC_DASH,                                                                 // Status — dot + label
@@ -5247,7 +5249,7 @@ page({
     const [b, q] = id.split('/'); return { id, b, q, price: ASSET[b].rate / ASSET[q].rate, change: +((g.r() - .45) * 8).toFixed(2), vol: Math.round(Math.pow(g.r(), 2) * 4e6 + 2e4), spread: (PAIRS.find(p => p[0] === id) || [0, .5])[1], min: +(10 / ASSET[b].rate).toPrecision(2), status: id === 'ZNX/USDT' ? 'HALTED' : 'TRADING', created: new Date(NOW.getTime() - (500 - i * 20) * DAY), updated: new Date(NOW.getTime() - g.int(1, 30) * DAY) }; }); },
   search: m => m.id,
   fields: { status: fE('Status', 'activity', MKT_STATUS, m => m.status), quote: fE('Quote', 'coins', { EUR: { label: 'EUR' }, USDT: { label: 'USDT' }, BTC: { label: 'BTC' } }, m => m.q) },
-  cols: [{ k: 'id', l: 'Pair', on: 1, lock: 1, cell: m => `<span class="ctry">${assetIc(m.b, 16)}${m.id}</span>` }, { k: 'price', l: 'Last price', al: 'r', on: 1, dir: 'desc', cell: m => `<span class="num">${(+m.price.toPrecision(6)).toLocaleString('en-US', { maximumFractionDigits: 6 })} ${m.q}</span>` },
+  cols: [{ k: 'id', l: 'Pair', on: 1, lock: 1, cell: m => `<span class="ctry" data-tip="${m.id.split('/').map(assetName).join(' / ')}">${noTip(assetIc(m.b, 16))}${m.id}</span>` }, { k: 'price', l: 'Last price', al: 'r', on: 1, dir: 'desc', cell: m => `<span class="num">${(+m.price.toPrecision(6)).toLocaleString('en-US', { maximumFractionDigits: 6 })} ${m.q}</span>` },
     { k: 'change', l: '24h change', al: 'r', on: 1, dir: 'desc', cell: m => deltaPill(m.change), kv: m => deltaPill(m.change) }, { k: 'vol', l: '24h volume', al: 'r', on: 1, dir: 'desc', cell: m => `<span class="num">€${compact(m.vol)}</span>` },
     K.pct('spread', 'Spread'), { k: 'min', l: 'Min. order', al: 'r', on: 1, cell: m => numM(fmtAmt(m.min, m.b)) }, K.status(MKT_STATUS), K.date('updated', 'Updated', 0)],
   sort: { k: 'vol', dir: 'desc' },
@@ -5424,7 +5426,7 @@ DASHES.reserves = {
     return [{ l: 'Reserves held', v: '€' + compact(Rs), d: 1.9 }, { l: 'Customer liabilities', v: '€' + compact(L), d: 2.3 }, { l: 'Coverage', v: (Rs / L * 100).toFixed(1) + '%', d: -.4, unit: 'pp' }, { l: 'Hot wallet share', v: '8.6%', note: 'Target ≤ 10%' }, { l: 'Last attestation', v: fmtDay(new Date(NOW.getTime() - 9 * DAY), false), note: 'Monthly · Armanino' }]; },
   cards: () => { const R = DASHES.reserves.rows(), tone = p => p >= 102 ? ['success', 'Healthy'] : p >= 100 ? ['warning', 'Thin buffer'] : ['error', 'Under-backed'];
     return `<div class="card span-8 flush"><div class="card-h"><span class="card-t">Coverage by asset</span><span class="card-tag">Snapshot · ${fmtDateTime(NOW)}</span></div>${dtable(['Asset', 'Liabilities|r', 'Reserves|r', 'Surplus|r', 'Coverage|r', 'Status'], R.map(x => { const [t, l] = tone(x.cov); return [`<span class="ctry">${assetIc(x.a.c, 16)}${TC.strong(x.a.c)} <span class="muted">${x.a.n}</span></span>`, `<span class="num">${fmtEur(x.liab)}</span>`, `<span class="num">${fmtEur(x.res)}</span>`, `<span class="num ${x.res >= x.liab ? 'pos' : ''}">${x.res >= x.liab ? '+' : '−'}${fmtEur(Math.abs(x.res - x.liab))}</span>`, `<span class="num">${x.cov.toFixed(1)}%</span>`, dotCell({ label: l, tone: t })]; }))}</div>`
-      + dcard(4, 'Reserve coverage', ctag('Marker = 100%'), lis(R.map(x => { const [t, l] = tone(x.cov); return li({ lead: assetIc(x.a.c, 16), l: x.a.c, meter: meterEl(x.cov, t, 120, x.cov.toFixed(1) + '%'), tt: `${x.a.c} · ${l}|${x.cov.toFixed(1)}% backed|Marker = 100% of liabilities` }); })))
+      + dcard(4, 'Reserve coverage', ctag('Marker = 100%'), lis(R.map(x => { const [t, l] = tone(x.cov); return li({ lead: noTip(assetIc(x.a.c, 16)), l: x.a.c, meter: meterEl(x.cov, t, 120, x.cov.toFixed(1) + '%'), tt: `${assetName(x.a.c)} · ${l}|${x.cov.toFixed(1)}% backed|Marker = 100% of liabilities` }); })))
       + dcard(6, 'Where reserves are held', ctag('Share of reserves'), barRows([['Fireblocks · cold storage', 58.4], ['BitGo · custody', 21.2], ['Banking Circle · safeguarding', 11.8], ['Hot wallets', 8.6]], v => v.toFixed(1) + '%'))
       + dcard(6, 'Attestations', ctag('Proof of reserves'), lis([0, 1, 2, 3].map(i => { const at = new Date(NOW.getTime() - (9 + i * 30) * DAY);
         return liAct({ time: i ? fmtDay(at, false) : rel(at), who: 'Armanino', what: `${new Date(NOW.getFullYear(), NOW.getMonth() - i, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })} attestation`, v: `${(103.6 - i * .7).toFixed(1)}%` }); })));
