@@ -3980,7 +3980,7 @@ function coRatesTab(c, D) {
   if (sub === 'bank') return tcard('Sell rates', note, dtable(['Operation', 'Code', 'Provider', 'Currency', 'Fee|r', 'Fixed|r', 'Minimum|r', '|a'], bankRows(D, R.level, R.init).map((x, i) => [
     ...opCells(x.op, custom(x)), x.provider, curCell(x.cur), `<span class="num">${x.pct}%</span>`, x.fixed ? `<span class="num">${money(x.fixed, x.cur)}</span>` : dash, `<span class="num">${money(x.min, x.cur)}</span>`, editBtn('rate-bank', i)])), seg + lvl + init);
   if (sub === 'spread') return tcard('Sell rates', note, dtable(['Pair', 'System|r', 'Client|r', 'Total|r', '|a'], D.spread.map((x, i) => [
-    TC.text(x.pair, custom(x)), numM(x.sys + '%'), `<span class="num">${x.client}%</span>`, `<span class="num" style="font-weight:600">${+(x.sys + x.client).toFixed(2)}%</span>`, editBtn('rate-spread', i)])), seg);
+    TC.text(x.pair, custom(x)), numM(x.sys + '%'), `<span class="num">${x.client}%</span>`, TC.num(+(x.sys + x.client).toFixed(2) + '%'), editBtn('rate-spread', i)])), seg);
   if (sub === 'exfees') {
     const vol = v => v == null ? TC.muted('and above') : TC.num('€' + volFmt(v)), n = v => TC.num(v + '%'), tip = '<span data-tip="30-day trading volume">';
     // one header row (no API / User group header): From ≥ · To < · API maker · API taker · User maker · User taker
