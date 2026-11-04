@@ -1107,6 +1107,17 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
   .card-tools .inp{width:100%}
   .kv2 .kv-r:nth-last-child(2):nth-child(odd){border-bottom:var(--border-width) solid var(--line-soft)}
 }
+/* Table cell (Figma ❖ Data display → Table cell): one class per Type — see TC in the script. Text-ish left, Number / Number muted right */
+.tc-strong{font-weight:var(--fw-medium);color:var(--ink)}
+.tc-empty{color:var(--ink-2)}
+.tc-card{display:inline-flex;align-items:center;gap:var(--space-8);white-space:nowrap}
+.tc-card .mc{width:36px;height:var(--icon-lg);border-radius:var(--r-xs);display:grid;place-items:center;flex:none;background:var(--inv);color:var(--on-inv)}
+.tc-card .mc.phys{background:var(--brand);color:var(--on-color)}
+.tc-curs{display:inline-flex;align-items:center;gap:var(--space-8);white-space:nowrap}
+.tc-curs .ics{display:inline-flex;gap:var(--space-4)}
+.tc-flags{display:inline-flex;align-items:center;gap:var(--space-8);white-space:nowrap}
+.tc-flags .ics{display:inline-flex;gap:var(--space-4)}
+.tc-flags .flag-i{width:var(--icon-md);height:var(--icon-md)}
 </style>
 <link rel="stylesheet" href="ds/tokens.css"> <!-- Design system tokens (generated from Figma). Keep this line after the <style> block. -->
 </head>
@@ -4607,24 +4618,55 @@ const optsOf = (o, f = v => v) => Object.fromEntries(Object.entries(o).map(([k, 
 const tile = (id, label, filter, sub) => ({ id, label, filter, sub });
 const allTile = (label, sub) => ({ id: 'all', label, clear: 1, sub });
 const share = (L, n) => L.length ? `${Math.round(n / L.length * 100)}%` : '0%';
+/* Table cell (Figma ❖ Data display → Table cell) — every cell type as one function, used by the K column presets and by dtable() rows.
+   Values arrive as display HTML (callers escape user text). Empty → a dash in Text muted. Number / Number muted / Number positive are right-aligned (TC_AL). */
+const TC_DASH = '<span class="tc-empty">—</span>';
+const tcE = v => v === undefined || v === null || v === '';
+const TC = {
+  text: v => tcE(v) ? TC_DASH : `<span class="tc-text">${v}</span>`,                                     // Text — Body/Medium, text/primary
+  strong: v => tcE(v) ? TC_DASH : `<span class="tc-strong">${v}</span>`,                                 // Text strong — Label/Medium: the row's main name
+  iconText: (ic, v) => tcE(v) ? TC_DASH : `<span class="txt">${icon(ic, 16)}<span>${v}</span></span>`,    // Icon + text — icon 16 in text/tertiary, gap 8
+  muted: v => tcE(v) ? TC_DASH : `<span class="muted">${v}</span>`,                                      // Text muted — text/secondary (also empty values)
+  num: (v, tone) => tcE(v) ? TC_DASH : `<span class="num${tone === 'positive' ? ' pos' : ''}">${v}</span>`, // Number — Tone Default / Positive
+  numMuted: v => tcE(v) ? TC_DASH : `<span class="num muted">${v}</span>`,                               // Number muted — dates, zeros
+  meter: (p, tone, scale = 200, label) => meterEl(p, tone, scale, label),                               // Meter — headroom to a threshold
+  copy: (v, shown) => tcE(v) ? TC_DASH : copyVal(v, shown),                                              // Copy — value + copy icon
+  country: code => ctryCell(code),                                                                       // Country — flag + ISO-3
+  countries: (ccs, total = ccs.length) => !ccs.length ? TC_DASH : `<span class="tc-flags"><span class="ics">${ccs.slice(0, 4).map(cc => `<span class="flag" title="${cc}">${flag(cc)}</span>`).join('')}</span>${total > 4 ? `<span class="muted">+${total - 4}</span>` : ''}</span>`, // Countries — up to 4 flags + «+N»
+  currency: c => tcE(c) ? TC_DASH : curCell(c),                                                          // Currency — icon + ticker
+  currencies: cs => !cs.length ? TC_DASH : `<span class="tc-curs"><span class="ics">${cs.slice(0, 3).map(c => assetIc(c, 16)).join('')}</span><span class="muted">${cs.join(', ')}</span></span>`, // Currencies — up to 3 icons + tickers
+  card: (last4, physical) => `<span class="tc-card"><span class="mc ${physical ? 'phys' : ''}">${brand().card()}</span>•••• ${last4}</span>`, // Card — .Mini card + last 4
+  yes: v => yes(v),                                                                                      // Yes / No
+  status: o => o ? dotCell(o) : TC_DASH,                                                                 // Status — dot + label
+  badge: o => o ? badge(o) : TC_DASH,                                                                    // Badge
+  risk: r => r ? riskCell(r) : TC_DASH,                                                                  // Risk
+  toggle: (on, attrs = '', tip = '') => `<button class="sw-t ${on ? 'on' : ''}" ${attrs}${tip ? ` data-tip="${tip}"` : ''}></button>`, // Toggle — left, like every slot type
+  check: (on, attrs = '') => `<button class="cb ${on ? 'on' : ''}" ${attrs}>${icon('check', 12, 2.5)}</button>`, // Checkbox
+  actions: btns => btns.map(([ic, tip, attrs]) => `<button class="ghost-ic" data-tip="${tip}" ${attrs || ''}>${icon(ic, 16)}</button>`).join(''), // Actions — Icon buttons Ghost, shown on row hover
+};
 const K = {
-  id: (l = 'ID', k = 'id') => ({ k, l, on: 1, dir: 'desc', cell: r => numM(esc(r[k])) }),
+  id: (l = 'ID', k = 'id') => ({ k, l, on: 1, dir: 'desc', cell: r => TC.numMuted(esc(r[k])) }),
   user: (k = 'uid') => ({ k: 'user', l: 'User', on: 1, val: r => { const u = byId(r[k]); return (u.name || '~' + u.email).toLowerCase(); }, cell: r => { const u = byId(r[k]); return u.name ? esc(u.name) : muted(u.email); }, kv: r => userLink(byId(r[k])) }),
-  status: (E, k = 'status', l = 'Status') => ({ k, l, on: 1, val: r => Object.keys(E).indexOf(r[k]), cell: r => dotCell(E[r[k]]) }),
-  badge: (E, k, l, on = 1) => ({ k, l, on, val: r => Object.keys(E).indexOf(r[k]), cell: r => badge(E[r[k]]) }),
-  text: (k, l, on = 1) => ({ k, l, on, val: r => String(r[k] ?? '').toLowerCase(), cell: r => r[k] ? esc(r[k]) : dash }),
-  muted: (k, l, on = 1) => ({ k, l, on, val: r => String(r[k] ?? '').toLowerCase(), cell: r => muted(r[k]) }),
+  status: (E, k = 'status', l = 'Status') => ({ k, l, on: 1, val: r => Object.keys(E).indexOf(r[k]), cell: r => TC.status(E[r[k]]) }),
+  badge: (E, k, l, on = 1) => ({ k, l, on, val: r => Object.keys(E).indexOf(r[k]), cell: r => TC.badge(E[r[k]]) }),
+  text: (k, l, on = 1) => ({ k, l, on, val: r => String(r[k] ?? '').toLowerCase(), cell: r => TC.text(r[k] ? esc(r[k]) : '') }),
+  muted: (k, l, on = 1) => ({ k, l, on, val: r => String(r[k] ?? '').toLowerCase(), cell: r => TC.muted(r[k] ? esc(r[k]) : '') }),
   code: (k, l, on = 1) => ({ k, l, on, cell: r => r[k] ? `<span class="code">${esc(r[k])}</span>` : dash }),
-  copy: (k, l, on = 1) => ({ k, l, on, cell: r => r[k] ? copyVal(r[k]) : dash }),
-  num: (k, l, f = fmtInt, on = 1) => ({ k, l, al: 'r', on, dir: 'desc', val: r => r[k] || 0, cell: r => `<span class="num ${r[k] ? '' : 'zero'}">${f(r[k] || 0)}</span>` }),
+  copy: (k, l, on = 1) => ({ k, l, on, cell: r => TC.copy(r[k]) }),
+  num: (k, l, f = fmtInt, on = 1) => ({ k, l, al: 'r', on, dir: 'desc', val: r => r[k] || 0, cell: r => r[k] ? TC.num(f(r[k])) : TC.numMuted(f(0)) }),
   eur: (k, l, on = 1) => K.num(k, l, v => fmtEur(v), on),
   pct: (k, l, on = 1) => K.num(k, l, v => +(+v).toFixed(2) + '%', on),
-  amt: (k = 'amount', l = 'Amount', ck = 'c', on = 1) => ({ k, l, al: 'r', on, dir: 'desc', val: r => r[k] * (ASSET[r[ck]]?.rate || 1), cell: r => `<span class="num">${fmtAmt(r[k], r[ck])}</span>` }),
-  asset: (k = 'c', l = 'Currency') => ({ k, l, on: 1, cell: r => txCur({ c: r[k] }) }),
-  yes: (k, l, on = 1) => ({ k, l, on, dir: 'desc', val: r => +!!r[k], cell: r => yes(r[k]) }),
-  sw: (k, l, act) => ({ k, l, al: 'c', on: 1, dir: 'desc', val: r => +!!r[k], cell: r => `<button class="sw-t ${r[k] ? 'on' : ''}" data-act="${act}" data-rid="${esc(pgKey(pg(), r))}" data-tip="${r[k] ? 'Turn off' : 'Turn on'}" aria-label="${l}"></button>`, kv: r => r[k] ? 'On' : '<span class="faint">Off</span>' }),
+  amt: (k = 'amount', l = 'Amount', ck = 'c', on = 1) => ({ k, l, al: 'r', on, dir: 'desc', val: r => r[k] * (ASSET[r[ck]]?.rate || 1), cell: r => TC.num(fmtAmt(r[k], r[ck])) }),
+  asset: (k = 'c', l = 'Currency') => ({ k, l, on: 1, cell: r => TC.currency(r[k]) }),
+  yes: (k, l, on = 1) => ({ k, l, on, dir: 'desc', val: r => +!!r[k], cell: r => TC.yes(r[k]) }),
+  strong: (k, l, on = 1) => ({ k, l, on, val: r => String(r[k] ?? '').toLowerCase(), cell: r => TC.strong(r[k] ? esc(r[k]) : '') }),
+  iconText: (k, l, ic, on = 1) => ({ k, l, on, val: r => String(r[k] ?? '').toLowerCase(), cell: r => TC.iconText(typeof ic === 'function' ? ic(r) : ic, r[k] ? esc(r[k]) : '') }),
+  country: (k = 'country', l = 'Country', on = 1) => ({ k, l, on, val: r => r[k] || '', cell: r => TC.country(r[k]) }),
+  currencies: (k, l, on = 1) => ({ k, l, on, val: r => (r[k] || []).length, cell: r => TC.currencies(r[k] || []) }),
+  risk: (k = 'risk', l = 'Risk', on = 1) => ({ k, l, on, val: r => Object.keys(RISK).indexOf(r[k]), cell: r => TC.risk(r[k]) }),
+  sw: (k, l, act) => ({ k, l, on: 1, dir: 'desc', val: r => +!!r[k], cell: r => `<button class="sw-t ${r[k] ? 'on' : ''}" data-act="${act}" data-rid="${esc(pgKey(pg(), r))}" data-tip="${r[k] ? 'Turn off' : 'Turn on'}" aria-label="${l}"></button>`, kv: r => r[k] ? 'On' : '<span class="faint">Off</span>' }),
   date: (k = 'created', l = 'Created', on = 1) => ({ k, l, al: 'r', on, dir: 'desc', val: r => r[k] ? r[k].getTime() : 0, cell: r => r[k] ? `<span class="muted" title="${fmtDateTime(r[k])}">${rel(r[k])}</span>` : dash, kv: r => r[k] ? fmtDateTime(r[k]) : dash }),
-  when: (k, l, on = 1) => ({ k, l, on, dir: 'desc', val: r => r[k] ? r[k].getTime() : 0, cell: r => r[k] ? fmtDateTime(r[k]) : dash }),
+  when: (k, l, on = 1) => ({ k, l, on, dir: 'desc', val: r => r[k] ? r[k].getTime() : 0, cell: r => TC.text(r[k] ? fmtDateTime(r[k]) : '') }),
 };
 const gen = seed => {
   const r = rng(seed);
