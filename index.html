@@ -382,13 +382,14 @@ tbody tr{cursor:pointer}
 tbody tr:hover td{background:var(--hover)}
 tbody tr.sel td,tbody tr.sel:hover td{background:var(--selected)}
 tbody tr:last-child td{border-bottom:0}
-th.cbcell,td.cbcell{width:44px;padding:0 var(--space-12)}
+th.cbcell,td.cbcell{width:52px;padding:0 var(--space-12) 0 var(--space-24)} /* a list table on its own: 24 edge before the checkbox */
+.ut th:last-child,.ut td:last-child{padding-right:var(--space-24)}
 /* bulk-select column stays pinned on the left while the table scrolls sideways (mirrors the pinned row actions on the right) */
 th.cbcell,td.cbcell,.dt th.cbcell{position:sticky;left:0}
 td.cbcell{z-index:1;background:var(--surface)}
 th.cbcell{z-index:3;background:var(--bg)}
 /* the ID column is pinned right after the checkboxes; once the table scrolls sideways a hairline separates it from what slides under */
-th.pin,td.pin{position:sticky;left:44px}
+th.pin,td.pin{position:sticky;left:52px}
 td.pin{z-index:1;background:var(--surface)}
 th.pin{z-index:3;background:var(--bg)}
 .hs-wrap.hs-l th.pin,.hs-wrap.hs-l td.pin{box-shadow:inset -1px 0 0 var(--line)}
@@ -562,19 +563,21 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .up-grid .card>.card-h{min-height:56px;margin:0;padding:var(--space-12) var(--space-16) var(--space-12) var(--card-padding);border-bottom:var(--border-width) solid var(--line);flex-wrap:nowrap}
 .up-grid .card-b{padding:var(--space-4) var(--card-padding) var(--space-8)}
 .up-grid .card-b.pad{padding:var(--space-16) var(--card-padding)}
-.up-grid .card-tools{padding:var(--space-12) var(--space-24);border-bottom:var(--border-width) solid var(--line)}
+.up-grid .card-tools{padding:var(--space-12) var(--card-padding);border-bottom:var(--border-width) solid var(--line)}
 
 .card-t .ct{font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);color:var(--ink-3);margin-left:var(--space-4)}
 .ch-act{display:flex;align-items:center;gap:var(--space-8);flex-wrap:wrap}
-.card-tools{display:flex;align-items:center;gap:var(--space-8);flex-wrap:wrap;padding:0 var(--space-24) var(--space-16)}
+.card-tools{display:flex;align-items:center;gap:var(--space-8);flex-wrap:wrap;padding:0 var(--card-padding) var(--space-16)}
 .dt-wrap{overflow-x:auto}
 .dt{min-width:720px}
 .dt th{position:static;height:var(--row);font-size:var(--fs-12)}
 .dt td{height:var(--row)}
 /* two-line rows (a label with a code line under it) keep their taller height until every table goes single-line */
 .dt:has(tbody td div.code) td{height:52px}
-.dt th:first-child,.dt td:first-child{padding-left:var(--space-24)} /* tables in cards keep a 24 edge (Table header / cell) */
+.dt th:first-child,.dt td:first-child{padding-left:var(--space-24)} /* a table on its own: 24 edge */
 .dt th:last-child,.dt td:last-child{padding-right:var(--space-24)}
+.card .dt th:first-child,.card .dt td:first-child{padding-left:var(--card-padding)} /* a table inside a Card: 16 edge, in line with the card header and lists */
+.card .dt th:last-child,.card .dt td:last-child{padding-right:var(--card-padding)}
 .dt th.a{width:1%;padding:0!important}
 .dt th.r,.dt td.r{text-align:right} .dt th.c,.dt td.c{text-align:center} .dt th.w,.dt td.w{width:1%}
 .dt tbody tr{cursor:default}
@@ -600,7 +603,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .inp:disabled,.fsel:disabled,.field input:disabled,.field select:disabled{background-color:var(--surface-2);border-color:var(--line);color:var(--ink-disabled);cursor:not-allowed}
 .mini-card{width:36px;height:24px;border-radius:var(--r-xs);background:linear-gradient(135deg,#2C2C2C,#111);color:#fff;display:grid;place-items:center;flex:none}
 .mini-card.alt{background:var(--card-alt);color:var(--card-alt-ink)}
-.docs{padding:var(--space-16) var(--space-24) var(--space-24);border-top:var(--border-width) solid var(--line);display:flex;flex-direction:column;gap:var(--space-12)}
+.docs{padding:var(--space-16) var(--card-padding);border-top:var(--border-width) solid var(--line);display:flex;flex-direction:column;gap:var(--space-12)}
 .docs-h{display:flex;align-items:center;justify-content:space-between;gap:var(--space-12)}
 .sub-t{font-weight:600;font-size:var(--fs-14)}
 .doc{display:flex;align-items:center;gap:var(--space-12);padding:var(--space-12);border:var(--border-width) solid var(--line);border-radius:var(--r);font-size:var(--fs-14)}
@@ -2348,7 +2351,7 @@ const colCtx = () => S.route === 'companies'
   ? { t: 'companies', cols: tVisible('companies').map(c => c.k), w: S.coColW, key: 'nsc.cocolw', sel: '#coResults table.ut', redraw: coResults }
   : PAGES[S.route] ? { t: 'pg:' + S.route, cols: tVisible('pg:' + S.route).map(c => c.k), w: pgW(S.route), key: 'nsc.pgw.' + S.route, sel: '#pgResults table.ut', redraw: pgResults }
   : { t: 'users', cols: usersCols().map(c => c.key), w: S.colW, key: 'nsc.colw', sel: '#results table.ut', redraw: renderResults };
-const tableW = (X = colCtx()) => X.cols.reduce((s, k) => s + X.w[k], 0) + 44 + 84;
+const tableW = (X = colCtx()) => X.cols.reduce((s, k) => s + X.w[k], 0) + 52 + 84;
 function fitColumns() {
   const X = colCtx(), t = $(X.sel); if (!t) return;
   let grew = false;
@@ -2378,7 +2381,7 @@ function tableHTML(list) {
   const all = rows.every(u => S.selected.has(u.id)), some = rows.some(u => S.selected.has(u.id));
   const fixed = cols.every(c => S.colW[c.key]);
   return `<div class="tcard compact"><div class="hs-wrap"><div class="tscroll hs" ${moreAttr(list, rows, 'users')}><table class="ut ${fixed ? 'fixed' : ''}" style="${fixed ? `width:${tableW()}px` : ''}">
-    <colgroup><col style="width:44px">${cols.map(c => `<col data-col="${c.key}" ${fixed ? `style="width:${S.colW[c.key]}px"` : ''}>`).join('')}<col></colgroup>
+    <colgroup><col style="width:52px">${cols.map(c => `<col data-col="${c.key}" ${fixed ? `style="width:${S.colW[c.key]}px"` : ''}>`).join('')}<col></colgroup>
     <thead><tr><th class="cbcell"><button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="sel-page" aria-label="Select loaded rows">${icon('check', 11, 3)}</button></th>
     ${cols.map(c => { const on = S.sort.key === c.key; return `<th class="sortable ${on ? 'sorted' : ''} ${c.right ? 'r' : ''} ${c.pin ? 'pin' : ''}" data-act="sort" data-key="${c.key}" ${dragAttrs('users', c.key, c.pin)}><span class="th-in">${c.label}<span class="srt">${icon(on && S.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 12, 2)}</span></span><span class="col-rs" data-rs="${c.key}" data-tip="Drag to resize · double-click to fit"></span></th>`; }).join('')}
     <th class="act-h"></th></tr>${filterRow(cols.map(c => ({ k: c.key, pin: c.pin, val: c.val, label: c.label })), 'users', list[0] || USERS[0])}</thead>
@@ -3774,7 +3777,7 @@ function coResults() {
   const cols = tVisible('companies'), fixed = cols.every(c => S.coColW[c.k]), rows = loaded(list, f.page);
   const all = rows.every(c => f.sel.has(c.id)), some = rows.some(c => f.sel.has(c.id));
   el.innerHTML = `<div class="tcard compact"><div class="hs-wrap"><div class="tscroll hs" ${moreAttr(list, rows, 'co')}><table class="ut ${fixed ? 'fixed' : ''}" style="${fixed ? `width:${tableW()}px` : ''}">
-    <colgroup><col style="width:44px">${cols.map(c => `<col data-col="${c.k}" ${fixed ? `style="width:${S.coColW[c.k]}px"` : ''}>`).join('')}<col></colgroup>
+    <colgroup><col style="width:52px">${cols.map(c => `<col data-col="${c.k}" ${fixed ? `style="width:${S.coColW[c.k]}px"` : ''}>`).join('')}<col></colgroup>
     <thead><tr><th class="cbcell"><button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="co-sel-page" aria-label="Select loaded rows">${icon('check', 11, 3)}</button></th>
     ${cols.map(c => { const on = f.sort.k === c.k; return `<th class="sortable ${on ? 'sorted' : ''} ${c.al === 'r' ? 'r' : ''} ${c.pin ? 'pin' : ''}" data-act="co-sort" data-k="${c.k}" data-key="${c.k}" ${dragAttrs('companies', c.k, c.pin)}><span class="th-in">${c.l}<span class="srt">${icon(on && f.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 12, 2)}</span></span><span class="col-rs" data-rs="${c.k}" data-tip="Drag to resize · double-click to fit"></span></th>`; }).join('')}
     <th class="act-h"></th></tr>${filterRow(cols.map(c => ({ k: c.k, pin: c.pin, val: c.val, label: c.l })), 'companies', list[0] || COMPANIES[0])}</thead>
@@ -4506,7 +4509,7 @@ function pgResults() {
   const cols = tVisible('pg:' + P.id), W = pgW(P.id), fixed = cols.every(c => W[c.k]), rows = loaded(list, st.page), keys = rows.map(r => pgKey(P, r));
   const all = keys.every(k => st.sel.has(k)), some = keys.some(k => st.sel.has(k)), al = c => c.al === 'r' ? 'r' : c.al === 'c' ? 'c' : '';
   el.innerHTML = `<div class="tcard compact"><div class="hs-wrap"><div class="tscroll hs" ${moreAttr(list, rows, 'pg')}><table class="ut ${fixed ? 'fixed' : ''}" style="${fixed ? `width:${tableW()}px` : ''}">
-    <colgroup><col style="width:44px">${cols.map(c => `<col data-col="${c.k}" ${fixed ? `style="width:${W[c.k]}px"` : ''}>`).join('')}<col></colgroup>
+    <colgroup><col style="width:52px">${cols.map(c => `<col data-col="${c.k}" ${fixed ? `style="width:${W[c.k]}px"` : ''}>`).join('')}<col></colgroup>
     <thead><tr><th class="cbcell"><button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="pg-sel-page" aria-label="Select loaded rows">${icon('check', 11, 3)}</button></th>
     ${cols.map(c => { const on = st.sort.k === c.k; return `<th class="sortable ${on ? 'sorted' : ''} ${al(c)} ${c.pin ? 'pin' : ''}" data-act="pg-sort" data-k="${c.k}" data-key="${c.k}" ${dragAttrs('pg:' + P.id, c.k, c.pin)}><span class="th-in">${c.l}<span class="srt">${icon(on && st.sort.dir === 'asc' ? 'arrowUp' : 'arrowDown', 12, 2)}</span></span><span class="col-rs" data-rs="${c.k}" data-tip="Drag to resize · double-click to fit"></span></th>`; }).join('')}
     <th class="act-h"></th></tr>${filterRow(cols.map(c => ({ k: c.k, pin: c.pin, val: c.val, label: c.l })), 'pg:' + P.id, list[0] || pgData(P)[0])}</thead>
@@ -5376,7 +5379,7 @@ page({
   id: 'roles', noun: 'role', nouns: 'roles', icon: 'key', searchPh: 'Search role…',
   data: () => ROLES, search: r => `${r.name} ${r.desc}`,
   cols: [K.id(), { k: 'name', l: 'Role', on: 1, lock: 1, val: r => r.name.toLowerCase(), cell: r => `${TC.strong(esc(r.name))}` }, K.muted('desc', 'Description'),
-    { k: 'admins', l: 'Administrators', al: 'r', on: 1, dir: 'desc', val: r => ADMINS.filter(a => a.role === r.id).length, cell: r => `<span class="num">${ADMINS.filter(a => a.role === r.id).length}</span>` },
+    { k: 'admins', l: 'Members', al: 'r', on: 1, dir: 'desc', val: r => ADMINS.filter(a => a.role === r.id).length, cell: r => TC.num(ADMINS.filter(a => a.role === r.id).length) },
     { k: 'perms', l: 'Permissions', al: 'r', on: 1, dir: 'desc', val: r => r.perms.size, cell: r => `<span class="num">${r.perms.size} of ${ALL_PERMS.length}</span>` }, K.date('updated', 'Updated'), K.date('created', 'Created', 0)],
   sort: { k: 'id', dir: 'asc' },
   form: {
@@ -5387,7 +5390,7 @@ page({
   rec: {
     title: r => r.name, sub: r => `<span>${esc(r.desc)}</span>`, badges: r => `<span class="badge t-neutral">${r.perms.size} of ${ALL_PERMS.length} permissions</span>${r.id === 1 ? badge({ label: 'Locked', tone: 'info' }) : ''}`,
     sections: r => PERM_GROUPS.map(([g, ps]) => `<div class="card"><div class="card-h"><span class="card-t">${g} <span class="ct">${ps.filter(([k]) => r.perms.has(k)).length} of ${ps.length}</span></span></div><div class="card-b">${ps.map(([k, l]) => `<div class="kv-r"><span style="color:var(--ink)">${l}<span class="code" style="margin-left:var(--space-8)">${k}</span></span><button class="sw-t ${r.perms.has(k) ? 'on' : ''}" data-act="role-perm" data-rid="${r.id}" data-p="${k}" ${r.id === 1 ? 'disabled' : ''} aria-label="${l}"></button></div>`).join('')}</div></div>`).join(''),
-    side: r => { const L = ADMINS.filter(a => a.role === r.id); return `<div class="card"><div class="card-h"><span class="card-t">Administrators <span class="ct">${L.length}</span></span></div><div class="card-b">${L.map(a => `<div class="kv-r">${recLink('admins', a.id, a.name)}${dotCell(ADMIN_STATUS[a.status])}</div>`).join('') || '<div class="faint" style="padding:var(--space-12) 0;font-size:var(--fs-14)">Nobody has this role yet</div>'}</div></div>`; },
+    side: r => { const L = ADMINS.filter(a => a.role === r.id); return `<div class="card"><div class="card-h"><span class="card-t">Members <span class="ct">${L.length}</span></span></div><div class="card-b">${L.map(a => `<div class="kv-r">${recLink('admins', a.id, a.name)}${dotCell(ADMIN_STATUS[a.status])}</div>`).join('') || '<div class="faint" style="padding:var(--space-12) 0;font-size:var(--fs-14)">Nobody has this role yet</div>'}</div></div>`; },
   },
 });
 const LOG_GROUP = { AUTH: { label: 'Sign-in', icon: 'login' }, USERS: { label: 'Users', icon: 'users' }, COMPANIES: { label: 'Companies', icon: 'building' }, FINANCIAL: { label: 'Financial', icon: 'arrows' }, RISK: { label: 'Risk', icon: 'radar' }, SETTINGS: { label: 'Settings', icon: 'sliders' } };
