@@ -3685,7 +3685,7 @@ function cd(c) {
   CD.set(c.id, D);
   return D;
 }
-const bankRows = (D, l, i) => D.bank[l + '|' + i] ||= BANK_BASE.map(([op, provider, cur, p, fixed, min]) => ({ op, provider, cur, pct: +(p * LVL_X[l] * (i === 'api' ? .8 : 1)).toFixed(2), fixed, min }));
+const bankRows = (D, l, i) => D.bank[l + '|' + i] ||= BANK_BASE.map(([op, provider, cur, p, fixed, min]) => ({ op, provider, cur, pct: +(p * LVL_X[l] * ({ api: .8, company: .9 }[i] || 1)).toFixed(2), fixed, min }));
 const exRows = (D, l) => D.exfees[l] ||= EX_TIERS.map(([from, to, p]) => { const v = +(p * LVL_X[l]).toFixed(3); return { from, to, apiM: +(v * .8).toFixed(3), apiT: v, userM: v, userT: v }; });
 
 /* ── Topbar, floating bar ── */
@@ -3978,10 +3978,10 @@ function coRatesTab(c, D) {
   const sub = S.coSub.rates, R = S.rate, custom = x => x.custom ? badge({ label: 'Custom', tone: 'info' }) : '';
   const seg = subSeg('rates', [['bank', 'Bank deposit / withdrawal'], ['spread', 'Exchange spread'], ['exfees', 'Exchange fees'], ['cards', 'Card products']]);
   const lvl = `<select class="fsel" data-rate="level">${Object.entries(LEVEL).map(([k, o]) => `<option value="${k}" ${R.level === k ? 'selected' : ''}>${o.label} level</option>`).join('')}</select>`;
-  const init = `<select class="fsel" data-rate="init">${[['user', 'Company user'], ['api', 'API']].map(([k, l]) => `<option value="${k}" ${R.init === k ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
+  const init = `<select class="fsel" data-rate="init">${[['company', 'Company'], ['user', 'Company user'], ['api', 'API']].map(([k, l]) => `<option value="${k}" ${R.init === k ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
   const note = '<span class="code">Platform defaults · edited rows are marked Custom</span>';
-  if (sub === 'bank') return tcard('Sell rates', note, dtable(['Operation', 'Code', 'Provider', 'Currency', 'Fee|r', 'Fixed|r', 'Minimum|r', '|a'], bankRows(D, R.level, R.init).map((x, i) => [
-    ...opCells(x.op, custom(x)), x.provider, curCell(x.cur), `<span class="num">${x.pct}%</span>`, x.fixed ? `<span class="num">${money(x.fixed, x.cur)}</span>` : dash, `<span class="num">${money(x.min, x.cur)}</span>`, editBtn('rate-bank', i)])), seg + lvl + init);
+  if (sub === 'bank') return tcard('Sell rates', note, dtable(['Operation', 'Provider', 'Currency', 'Fee|r', 'Fixed|r', 'Minimum|r', '|a'], bankRows(D, R.level, R.init).map((x, i) => [
+    TC.text(opLabel(x.op), custom(x)), x.provider, curCell(x.cur), `<span class="num">${x.pct}%</span>`, x.fixed ? `<span class="num">${money(x.fixed, x.cur)}</span>` : dash, `<span class="num">${money(x.min, x.cur)}</span>`, editBtn('rate-bank', i)])), seg + lvl + init);
   if (sub === 'spread') return tcard('Sell rates', note, dtable(['Pair', 'System|r', 'Client|r', 'Total|r', '|a'], D.spread.map((x, i) => [
     TC.text(x.pair, custom(x)), numM(x.sys + '%'), `<span class="num">${x.client}%</span>`, TC.num(+(x.sys + x.client).toFixed(2) + '%'), editBtn('rate-spread', i)])), seg);
   if (sub === 'exfees') {
