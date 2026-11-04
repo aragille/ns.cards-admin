@@ -3977,7 +3977,7 @@ function coDirTab(c, D) {
 function coRatesTab(c, D) {
   const sub = S.coSub.rates, R = S.rate, custom = x => x.custom ? badge({ label: 'Custom', tone: 'info' }) : '';
   const seg = subSeg('rates', [['bank', 'Bank deposit / withdrawal'], ['spread', 'Exchange spread'], ['exfees', 'Exchange fees'], ['cards', 'Card products']]);
-  const lvl = `<span class="tools-sep"></span><select class="fsel" data-rate="level">${Object.entries(LEVEL).map(([k, o]) => `<option value="${k}" ${R.level === k ? 'selected' : ''}>${o.label} level</option>`).join('')}</select>`;
+  const lvl = `<select class="fsel" data-rate="level">${Object.entries(LEVEL).map(([k, o]) => `<option value="${k}" ${R.level === k ? 'selected' : ''}>${o.label} level</option>`).join('')}</select>`;
   const init = `<select class="fsel" data-rate="init">${[['user', 'Company user'], ['api', 'API']].map(([k, l]) => `<option value="${k}" ${R.init === k ? 'selected' : ''}>${l}</option>`).join('')}</select>`;
   const note = '<span class="code">Platform defaults · edited rows are marked Custom</span>';
   if (sub === 'bank') return tcard('Sell rates', note, dtable(['Operation', 'Code', 'Provider', 'Currency', 'Fee|r', 'Fixed|r', 'Minimum|r', '|a'], bankRows(D, R.level, R.init).map((x, i) => [
