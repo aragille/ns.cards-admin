@@ -1149,6 +1149,14 @@ const compact = v => v >= 1e9 ? (v / 1e9).toFixed(2) + 'B' : v >= 1e6 ? (v / 1e6
 // Round country flags and currency icons from the design packs (64px PNGs, only the ones the prototype uses), embedded so the page stays one file.
 // flag(cc) takes an ISO-2 code; countries the pack doesn't cover get a neutral round chip with their code.
 const FLAG_IMG = {
+  AF: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PG1hc2sgaWQ9ImEiPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMjU2IiBmaWxsPSIjZmZmIi8+PC9tYXNrPjxnIG1hc2s9InVybCgjYSkiPjxwYXRoIGZpbGw9IiNkODAwMjciIGQ9Ik0xNDUgMGgyMjJsMzIgMjU2LTMyIDI1NkgxNDVsLTMyLTI1NloiLz48cGF0aCBmaWxsPSIjNDk2ZTJkIiBkPSJNMzY3IDBoMTQ1djUxMkgzNjdaIi8+PHBhdGggZmlsbD0iIzMzMyIgZD0iTTAgMGgxNDV2NTEySDBaIi8+PHBhdGggZmlsbD0iI2ZmZGE0NCIgZD0iTTI1NiAxNjdhODkgODkgMCAwIDAgMCAxNzggODkgODkgMCAwIDAgMC0xNzhtMCAzM2E1NiA1NiAwIDAgMSAwIDExMiA1NiA1NiAwIDAgMSAwLTExMm0wIDI4LjVjLTEyIDAtMjIgMTAtMjIgMjJ2MzNoNDR2LTMzYzAtMTItMTAtMjItMjItMjIiLz48L2c+PC9zdmc+', // circle-flags 2.8.3, MIT
+  BY: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PG1hc2sgaWQ9ImEiPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMjU2IiBmaWxsPSIjZmZmIi8+PC9tYXNrPjxnIG1hc2s9InVybCgjYSkiPjxwYXRoIGZpbGw9IiNlZWUiIGQ9Ik0wIDBoMTU1LjhsMzUgMjU0LjYtMzUgMjU3LjRIMHoiLz48cGF0aCBmaWxsPSIjYTIwMDFkIiBkPSJNMTU1LjggMEg1MTJ2MzQ1LjFsLTE4MyAzNy40LTE3My4yLTM3LjR6Ii8+PHBhdGggZmlsbD0iIzZkYTU0NCIgZD0iTTE1NS44IDM0NS4xSDUxMlY1MTJIMTU1Ljh6Ii8+PHBhdGggZmlsbD0iI2EyMDAxZCIgZD0iTTUwIC4yIDIyLjMgNTBsMjcuOCA1MC40TDc3LjkgNTB6bTU1LjggMEw3OCA1MGwyNy43IDUwLjQgMjgtNTAuNHpNNTAgMTM3LjVsLTI3LjcgNDkuNiAyNy44IDUwLjUgMjcuNy01MC41em01NS44IDBMNzggMTg3LjFsMjcuNyA1MC41IDI4LTUwLjV6TTUwIDI3NC43bC0yNy43IDQ5LjcgMjcuOCA1MC40IDI3LjgtNTAuNHptNTUuOCAwTDc4IDMyNC40bDI3LjcgNTAuNCAyOC01MC40ek01MCA0MTJsLTI3LjcgNDkuNiAyNy44IDUwLjUgMjcuNy01MC41em01NS44IDBMNzggNDYxLjZsMjcuNyA1MC41IDI4LTUwLjV6Ii8+PC9nPjwvc3ZnPg==', // circle-flags 2.8.3, MIT
+  CU: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PG1hc2sgaWQ9ImEiPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMjU2IiBmaWxsPSIjZmZmIi8+PC9tYXNrPjxnIG1hc2s9InVybCgjYSkiPjxwYXRoIGZpbGw9IiMwMDUyYjQiIGQ9Ik0wIDBoNTEydjEwMi40TDQ4My44IDE1MWwyOC4yIDUzLjh2MTAyLjRsLTMwLjUgNTAuNyAzMC41IDUxLjdWNTEySDBsMzkuOC0yNTd6Ii8+PHBhdGggZmlsbD0iI2ZmOTgxMSIgZD0iTTAgNDQuNXY0MjNWMjU2eiIvPjxwYXRoIGZpbGw9IiNlZWUiIGQ9Ik0yNy4yIDEwMi40djEwMi40SDUxMlYxMDIuNEgyNy4yem0wIDIwNC44djEwMi40SDUxMlYzMDcuMkgyNy4yeiIvPjxwYXRoIGZpbGw9IiNkODAwMjciIGQ9Ik0wIDB2NTEybDI1Ni0yNTZMMCAweiIvPjxwYXRoIGZpbGw9IiNlZWUiIGQ9Im0xMDMuNiAxODkuMiAxNi42IDUxaDUzLjZsLTQzLjQgMzEuNiAxNi42IDUxLTQzLjQtMzEuNS00My40IDMxLjUgMTYuNi01MS00My40LTMxLjZIODd6Ii8+PC9nPjwvc3ZnPg==', // circle-flags 2.8.3, MIT
+  IR: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PG1hc2sgaWQ9ImEiPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMjU2IiBmaWxsPSIjZmZmIi8+PC9tYXNrPjxnIG1hc2s9InVybCgjYSkiPjxwYXRoIGZpbGw9IiNlZWUiIGQ9Ik0wIDE0NC43IDI1OC44IDM5LjYgNTEyIDE0NC43djIyMi42TDI1NyA0OTMgMCAzNjcuM3oiLz48cGF0aCBmaWxsPSIjNmRhNTQ0IiBkPSJNMCAwdjE0NC43aDEwNS42di0yMi4yaDMzLjZ2MjIuMmgzMy4zdi0yMi4yaDMzLjZ2MjIuMmgzMy4zdi0yMi4ySDI3M3YyMi4yaDMzdi0yMi4yaDMzLjZ2MjIuMmgzMy4ydi0yMi4yaDMzLjZ2MjIuMkg1MTJWMHoiLz48cGF0aCBmaWxsPSIjZDgwMDI3IiBkPSJNMCAzNjcuM1Y1MTJoNTEyVjM2Ny4zSDQwNi40djIyLjRoLTMzLjZ2LTIyLjRoLTMzLjJ2MjIuNEgzMDZ2LTIyLjRoLTMzdjIyLjRoLTMzLjZ2LTIyLjRoLTMzLjN2MjIuNGgtMzMuNnYtMjIuNGgtMzMuM3YyMi40aC0zMy42di0yMi40em0zMzkuMS0xNzhoLTMzLjRjLjIgMy43LjQgNy40LjQgMTEuMSAwIDI0LjgtNi4yIDQ4LjgtMTcgNjYtMy4zIDUuMi05IDEyLjYtMTYuNCAxNy42di05NC43aC0zMy40djk0LjhjLTcuNS01LTEzLTEyLjQtMTYuNC0xNy43LTEwLjgtMTctMTctNDEtMTctNjUuOSAwLTMuNy4yLTcuNC40LTExSDE3M2ExOTAgMTkwIDAgMCAwLS40IDExYzAgNjguNyAzNi43IDEyMi41IDgzLjUgMTIyLjVzODMuNS01My44IDgzLjUtMTIyLjVjMC0zLjctLjEtNy40LS40LTExeiIvPjwvZz48L3N2Zz4=', // circle-flags 2.8.3, MIT
+  KP: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PG1hc2sgaWQ9ImEiPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMjU2IiBmaWxsPSIjZmZmIi8+PC9tYXNrPjxnIG1hc2s9InVybCgjYSkiPjxwYXRoIGZpbGw9IiMwMDUyYjQiIGQ9Ik0wIDBoNTEydjg5bC02MS4yIDE2NS42TDUxMiA0MjN2ODlIMHYtODlsNjIuNS0xNzQuNkwwIDg5eiIvPjxwYXRoIGZpbGw9IiNlZWUiIGQ9Ik0wIDg5aDUxMnYzMy40bC0yOC4xIDEzMEw1MTIgMzg5LjdWNDIzSDB2LTMzLjRMMzAgMjU1IDAgMTIyLjR6Ii8+PHBhdGggZmlsbD0iI2Q4MDAyNyIgZD0iTTAgMTIyLjRoNTEydjI2Ny4ySDB6Ii8+PGNpcmNsZSBjeD0iMTU3LjUiIGN5PSIyNTYiIHI9Ijk4LjUiIGZpbGw9IiNlZWUiLz48cGF0aCBmaWxsPSIjZDgwMDI3IiBkPSJtMTU3LjUgMTU3LjUgMjIuMSA2OGg3MS42bC01OCA0MiAyMi4zIDY4LjMtNTgtNDIuMy01OCA0Mi4yIDIyLjItNjguMS01Ny45LTQyaDcxLjZ6Ii8+PC9nPjwvc3ZnPg==', // circle-flags 2.8.3, MIT
+  MM: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PG1hc2sgaWQ9ImEiPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMjU2IiBmaWxsPSIjZmZmIi8+PC9tYXNrPjxnIG1hc2s9InVybCgjYSkiPjxwYXRoIGZpbGw9IiM2ZGE1NDQiIGQ9Im0wIDE2NyAyNTMuOC0xOS4zTDUxMiAxNjd2MTc4bC0yNTQuOSAzMi4zTDAgMzQ1eiIvPjxwYXRoIGZpbGw9IiNmZmRhNDQiIGQ9Ik0wIDBoNTEydjE2N0gweiIvPjxwYXRoIGZpbGw9IiNkODAwMjciIGQ9Ik0wIDM0NWg1MTJ2MTY3SDB6Ii8+PHBhdGggZmlsbD0iI2VlZSIgZD0iTTQzMS41IDIxNi41aC0xMzRMMjU2IDg5bC00MS40IDEyNy42aC0xMzRsMTA4LjMgNzguOEwxNDcuNSA0MjMgMjU2IDM0NWwxMDguNSA3OC00MS40LTEyNy42eiIvPjwvZz48L3N2Zz4=', // circle-flags 2.8.3, MIT
+  SY: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PG1hc2sgaWQ9ImEiPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMjU2IiBmaWxsPSIjZmZmIi8+PC9tYXNrPjxnIG1hc2s9InVybCgjYSkiPjxwYXRoIGZpbGw9IiNlZWUiIGQ9Im0wIDE2NyAyNTMuOC0xOS4zTDUxMiAxNjd2MTc4bC0yNTQuOSAzMi4zTDAgMzQ1eiIvPjxwYXRoIGQ9Ik0wIDBoNTEydjE2N0gweiIgZmlsbD0iIzQ5NmUyZCIvPjxwYXRoIGZpbGw9IiMzMzMiIGQ9Ik0wIDM0NWg1MTJ2MTY3SDB6Ii8+PHBhdGggZD0ibTExMCAyMDAgMzYgMTEyLTk1LTY5aDExN2wtOTQgNjl6bTE0NiAwIDM2IDExMi05NC02OWgxMTdsLTk1IDY5em0xNDYgMCAzNiAxMTItOTQtNjloMTE3bC05NSA2OXoiIGZpbGw9IiNkODAwMjciLz48L2c+PC9zdmc+', // circle-flags 2.8.3, MIT
+  VE: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiB2aWV3Qm94PSIwIDAgNTEyIDUxMiI+PG1hc2sgaWQ9ImEiPjxjaXJjbGUgY3g9IjI1NiIgY3k9IjI1NiIgcj0iMjU2IiBmaWxsPSIjZmZmIi8+PC9tYXNrPjxnIG1hc2s9InVybCgjYSkiPjxwYXRoIGZpbGw9IiMwMDUyYjQiIGQ9Im0wIDE0NC43IDI1NS4zLTM2LjVMNTEyIDE0NC43djIyMi42TDI1MC41IDQwNyAwIDM2Ny4zeiIvPjxwYXRoIGZpbGw9IiNmZmRhNDQiIGQ9Ik0wIDBoNTEydjE0NC43SDB6Ii8+PHBhdGggZmlsbD0iI2Q4MDAyNyIgZD0iTTAgMzY3LjNoNTEyVjUxMkgweiIvPjxwYXRoIGZpbGw9IiNlZWUiIGQ9Ik00NDMuNCAzMDYuNCA0MjkuOCAzMTdsNiAxNi4xLTE0LjMtOS42LTEzLjUgMTAuNyA0LjctMTYuNS0xNC4yLTkuNiAxNy4xLS42IDQuNy0xNi41IDYgMTYuMXptLTM0LjctNjAtOSAxNC41IDExIDEzLjJMMzk0IDI3MGwtOSAxNC42LTEuMy0xNy0xNi42LTQuMyAxNS45LTYuNC0xLjItMTcgMTEgMTN6bS01My00NC41LTMuNiAxNi44IDE0LjkgOC40LTE3IDEuOC0zLjYgMTYuOC03LTE1LjctMTcgMS44IDEyLjctMTEuNS03LTE1LjYgMTQuOCA4LjZ6bS02NS0yMy43IDIuMyAxNyAxNyAzLTE1LjUgNy41IDIuNCAxNy0xMi0xMi40LTE1LjQgNy42IDgtMTUuMi0xMS44LTEyLjMgMTYuOSAzem0tNjkuMyAwIDggMTUuMSAxNy0zLTEyIDEyLjQgOCAxNS4yLTE1LjQtNy42LTExLjkgMTIuNCAyLjQtMTctMTUuNC03LjUgMTYuOS0zem0tNjUgMjMuNyAxMi43IDExLjUgMTQuOC04LjYtNyAxNS43IDEyLjggMTEuNC0xNy0xLjgtNyAxNS43LTMuNy0xNi43LTE3LTEuOCAxNC44LTguNXptLTUzLjEgNDQuNSAxNS45IDYuNCAxMS0xMy0xLjIgMTcgMTYgNi40LTE2LjcgNC4yLTEuMiAxN0wxMTggMjcwbC0xNi43IDQuMiAxMS0xMy4yem0tMzQuNyA2MCAxNy4yLjUgNS45LTE2IDQuNyAxNi40IDE3LjEuNi0xNC4yIDkuNiA0LjcgMTYuNi0xMy41LTEwLjYtMTQuMiA5LjYgNS45LTE2eiIvPjwvZz48L3N2Zz4=', // circle-flags 2.8.3, MIT
   DE: 'data:image/png;base64,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',
   ES: 'data:image/png;base64,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',
   FR: 'data:image/png;base64,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',
@@ -1582,7 +1590,7 @@ const STAT_TILES = [
   { id: 'blocked', label: 'Blocked', tone: 'neutral', filter: { key: 'status', values: ['blocked'] }, sub: (L, n) => `${(n / L.length * 100).toFixed(1)}%` },
 ];
 
-const badge = (o, pre = '') => `<span class="badge t-${o.tone || 'neutral'}"><i class="dot"></i>${pre}${o.label}</span>`;
+const badge = (o, pre = '') => `<span class="badge t-${o.tone || 'neutral'}"${o.tip ? ` data-tip="${o.tip}"` : ''}>${o.icon ? icon(o.icon, 12, o.stroke) : o.dot === false ? '' : '<i class="dot"></i>'}${pre}${o.label}</span>`; // Badge: dot by default, or an icon (icon), or neither (dot: false)
 const statusCell = s => `<span class="stat"><i class="dot t-${STATUS[s].tone}"></i>${STATUS[s].label}</span>`;
 function riskIcon(r) {
   const o = RISK[r]; const col = { success: 'var(--ink-2)', warning: 'var(--warning)', error: 'var(--error)', neutral: 'var(--line-strong)' }[o.tone];
@@ -1590,12 +1598,12 @@ function riskIcon(r) {
   return `<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">${bars}</svg>`;
 }
 const riskCell = r => `<span class="risk">${riskIcon(r)}<span class="${r === 'unknown' ? 'faint' : ''}">${RISK[r].label}</span></span>`;
-const ctryCell = c => c ? `<span class="ctry"><span class="flag">${flag(COUNTRIES[c].cc)}</span><span class="mono">${c}</span></span>` : '<span class="faint">—</span>';
+const ctryCell = c => c ? `<span class="ctry"><span class="flag">${flag(COUNTRIES[c].cc)}</span><span class="mono">${c}</span></span>` : '<span class="tc-empty">—</span>';
 
 const DEFAULT_HIDDEN = ['kycVerified', 'idv', 'emailVerified', 'riskPoints', 'type', 'cards', 'twofa', 'tempPassword', 'lang', 'referral', 'invitedBy', 'source', 'companyId', 'companyName', 'companyRef', 'companySource', 'updated'];
 const COLS = [
   { key: 'id', label: 'ID', val: u => u.id, dir: 'desc', pin: 1, lock: 1, cell: u => `<span class="num muted">${u.id}</span>` },
-  { key: 'name', label: 'Name', val: u => (u.name || '~').toLowerCase(), dir: 'asc', cell: u => u.name ? `<b style="font-weight:500">${esc(u.name)}</b>` : '<span class="faint">No profile yet</span>' },
+  { key: 'name', label: 'Name', val: u => (u.name || '~').toLowerCase(), dir: 'asc', cell: u => u.name ? TC.strong(esc(u.name)) : TC.muted('No profile yet') },
   { key: 'email', label: 'Email', val: u => u.email, dir: 'asc', cell: u => `<span class="muted">${esc(u.email)}</span>` },
   { key: 'uid', label: 'Unique ID', val: u => u.uid, dir: 'asc', cell: u => `<button class="copy num" data-act="copy" data-copy="${u.uid}" title="Copy">${u.uid}${icon('copy', 12)}</button>` },
   { key: 'country', label: 'Residency', val: u => u.country || 'ZZZ', dir: 'asc', cell: u => ctryCell(u.country) },
@@ -1605,16 +1613,16 @@ const COLS = [
   { key: 'idv', label: 'IDV verified', val: u => +u.idv, dir: 'desc', cell: u => yes(u.idv) },
   { key: 'emailVerified', label: 'Email verified', val: u => +u.emailVerified, dir: 'desc', cell: u => yes(u.emailVerified) },
   { key: 'risk', label: 'Risk', val: u => RISK[u.risk].n, dir: 'desc', cell: u => riskCell(u.risk) },
-  { key: 'riskPoints', label: 'Risk points', val: u => u.riskPoints ?? -1, dir: 'desc', right: 1, cell: u => u.riskPoints == null ? '<span class="faint">—</span>' : `<span class="num">${u.riskPoints}</span>` },
+  { key: 'riskPoints', label: 'Risk points', val: u => u.riskPoints ?? -1, dir: 'desc', right: 1, cell: u => u.riskPoints == null ? '<span class="tc-empty">—</span>' : `<span class="num">${u.riskPoints}</span>` },
   { key: 'level', label: 'Level', val: u => Object.keys(LEVEL).indexOf(u.level), dir: 'desc', cell: u => `<span class="muted">${LEVEL[u.level].label}</span>` },
   { key: 'type', label: 'Type', val: u => u.type, dir: 'asc', cell: u => `<span class="muted">${TYPE[u.type].label}</span>` },
-  { key: 'balance', label: 'Balance', val: u => u.balance, dir: 'desc', right: 1, cell: u => `<span class="num ${u.balance ? '' : 'zero'}">${fmtEur(u.balance)}</span>` },
-  { key: 'cards', label: 'Cards', val: u => u.cards, dir: 'desc', right: 1, cell: u => `<span class="num ${u.cards ? '' : 'zero'}">${u.cards}</span>` },
+  { key: 'balance', label: 'Balance', val: u => u.balance, dir: 'desc', right: 1, cell: u => `<span class="num ${u.balance ? '' : 'muted'}">${fmtEur(u.balance)}</span>` },
+  { key: 'cards', label: 'Cards', val: u => u.cards, dir: 'desc', right: 1, cell: u => `<span class="num ${u.cards ? '' : 'muted'}">${u.cards}</span>` },
   { key: 'twofa', label: '2FA', val: u => +u.twofa, dir: 'desc', cell: u => yes(u.twofa) },
   { key: 'tempPassword', label: 'Temporary password', val: u => +u.tempPassword, dir: 'desc', cell: u => yes(u.tempPassword) },
   { key: 'lang', label: 'Language', val: u => u.lang, dir: 'asc', cell: u => `<span class="muted">${u.lang}</span>` },
   { key: 'referral', label: 'Referral code', val: u => u.referral, dir: 'asc', cell: u => `<span class="num muted">${u.referral}</span>` },
-  { key: 'invitedBy', label: 'Invited by', val: u => u.invitedBy || 0, dir: 'desc', cell: u => u.invitedBy ? `<span class="num">#${u.invitedBy}</span>` : '<span class="faint">—</span>' },
+  { key: 'invitedBy', label: 'Invited by', val: u => u.invitedBy || 0, dir: 'desc', cell: u => u.invitedBy ? `<span class="num">#${u.invitedBy}</span>` : '<span class="tc-empty">—</span>' },
   { key: 'source', label: 'Source', val: u => u.source, dir: 'asc', cell: u => `<span class="muted">${SOURCES[u.source]}</span>` },
   { key: 'companyId', label: 'Company ID', val: u => u.companyId, dir: 'asc', cell: u => `<span class="num muted">${u.companyId}</span>` },
   { key: 'companyName', label: 'Company', val: u => companyOf(u).name, dir: 'asc', cell: u => companyOf(u).name },
@@ -2071,7 +2079,7 @@ function dashData(range) {
 }
 const sum = a => a.reduce((s, v) => s + v, 0);
 const pct = (a, b) => (a - b) / b * 100;
-const deltaPill = (v, unit = '%') => `<span class="delta ${v >= 0 ? 'up' : 'down'}">${icon(v >= 0 ? 'arrowUR' : 'arrowDR', 12, 2)}${Math.abs(v).toFixed(1)}${unit}</span>`;
+const deltaPill = (v, unit = '%') => badge({ label: Math.abs(v).toFixed(1) + unit, tone: v >= 0 ? 'success' : 'error', icon: v >= 0 ? 'arrowUR' : 'arrowDR', stroke: 2 }); // change = Badge with an arrow
 function spark(data) {
   const mn = Math.min(...data), mx = Math.max(...data), n = data.length;
   const line = data.map((v, i) => (i ? 'L' : 'M') + (i / (n - 1) * 100).toFixed(1) + ' ' + (28 - (v - mn) / (mx - mn || 1) * 24).toFixed(1)).join('');
@@ -2373,7 +2381,7 @@ function tableHTML(list) {
     <th class="act-h"></th></tr>${filterRow(cols.map(c => ({ k: c.key, pin: c.pin, val: c.val, label: c.label })), 'users', list[0] || USERS[0])}</thead>
     <tbody>${rows.map(u => `<tr data-uid="${u.id}" class="${S.selected.has(u.id) ? 'sel' : ''}">
       <td class="cbcell"><button class="cb ${S.selected.has(u.id) ? 'on' : ''}" data-act="sel" data-id="${u.id}" aria-label="Select">${icon('check', 11, 3)}</button></td>
-      ${cols.map(c => `<td class="${c.right ? 'r' : ''} ${c.pin ? 'pin' : ''}">${c.cell(u)}</td>`).join('')}
+      ${cols.map(c => `<td class="${c.right ? 'r' : ''} ${c.pin ? 'pin' : ''}">${tcCell(c.cell(u), c.right)}</td>`).join('')}
       <td class="act"><div class="row-actions"><button class="ghost-ic" data-act="impersonate" data-id="${u.id}" data-tip="Login as user">${icon('login', 16)}</button><button class="ghost-ic" data-act="row-more" data-id="${u.id}" data-tip="More">${icon('more', 16)}</button></div></td>
     </tr>`).join('') || noMatchRow(cols.length + 2, 'users')}</tbody></table></div></div>${listFoot(list, rows, 'user', 'users', USERS.length)}</div>`;
 }
@@ -2485,7 +2493,7 @@ function bcardHTML(u, by) {
       ${by !== 'level' ? `<span class="tag"><i class="dot t-${LEVEL[u.level].tone}"></i>${LEVEL[u.level].label}</span>` : ''}
       ${by !== 'status' && u.status !== 'active' ? `<span class="tag"><i class="dot t-${STATUS[u.status].tone}"></i>${STATUS[u.status].label}</span>` : ''}
     </div>
-    <div class="bc-foot"><span class="num ${u.balance ? '' : 'zero'}">${fmtEur(u.balance)}</span><span class="faint">${rel(u.created)}</span></div>
+    <div class="bc-foot"><span class="num ${u.balance ? '' : 'muted'}">${fmtEur(u.balance)}</span><span class="faint">${rel(u.created)}</span></div>
   </div>`;
 }
 
@@ -2647,7 +2655,7 @@ const assetIc = (c, s = 16) => CUR_IMG[c] ? `<img class="asset-ic" src="${CUR_IM
   : `<span class="asset-ic" style="width:${s}px;height:${s}px;font-size:${Math.round(s * .42)}px;background:${ASSET[c]?.col || 'var(--neutral)'}">${ASSET[c]?.s || { GBP: '£', CHF: '₣' }[c] || c[0]}</span>`;
 const curCell = c => `<span class="ctry">${assetIc(c, 16)}${c}</span>`; // a currency code with its icon, wherever a column holds one
 const yes = v => `<span class="yn ${v ? 'ok' : 'no'}" role="img" aria-label="${v ? 'Yes' : 'No'}">${icon(v ? 'checkCircle' : 'minusCircle', 16)}</span>`;
-const dash = '<span class="faint">—</span>';
+const dash = '<span class="tc-empty">—</span>';
 const copyVal = (v, shown = v) => `<button class="copy num" data-act="copy" data-copy="${esc(v)}">${esc(shown)}${icon('copy', 12)}</button>`;
 const emptyBlock = (ic, t, p, btn = '') => `<div class="empty sm"><div class="em-ic">${icon(ic, 24)}</div><h3>${t}</h3><p>${p}</p>${btn}</div>`;
 const tabCount = n => n ? ` <span class="tab-n">${n}</span>` : '';
@@ -2664,7 +2672,7 @@ function dtable(heads, rows, empty = '', drag) {
   const H = heads.map(h => { const k = h.lastIndexOf('|'); return k < 0 ? { l: h, al: '' } : { l: h.slice(0, k), al: h.slice(k + 1) }; });
   const W = H.map(dtColW), minW = W.reduce((s, w) => s + (w ?? 220), 0);
   return `<div class="hs-wrap"><div class="dt-wrap hs"><table class="dt fx" style="min-width:${Math.max(720, minW)}px"><colgroup>${W.map(w => `<col${w == null ? '' : ` style="width:${w}px"`}>`).join('')}</colgroup><thead><tr>${H.map((h, i) => `<th class="${h.al}" ${drag?.keys[i] ? `draggable="true" data-t="${drag.t}" data-drag="${drag.keys[i]}"` : ''}>${h.l}</th>`).join('')}</tr></thead>
-    <tbody>${rows.map(r => { const cells = Array.isArray(r) ? r : r.cells; return `<tr class="${r.cls || ''}">${cells.map((c, i) => (H[i].al === 'a' ? `<td class="act"><div class="row-actions">${c}</div></td>` : `<td class="${H[i].al}">${c}</td>`)).join('')}</tr>`; }).join('')}</tbody></table></div></div>`;
+    <tbody>${rows.map(r => { const cells = Array.isArray(r) ? r : r.cells; return `<tr class="${r.cls || ''}">${cells.map((c, i) => (H[i].al === 'a' ? `<td class="act"><div class="row-actions">${c}</div></td>` : `<td class="${H[i].al}">${tcCell(c, H[i].al === 'r')}</td>`)).join('')}</tr>`; }).join('')}</tbody></table></div></div>`;
 }
 // List row (Figma ❖ Data display → List row) — every short list in a card. A row link (go = route, act = data attrs) gets the hover band and a chevron.
 // li: Text / Chevron / Legend / Meter types — Key: tile (16px icon in a 24px tile) · lead (16px icon or asset) · dot (status tone) · sw (series colour) · l label (sub: secondary) · tag (chip);
@@ -2895,17 +2903,17 @@ function ibanTab(u, D) {
 }
 
 /* Fees & limits — readable versions of the per-operation JSON */
-const feeStr = f => { const p = []; if (f.pct) p.push(+(f.pct * 100).toFixed(3) + '%'); Object.entries(f.fixed || {}).forEach(([c, v]) => v && p.push(`${v} ${c}`)); return p.length ? p.join(' + ') : '<span class="faint">Free</span>'; };
+const feeStr = f => { const p = []; if (f.pct) p.push(+(f.pct * 100).toFixed(3) + '%'); Object.entries(f.fixed || {}).forEach(([c, v]) => v && p.push(`${v} ${c}`)); return p.length ? p.join(' + ') : TC.numMuted('Free'); };
 const fixedStr = o => Object.entries(o || {}).filter(([, v]) => v).map(([c, v]) => `${v} ${c}`).join(', ');
 const parseFixed = s => Object.fromEntries(s.split(',').map(x => x.trim().split(/\s+/)).filter(p => p.length === 2 && !isNaN(+p[0])).map(([v, c]) => [c.toUpperCase(), +v]));
 const editBtn = (act, i) => `<button class="ghost-ic" data-act="${act}" data-i="${i}" data-tip="Edit">${icon('pencil', 16)}</button>`;
 const opCells = (op, extra = '') => [`<span style="display:flex;align-items:center;gap:var(--space-8)">${opLabel(op)}${extra}</span>`, `<span class="code">${op}</span>`]; // operation + its code, one line each
 function feesTab(u, D) {
-  const lim = v => v ? `<span class="num">${fmtInt(v)}</span>` : '<span class="num faint">0</span>';
+  const lim = v => v ? `<span class="num">${fmtInt(v)}</span>` : TC.numMuted('0');
   return tcard('Fees', '<span class="code">App users vs API clients</span>', dtable(['Operation', 'Code', 'App fee', 'API fee', '|a'],
       D.fees.map((f, i) => [...opCells(f.op), feeStr(f.user), feeStr(f.api), editBtn('fee-edit', i)])))
     + tcard('Limits', '', dtable(['Operation', 'Code', 'Daily|r', 'Monthly|r', 'Yearly|r', 'Currency', '|a'],
-      D.limits.map((l, i) => [...opCells(l.op, !l.day && !l.month && !l.year ? badge({ label: 'Blocked', tone: 'error' }) : ''), lim(l.day), lim(l.month), lim(l.year), l.cur, editBtn('limit-edit', i)])));
+      D.limits.map((l, i) => [...opCells(l.op, !l.day && !l.month && !l.year ? badge({ label: 'Blocked', tone: 'error' }) : ''), lim(l.day), lim(l.month), lim(l.year), TC.currency(l.cur), editBtn('limit-edit', i)])));
 }
 
 /* Addresses */
@@ -3559,7 +3567,7 @@ Object.assign(S, { coColW: store.get('nsc.cocolw', {}), coId: null, coView: 'lis
 const coById = id => COMPANIES.find(c => c.id === id);
 const goCo = (id, e) => { const url = '#/companies/' + id; if (e && (e.metaKey || e.ctrlKey)) window.open(location.pathname + url, '_blank'); else location.hash = url; };
 const coInit = s => (s || '').replace(/[^\p{L}\p{N} ]/gu, '').split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?';
-const srcTag = s => `<span class="src">${CO_SOURCES[s]}</span>`;
+const srcTag = s => badge({ label: CO_SOURCES[s], dot: false }); // source tag = Badge Neutral without a dot
 const coUsers = c => USERS.filter(u => u.companyId === c.id);
 const hasP = (c, k) => (k[0] === 'c' ? c.cp : c.ip).some(a => a.pid === +k.slice(2));
 const pOf = k => PROD_BY[k[0]][+k.slice(2)];
@@ -3570,8 +3578,8 @@ function setP(c, k, on) {
 }
 const money = (v, cur = 'EUR') => ({ EUR: '€', USD: '$', GBP: '£' }[cur] || cur + ' ') + (+v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const volFmt = v => v >= 1e9 ? v / 1e9 + 'B' : v >= 1e6 ? v / 1e6 + 'M' : v >= 1e3 ? v / 1e3 + 'K' : String(v);
-const prodCell = c => { const a = c.cp.length, b = c.ip.length; return !a && !b ? badge({ label: 'Not set up', tone: 'warning' }) : `<span class="pchips">${a ? `<span class="tag" data-tip="${a} card product${a > 1 ? 's' : ''}">${icon('card', 16)}${a}</span>` : ''}${b ? `<span class="tag" data-tip="${b} IBAN product${b > 1 ? 's' : ''}">${icon('bank', 16)}${b}</span>` : ''}</span>`; };
-const kycCell = v => v ? `<span>${LEVEL[v].label}</span>` : '<span class="faint">Not required</span>';
+const prodCell = c => { const a = c.cp.length, b = c.ip.length; return !a && !b ? badge({ label: 'Not set up', tone: 'warning' }) : `<span class="pchips">${a ? badge({ label: a, icon: 'card', tip: `${a} card product${a > 1 ? 's' : ''}` }) : ''}${b ? badge({ label: b, icon: 'bank', tip: `${b} IBAN product${b > 1 ? 's' : ''}` }) : ''}</span>`; };
+const kycCell = v => v ? TC.text(LEVEL[v].label) : TC.muted('Not required');
 const lum = h => { const c = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(v => v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; };
 const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
 const hexOk = v => /^#[0-9A-F]{6}$/i.test(v || '');
@@ -3580,12 +3588,12 @@ const linkBtn = (act, v, l) => `<button class="btn btn-link" data-act="${act}" d
 Object.assign(TCOLS, {
   companies: [
     { k: 'id', l: 'ID', on: 1, pin: 1, lock: 1, val: c => c.id, dir: 'desc', cell: c => numM(c.id) },
-    { k: 'name', l: 'Name', on: 1, val: c => c.name.toLowerCase(), dir: 'asc', cell: c => `<b style="font-weight:500">${esc(c.name)}</b>` },
+    { k: 'name', l: 'Name', on: 1, val: c => c.name.toLowerCase(), dir: 'asc', cell: c => `${TC.strong(esc(c.name))}` },
     { k: 'email', l: 'Email', on: 1, val: c => c.email, dir: 'asc', cell: c => muted(c.email) },
     { k: 'source', l: 'Source', on: 1, val: c => c.source, dir: 'asc', cell: c => srcTag(c.source) },
     { k: 'status', l: 'Status', on: 1, val: c => Object.keys(STATUS).indexOf(c.status), dir: 'asc', cell: c => statusCell(c.status) },
     { k: 'products', l: 'Products', on: 1, val: c => c.cp.length + c.ip.length, dir: 'desc', cell: prodCell },
-    { k: 'users', l: 'Users', al: 'r', on: 1, val: c => coUsers(c).length, dir: 'desc', cell: c => { const n = coUsers(c).length; return `<span class="num ${n ? '' : 'zero'}">${fmtInt(n)}</span>`; } },
+    { k: 'users', l: 'Users', al: 'r', on: 1, val: c => coUsers(c).length, dir: 'desc', cell: c => { const n = coUsers(c).length; return `<span class="num ${n ? '' : 'muted'}">${fmtInt(n)}</span>`; } },
     { k: 'ref', l: 'Referral code', on: 1, val: c => c.ref, dir: 'asc', cell: c => copyVal(c.ref) },
     { k: 'level', l: 'Min. user level', on: 1, val: c => Object.keys(LEVEL).indexOf(c.minLevel), dir: 'desc', cell: c => muted(LEVEL[c.minLevel].label) },
     { k: 'kyc', l: 'KYC required on', on: 1, val: c => c.kycLevel ? Object.keys(LEVEL).indexOf(c.kycLevel) : -1, dir: 'desc', cell: c => kycCell(c.kycLevel) },
@@ -3603,7 +3611,7 @@ Object.assign(TCOLS, {
     { k: 'active', l: 'Active', al: 'c', on: 1, cell: (a, i) => `<button class="sw-t ${a.active ? 'on' : ''}" data-act="cp-active" data-i="${i}" data-tip="${a.active ? 'Deactivate' : 'Activate'}" aria-label="Active"></button>` },
     { k: 'level', l: 'Min. user level', on: 1, cell: a => muted(LEVEL[a.minLevel].label) },
     { k: 'kind', l: 'Card type', on: 1, cell: a => PROD_BY.c[a.pid].kind === 'physical' ? 'Physical' : 'Virtual' },
-    { k: 'cost', l: 'Cost', al: 'r', on: 1, cell: a => a.cost ? `<span class="num">${money(a.cost, PROD_BY.c[a.pid].cur)}</span>` : '<span class="faint">Free</span>' },
+    { k: 'cost', l: 'Cost', al: 'r', on: 1, cell: a => a.cost ? `<span class="num">${money(a.cost, PROD_BY.c[a.pid].cur)}</span>` : TC.numMuted('Free') },
     { k: 'discount', l: 'Discount', al: 'r', on: 1, cell: a => a.discount ? `<span class="num">${a.discount}%</span>` : dash },
     { k: 'material', l: 'Material ID', cell: a => a.material ? numM(a.material) : dash },
     { k: 'group', l: 'Payment group', on: 1, cell: a => `<span class="code">${a.group}</span>` },
@@ -3620,7 +3628,7 @@ Object.assign(TCOLS, {
     { k: 'cur', l: 'Currency', on: 1, cell: a => curCell(PROD_BY.i[a.pid].cur) },
     { k: 'type', l: 'Type', on: 1, cell: a => muted(PROD_BY.i[a.pid].type) },
     { k: 'provider', l: 'Provider', on: 1, cell: a => PROD_BY.i[a.pid].provider },
-    { k: 'price', l: 'Price', al: 'r', on: 1, cell: a => { const p = PROD_BY.i[a.pid]; return p.price ? `<span class="num">${money(p.price, p.cur)}</span>` : '<span class="faint">Free</span>'; } },
+    { k: 'price', l: 'Price', al: 'r', on: 1, cell: a => { const p = PROD_BY.i[a.pid]; return p.price ? `<span class="num">${money(p.price, p.cur)}</span>` : TC.numMuted('Free'); } },
     { k: 'fee', l: 'Monthly fee', al: 'r', on: 1, cell: a => { const p = PROD_BY.i[a.pid]; return `<span class="num">${money(p.fee, p.cur)}</span>`; } },
     { k: 'active', l: 'Active', al: 'c', on: 1, cell: (a, i) => `<button class="sw-t ${a.active ? 'on' : ''}" data-act="ip-active" data-i="${i}" data-tip="${a.active ? 'Deactivate' : 'Activate'}" aria-label="Active"></button>` },
     { k: 'created', l: 'Created', on: 1, cell: a => muted(fmtDay(a.created)) },
@@ -3767,7 +3775,7 @@ function coResults() {
     <th class="act-h"></th></tr>${filterRow(cols.map(c => ({ k: c.k, pin: c.pin, val: c.val, label: c.l })), 'companies', list[0] || COMPANIES[0])}</thead>
     <tbody>${rows.map(c => `<tr data-cid="${c.id}" class="${f.sel.has(c.id) ? 'sel' : ''}">
       <td class="cbcell"><button class="cb ${f.sel.has(c.id) ? 'on' : ''}" data-act="co-sel" data-id="${c.id}" aria-label="Select">${icon('check', 11, 3)}</button></td>
-      ${cols.map(x => `<td class="${x.al === 'r' ? 'r' : ''} ${x.pin ? 'pin' : ''}">${x.cell(c)}</td>`).join('')}
+      ${cols.map(x => `<td class="${x.al === 'r' ? 'r' : ''} ${x.pin ? 'pin' : ''}">${tcCell(x.cell(c), x.al === 'r')}</td>`).join('')}
       <td class="act"><div class="row-actions"><button class="ghost-ic" data-act="co-open-tab" data-id="${c.id}" data-v="products" data-tip="Products">${icon('cardProduct', 16)}</button><button class="ghost-ic" data-act="co-row-more" data-id="${c.id}" data-tip="More">${icon('more', 16)}</button></div></td>
     </tr>`).join('') || noMatchRow(cols.length + 2, 'companies')}</tbody></table></div></div>${listFoot(list, rows, 'company', 'companies', COMPANIES.length)}</div>`;
   fitColumns(); markHits($('tbody', el), f.search);
@@ -3933,7 +3941,7 @@ function coUsersBody(c) {
   if (!list.length) return emptyBlock('search', 'No users match', 'Try a different name, email or ID.');
   const rows = loaded(list, S.coUserPage);
   return `<div class="hs-wrap"><div class="dt-wrap hs"><table class="dt"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Residency</th><th>Status</th><th>KYC</th><th>Risk</th><th class="r">Balance</th><th class="r">Created</th></tr></thead>
-    <tbody>${rows.map(u => `<tr data-uid="${u.id}" style="cursor:pointer"><td>${numM(u.id)}</td><td>${u.name ? esc(u.name) : dash}</td><td>${muted(u.email)}</td><td>${ctryCell(u.country)}</td><td>${statusCell(u.status)}</td><td>${badge(KYC[u.kyc])}</td><td>${riskCell(u.risk)}</td><td class="r"><span class="num ${u.balance ? '' : 'zero'}">${fmtEur(u.balance)}</span></td><td class="r"><span class="muted">${rel(u.created)}</span></td></tr>`).join('')}</tbody></table></div></div>
+    <tbody>${rows.map(u => `<tr data-uid="${u.id}" style="cursor:pointer"><td>${numM(u.id)}</td><td>${u.name ? TC.strong(esc(u.name)) : TC.muted('No profile yet')}</td><td>${muted(u.email)}</td><td>${ctryCell(u.country)}</td><td>${statusCell(u.status)}</td><td>${badge(KYC[u.kyc])}</td><td>${riskCell(u.risk)}</td><td class="r"><span class="num ${u.balance ? '' : 'muted'}">${fmtEur(u.balance)}</span></td><td class="r"><span class="muted">${rel(u.created)}</span></td></tr>`).join('')}</tbody></table></div></div>
     ${tfoot(list, rows, 'user', 'users').replace('class="tfoot"', `class="tfoot" ${moreAttr(list, rows, 'cou')}`)}`;
 }
 function coUsersTab(c) {
@@ -3944,7 +3952,7 @@ function coUsersTab(c) {
 function coKeysTab(c, D) {
   const btn = `<button class="btn btn-secondary" data-act="key-new">${icon('plus', 16)}Add API key</button>`;
   return tcard('API keys', D.keys.length ? btn : '', dtable(['Name', 'Key', 'Permissions', 'IP allowlist', 'Status', 'Last used', 'Created|r', '|a'], D.keys.map((k, i) => [
-    `<b style="font-weight:500">${esc(k.name)}</b>`, `<span class="num muted">${k.key.slice(0, 14)}••••${k.key.slice(-4)}</span>`,
+    `${TC.strong(esc(k.name))}`, `<span class="num muted">${k.key.slice(0, 14)}••••${k.key.slice(-4)}</span>`,
     `<span class="pchips">${k.scopes.map(s => `<span class="tag">${s}</span>`).join('')}</span>`, k.ips.length ? `<span class="num muted">${esc(k.ips.join(', '))}</span>` : '<span class="faint">Any IP</span>',
     badge(k.status === 'ACTIVE' ? { label: 'Active', tone: 'success' } : { label: 'Revoked', tone: 'neutral' }), k.lastUsed ? muted(rel(k.lastUsed)) : '<span class="faint">Never</span>', muted(fmtDay(k.created)),
     k.status === 'ACTIVE' ? `<button class="ghost-ic" data-act="key-revoke" data-i="${i}" data-tip="Revoke">${icon('ban', 16)}</button>` : '']),
@@ -3953,7 +3961,7 @@ function coKeysTab(c, D) {
 function coDirTab(c, D) {
   const btn = `<button class="btn btn-secondary" data-act="dir-add">${icon('plus', 16)}Add person</button>`, own = D.directors.reduce((s, p) => s + p.own, 0);
   return tcard(`Directors & owners${D.directors.length ? ` <span class="ct">${own}% ownership declared</span>` : ''}`, D.directors.length ? btn : '', dtable(['Name', 'Role', 'Nationality', 'Date of birth', 'Ownership|r', 'KYC', 'Added|r', '|a'], D.directors.map((p, i) => [
-    `<b style="font-weight:500">${esc(p.name)}</b>`, muted(DIR_ROLE[p.role]), `<span class="ctry"><span class="flag">${flag(COUNTRIES[p.nat].cc)}</span>${COUNTRIES[p.nat].name}</span>`,
+    `${TC.strong(esc(p.name))}`, muted(DIR_ROLE[p.role]), `<span class="ctry"><span class="flag">${flag(COUNTRIES[p.nat].cc)}</span>${COUNTRIES[p.nat].name}</span>`,
     `<span class="num">${fmtDay(p.dob)}</span>`, p.own ? `<span class="num">${p.own}%</span>` : dash, badge(KYC[p.kyc]), muted(fmtDay(p.added)),
     (p.kyc !== 'approved' ? `<button class="ghost-ic" data-act="dir-kyc" data-i="${i}" data-tip="Send KYC link">${icon('send', 16)}</button>` : '') + `<button class="ghost-ic" data-act="dir-rm" data-i="${i}" data-tip="Remove">${icon('trash', 16)}</button>`]),
     emptyBlock('idcard', 'No directors or owners', c.type === 'single' ? 'Single-user companies usually don’t need them, but you can still add people for KYB.' : 'Add the company’s directors and beneficial owners for KYB.', btn)));
@@ -3967,16 +3975,15 @@ function coRatesTab(c, D) {
   if (sub === 'bank') return tcard('Sell rates', note, dtable(['Operation', 'Code', 'Provider', 'Currency', 'Fee|r', 'Fixed|r', 'Minimum|r', '|a'], bankRows(D, R.level, R.init).map((x, i) => [
     ...opCells(x.op, custom(x)), x.provider, curCell(x.cur), `<span class="num">${x.pct}%</span>`, x.fixed ? `<span class="num">${money(x.fixed, x.cur)}</span>` : dash, `<span class="num">${money(x.min, x.cur)}</span>`, editBtn('rate-bank', i)])), seg + lvl + init);
   if (sub === 'spread') return tcard('Sell rates', note, dtable(['Pair', 'System|r', 'Client|r', 'Total|r', '|a'], D.spread.map((x, i) => [
-    `<b style="font-weight:500">${x.pair}</b>${custom(x)}`, numM(x.sys + '%'), `<span class="num">${x.client}%</span>`, `<span class="num" style="font-weight:600">${+(x.sys + x.client).toFixed(2)}%</span>`, editBtn('rate-spread', i)])), seg);
+    `${TC.strong(x.pair)}${custom(x)}`, numM(x.sys + '%'), `<span class="num">${x.client}%</span>`, `<span class="num" style="font-weight:600">${+(x.sys + x.client).toFixed(2)}%</span>`, editBtn('rate-spread', i)])), seg);
   if (sub === 'exfees') {
-    const vol = v => v == null ? '<span class="faint">and above</span>' : `<span class="num">€${volFmt(v)}</span>`, n = v => `<span class="num">${v}%</span>`;
-    return tcard('Sell rates', note, `<div class="hs-wrap"><div class="dt-wrap hs"><table class="dt grp"><thead>
-      <tr><th colspan="2">30-day trading volume</th><th class="gs" colspan="2">API</th><th class="gs" colspan="2">User</th><th class="a"></th></tr>
-      <tr><th>From ≥</th><th>To &lt;</th><th class="r gs">Maker</th><th class="r">Taker</th><th class="r gs">Maker</th><th class="r">Taker</th><th class="a"></th></tr></thead>
-      <tbody>${exRows(D, R.level).map((x, i) => `<tr><td>${vol(x.from)}${custom(x)}</td><td>${vol(x.to)}</td><td class="r gs">${n(x.apiM)}</td><td class="r">${n(x.apiT)}</td><td class="r gs">${n(x.userM)}</td><td class="r">${n(x.userT)}</td><td class="act"><div class="row-actions">${editBtn('rate-ex', i)}</div></td></tr>`).join('')}</tbody></table></div></div>`, seg + lvl);
+    const vol = v => v == null ? TC.muted('and above') : TC.num('€' + volFmt(v)), n = v => TC.num(v + '%'), tip = '<span data-tip="30-day trading volume">';
+    // one header row (no API / User group header): From ≥ · To < · API maker · API taker · User maker · User taker
+    return tcard('Sell rates', note, dtable([`${tip}From ≥</span>`, `${tip}To &lt;</span>`, 'API maker|r', 'API taker|r', 'User maker|r', 'User taker|r', '|a'],
+      exRows(D, R.level).map((x, i) => [vol(x.from) + custom(x), vol(x.to), n(x.apiM), n(x.apiT), n(x.userM), n(x.userT), editBtn('rate-ex', i)])), seg + lvl);
   }
   return tcard('Sell rates', c.cp.length ? linkBtn('co-tab', 'products', 'Edit prices in Products') : '', dtable(['ID', 'Provider', 'Name', 'Virtual issuing|r', 'Physical issuing|r', 'Monthly user fee|r', 'Cardholder', 'Active', 'Type'], c.cp.map(a => {
-    const p = PROD_BY.c[a.pid], phys = p.kind === 'physical', fee = v => v ? `<span class="num">${money(v, p.cur)}</span>` : '<span class="faint">Free</span>';
+    const p = PROD_BY.c[a.pid], phys = p.kind === 'physical', fee = v => v ? `<span class="num">${money(v, p.cur)}</span>` : TC.numMuted('Free');
     return [numM(p.id), p.provider, esc(p.name), phys ? dash : fee(a.cost), phys ? fee(a.cost) : dash, fee(a.monthly), muted(c.type === 'single' ? 'Individual' : 'Company'), yes(a.active), phys ? 'Physical' : 'Virtual'];
   }), emptyBlock('cardProduct', 'No card products', 'Assign card products to this company to see their prices here.', `<button class="btn btn-secondary" data-act="co-tab" data-v="products">Assign a product</button>`)), seg);
 }
@@ -3984,8 +3991,8 @@ function coImportsTab(c, D) {
   const sub = S.coSub.imports, list = D.imports[sub], what = sub === 'users' ? 'users' : 'top-ups';
   const acts = `<button class="btn btn-tertiary" data-act="imp-template">${icon('download', 16)}Template</button><button class="btn btn-secondary" data-act="imp-open">${icon('upload', 16)}Import ${what}</button>`;
   return tcard('Bulk operations', acts, dtable(['Operation ID', 'File', 'Rows|r', 'Imported|r', 'Skipped|r', 'Errors|r', 'Status', 'Created|r', '|a'], list.map((o, i) => {
-    const run = o.status === 'PROCESSING', cnt = v => run ? dash : `<span class="num ${v ? '' : 'zero'}">${fmtInt(v)}</span>`;
-    return [numM(o.id), `<span class="txt">${icon('file', 16)}${esc(o.file)}</span>`, cnt(o.total), cnt(o.ok), cnt(o.skipped), run ? dash : `<span class="num ${o.errors ? '' : 'zero'}" style="${o.errors ? 'color:var(--error-ink)' : ''}">${o.errors}</span>`,
+    const run = o.status === 'PROCESSING', cnt = v => run ? dash : `<span class="num ${v ? '' : 'muted'}">${fmtInt(v)}</span>`;
+    return [numM(o.id), `<span class="txt">${icon('file', 16)}${esc(o.file)}</span>`, cnt(o.total), cnt(o.ok), cnt(o.skipped), run ? dash : `<span class="num ${o.errors ? '' : 'muted'}" style="${o.errors ? 'color:var(--error-ink)' : ''}">${o.errors}</span>`,
       badge(IMP_STATUS[o.status]), muted(rel(o.created)), run ? '' : `<button class="ghost-ic" data-act="imp-report" data-i="${i}" data-tip="Download report">${icon('download', 16)}</button>`];
   }), emptyBlock('upload', `No ${what} imported yet`, sub === 'users' ? 'Upload a CSV to create many users at once. Start from the template so columns match.' : 'Upload a CSV to top up many cards at once.', `<button class="btn btn-secondary" data-act="imp-open">${icon('upload', 16)}Import ${what}</button>`)),
     subSeg('imports', [['users', 'User import'], ['topups', 'Card top-up']]));
@@ -3996,7 +4003,7 @@ function coCurTab(c, D) {
   return tcard('Currencies', D.currencies.length ? `<select class="fsel sm" data-curprov="1"><option value="">All providers</option>${provs.map(p => `<option value="${p}" ${S.curProv === p ? 'selected' : ''}>${p}</option>`).join('')}</select>${btn}` : '',
     dtable(['ID', 'Currency', 'Network', 'Type', 'Network ID', 'Provider ID', 'Provider', 'Created', 'Updated|r', '|a'], list.map(x => {
       const a = ASSET[x.c];
-      return [numM(x.id), `<span class="ctry">${assetIc(x.c, 16)}<span><b style="font-weight:500">${x.c}</b> <span class="muted">${a.n}</span></span></span>`, muted(a.net), a.fiat ? 'Fiat' : 'Crypto', `<span class="code">${NET_ID[x.c]}</span>`,
+      return [numM(x.id), `<span class="ctry">${assetIc(x.c, 16)}<span>${x.c} <span class="muted">${a.n}</span></span></span>`, muted(a.net), a.fiat ? 'Fiat' : 'Crypto', `<span class="code">${NET_ID[x.c]}</span>`,
         copyVal(x.providerId), x.provider, muted(fmtDay(x.created)), muted(rel(x.updated)), `<button class="ghost-ic" data-act="cur-rm" data-id="${x.id}" data-tip="Remove">${icon('trash', 16)}</button>`];
     }), D.currencies.length ? emptyBlock('search', 'No currencies for this provider', 'Pick another provider.') : emptyBlock('coins', 'No currencies enabled', 'Enable the assets this company’s users can hold and exchange.', btn)));
 }
@@ -4500,7 +4507,7 @@ function pgResults() {
     <th class="act-h"></th></tr>${filterRow(cols.map(c => ({ k: c.k, pin: c.pin, val: c.val, label: c.l })), 'pg:' + P.id, list[0] || pgData(P)[0])}</thead>
     <tbody>${rows.map((r, i) => { const k = esc(keys[i]), q = P.quick?.(r), on = st.sel.has(keys[i]); return `<tr data-rid="${k}" class="${on ? 'sel' : ''}">
       <td class="cbcell"><button class="cb ${on ? 'on' : ''}" data-act="pg-sel" data-rid="${k}" aria-label="Select">${icon('check', 11, 3)}</button></td>
-      ${cols.map(c => `<td class="${al(c)} ${c.pin ? 'pin' : ''}">${c.cell(r)}</td>`).join('')}
+      ${cols.map(c => `<td class="${al(c)} ${c.pin ? 'pin' : ''}">${tcCell(c.cell(r), al(c) === 'r')}</td>`).join('')}
       <td class="act"><div class="row-actions">${q ? `<button class="ghost-ic" data-act="${q.act}" data-rid="${k}" ${Object.entries(q.data || {}).map(([a, v]) => `data-${a}="${esc(v)}"`).join(' ')} data-tip="${q.tip}">${icon(q.icon, 16)}</button>` : ''}<button class="ghost-ic" data-act="pg-row-more" data-rid="${k}" data-tip="More">${icon('more', 16)}</button></div></td>
     </tr>`; }).join('') || noMatchRow(cols.length + 2, P.nouns)}</tbody></table></div></div>${listFoot(list, rows, P.noun, P.nouns, pgData(P).length)}</div>`;
   fitColumns(); markHits($('tbody', el), st.search);
@@ -4628,6 +4635,8 @@ const share = (L, n) => L.length ? `${Math.round(n / L.length * 100)}%` : '0%';
 /* Table cell (Figma ❖ Data display → Table cell) — every cell type as one function, used by the K column presets and by dtable() rows.
    Values arrive as display HTML (callers escape user text). Empty → a dash in Text muted. Number / Number muted / Number positive are right-aligned (TC_AL). */
 const TC_DASH = '<span class="tc-empty">—</span>';
+// tcCell: a table cell that came back as plain text (no DS markup) is wrapped as Table cell Text, or Number in a right-aligned column; empty → dash
+const tcCell = (c, right) => c === undefined || c === null || c === '' ? TC_DASH : /^\s*</.test(String(c)) ? c : right ? TC.num(c) : TC.text(c);
 const tcE = v => v === undefined || v === null || v === '';
 const TC = {
   text: v => tcE(v) ? TC_DASH : `<span class="tc-text">${v}</span>`,                                     // Text — Body/Medium, text/primary
@@ -4875,7 +4884,7 @@ page({
     tile('req', 'Access requested', { key: 'status', values: ['ACCESS_REQUESTED'] }, () => 'Waiting on CreditCo'), tile('inc', 'Forms incomplete', { key: 'status', values: ['NOT_ALL_FORM_SUBMITTED'] }, share), tile('ver', 'KYC verified', { key: 'kyc', values: ['VERIFIED'] }, share)],
   cols: [{ k: 'id', l: 'CreditCo ID', on: 1, cell: r => r.C.id ? copyVal(r.C.id) : dash }, K.user(), { k: 'email', l: 'CreditCo email', on: 1, val: r => r.C.email || '', cell: r => muted(r.C.email) },
     { k: 'status', l: 'Status', on: 1, val: r => r.C.status, cell: r => dotCell(CC_STATUS[r.C.status]) }, { k: 'kyc', l: 'KYC status', on: 1, val: ccKyc, cell: r => badge(CC_KYC[ccKyc(r)]) },
-    { k: 'docs', l: 'Documents', al: 'r', on: 1, dir: 'desc', val: r => r.C.docs.length, cell: r => `<span class="num ${r.C.docs.length ? '' : 'zero'}">${r.C.docs.length}</span>` },
+    { k: 'docs', l: 'Documents', al: 'r', on: 1, dir: 'desc', val: r => r.C.docs.length, cell: r => `<span class="num ${r.C.docs.length ? '' : 'muted'}">${r.C.docs.length}</span>` },
     { k: 'remark', l: 'KYC remark', val: r => r.C.remark || '', cell: r => muted(r.C.remark) },
     { k: 'created', l: 'Created', al: 'r', on: 1, dir: 'desc', val: r => r.C.created?.getTime() || 0, cell: r => r.C.created ? `<span class="muted">${rel(r.C.created)}</span>` : dash, kv: r => r.C.created ? fmtDateTime(r.C.created) : dash },
     { k: 'updated', l: 'Updated', al: 'r', dir: 'desc', val: r => r.C.updated?.getTime() || 0, cell: r => r.C.updated ? `<span class="muted">${rel(r.C.updated)}</span>` : dash, kv: r => r.C.updated ? fmtDateTime(r.C.updated) : dash }],
@@ -5030,7 +5039,7 @@ page({
   id: 'strategies', noun: 'strategy', nouns: 'strategies', icon: 'strategy', searchPh: 'Search strategy, asset…',
   data: () => STRATS, search: s => `${s.name} ${s.c}`,
   fields: { status: fE('Status', 'activity', STRAT_STATUS, s => s.status), asset: fE('Asset', 'coins', optsOf(Object.fromEntries(ASSETS.filter(a => !a.fiat).map(a => [a.c, a.c]))), s => s.c), term: fE('Term', 'calendar', { flex: { label: 'Flexible' }, lock: { label: 'Locked' } }, s => s.lock ? 'lock' : 'flex') },
-  cols: [K.id(), { k: 'name', l: 'Strategy', on: 1, lock: 1, val: s => s.name.toLowerCase(), cell: s => `<b style="font-weight:500">${esc(s.name)}</b>` }, K.asset(), K.pct('apy', 'APY'), { k: 'lock', l: 'Term', on: 1, cell: s => muted(lockLbl(s.lock)) },
+  cols: [K.id(), { k: 'name', l: 'Strategy', on: 1, lock: 1, val: s => s.name.toLowerCase(), cell: s => `${TC.strong(esc(s.name))}` }, K.asset(), K.pct('apy', 'APY'), { k: 'lock', l: 'Term', on: 1, cell: s => muted(lockLbl(s.lock)) },
     { k: 'min', l: 'Min. stake', al: 'r', on: 1, cell: s => numM(fmtAmt(s.min, s.c)) }, { k: 'tvl', l: 'TVL', al: 'r', on: 1, dir: 'desc', val: s => stratStats(s).tvl, cell: s => `<span class="num">${fmtEur(stratStats(s).tvl)}</span>` },
     { k: 'stakers', l: 'Stakers', al: 'r', on: 1, dir: 'desc', val: s => stratStats(s).n, cell: s => `<span class="num">${fmtInt(stratStats(s).n)}</span>` },
     { k: 'cap', l: 'Capacity used', al: 'r', on: 1, dir: 'desc', val: s => stratStats(s).amt / s.cap, cell: s => `<span class="num">${(stratStats(s).amt / s.cap * 100).toFixed(1)}%</span>` }, K.status(STRAT_STATUS), K.date('updated', 'Updated', 0), K.date('created', 'Created', 0)],
@@ -5065,7 +5074,7 @@ page({
     tile('unb', 'Unbonding', { key: 'status', values: ['UNBONDING'] }, () => 'Releasing funds'), tile('done', 'Completed', { key: 'status', values: ['COMPLETED'] }, share), tile('lock', 'Locked', { key: 'term', values: ['lock'] }, share)],
   cols: [K.id(), K.user(), { k: 'sid', l: 'Strategy', on: 1, val: x => stratOf(x.sid).name, cell: x => esc(stratOf(x.sid).name), kv: x => recLink('strategies', x.sid, stratOf(x.sid).name) }, K.asset(), K.amt('amount', 'Amount'), K.pct('apy', 'APY'),
     { ...K.amt('rewards', 'Rewards earned'), cell: x => `<span class="num pos">+${fmtAmt(x.rewards, x.c)}</span>` }, K.status(STAKE_STATUS), K.date('created', 'Started'),
-    { k: 'ends', l: 'Ends', al: 'r', on: 1, dir: 'desc', val: x => x.ends ? x.ends.getTime() : 9e15, cell: x => x.ends ? `<span class="muted">${fmtDay(x.ends)}</span>` : '<span class="faint">Flexible</span>' }],
+    { k: 'ends', l: 'Ends', al: 'r', on: 1, dir: 'desc', val: x => x.ends ? x.ends.getTime() : 9e15, cell: x => x.ends ? `<span class="muted">${fmtDay(x.ends)}</span>` : TC.numMuted('Flexible') }],
   sort: { k: 'created', dir: 'desc' },
   quick: x => ({ act: 'open-user', icon: 'user', tip: 'Open user', data: { id: x.uid } }),
   menu: x => [...(x.status === 'ACTIVE' ? [{ act: 'stake-un', data: { rid: x.id }, icon: 'minus', label: 'Force unstake' }] : []), { act: 'open-user', data: { id: x.uid }, icon: 'user', label: 'Open user' }],
@@ -5121,7 +5130,7 @@ page({
   fields: { on: fE('State', 'activity', { on: { label: 'Enabled', tone: 'success' }, off: { label: 'Disabled', tone: 'neutral' } }, k => k.on ? 'on' : 'off'), action: fE('Action', 'shieldCheck', KYT_ACTION, k => k.action), cat: fE('Category', 'radar', optsOf(KYT_CAT), k => k.cat), dir: fE('Direction', 'arrows', optsOf(KYT_DIR), k => k.dir) },
   tiles: [allTile('All rules', L => `${sum(L.map(k => k.hits))} hits in 30 days`), tile('on', 'Enabled', { key: 'on', values: ['on'] }, share), tile('block', 'Blocking', { key: 'action', values: ['BLOCK'] }, () => 'Stop the transfer'),
     tile('rev', 'Hold for review', { key: 'action', values: ['REVIEW'] }, () => 'Goes to Confirmations'), tile('off', 'Disabled', { key: 'on', values: ['off'] }, share)],
-  cols: [K.id(), { k: 'name', l: 'Rule', on: 1, lock: 1, val: k => k.name.toLowerCase(), cell: k => `<b style="font-weight:500">${esc(k.name)}</b>` }, { k: 'cat', l: 'Category', on: 1, cell: k => muted(KYT_CAT[k.cat]) },
+  cols: [K.id(), { k: 'name', l: 'Rule', on: 1, lock: 1, val: k => k.name.toLowerCase(), cell: k => `${TC.strong(esc(k.name))}` }, { k: 'cat', l: 'Category', on: 1, cell: k => muted(KYT_CAT[k.cat]) },
     { k: 'dir', l: 'Direction', on: 1, cell: k => KYT_DIR[k.dir] }, K.code('cond', 'Condition'), K.badge(KYT_ACTION, 'action', 'Action'), K.num('hits', 'Hits, 30 days'), K.sw('on', 'Enabled', 'kyt-tog'), K.date('updated', 'Updated'), K.muted('by', 'Updated by', 0)],
   sort: { k: 'hits', dir: 'desc' },
   quick: k => ({ act: 'kyt-tog', icon: k.on ? 'minus' : 'check', tip: k.on ? 'Disable' : 'Enable' }),
@@ -5157,9 +5166,9 @@ page({
   tiles: [allTile('All products', L => `${fmtInt(sum(L.map(p => p.issued || 0)))} cards issued`), tile('act', 'Active', { key: 'status', values: ['ACTIVE'] }, share), tile('dr', 'Draft', { key: 'status', values: ['DRAFT'] }, () => 'Not offered yet'),
     tile('ret', 'Retired', { key: 'status', values: ['RETIRED'] }, () => 'No new cards'), tile('phy', 'Physical', { key: 'kind', values: ['physical'] }, share)],
   fields: { status: fE('Status', 'activity', PROD_STATUS, p => p.status), provider: fE('Provider', 'folder', optsOf(Object.fromEntries(CARD_PROVIDERS.map(x => [x, x]))), p => p.provider), kind: fE('Card type', 'card', { virtual: { label: 'Virtual' }, physical: { label: 'Physical' } }, p => p.kind), cur: fE('Currency', 'coins', { EUR: { label: 'EUR' }, USD: { label: 'USD' } }, p => p.cur) },
-  cols: [K.id(), { k: 'name', l: 'Name', on: 1, lock: 1, val: p => p.name.toLowerCase(), cell: p => `<b style="font-weight:500">${esc(p.name)}</b>` }, K.text('provider', 'Provider'), { k: 'kind', l: 'Card type', on: 1, cell: p => cap(p.kind) }, { ...K.text('cur', 'Currency'), cell: p => curCell(p.cur) },
-    { k: 'issue', l: 'Issue fee', al: 'r', on: 1, dir: 'desc', cell: p => p.issue ? `<span class="num">${money(p.issue, p.cur)}</span>` : '<span class="faint">Free</span>' }, { k: 'monthly', l: 'Monthly fee', al: 'r', on: 1, dir: 'desc', cell: p => p.monthly ? `<span class="num">${money(p.monthly, p.cur)}</span>` : '<span class="faint">Free</span>' },
-    { k: 'cos', l: 'Companies', al: 'r', on: 1, dir: 'desc', val: p => prodCos('c:' + p.id).length, cell: p => { const n = prodCos('c:' + p.id).length; return `<span class="num ${n ? '' : 'zero'}">${n}</span>`; } },
+  cols: [K.id(), { k: 'name', l: 'Name', on: 1, lock: 1, val: p => p.name.toLowerCase(), cell: p => `${TC.strong(esc(p.name))}` }, K.text('provider', 'Provider'), { k: 'kind', l: 'Card type', on: 1, cell: p => cap(p.kind) }, { ...K.text('cur', 'Currency'), cell: p => curCell(p.cur) },
+    { k: 'issue', l: 'Issue fee', al: 'r', on: 1, dir: 'desc', cell: p => p.issue ? `<span class="num">${money(p.issue, p.cur)}</span>` : TC.numMuted('Free') }, { k: 'monthly', l: 'Monthly fee', al: 'r', on: 1, dir: 'desc', cell: p => p.monthly ? `<span class="num">${money(p.monthly, p.cur)}</span>` : TC.numMuted('Free') },
+    { k: 'cos', l: 'Companies', al: 'r', on: 1, dir: 'desc', val: p => prodCos('c:' + p.id).length, cell: p => { const n = prodCos('c:' + p.id).length; return `<span class="num ${n ? '' : 'muted'}">${n}</span>`; } },
     K.num('issued', 'Cards issued'), K.code('bin', 'BIN', 0), K.status(PROD_STATUS), K.date('updated', 'Updated', 0), K.date('created', 'Created', 0)],
   sort: { k: 'id', dir: 'asc' },
   menu: p => [{ act: 'route', data: { arg: 'companies/access' }, icon: 'table', label: 'Open product access' }],
@@ -5185,8 +5194,8 @@ page({
   tiles: [allTile('All products', L => `${fmtInt(sum(L.map(p => p.accounts || 0)))} accounts`), tile('act', 'Active', { key: 'status', values: ['ACTIVE'] }, share), tile('dr', 'Draft', { key: 'status', values: ['DRAFT'] }, () => 'Not offered yet'),
     tile('ret', 'Retired', { key: 'status', values: ['RETIRED'] }, () => 'No new accounts'), tile('biz', 'Business', { key: 'type', values: ['Business'] }, share)],
   fields: { status: fE('Status', 'activity', PROD_STATUS, p => p.status), provider: fE('Provider', 'bank', { 'Banking Circle': { label: 'Banking Circle' }, 'Clear Junction': { label: 'Clear Junction' } }, p => p.provider), type: fE('Type', 'user', { Personal: { label: 'Personal' }, Business: { label: 'Business' } }, p => p.type) },
-  cols: [K.id(), { k: 'name', l: 'Name', on: 1, lock: 1, val: p => p.name.toLowerCase(), cell: p => `<b style="font-weight:500">${esc(p.name)}</b>` }, K.text('provider', 'Provider'), { ...K.text('cur', 'Currency'), cell: p => curCell(p.cur) }, K.muted('type', 'Type'),
-    { k: 'price', l: 'Opening fee', al: 'r', on: 1, dir: 'desc', cell: p => p.price ? `<span class="num">${money(p.price, p.cur)}</span>` : '<span class="faint">Free</span>' }, { k: 'fee', l: 'Monthly fee', al: 'r', on: 1, dir: 'desc', cell: p => `<span class="num">${money(p.fee, p.cur)}</span>` },
+  cols: [K.id(), { k: 'name', l: 'Name', on: 1, lock: 1, val: p => p.name.toLowerCase(), cell: p => `${TC.strong(esc(p.name))}` }, K.text('provider', 'Provider'), { ...K.text('cur', 'Currency'), cell: p => curCell(p.cur) }, K.muted('type', 'Type'),
+    { k: 'price', l: 'Opening fee', al: 'r', on: 1, dir: 'desc', cell: p => p.price ? `<span class="num">${money(p.price, p.cur)}</span>` : TC.numMuted('Free') }, { k: 'fee', l: 'Monthly fee', al: 'r', on: 1, dir: 'desc', cell: p => `<span class="num">${money(p.fee, p.cur)}</span>` },
     { k: 'cos', l: 'Companies', al: 'r', on: 1, dir: 'desc', val: p => prodCos('i:' + p.id).length, cell: p => `<span class="num">${prodCos('i:' + p.id).length}</span>` }, K.num('accounts', 'Accounts'), K.status(PROD_STATUS), K.date('updated', 'Updated', 0)],
   sort: { k: 'id', dir: 'asc' },
   form: {
@@ -5211,7 +5220,7 @@ page({
   data: () => { ASSETS.forEach((a, i) => a.status || Object.assign(a, { status: 'ACTIVE', dep: true, wd: a.c !== 'ZNX', minWd: a.fiat ? 10 : +(10 / a.rate).toPrecision(2), wdFee: a.fiat ? 1 : +(1.5 / a.rate).toPrecision(2), created: new Date(NOW.getTime() - (700 - i * 40) * DAY), updated: new Date(NOW.getTime() - (3 + i * 6) * DAY) })); return ASSETS; },
   search: a => `${a.c} ${a.n} ${a.net}`,
   fields: { status: fE('Status', 'activity', ON_OFF, a => a.status), type: fE('Type', 'coins', { crypto: { label: 'Crypto' }, fiat: { label: 'Fiat' } }, a => a.fiat ? 'fiat' : 'crypto') },
-  cols: [{ k: 'c', l: 'Currency', on: 1, lock: 1, cell: a => `<span class="ctry">${assetIc(a.c, 16)}<b style="font-weight:500">${a.c}</b></span>` }, K.text('n', 'Name'), K.muted('net', 'Network'), { k: 'fiat', l: 'Type', on: 1, val: a => +!!a.fiat, cell: a => a.fiat ? 'Fiat' : 'Crypto' },
+  cols: [{ k: 'c', l: 'Currency', on: 1, lock: 1, cell: a => TC.currency(a.c) }, K.text('n', 'Name'), K.muted('net', 'Network'), { k: 'fiat', l: 'Type', on: 1, val: a => +!!a.fiat, cell: a => a.fiat ? 'Fiat' : 'Crypto' },
     { k: 'rate', l: 'Rate, €', al: 'r', on: 1, dir: 'desc', cell: a => `<span class="num">${fmtEur(a.rate, a.rate < 10 ? 4 : 2)}</span>` }, K.sw('dep', 'Deposits', 'cur-dep'), K.sw('wd', 'Withdrawals', 'cur-wd'),
     { k: 'minWd', l: 'Min. withdrawal', al: 'r', on: 1, cell: a => numM(fmtAmt(a.minWd, a.c)) }, { k: 'wdFee', l: 'Withdrawal fee', al: 'r', on: 1, cell: a => numM(fmtAmt(a.wdFee, a.c)) }, K.num('dp', 'Decimals', fmtInt, 0), K.status(ON_OFF), K.date('updated', 'Updated', 0)],
   sort: { k: 'c', dir: 'asc' },
@@ -5234,7 +5243,7 @@ page({
     const [b, q] = id.split('/'); return { id, b, q, price: ASSET[b].rate / ASSET[q].rate, change: +((g.r() - .45) * 8).toFixed(2), vol: Math.round(Math.pow(g.r(), 2) * 4e6 + 2e4), spread: (PAIRS.find(p => p[0] === id) || [0, .5])[1], min: +(10 / ASSET[b].rate).toPrecision(2), status: id === 'ZNX/USDT' ? 'HALTED' : 'TRADING', created: new Date(NOW.getTime() - (500 - i * 20) * DAY), updated: new Date(NOW.getTime() - g.int(1, 30) * DAY) }; }); },
   search: m => m.id,
   fields: { status: fE('Status', 'activity', MKT_STATUS, m => m.status), quote: fE('Quote', 'coins', { EUR: { label: 'EUR' }, USDT: { label: 'USDT' }, BTC: { label: 'BTC' } }, m => m.q) },
-  cols: [{ k: 'id', l: 'Pair', on: 1, lock: 1, cell: m => `<span class="ctry">${assetIc(m.b, 16)}<b style="font-weight:500">${m.id}</b></span>` }, { k: 'price', l: 'Last price', al: 'r', on: 1, dir: 'desc', cell: m => `<span class="num">${(+m.price.toPrecision(6)).toLocaleString('en-US', { maximumFractionDigits: 6 })} ${m.q}</span>` },
+  cols: [{ k: 'id', l: 'Pair', on: 1, lock: 1, cell: m => `<span class="ctry">${assetIc(m.b, 16)}${m.id}</span>` }, { k: 'price', l: 'Last price', al: 'r', on: 1, dir: 'desc', cell: m => `<span class="num">${(+m.price.toPrecision(6)).toLocaleString('en-US', { maximumFractionDigits: 6 })} ${m.q}</span>` },
     { k: 'change', l: '24h change', al: 'r', on: 1, dir: 'desc', cell: m => deltaPill(m.change), kv: m => deltaPill(m.change) }, { k: 'vol', l: '24h volume', al: 'r', on: 1, dir: 'desc', cell: m => `<span class="num">€${compact(m.vol)}</span>` },
     K.pct('spread', 'Spread'), { k: 'min', l: 'Min. order', al: 'r', on: 1, cell: m => numM(fmtAmt(m.min, m.b)) }, K.status(MKT_STATUS), K.date('updated', 'Updated', 0)],
   sort: { k: 'vol', dir: 'desc' },
@@ -5265,9 +5274,9 @@ page({
     .map(([name, type, scope, list], i) => ({ id: 21 + i, name, type, scope, list, created: new Date(NOW.getTime() - (400 - i * 30) * DAY), updated: new Date(NOW.getTime() - (4 + i * 9) * DAY), by: REVIEWERS[i % 5] })),
   search: l => `${l.name} ${l.list.map(k => WORLD[k].name).join(' ')}`,
   fields: { type: fE('Type', 'layers', LIST_TYPE, l => l.type), scope: fE('Applies to', 'shieldCheck', optsOf(LIST_SCOPE), l => l.scope) },
-  cols: [K.id(), { k: 'name', l: 'List', on: 1, lock: 1, val: l => l.name.toLowerCase(), cell: l => `<b style="font-weight:500">${esc(l.name)}</b>` }, K.badge(LIST_TYPE, 'type', 'Type'), { k: 'scope', l: 'Applies to', on: 1, cell: l => muted(LIST_SCOPE[l.scope]) },
+  cols: [K.id(), { k: 'name', l: 'List', on: 1, lock: 1, val: l => l.name.toLowerCase(), cell: l => `${TC.strong(esc(l.name))}` }, K.badge(LIST_TYPE, 'type', 'Type'), { k: 'scope', l: 'Applies to', on: 1, cell: l => muted(LIST_SCOPE[l.scope]) },
     { k: 'n', l: 'Countries', al: 'r', on: 1, dir: 'desc', val: l => l.list.length, cell: l => `<span class="num">${l.list.length}</span>` },
-    { k: 'flags', l: 'Preview', on: 1, rec: false, val: l => l.list.join(), cell: l => `<span class="flags">${l.list.slice(0, 8).map(k => `<span class="flag" title="${WORLD[k].name}">${flag(WORLD[k].cc)}</span>`).join('')}${l.list.length > 8 ? `<span class="faint">+${l.list.length - 8}</span>` : ''}</span>` },
+    { k: 'flags', l: 'Preview', on: 1, rec: false, val: l => l.list.join(), cell: l => TC.countries(l.list.map(k => WORLD[k].cc)) },
     K.date('updated', 'Updated'), K.muted('by', 'Updated by', 0)],
   sort: { k: 'id', dir: 'asc' },
   form: {
@@ -5332,7 +5341,7 @@ page({
   fields: { status: fE('Status', 'activity', ADMIN_STATUS, a => a.status), role: fE('Role', 'key', Object.fromEntries(ROLES.map(r => [r.id, { label: r.name }])), a => String(a.role)), twofa: fE('2FA', 'lock', { on: { label: 'Enabled' }, off: { label: 'Disabled' } }, a => a.twofa ? 'on' : 'off') },
   tiles: [allTile('All administrators', L => `${new Set(L.map(a => a.role)).size} roles in use`), tile('act', 'Active', { key: 'status', values: ['ACTIVE'] }, share), tile('inv', 'Invited', { key: 'status', values: ['INVITED'] }, () => 'Invite not accepted'),
     tile('no2fa', 'Without 2FA', { key: 'twofa', values: ['off'] }, () => 'Ask them to enrol'), tile('dis', 'Disabled', { key: 'status', values: ['DISABLED'] }, share)],
-  cols: [K.id(), { k: 'name', l: 'Name', on: 1, val: a => a.name.toLowerCase(), cell: a => `<b style="font-weight:500">${esc(a.name)}</b>`, kv: a => `<span>${esc(a.name)}</span>` },
+  cols: [K.id(), { k: 'name', l: 'Name', on: 1, val: a => a.name.toLowerCase(), cell: a => `${TC.strong(esc(a.name))}`, kv: a => `<span>${esc(a.name)}</span>` },
     { k: 'email', l: 'Email', on: 1, cell: a => muted(a.email) }, { k: 'role', l: 'Role', on: 1, val: a => roleOf(a.role).name, cell: a => esc(roleOf(a.role).name), kv: a => recLink('roles', a.role, roleOf(a.role).name) },
     K.yes('twofa', '2FA'), K.status(ADMIN_STATUS), K.date('lastActive', 'Last active'), K.code('ip', 'Last IP', 0), K.date('created', 'Added', 0)],
   sort: { k: 'lastActive', dir: 'desc' },
@@ -5360,7 +5369,7 @@ page({
 page({
   id: 'roles', noun: 'role', nouns: 'roles', icon: 'key', searchPh: 'Search role…',
   data: () => ROLES, search: r => `${r.name} ${r.desc}`,
-  cols: [K.id(), { k: 'name', l: 'Role', on: 1, lock: 1, val: r => r.name.toLowerCase(), cell: r => `<b style="font-weight:500">${esc(r.name)}</b>` }, K.muted('desc', 'Description'),
+  cols: [K.id(), { k: 'name', l: 'Role', on: 1, lock: 1, val: r => r.name.toLowerCase(), cell: r => `${TC.strong(esc(r.name))}` }, K.muted('desc', 'Description'),
     { k: 'admins', l: 'Administrators', al: 'r', on: 1, dir: 'desc', val: r => ADMINS.filter(a => a.role === r.id).length, cell: r => `<span class="num">${ADMINS.filter(a => a.role === r.id).length}</span>` },
     { k: 'perms', l: 'Permissions', al: 'r', on: 1, dir: 'desc', val: r => r.perms.size, cell: r => `<span class="num">${r.perms.size} of ${ALL_PERMS.length}</span>` }, K.date('updated', 'Updated'), K.date('created', 'Created', 0)],
   sort: { k: 'id', dir: 'asc' },
@@ -5410,7 +5419,7 @@ DASHES.reserves = {
   kpis: () => { const R = DASHES.reserves.rows(), L = sum(R.map(x => x.liab)), Rs = sum(R.map(x => x.res));
     return [{ l: 'Reserves held', v: '€' + compact(Rs), d: 1.9 }, { l: 'Customer liabilities', v: '€' + compact(L), d: 2.3 }, { l: 'Coverage', v: (Rs / L * 100).toFixed(1) + '%', d: -.4, unit: 'pp' }, { l: 'Hot wallet share', v: '8.6%', note: 'Target ≤ 10%' }, { l: 'Last attestation', v: fmtDay(new Date(NOW.getTime() - 9 * DAY), false), note: 'Monthly · Armanino' }]; },
   cards: () => { const R = DASHES.reserves.rows(), tone = p => p >= 102 ? ['success', 'Healthy'] : p >= 100 ? ['warning', 'Thin buffer'] : ['error', 'Under-backed'];
-    return `<div class="card span-8 flush"><div class="card-h"><span class="card-t">Coverage by asset</span><span class="card-tag">Snapshot · ${fmtDateTime(NOW)}</span></div>${dtable(['Asset', 'Liabilities|r', 'Reserves|r', 'Surplus|r', 'Coverage|r', 'Status'], R.map(x => { const [t, l] = tone(x.cov); return [`<span class="ctry">${assetIc(x.a.c, 16)}<b style="font-weight:500">${x.a.c}</b> <span class="muted">${x.a.n}</span></span>`, `<span class="num">${fmtEur(x.liab)}</span>`, `<span class="num">${fmtEur(x.res)}</span>`, `<span class="num ${x.res >= x.liab ? 'pos' : ''}">${x.res >= x.liab ? '+' : '−'}${fmtEur(Math.abs(x.res - x.liab))}</span>`, `<span class="num">${x.cov.toFixed(1)}%</span>`, dotCell({ label: l, tone: t })]; }))}</div>`
+    return `<div class="card span-8 flush"><div class="card-h"><span class="card-t">Coverage by asset</span><span class="card-tag">Snapshot · ${fmtDateTime(NOW)}</span></div>${dtable(['Asset', 'Liabilities|r', 'Reserves|r', 'Surplus|r', 'Coverage|r', 'Status'], R.map(x => { const [t, l] = tone(x.cov); return [`<span class="ctry">${assetIc(x.a.c, 16)}${TC.strong(x.a.c)} <span class="muted">${x.a.n}</span></span>`, `<span class="num">${fmtEur(x.liab)}</span>`, `<span class="num">${fmtEur(x.res)}</span>`, `<span class="num ${x.res >= x.liab ? 'pos' : ''}">${x.res >= x.liab ? '+' : '−'}${fmtEur(Math.abs(x.res - x.liab))}</span>`, `<span class="num">${x.cov.toFixed(1)}%</span>`, dotCell({ label: l, tone: t })]; }))}</div>`
       + dcard(4, 'Reserve coverage', ctag('Marker = 100%'), lis(R.map(x => { const [t, l] = tone(x.cov); return li({ lead: assetIc(x.a.c, 16), l: x.a.c, meter: meterEl(x.cov, t, 120, x.cov.toFixed(1) + '%'), tt: `${x.a.c} · ${l}|${x.cov.toFixed(1)}% backed|Marker = 100% of liabilities` }); })))
       + dcard(6, 'Where reserves are held', ctag('Share of reserves'), barRows([['Fireblocks · cold storage', 58.4], ['BitGo · custody', 21.2], ['Banking Circle · safeguarding', 11.8], ['Hot wallets', 8.6]], v => v.toFixed(1) + '%'))
       + dcard(6, 'Attestations', ctag('Proof of reserves'), lis([0, 1, 2, 3].map(i => { const at = new Date(NOW.getTime() - (9 + i * 30) * DAY);
@@ -5484,7 +5493,7 @@ page({
   tiles: [allTile('All orders', L => `${L.filter(r => NOW - r.created < 7 * DAY).length} this week`), tile('new', 'New', { key: 'status', values: ['NEW'] }, () => 'Waiting for production'),
     tile('prod', 'In production', { key: 'status', values: ['PRODUCTION'] }, share), tile('ship', 'Shipped', { key: 'status', values: ['SHIPPED'] }, share), tile('done', 'Delivered', { key: 'status', values: ['DELIVERED'] }, share)],
   cols: [K.id(), K.user(), { k: 'pid', l: 'Product', on: 1, val: r => PROD_BY.c[r.pid].name, cell: r => esc(PROD_BY.c[r.pid].name) }, { k: 'country', l: 'Ship to', on: 1, cell: r => ctryCell(r.country) },
-    K.text('courier', 'Courier'), K.code('tracking', 'Tracking'), { k: 'fee', l: 'Delivery fee', al: 'r', on: 1, dir: 'desc', cell: r => r.fee ? `<span class="num">${money(r.fee)}</span>` : '<span class="faint">Free</span>' },
+    K.text('courier', 'Courier'), K.code('tracking', 'Tracking'), { k: 'fee', l: 'Delivery fee', al: 'r', on: 1, dir: 'desc', cell: r => r.fee ? `<span class="num">${money(r.fee)}</span>` : TC.numMuted('Free') },
     K.status(ORDER_STATUS), K.date('created', 'Ordered'), K.date('updated', 'Updated', 0)],
   sort: { k: 'created', dir: 'desc' },
   quick: r => ORDER_NEXT[r.status] ? { act: 'ord-next', icon: 'check', tip: ORDER_STEP[r.status] } : { act: 'open-user', icon: 'user', tip: 'Open user', data: { id: r.uid } },
@@ -5533,9 +5542,9 @@ page({
   id: 'networks', noun: 'network', nouns: 'networks', icon: 'link', searchPh: 'Search network or currency…',
   data: () => NETWORKS, search: n => `${n.id} ${n.name} ${n.assets.join(' ')}`,
   fields: { status: fE('Status', 'activity', ON_OFF, n => n.status), type: fE('Type', 'link', { chain: { label: 'Blockchain' }, fiat: { label: 'Fiat rail' } }, n => n.fiat ? 'fiat' : 'chain') },
-  cols: [{ k: 'id', l: 'Code', on: 1, cell: n => `<b style="font-weight:500">${n.id}</b>` }, K.text('name', 'Network'), { k: 'type', l: 'Type', on: 1, val: n => n.fiat, cell: n => muted(n.fiat ? 'Fiat rail' : 'Blockchain') },
+  cols: [{ k: 'id', l: 'Code', on: 1, cell: n => `${TC.strong(n.id)}` }, K.text('name', 'Network'), { k: 'type', l: 'Type', on: 1, val: n => n.fiat, cell: n => muted(n.fiat ? 'Fiat rail' : 'Blockchain') },
     { k: 'assets', l: 'Currencies', on: 1, val: n => n.assets.length, cell: n => `<span class="ctry" style="gap:var(--space-8)">${n.assets.map(c => assetIc(c, 16)).join('')}<span class="muted">${n.assets.join(', ')}</span></span>`, kv: n => n.assets.join(', ') },
-    K.num('conf', 'Confirmations'), { k: 'fee', l: 'Withdrawal fee', al: 'r', on: 1, dir: 'desc', cell: n => n.fee ? `<span class="num">${money(n.fee)}</span>` : '<span class="faint">Free</span>' },
+    K.num('conf', 'Confirmations'), { k: 'fee', l: 'Withdrawal fee', al: 'r', on: 1, dir: 'desc', cell: n => n.fee ? `<span class="num">${money(n.fee)}</span>` : TC.numMuted('Free') },
     K.eur('min', 'Min. withdrawal', 0), K.status(ON_OFF), K.date('updated', 'Updated')],
   sort: { k: 'id', dir: 'asc' },
   quick: n => ({ act: 'net-tog', icon: n.status === 'ACTIVE' ? 'minus' : 'check', tip: n.status === 'ACTIVE' ? 'Disable' : 'Enable' }),
@@ -5554,7 +5563,7 @@ page({
   id: 'verification-templates', noun: 'template', nouns: 'templates', icon: 'file', searchPh: 'Search template, provider, step…',
   data: () => VTEMPLATES, search: v => `${v.name} ${v.provider} ${v.steps.join(' ')}`,
   fields: { status: fE('Status', 'activity', ON_OFF, v => v.status), level: fE('Level', 'tag', LEVEL, v => v.level), provider: fE('Provider', 'folder', optsOf({ Sumsub: 'Sumsub', CreditCo: 'CreditCo', Manual: 'Manual' }), v => v.provider) },
-  cols: [K.id(), { k: 'name', l: 'Template', on: 1, val: v => v.name.toLowerCase(), cell: v => `<b style="font-weight:500">${esc(v.name)}</b>` }, K.text('provider', 'Provider'), K.badge(LEVEL, 'level', 'Level'), K.muted('who', 'Applies to'),
+  cols: [K.id(), { k: 'name', l: 'Template', on: 1, val: v => v.name.toLowerCase(), cell: v => `${TC.strong(esc(v.name))}` }, K.text('provider', 'Provider'), K.badge(LEVEL, 'level', 'Level'), K.muted('who', 'Applies to'),
     { k: 'steps', l: 'Steps', on: 1, val: v => v.steps.length, cell: v => muted(v.steps.join(' · ')) }, K.muted('regions', 'Countries'), K.num('users', 'Users verified'), K.status(ON_OFF), K.date('updated', 'Updated')],
   quick: v => ({ act: 'vt-tog', icon: v.status === 'ACTIVE' ? 'minus' : 'check', tip: v.status === 'ACTIVE' ? 'Disable' : 'Enable' }),
   menu: v => [{ act: 'vt-tog', data: { rid: v.id }, icon: v.status === 'ACTIVE' ? 'minus' : 'check', label: v.status === 'ACTIVE' ? 'Disable template' : 'Enable template' }],
@@ -5571,7 +5580,7 @@ Object.entries(MON_KIND).forEach(([kind, M]) => page({
   fields: { status: fE('Status', 'activity', MON_STATUS, m => m.status), provider: fE('Provider', 'folder', optsOf(Object.fromEntries(MONITORS.filter(m => m.kind === kind).map(m => [m.provider, m.provider]))), m => m.provider) },
   tiles: [allTile('All monitors', L => `${L.filter(m => m.on).length} active`), tile('alert', 'Below threshold', { key: 'status', values: ['ALERT'] }, () => 'Top up or rebalance'),
     tile('stale', 'No fresh data', { key: 'status', values: ['STALE'] }, () => 'Over 6 hours old'), tile('ok', 'Healthy', { key: 'status', values: ['OK'] }, share)],
-  cols: [K.id(), { k: 'name', l: 'Monitor', on: 1, val: m => m.name.toLowerCase(), cell: m => `<b style="font-weight:500">${esc(m.name)}</b>` }, K.text('provider', 'Provider'), K.asset('c', 'Currency'),
+  cols: [K.id(), { k: 'name', l: 'Monitor', on: 1, val: m => m.name.toLowerCase(), cell: m => `${TC.strong(esc(m.name))}` }, K.text('provider', 'Provider'), K.asset('c', 'Currency'),
     { k: 'bal', l: 'Balance', al: 'r', on: 1, dir: 'desc', val: m => m.bal * ASSET[m.c].rate, cell: m => `<span class="num">${fmtAmt(m.bal, m.c)}</span>` },
     { k: 'min', l: 'Alert below', al: 'r', on: 1, dir: 'desc', val: m => m.min * ASSET[m.c].rate, cell: m => numM(fmtAmt(m.min, m.c)) },
     { k: 'headroom', l: 'Headroom', on: 1, val: m => m.bal / m.min, cell: monMeter, kv: m => `${Math.round(m.bal / m.min * 100)}% of the threshold` }, K.status(MON_STATUS), K.date('updated', 'Last update'), K.sw('on', 'Active', 'mon-tog')],
