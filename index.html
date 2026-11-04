@@ -583,7 +583,12 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .dt tbody tr{cursor:default}
 .dt.fx{table-layout:fixed} .dt.fx td,.dt.fx td>div{overflow:hidden;text-overflow:ellipsis}
 .card.flush .tfoot{border-top:var(--border-width) solid var(--line)}
-.card .tfoot{padding:0 var(--card-padding)} /* footer follows the table edge: 24 on its own, 16 in a card */
+.card .tfoot{padding:0 var(--card-padding)}
+.tfoot{justify-content:space-between;gap:var(--space-16)} .tf-c{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tf-pg{display:flex;align-items:center;gap:var(--space-16);flex:none} .tf-per{display:flex;align-items:center;gap:var(--space-8)}
+.tf-sel{height:var(--control-md);font-size:var(--fs-14)} .tf-pages{display:flex;align-items:center;gap:var(--space-4)}
+.pn{display:inline-grid;place-items:center;min-width:var(--control-md);height:var(--control-md);padding:0 var(--space-8);border-radius:var(--r-sm);font-size:var(--fs-14);font-weight:var(--fw-medium);color:var(--ink-2);font-variant-numeric:tabular-nums}
+.pn:hover{background:var(--hover);color:var(--ink)} .pn.on{background:var(--inv);color:var(--on-inv)} .pn-gap{color:var(--ink-3);padding:0 var(--space-4)} /* footer follows the table edge: 24 on its own, 16 in a card */
 .code{font-size:var(--fs-14);line-height:var(--lh-20);color:var(--ink-3);font-weight:400} /* codes (operation codes, IDs, captions) read at body size */
 .code .copy{color:var(--ink-3)}
 .txt{display:inline-flex;align-items:center;gap:var(--space-8)} .txt .i{color:var(--ink-3)}
@@ -786,7 +791,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .cfm-ic{width:var(--control-lg);height:var(--control-lg);border-radius:var(--pill);display:grid;place-items:center;flex:none;background:var(--info-bg);color:var(--info-ink)}
 .cfm-ic.bad{background:var(--error-bg);color:var(--error-ink)}
 /* Prototype config: floating button bottom-right, where support chat buttons usually sit */
-.pc-fab{position:fixed;right:20px;bottom:20px;z-index:70;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#FFFFFF;color:#111111;border:var(--border-width) solid rgba(17,17,17,.08);box-shadow:0 6px 18px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.08);transition:transform .14s ease,box-shadow .14s ease}
+.pc-fab{position:fixed;right:20px;bottom:76px;z-index:70;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#FFFFFF;color:#111111;border:var(--border-width) solid rgba(17,17,17,.08);box-shadow:0 6px 18px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.08);transition:transform .14s ease,box-shadow .14s ease}
 .pc-fab:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.16),0 1px 3px rgba(0,0,0,.08)}
 :root[data-theme="dark"] .pc-fab{background:var(--selected);color:var(--ink);border-color:var(--neutral-line);box-shadow:0 6px 18px rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.3)} /* dark button in dark mode */
 :root[data-theme="dark"] .pc-fab:hover{background:var(--neutral-bg)}
@@ -2291,9 +2296,8 @@ function filterSummary() {
   ctextOn().forEach(([k, v]) => out.push(`${cols.find(x => x.k === k)?.label || k} contains “${v.trim()}”`));
   return out;
 }
-const listFoot = (list, rows, one, many, total) => { const sum = filterMode() === 'inline' ? filterSummary() : [];
-  if (!sum.length) return tfoot(list, rows, one, many);
-  return `<div class="tfoot">${fmtInt(list.length)} of ${fmtInt(total)} ${many}${rows.length < list.length ? ' · more load as you scroll' : ''} · ${sum.map(esc).join(' · ')}</div>`; };
+const listFoot = (list, rows, one, many, total, k, page) => { const sum = filterMode() === 'inline' ? filterSummary() : [];
+  return tfoot(list, rows, one, many, k, page, sum.length ? ` · filtered from ${fmtInt(total)} · ${sum.map(esc).join(' · ')}` : ''); };
 function colTextInput(t) {
   const k = t.dataset.ctext, pos = t.selectionStart, left = t.closest('.tscroll')?.scrollLeft || 0;
   ctextOf()[k] = t.value; fx().changed();
@@ -2390,21 +2394,33 @@ function tableHTML(list) {
       <td class="cbcell"><button class="cb ${S.selected.has(u.id) ? 'on' : ''}" data-act="sel" data-id="${u.id}" aria-label="Select">${icon('check', 11, 3)}</button></td>
       ${cols.map(c => `<td class="${c.right ? 'r' : ''} ${c.pin ? 'pin' : ''}">${tcCell(c.cell(u), c.right)}</td>`).join('')}
       <td class="act"><div class="row-actions"><button class="ghost-ic" data-act="impersonate" data-id="${u.id}" data-tip="Login as user">${icon('login', 16)}</button><button class="ghost-ic" data-act="row-more" data-id="${u.id}" data-tip="More">${icon('more', 16)}</button></div></td>
-    </tr>`).join('') || noMatchRow(cols.length + 2, 'users')}</tbody></table></div></div>${listFoot(list, rows, 'user', 'users', USERS.length)}</div>`;
+    </tr>`).join('') || noMatchRow(cols.length + 2, 'users')}</tbody></table></div></div>${listFoot(list, rows, 'user', 'users', USERS.length, 'users', S.page)}</div>`;
 }
-/* Infinite scroll instead of pages: a list shows its first CHUNK rows and loads the next CHUNK as the scroll nears the end.
-   `page` in each list's state counts the chunks loaded, so every place that resets it to 1 starts the list from the top again. */
-const CHUNK = 50;
-const loaded = (list, page) => list.slice(0, page * CHUNK);
-const moreAttr = (list, rows, k) => rows.length < list.length ? `data-more="${k}"` : '';
-const tfoot = (list, rows, one, many) => `<div class="tfoot">${rows.length < list.length ? `${fmtInt(rows.length)} of ${fmtInt(list.length)} ${many} · more load as you scroll` : `${fmtInt(list.length)} ${list.length === 1 ? one : many}`}</div>`;
-const MORE = {
-  users: () => { S.page++; renderResults(); },
-  co: () => { S.co.page++; coResults(); },
-  pg: () => { pgS(S.route).page++; pgResults(); },
-  tx: () => { S.tx.page++; refreshTx(); },
-  cou: () => { S.coUserPage++; $('#coUsersBody').innerHTML = coUsersBody(coById(S.coId)); markHits($('#coUsersBody tbody'), S.coUserQ); },
+/* Pages: a list shows PER rows per page (10–50, 30 by default as in the live admin; the choice is remembered) and the footer
+   carries «Rows per page» and the page buttons. `page` in each list's state is the current page, so every place that resets it to 1 starts from the first page. */
+const PER_OPTS = [10, 20, 30, 40, 50];
+let PER = PER_OPTS.includes(+store.get('nsc.perPage', 30)) ? +store.get('nsc.perPage', 30) : 30;
+const pagesOf = list => Math.max(1, Math.ceil(list.length / PER));
+const loaded = (list, page) => { const p = Math.min(Math.max(1, page || 1), pagesOf(list)); return list.slice((p - 1) * PER, p * PER); };
+const moreAttr = () => ''; // infinite scroll is off: lists page instead
+const pagerHTML = (k, p, pages) => { const nums = [];
+  for (let i = 1; i <= pages; i++) if (i === 1 || i === pages || Math.abs(i - p) <= 1) nums.push(i); else if (nums[nums.length - 1] !== '…') nums.push('…');
+  return `<span class="tf-pg"><span class="tf-per"><span>Rows per page</span><button class="fdd on tf-sel" data-act="per-page" data-k="${k}">${PER}${icon('chevDown', 16)}</button></span>`
+    + `<span class="tf-pages"><button class="ghost-ic" data-act="go-page" data-k="${k}" data-p="${p - 1}" data-tip="Previous page" ${p <= 1 ? 'disabled' : ''}>${icon('chevLeft', 16)}</button>`
+    + nums.map(n => n === '…' ? '<span class="pn-gap">…</span>' : `<button class="pn ${n === p ? 'on' : ''}" data-act="go-page" data-k="${k}" data-p="${n}">${n}</button>`).join('')
+    + `<button class="ghost-ic" data-act="go-page" data-k="${k}" data-p="${p + 1}" data-tip="Next page" ${p >= pages ? 'disabled' : ''}>${icon('chevRight', 16)}</button></span></span>`; };
+// Table footer: «31–60 of 320 users» (+ filter summary) on the left, Rows per page + pages on the right once the list is longer than a page
+const tfoot = (list, rows, one, many, k, page, sum = '') => { const n = list.length, pages = pagesOf(list), p = Math.min(Math.max(1, page || 1), pages), start = (p - 1) * PER;
+  const count = pages > 1 ? `${fmtInt(start + 1)}–${fmtInt(start + rows.length)} of ${fmtInt(n)} ${many}` : `${fmtInt(n)} ${n === 1 ? one : many}`;
+  return `<div class="tfoot"><span class="tf-c">${count}${sum}</span>${k && pages > 1 ? pagerHTML(k, p, pages) : ''}</div>`; };
+const PAGE = {
+  users: p => { S.page = p; renderResults(); },
+  co: p => { S.co.page = p; coResults(); },
+  pg: p => { pgS(S.route).page = p; pgResults(); },
+  tx: p => { S.tx.page = p; refreshTx(); },
+  cou: p => { S.coUserPage = p; $('#coUsersBody').innerHTML = coUsersBody(coById(S.coId)); markHits($('#coUsersBody tbody'), S.coUserQ); },
 };
+const MORE = {};
 // List tables scroll inside .tscroll (data-more on it); record-page tables scroll with #main (data-more on their footer)
 document.addEventListener('scroll', e => {
   const sc = e.target; if (!(sc instanceof Element)) return;
@@ -2893,7 +2909,7 @@ function txBody(D) {
     ? ctable('txa', rows, '', { rowCls: h => f.sel.has(h.id) ? 'sel' : '',
         pre: { head: `<button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="tx-sel-page" aria-label="Select page">${icon('check', 11, 3)}</button>|cbcell`, cell: h => `<button class="cb ${f.sel.has(h.id) ? 'on' : ''}" data-act="tx-sel" data-id="${h.id}" aria-label="Select">${icon('check', 11, 3)}</button>` } })
     : ctable('txw', rows, '');
-  return table + tfoot(list, rows, 'transaction', 'transactions').replace('class="tfoot"', `class="tfoot" ${moreAttr(list, rows, 'tx')}`);
+  return table + tfoot(list, rows, 'transaction', 'transactions', 'tx', f.page);
 }
 const refreshTx = () => { const el = $('#txBody'); if (el) el.innerHTML = txBody(ud(byId(S.userId))); };
 
@@ -3417,6 +3433,9 @@ const ACT = {
   'export-do': a => { closePop(); const l = S._list.length ? S._list : USERS; a.dataset.f === 'csv' ? exportCSV(l) : toast(`XLSX export of ${fmtInt(l.length)} users started`, 'download'); },
 
   'u-step': a => stepUser(+a.dataset.d),
+  'per-page': a => openPop(a, menuItems(PER_OPTS.map(n => ({ act: 'set-per', data: { n, k: a.dataset.k }, label: `${n} rows`, on: PER === n }))), { width: 140 }),
+  'set-per': a => { closePop(); PER = +a.dataset.n; store.set('nsc.perPage', PER); PAGE[a.dataset.k]?.(1); },
+  'go-page': a => { PAGE[a.dataset.k]?.(+a.dataset.p); const sc = $('#main .tscroll'); if (sc) sc.scrollTop = 0; },
   'u-tab': a => { S.userTab = a.dataset.v; renderUserPage(); },
   'u-discard': () => { S.draft = {}; renderUserPage(); },
   'u-save': () => { const X = edCtx(); if (!edCheck(X)) return; edApply(X); X.r.updated = NOW; S.draft = {}; toast('Changes saved'); renderUserPage(); },
@@ -3786,7 +3805,7 @@ function coResults() {
       <td class="cbcell"><button class="cb ${f.sel.has(c.id) ? 'on' : ''}" data-act="co-sel" data-id="${c.id}" aria-label="Select">${icon('check', 11, 3)}</button></td>
       ${cols.map(x => `<td class="${x.al === 'r' ? 'r' : ''} ${x.pin ? 'pin' : ''}">${tcCell(x.cell(c), x.al === 'r')}</td>`).join('')}
       <td class="act"><div class="row-actions"><button class="ghost-ic" data-act="co-open-tab" data-id="${c.id}" data-v="products" data-tip="Products">${icon('cardProduct', 16)}</button><button class="ghost-ic" data-act="co-row-more" data-id="${c.id}" data-tip="More">${icon('more', 16)}</button></div></td>
-    </tr>`).join('') || noMatchRow(cols.length + 2, 'companies')}</tbody></table></div></div>${listFoot(list, rows, 'company', 'companies', COMPANIES.length)}</div>`;
+    </tr>`).join('') || noMatchRow(cols.length + 2, 'companies')}</tbody></table></div></div>${listFoot(list, rows, 'company', 'companies', COMPANIES.length, 'co', f.page)}</div>`;
   fitColumns(); markHits($('tbody', el), f.search);
 }
 const coCSV = (l, name) => {
@@ -3951,7 +3970,7 @@ function coUsersBody(c) {
   const rows = loaded(list, S.coUserPage);
   return `<div class="hs-wrap"><div class="dt-wrap hs"><table class="dt"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Residency</th><th>Status</th><th>KYC</th><th>Risk</th><th class="r">Balance</th><th class="r">Created</th></tr></thead>
     <tbody>${rows.map(u => `<tr data-uid="${u.id}" style="cursor:pointer"><td>${numM(u.id)}</td><td>${u.name ? TC.strong(esc(u.name)) : TC.muted('No profile yet')}</td><td>${muted(u.email)}</td><td>${ctryCell(u.country)}</td><td>${statusCell(u.status)}</td><td>${badge(KYC[u.kyc])}</td><td>${riskCell(u.risk)}</td><td class="r"><span class="num ${u.balance ? '' : 'muted'}">${fmtEur(u.balance)}</span></td><td class="r"><span class="muted">${rel(u.created)}</span></td></tr>`).join('')}</tbody></table></div></div>
-    ${tfoot(list, rows, 'user', 'users').replace('class="tfoot"', `class="tfoot" ${moreAttr(list, rows, 'cou')}`)}`;
+    ${tfoot(list, rows, 'user', 'users', 'cou', S.coUserPage)}`;
 }
 function coUsersTab(c) {
   const n = coUsers(c).length;
@@ -4518,7 +4537,7 @@ function pgResults() {
       <td class="cbcell"><button class="cb ${on ? 'on' : ''}" data-act="pg-sel" data-rid="${k}" aria-label="Select">${icon('check', 11, 3)}</button></td>
       ${cols.map(c => `<td class="${al(c)} ${c.pin ? 'pin' : ''}">${tcCell(c.cell(r), al(c) === 'r')}</td>`).join('')}
       <td class="act"><div class="row-actions">${q ? `<button class="ghost-ic" data-act="${q.act}" data-rid="${k}" ${Object.entries(q.data || {}).map(([a, v]) => `data-${a}="${esc(v)}"`).join(' ')} data-tip="${q.tip}">${icon(q.icon, 16)}</button>` : ''}<button class="ghost-ic" data-act="pg-row-more" data-rid="${k}" data-tip="More">${icon('more', 16)}</button></div></td>
-    </tr>`; }).join('') || noMatchRow(cols.length + 2, P.nouns)}</tbody></table></div></div>${listFoot(list, rows, P.noun, P.nouns, pgData(P).length)}</div>`;
+    </tr>`; }).join('') || noMatchRow(cols.length + 2, P.nouns)}</tbody></table></div></div>${listFoot(list, rows, P.noun, P.nouns, pgData(P).length, 'pg', st.page)}</div>`;
   fitColumns(); markHits($('tbody', el), st.search);
 }
 function pgFloat(el) {
