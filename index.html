@@ -124,7 +124,7 @@ img.crop{object-fit:cover;object-position:left center}
 .app.collapsed .sb-sec::before{opacity:1;transition-delay:.06s}
 .app.collapsed .sb-sec.closed:has(.sb-dot)::before{background:var(--brand)} /* folded section with something pending */
 /* sections fold from their title: the chevron shows on hover and stays (turned) while folded; a folded section with pending items gets a small brand dot */
-.sb-label .i{margin-left:auto;opacity:0;transition:opacity .12s,transform .15s}
+.sb-label .i{margin-left:auto;opacity:0;transition:opacity .12s,transform .15s} /* the sidebar keeps its chevron animation; elsewhere arrows flip instantly */
 .sb-label:hover{color:var(--ink-2)} .sb-label:hover .i{opacity:1}
 .sb-dot{display:none;width:6px;height:6px;border-radius:var(--pill);background:var(--brand);flex:none}
 .sb-sec.closed .sb-label .i{transform:rotate(-90deg);opacity:1}
@@ -481,7 +481,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 
 /* list view */
 .lg-h{display:flex;align-items:center;gap:var(--space-12);width:100%;height:42px;padding:0 var(--space-16);background:var(--hover);border-bottom:var(--border-width) solid var(--line);font-weight:500;position:sticky;top:0;z-index:1}
-.lg-h>.i{color:var(--ink-3);transition:transform .15s}
+.lg-h>.i{color:var(--ink-3)}
 .lg.collapsed .lg-h>.i{transform:rotate(-90deg)}
 .lg.collapsed .lg-b{display:none}
 .lrow{display:flex;align-items:center;gap:var(--space-12);padding:0 var(--space-16);height:58px;border-bottom:var(--border-width) solid var(--line-soft);cursor:pointer}
@@ -582,6 +582,8 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .dt th.r,.dt td.r{text-align:right} .dt th.c,.dt td.c{text-align:center} .dt th.w,.dt td.w{width:1%}
 .dt tbody tr{cursor:default}
 .dt.fx{table-layout:fixed} .dt.fx td,.dt.fx td>div{overflow:hidden;text-overflow:ellipsis}
+/* record-page tables give the actions column no width: the hover overlay sizes to its buttons and fades in over the 32px before them */
+.dt td.act>.row-actions{left:auto;padding-left:var(--space-32);overflow:visible}
 .card.flush .tfoot{border-top:var(--border-width) solid var(--line)}
 .card .tfoot{padding:0 var(--card-padding)}
 .tfoot{justify-content:space-between;gap:var(--space-16)} .tf-c{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -601,7 +603,13 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .dd .flag{margin-right:var(--space-8)}
 .dd-field{display:block;width:100%;max-width:none;height:var(--control-lg);border-radius:var(--r);border:var(--border-width) solid var(--line);padding:0 var(--space-32) 0 var(--space-12);font-size:var(--fs-14);color:var(--ink);background:var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B9B98' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right var(--space-8) center/16px}
 .dd:hover{border-color:var(--line-strong)}
-.dd.open,.dd:focus-visible{border-color:var(--focus);box-shadow:var(--focus-brand);outline:0}
+.dd:focus-visible{border-color:var(--focus);box-shadow:var(--focus-brand);outline:0}
+/* Open state — one for every trigger that opens a menu (Figma ❖ Select, State=Open): border/focus + Focus/Brand ring on the surface fill,
+   and the chevron flips up in place (it stays 8px from the right edge, as in the Select: 12 left / 8 right padding, 16px chevron).
+   Only dropdowns take it (Select, date range, filter-field dropdowns, inline select); buttons that open menus (Display, Export, Filter) keep their look — just the chevron flips. */
+.popped>.i-chev{transform:rotate(180deg)} /* flips instantly, no animation */
+:root :is(.dd.open,.dd.popped,.dp-btn.popped,.fdd.popped,.fsel-c.popped,.sel-btn.popped){border-color:var(--focus);box-shadow:var(--focus-brand);background-color:var(--surface);outline:0}
+.dd.fsel.open,.dd.dd-field.open{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B9B98' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 15 6-6 6 6'/%3E%3C/svg%3E")}
 .fsel:hover,.inp:hover,.dd-field:hover,.field input:hover,.field select:hover{border-color:var(--line-strong)}
 .fsel:focus,.inp:focus{border-color:var(--focus);box-shadow:var(--focus-brand)}
 .inp:disabled,.fsel:disabled,.field input:disabled,.field select:disabled{background-color:var(--surface-2);border-color:var(--line);color:var(--ink-disabled);cursor:not-allowed}
@@ -629,8 +637,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .lnk{color:var(--ink);text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px;font-weight:500}
 .lnk:hover{text-decoration-color:currentColor} /* every name / company link: hover = a grey line, nothing else */
 .sel-btn{display:inline-flex;align-items:center;gap:var(--space-8);height:32px;padding:0 var(--space-8) 0 var(--space-12);border-radius:var(--r-sm);border:var(--border-width) solid transparent;font-weight:500;margin-right:calc(-1 * var(--space-8))}
-.sel-btn:hover,.sel-btn.popped{background:var(--hover);border-color:var(--line)}
-.sel-btn.popped>.i:last-child{transform:rotate(180deg)}
+.sel-btn:hover{background:var(--hover);border-color:var(--line)}
 .sel-btn.dirty{background:var(--brand-subtle);border-color:var(--brand-subtle)}
 .sel-btn>.i{color:var(--ink-3)}
 /* inline editing: values look plain until hovered or focused; a changed field tints like the Users dropdowns */
@@ -672,10 +679,10 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .pop{position:fixed;z-index:80;max-width:calc(100vw - 16px);background:var(--surface);border:var(--border-width) solid var(--line);border-radius:var(--r);box-shadow:var(--shadow-lg);min-width:220px;padding:var(--space-4);display:none;animation:pop-in .12s ease}
 .pop.open{display:block}
 /* date range picker: presets on the left, month calendar on the right */
-.dp-btn{display:inline-flex;align-items:center;gap:var(--space-8);height:var(--control-md);max-width:260px;padding:0 var(--space-12) 0 var(--space-12);border-radius:var(--r-sm);border:var(--border-width) solid var(--line);background:var(--surface);font-size:var(--fs-14);font-weight:500;color:var(--ink);white-space:nowrap}
+.dp-btn{display:inline-flex;align-items:center;gap:var(--space-8);height:var(--control-md);max-width:260px;padding:0 var(--space-8) 0 var(--space-12);border-radius:var(--r-sm);border:var(--border-width) solid var(--line);background:var(--surface);font-size:var(--fs-14);font-weight:var(--fw-regular);color:var(--ink);white-space:nowrap;transition:border-color .12s,box-shadow .12s}
 .dp-btn span{overflow:hidden;text-overflow:ellipsis}
 .dp-btn .i{color:var(--ink-3)}
-.dp-btn:hover{background:var(--hover)}
+.dp-btn:hover{border-color:var(--line-strong)} .dp-btn:focus-visible{outline:0;border-color:var(--focus);box-shadow:var(--focus-brand)} /* a Select with a leading icon */
 .topbar .dp-btn{height:var(--control-lg);border-radius:var(--r)}
 /* topbar actions are Large (40): radius/md */
 .topbar .btn{height:var(--control-lg);padding:0 var(--space-16);border-radius:var(--r)}
@@ -788,30 +795,29 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .cfm-b p{margin:0;font-size:var(--fs-14);line-height:var(--lh-20);color:var(--ink-2)}
 .cfm-ic{width:var(--control-lg);height:var(--control-lg);border-radius:var(--pill);display:grid;place-items:center;flex:none;background:var(--info-bg);color:var(--info-ink)}
 .cfm-ic.bad{background:var(--error-bg);color:var(--error-ink)}
-/* Prototype config: floating button bottom-right, where support chat buttons usually sit */
-.pc-fab{position:fixed;right:20px;bottom:76px;z-index:70;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#FFFFFF;color:#111111;border:var(--border-width) solid rgba(17,17,17,.08);box-shadow:0 6px 18px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.08);transition:transform .14s ease,box-shadow .14s ease}
+/* Prototype config: floating button bottom-right, where support chat buttons usually sit — on the page gutter (24px), so on list pages it sits at the end of the table footer row;
+   with pagination on, it lifts above the footer so the pager stays clear (toasts stack above it) */
+.pc-fab{position:fixed;right:var(--space-24);bottom:var(--space-24);z-index:70;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#FFFFFF;color:#111111;border:var(--border-width) solid rgba(17,17,17,.08);box-shadow:0 6px 18px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.08);transition:transform .14s ease,box-shadow .14s ease}
+:root[data-tablenav="pages"] .pc-fab{bottom:76px} :root[data-tablenav="pages"] .toasts{bottom:132px}
 .pc-fab:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.16),0 1px 3px rgba(0,0,0,.08)}
 :root[data-theme="dark"] .pc-fab{background:var(--selected);color:var(--ink);border-color:var(--neutral-line);box-shadow:0 6px 18px rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.3)} /* dark button in dark mode */
 :root[data-theme="dark"] .pc-fab:hover{background:var(--neutral-bg)}
-.modal.pc{width:min(620px,100%)} .pc .modal-b{gap:var(--space-24)}
-.pc-lbl{font-size:var(--fs-14);font-weight:600;margin-bottom:var(--space-4)} .pc-sub{font-size:var(--fs-12);color:var(--ink-2);margin-bottom:var(--space-12)}
-.pc-brands{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-12)}
-.pc-brand{display:flex;flex-direction:column;border:var(--border-width) solid var(--line);border-radius:var(--r);overflow:hidden;text-align:left;background:var(--surface);transition:border-color .12s,box-shadow .12s}
-.pc-brand:hover{border-color:var(--line-strong)}
+/* Prototype config, compact: one row per setting — label on the left, choices on the right; brand tiles show the logo only */
+.modal.pc{width:min(640px,100%)} .pc .modal-b{gap:var(--space-16)}
+.pc section{display:grid;grid-template-columns:128px minmax(0,1fr);align-items:center;gap:var(--space-16)}
+.pc-lbl{font-size:var(--fs-14);font-weight:var(--fw-medium);color:var(--ink-2)}
+.pc-brands{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-8)}
+.pc-brand{display:flex;border:var(--border-width) solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface-2);transition:border-color .12s,box-shadow .12s}
+.pc-brand:hover,.pc-nav:hover{border-color:var(--line-strong)}
 .pc-brand.on,.pc-nav.on{border-color:var(--ink);box-shadow:0 0 0 var(--border-width) var(--ink)}
-.pc-logo{height:64px;display:grid;place-items:center;background:var(--surface-2);color:var(--ink);border-bottom:var(--border-width) solid var(--line)}
+.pc-logo{flex:1;height:44px;display:grid;place-items:center;color:var(--ink)}
 .pc-logo>span{display:flex;align-items:center;gap:var(--space-8)}
-.pc-meta{display:flex;flex-direction:column;gap:var(--space-4);padding:var(--space-12) var(--space-12)}
-.pc-n{font-size:var(--fs-14);font-weight:500;display:block}
-.pc-c{display:flex;align-items:center;gap:var(--space-8);font-size:var(--fs-12);color:var(--ink-3);font-variant-numeric:tabular-nums}
-.pc-c i{width:12px;height:12px;border-radius:var(--r-xs);box-shadow:inset 0 0 0 var(--border-width) rgba(0,0,0,.1)}
-.pc-navs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-12)}
-.pc-nav{display:flex;align-items:flex-start;gap:var(--space-12);padding:var(--space-12) var(--space-12);border:var(--border-width) solid var(--line);border-radius:var(--r);text-align:left;transition:border-color .12s,box-shadow .12s}
-.pc-nav:hover{border-color:var(--line-strong)}
-.pc-d{display:block;font-size:var(--fs-12);color:var(--ink-2);margin-top:var(--space-2)}
-.pc-rad{width:16px;height:16px;border-radius:50%;border:var(--border-width) solid var(--line-strong);flex:none;margin-top:1px;display:grid;place-items:center}
+.pc-navs{display:flex;flex-wrap:wrap;gap:var(--space-8)}
+.pc-nav{display:flex;align-items:center;gap:var(--space-8);height:var(--control-md);padding:0 var(--space-12);border:var(--border-width) solid var(--line);border-radius:var(--r);white-space:nowrap;transition:border-color .12s,box-shadow .12s}
+.pc-n{font-size:var(--fs-14);font-weight:var(--fw-medium)}
+.pc-rad{width:16px;height:16px;border-radius:50%;border:var(--border-width) solid var(--line-strong);flex:none;display:grid;place-items:center}
 .pc-nav.on .pc-rad{border-color:var(--inv);background:var(--inv)} .pc-nav.on .pc-rad::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--on-inv)}
-@media (max-width:600px){.pc-brands,.pc-navs{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:600px){.pc section{grid-template-columns:minmax(0,1fr);gap:var(--space-8)}}
 .field label{display:block;font-size:var(--fs-12);line-height:var(--lh-16);color:var(--ink-2);margin-bottom:var(--space-8);font-weight:var(--fw-medium)}
 .field input,.field select{width:100%;height:var(--control-lg);border-radius:var(--r);border:var(--border-width) solid var(--line);padding:0 var(--space-12);outline:0;background:var(--surface)}
 .field input:focus,.field select:focus{border-color:var(--focus);box-shadow:var(--focus-brand)}
@@ -950,7 +956,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .su-step{display:flex;align-items:center;gap:var(--space-12);width:100%;height:42px;border-bottom:var(--border-width) solid var(--line-soft);font-size:var(--fs-14);color:var(--ink)}
 .su-step:last-child{border-bottom:0}
 .su-step .pl{flex:1}
-.su-step>.i{color:var(--ink-3);transition:transform .12s}
+.su-step>.i{color:var(--ink-3)}
 .su-step:hover>.i{color:var(--ink);transform:translateX(2px)}
 .su-step.done .pl{color:var(--ink-2)}
 .inp.w{width:100%}
@@ -1438,8 +1444,8 @@ const SOLAR = {
 };
 // Solar where available; the plain stroke set (ICONS) covers tiny utility marks: check, plus, minus, ×, small arrows
 const icon = (n, s = 16, sw = 1.5) => SOLAR[n]
-  ? `<svg class="i" width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true">${SOLAR[n]}</svg>`
-  : `<svg class="i" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ''}</svg>`;
+  ? `<svg class="i${n === 'chevDown' ? ' i-chev' : ''}" width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true">${SOLAR[n]}</svg>`
+  : `<svg class="i${n === 'chevDown' ? ' i-chev' : ''}" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n] || ''}</svg>`;
 
 /* ════════════════════════════ Domain ════════════════════════════ */
 const STATUS = { active: { label: 'Active', tone: 'success' }, inactive: { label: 'Inactive', tone: 'neutral' }, blocked: { label: 'Blocked', tone: 'error' } };
@@ -1738,6 +1744,7 @@ const curSec = () => NAV.find(n => n.items?.some(navOn));
    fly — each section is a single row that opens its pages in a panel beside the sidebar, so only about a dozen rows show at once
    tabs — the sidebar lists only the sections; a section's pages are tabs in the header, and the section reopens on the page you left it on */
 const NAV_V = { classic: ['Classic', 'Sections stay as you fold them'], focus: ['Focus', 'Only the current section stays open'], fly: ['Flyout', 'Sections open in a side panel'], tabs: ['Sections', 'Pages as tabs in the header'] };
+const secNav = () => S.navV === 'tabs';
 S.navV = NAV_V[store.get('nsc.navv', 'classic')] ? store.get('nsc.navv', 'classic') : 'classic'; S.navPeek = new Set();
 S.secLast = {};
 const navHref = it => it.href || '#/' + it.id;
@@ -1746,7 +1753,7 @@ const secTabs = sec => `<nav class="tabs tb-tabs" aria-label="${t(sec.label)}">$
 const secShut = n => S.navV === 'focus' ? (n !== curSec()) !== S.navPeek.has(n.label) : S.navClosed.has(n.label);
 function navSection(n) {
   const dot = n.items.some(navAttn);
-  if (S.navV === 'tabs') {
+  if (secNav()) {
     const n0 = navShown(n.items).reduce((a, it) => a + navAttn(it), 0);
     return `<a class="nav ${n === curSec() ? 'active' : ''}" href="${S.secLast[n.label] || navHref(n.items[0])}" data-tip="${t(n.label)}${n0 ? ` · ${fmtInt(n0)} need attention` : ''}" data-tip-collapsed>${icon(n.icon, 16)}<span class="fade">${t(n.label)}</span>${n0 ? `<em class="nb">${fmtInt(n0)}</em><i class="ndot ndot-c"></i>` : ''}</a>`;
   }
@@ -1826,7 +1833,7 @@ function topbarActions() {
 // Sections navigation: a list page's header is the section title with the page's actions, and the section's pages as tabs under them;
 // a record page keeps one row, its breadcrumb led by the section name (not a link — the list crumb goes back to the tab)
 function renderTopbar() {
-  const c = crumbs(), acts = topbarActions(), sec = S.navV === 'tabs' && curSec(), list = sec && c.length === 1;
+  const c = crumbs(), acts = topbarActions(), sec = secNav() && curSec(), list = sec && c.length === 1;
   const path = sec && !list ? [[sec.label, '', '', 1], ...c] : c;
   const menu = `<button class="icon-btn menu-btn" data-act="mobile-menu" aria-label="Menu">${icon('menu', 16)}</button>`, ctx = acts ? `<div class="tb-ctx">${acts}</div>` : '';
   $('#topbar').classList.toggle('sec', !!list);
@@ -1853,25 +1860,24 @@ function meMenu(view) {
 }
 // Prototype config: knobs for exploring the prototype, not product settings. Each choice applies at once and is kept in this browser.
 function protoModal() {
-  const D = S.pcDraft ||= { brand: S.brand, navV: S.navV, filterV: S.filterV };
+  const D = S.pcDraft ||= { brand: S.brand, navV: S.navV, filterV: S.filterV, tableNav: S.tableNav };
   const opt = (k, on, act, body, cls) => `<button class="${cls} ${on ? 'on' : ''}" data-act="${act}" data-v="${k}" aria-pressed="${on}">${body}</button>`;
   const html = `<div class="modal pc" role="dialog" aria-label="${t('Prototype config')}">
     <div class="modal-h">${t('Prototype config')}<button class="icon-btn icon-btn-link" data-act="modal-close" aria-label="${t('Close')}">${icon('x', 16)}</button></div>
     <div class="modal-b">
-      <section><div class="pc-lbl">${t('White-label product')}</div><div class="pc-sub">${t('The client the admin panel is branded for: logo, favicon and accent colour.')}</div>
-        <div class="pc-brands">${Object.entries(BRANDS).map(([k, b]) => opt(k, k === D.brand, 'pc-pick-brand', `<span class="pc-logo"><span class="lg-${k}">${b.chip()}</span></span><span class="pc-meta"><span class="pc-n">${b.name}</span><span class="pc-c"><i style="background:${b.color}"></i>${b.color.slice(1)}</span></span>`, 'pc-brand')).join('')}</div></section>
-      <section><div class="pc-lbl">${t('Navigation')}</div><div class="pc-sub">${t('How the sidebar groups pages.')}</div>
-        <div class="pc-navs">${Object.entries(NAV_V).map(([k, [l, d]]) => opt(k, k === D.navV, 'pc-pick-nav', `<span class="pc-rad"></span><span><span class="pc-n">${t(l)}</span><span class="pc-d">${t(d)}</span></span>`, 'pc-nav')).join('')}</div></section>
-      <section><div class="pc-lbl">${t('Filters')}</div><div class="pc-sub">${t('How list pages show and add filters.')}</div>
-        <div class="pc-navs">${Object.entries(FILTER_V).map(([k, [l, d]]) => opt(k, k === D.filterV, 'pc-pick-filter', `<span class="pc-rad"></span><span><span class="pc-n">${t(l)}</span><span class="pc-d">${t(d)}</span></span>`, 'pc-nav pc-fil')).join('')}</div></section>
+      <section><div class="pc-lbl">${t('Product')}</div>
+        <div class="pc-brands">${Object.entries(BRANDS).map(([k, b]) => opt(k, k === D.brand, 'pc-pick-brand', `<span class="pc-logo"><span class="lg-${k}">${b.chip()}</span></span>`, 'pc-brand')).join('')}</div></section>
+${[['Navigation', NAV_V, D.navV, 'pc-pick-nav', ''], ['Filters', FILTER_V, D.filterV, 'pc-pick-filter', ' pc-fil'], ['Table navigation', TABLE_NAV, D.tableNav, 'pc-pick-tnav', ' pc-tnav']].map(([lbl, V, cur, act, cls]) => `      <section><div class="pc-lbl">${t(lbl)}</div>
+        <div class="pc-navs">${Object.entries(V).map(([k, [l]]) => opt(k, k === cur, act, `<span class="pc-rad"></span><span class="pc-n">${t(l)}</span>`, 'pc-nav' + cls)).join('')}</div></section>`).join('')}
     </div>
     <div class="modal-f"><button class="btn btn-tertiary btn-lg" data-act="pc-defaults" style="margin-right:auto">${t('Reset to defaults')}</button><button class="btn btn-tertiary btn-lg" data-act="modal-close">${t('Cancel')}</button><button class="btn btn-primary btn-lg" data-act="pc-done">${t('Done')}</button></div>
   </div>`;
   openModal(html);
 }
 // Picking only moves the selection; re-rendering the modal would replay its open animation
-function pcMark() { const D = S.pcDraft; $$('.pc-brand, .pc-nav', modal).forEach(b => { const on = b.dataset.v === (b.classList.contains('pc-brand') ? D.brand : b.classList.contains('pc-fil') ? D.filterV : D.navV); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); }); }
-function applyProto({ brand: b, navV: n, filterV: fv }) {
+function pcMark() { const D = S.pcDraft; $$('.pc-brand, .pc-nav', modal).forEach(b => { const on = b.dataset.v === (b.classList.contains('pc-brand') ? D.brand : b.classList.contains('pc-fil') ? D.filterV : b.classList.contains('pc-tnav') ? D.tableNav : D.navV); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); }); }
+function applyProto({ brand: b, navV: n, filterV: fv, tableNav: tn }) {
+  if (tn && tn !== S.tableNav) { S.tableNav = tn; store.set('nsc.tablenav', tn); document.documentElement.dataset.tablenav = tn; Object.keys(EXTRA).forEach(k => { EXTRA[k] = null; }); S.page = 1; if (S.co) S.co.page = 1; if (S.tx) S.tx.page = 1; S.coUserPage = 1; Object.values(S.pg || {}).forEach(x => { x.page = 1; }); }
   S.brand = b; store.set('nsc.brand', b); applyBrand();
   if (n !== S.navV) { S.navV = n; store.set('nsc.navv', n); S.navPeek.clear(); }
   if (fv !== S.filterV) { S.filterV = fv; store.set('nsc.filterv', fv); closePop(); }
@@ -2394,17 +2400,24 @@ function tableHTML(list) {
       <td class="act"><div class="row-actions"><button class="ghost-ic" data-act="impersonate" data-id="${u.id}" data-tip="Login as user">${icon('login', 16)}</button><button class="ghost-ic" data-act="row-more" data-id="${u.id}" data-tip="More">${icon('more', 16)}</button></div></td>
     </tr>`).join('') || noMatchRow(cols.length + 2, 'users')}</tbody></table></div></div>${listFoot(list, rows, 'user', 'users', USERS.length, 'users', S.page)}</div>`;
 }
-/* Pages + infinite scroll: a list opens on a page of PER rows (10–50, 30 by default as in the live admin; remembered).
-   Scrolling to the end loads the next PER rows under it, so one admin can jump to «page 5» and another can just keep scrolling.
-   `page` in each list's state is the page the view starts on; EXTRA[k] counts the pages loaded under it (dropped when the list, its page or the route changes). */
+/* Table navigation (Prototype config → Table navigation, S.tableNav):
+   scroll (default) — infinite scroll: a list shows its first CHUNK rows and loads the next CHUNK as the scroll nears the end; the footer counts what is loaded.
+   pages — pagination: PER rows a page (10–50, 30 by default as in the live admin; remembered), Rows per page + page numbers in the footer, no loading on scroll.
+   `page` in each list's state is the page shown (always 1 when scrolling); EXTRA[k] counts the chunks loaded under it (dropped when the list, its page or the route changes). */
+const CHUNK = 50;
+const TABLE_NAV = { scroll: ['Infinite scroll', 'Rows load as you scroll; the footer counts them'], pages: ['Pagination', 'Rows per page and page numbers in the footer'] };
+S.tableNav = TABLE_NAV[store.get('nsc.tablenav', 'scroll')] ? store.get('nsc.tablenav', 'scroll') : 'scroll';
+document.documentElement.dataset.tablenav = S.tableNav; // the config button sits higher when the footer has a pager
+const paged = () => S.tableNav === 'pages';
 const PER_OPTS = [10, 20, 30, 40, 50];
 let PER = PER_OPTS.includes(+store.get('nsc.perPage', 30)) ? +store.get('nsc.perPage', 30) : 30;
 const EXTRA = {}, PG_LAST = {};
-const pagesOf = list => Math.max(1, Math.ceil(list.length / PER));
-const loaded = (list, page, k) => { const p = Math.min(Math.max(1, page || 1), pagesOf(list)), sig = `${S.route}|${list.length}|${p}|${PER}`, e = EXTRA[k];
-  const n = e && e.sig === sig ? Math.min(e.n, pagesOf(list) - p) : 0; if (k) PG_LAST[k] = { sig, n, p };
-  return list.slice((p - 1) * PER, (p + n) * PER); };
-const moreAttr = (list, rows, k) => { const L = PG_LAST[k]; return L && (L.p + L.n) < pagesOf(list) ? `data-more="${k}"` : ''; };
+const perNow = () => paged() ? PER : CHUNK;
+const pagesOf = list => Math.max(1, Math.ceil(list.length / perNow()));
+const loaded = (list, page, k) => { const per = perNow(), p = paged() ? Math.min(Math.max(1, page || 1), pagesOf(list)) : 1, sig = `${S.route}|${list.length}|${p}|${per}`, e = EXTRA[k];
+  const n = !paged() && e && e.sig === sig ? Math.min(e.n, pagesOf(list) - p) : 0; if (k) PG_LAST[k] = { sig, n, p };
+  return list.slice((p - 1) * per, (p + n) * per); };
+const moreAttr = (list, rows, k) => { const L = PG_LAST[k]; return !paged() && L && (L.p + L.n) < pagesOf(list) ? `data-more="${k}"` : ''; };
 const pagerHTML = (k, p, pages) => { const nums = [];
   for (let i = 1; i <= pages; i++) if (i === 1 || i === pages || Math.abs(i - p) <= 1) nums.push(i); else if (nums[nums.length - 1] !== '…') nums.push('…');
   // DS parts: Select (native select → .dd.fsel), Icon button Link for ‹ ›, Pill for page numbers (current = Pill On)
@@ -2413,12 +2426,13 @@ const pagerHTML = (k, p, pages) => { const nums = [];
     + nums.map(n => n === '…' ? '<span class="pn-gap">…</span>' : `<button class="pill ${n === p ? 'on' : ''}" data-act="go-page" data-k="${k}" data-p="${n}">${n}</button>`).join('')
     + `<button class="icon-btn icon-btn-link" data-act="go-page" data-k="${k}" data-p="${p + 1}" data-tip="Next page" ${p >= pages ? 'disabled' : ''}>${icon('chevRight', 16)}</button></span></span>`; };
 document.addEventListener('change', e => { const sel = e.target.closest?.('select[data-per]'); if (!sel) return; PER = +sel.value; store.set('nsc.perPage', PER); PAGE[sel.dataset.per]?.(1); });
-// Table footer: «31–90 of 320 users» (+ filter summary) on the left; Rows per page + pages on the right once the list is longer than a page.
-// The highlighted page is the last one loaded, so it follows the scroll.
-const tfoot = (list, rows, one, many, k, page, sum = '') => { const n = list.length, pages = pagesOf(list), L = PG_LAST[k], p = L ? L.p : Math.min(Math.max(1, page || 1), pages), start = (p - 1) * PER;
-  const count = pages > 1 ? `${fmtInt(start + 1)}–${fmtInt(start + rows.length)} of ${fmtInt(n)} ${many}` : `${fmtInt(n)} ${n === 1 ? one : many}`;
-  const more = L && k !== 'users' && k !== 'co' && k !== 'pg' ? moreAttr(list, rows, k) : ''; // record-page tables scroll with #main: the footer carries data-more
-  return `<div class="tfoot" ${more}><span class="tf-c">${count}${sum}</span>${k && pages > 1 ? pagerHTML(k, L ? L.p + L.n : p, pages) : ''}</div>`; };
+// Table footer (+ filter summary). Infinite scroll: «50 of 320 users · more load as you scroll». Pagination: «31–60 of 320 users» on the left, Rows per page + pages on the right.
+const tfoot = (list, rows, one, many, k, page, sum = '') => { const n = list.length, all = `${fmtInt(n)} ${n === 1 ? one : many}`;
+  if (!paged()) { const more = k && k !== 'users' && k !== 'co' && k !== 'pg' ? moreAttr(list, rows, k) : ''; // record-page tables scroll with #main: the footer carries data-more
+    return `<div class="tfoot" ${more}><span class="tf-c">${rows.length < n ? `${fmtInt(rows.length)} of ${all} · more load as you scroll` : all}${sum}</span></div>`; }
+  const pages = pagesOf(list), L = PG_LAST[k], p = L ? L.p : Math.min(Math.max(1, page || 1), pages), start = (p - 1) * PER;
+  const count = pages > 1 ? `${fmtInt(start + 1)}–${fmtInt(start + rows.length)} of ${all}` : all;
+  return `<div class="tfoot"><span class="tf-c">${count}${sum}</span>${k && pages > 1 ? pagerHTML(k, p, pages) : ''}</div>`; };
 const RENDER = {
   users: () => renderResults(), co: () => coResults(), pg: () => pgResults(), tx: () => refreshTx(),
   cou: () => { $('#coUsersBody').innerHTML = coUsersBody(coById(S.coId)); markHits($('#coUsersBody tbody'), S.coUserQ); },
@@ -2819,14 +2833,15 @@ function userTab(u, d, D) {
   }
 }
 
-/* Wallets — every supported asset as a list row (asset · network chip · balance · in EUR); the row opens Adjust / Freeze / Copy address */
+/* Wallets — one table row per supported asset (asset · network · deposit address · balance · in EUR); on hover a row shows one action: Adjust balance, preset to its currency */
 function walletsTab(u, D) {
   // Wallets (live admin → user → Wallets, one row per currency; the live accordion only held the deposit addresses — here they are a column).
   // No Freeze (not in the live admin); balance adjustments stay in the card header (the live BALANCE tab as a dialog).
   const short = a => `${a.slice(0, 6)}…${a.slice(-4)}`;
   const rows = [...D.wallets].sort((x, y) => eurOf(y) - eurOf(x)).map(w => { const a = ASSET[w.c];
-    return [TC.currency(w.c), TC.muted(a.net), w.address ? TC.copy(w.address, short(w.address)) : TC.muted(a.net), w.amt ? TC.num(fmtAmt(w.amt, w.c)) : TC.numMuted(fmtAmt(0, w.c)), TC.numMuted(fmtEur(eurOf(w), 2))]; });
-  return tcard(`Wallets <span class="ct">${fmtEur(u.balance, 2)}</span>`, `<button class="btn btn-tertiary" data-act="adj-open">${icon('sliders', 16)}Adjust balance</button>`, dtable(['Currency', 'Network', 'Deposit address', 'Balance|r', 'In EUR|r'], rows));
+    return [TC.currency(w.c), TC.muted(a.net), w.address ? TC.copy(w.address, short(w.address)) : TC.muted(a.net), w.amt ? TC.num(fmtAmt(w.amt, w.c)) : TC.numMuted(fmtAmt(0, w.c)), TC.numMuted(fmtEur(eurOf(w), 2)),
+      `<button class="ghost-ic" data-act="adj-open" data-c="${w.c}" data-tip="Adjust ${w.c} balance">${icon('sliders', 16)}</button>`]; });
+  return tcard(`Wallets <span class="ct">${fmtEur(u.balance, 2)}</span>`, `<button class="btn btn-tertiary" data-act="adj-open">${icon('sliders', 16)}Adjust balance</button>`, dtable(['Currency', 'Network', 'Deposit address', 'Balance|r', 'In EUR|r', '|a'], rows));
 }
 
 const txType = h => `<span class="txt">${icon(TX[h.type].icon, 16)}${TX[h.type].label}</span>`;
@@ -3587,8 +3602,9 @@ const ACT = {
   'pc-pick-brand': a => { S.pcDraft.brand = a.dataset.v; pcMark(); },
   'pc-pick-nav': a => { S.pcDraft.navV = a.dataset.v; pcMark(); },
   'pc-pick-filter': a => { S.pcDraft.filterV = a.dataset.v; pcMark(); },
-  'pc-defaults': () => { S.pcDraft = { brand: 'ns', navV: 'classic', filterV: 'bar' }; pcMark(); },
-  'pc-done': () => { const d = S.pcDraft; closeModal(); if (d.brand !== S.brand || d.navV !== S.navV || d.filterV !== S.filterV) { applyProto(d); toast(t('Prototype config applied'), 'sliders'); } },
+  'pc-pick-tnav': a => { S.pcDraft.tableNav = a.dataset.v; pcMark(); },
+  'pc-defaults': () => { S.pcDraft = { brand: 'ns', navV: 'classic', filterV: 'bar', tableNav: 'scroll' }; pcMark(); },
+  'pc-done': () => { const d = S.pcDraft; closeModal(); if (d.brand !== S.brand || d.navV !== S.navV || d.filterV !== S.filterV || d.tableNav !== S.tableNav) { applyProto(d); toast(t('Prototype config applied'), 'sliders'); } },
 };
 
 /* ════════════════════════════ Companies ════════════════════════════ */
@@ -5783,7 +5799,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.target.id === 'ddQ') { const b = $('#ddList .pi[data-v]'); b && b.click(); }
   if (e.key === 'Enter' && e.target.id === 'nuEmail') ACT['create-user']();
   if (e.target.dataset?.ie && e.key === 'Enter') { e.target.blur(); return; }
-  if (e.target.dataset?.ie && e.key === 'Escape') { edRevert(e.target); e.target.blur(); return; }
+  if (e.target.dataset?.ie && e.key === 'Escape' && e.target.closest('.ie-box')) { edRevert(e.target); e.target.blur(); return; } // inline text fields; an inline select's Escape just closes its menu
   if (e.key === 'Enter' && e.target.id === 'ieQ') { const b = $('#ieList .pi:not([hidden])'); b && b.click(); }
   if (e.key === 'Escape') {
     if (cfm.classList.contains('open')) closeConfirm();
