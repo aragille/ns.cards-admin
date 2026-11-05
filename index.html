@@ -287,6 +287,8 @@ img.asset-ic{display:block;object-fit:cover}
 .ust.on,.ust.on:hover{background:var(--surface);box-shadow:var(--shadow-sm),0 0 0 var(--border-width) var(--line)}
 .ust .ust-v b{color:var(--ink-2);transition:color .12s}
 .ust:hover .ust-v b,.ust.on .ust-v b{color:var(--ink)}
+/* Attention tile: the count in the semantic warning colour (status/warning ink — orange whatever the white-label brand); the label stays grey */
+.ust.attn .ust-v b,.ust.attn:hover .ust-v b,.ust.attn.on .ust-v b{color:var(--warning-ink)}
 .ust-l{display:flex;align-items:center;gap:var(--space-4);font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
 .ust.on .ust-l{color:var(--ink-2)}
 .ust-v{display:flex;align-items:baseline;gap:var(--space-8);margin-top:var(--space-4);white-space:nowrap}
@@ -1676,12 +1678,13 @@ const monStatus = m => !m.on ? 'OFF' : NOW - m.updated > 6 * 36e5 ? 'STALE' : m.
 const monitorsOf = kind => MONITORS.filter(m => !kind || m.kind === kind).map(m => (m.status = monStatus(m), m));
 const monitorsDue = kind => monitorsOf(kind).filter(m => m.status === 'ALERT' || m.status === 'STALE');
 // attn() counts what waits on an admin on that page (why says what): the item shows the count as a badge (a dot on its icon when the sidebar is collapsed), its section title a dot while folded.
-const waiting = (id, key, values) => () => { const P = PAGES[id]; return applyFilters(pgData(P), [{ key, values }], null, P.fields).length; };
+const waiting = (id, key, values) => Object.assign(() => { const P = PAGES[id]; return applyFilters(pgData(P), [{ key, values }], null, P.fields).length; }, { f: { key, values } });
+const counting = (fn, key, values) => Object.assign(fn, { f: { key, values } }); // a custom attn count + the list filter that shows it
 const NAV = [
   { id: 'dashboard', label: 'Overview', icon: 'dashboard' }, // the homepage sits above every section
   { id: 'requests', label: 'Requests', icon: 'inbox', attn: waiting('requests', 'status', ['NEW']), why: 'new' }, // what WL operators ask NS.Cards for
-  { label: 'Clients', icon: 'users', items: [{ id: 'users', label: 'Users', icon: 'users', attn: () => USERS.filter(u => ['pending', 'review'].includes(u.kyc)).length, why: 'with KYC to review' },
-    { id: 'companies', label: 'Company list', icon: 'building', on: () => S.route === 'companies' && S.coView !== 'access', attn: () => COMPANIES.filter(c => !c.cp.length && !c.ip.length).length, why: 'not set up' },
+  { label: 'Clients', icon: 'users', items: [{ id: 'users', label: 'Users', icon: 'users', attn: counting(() => USERS.filter(u => ['pending', 'review'].includes(u.kyc)).length, 'kyc', ['pending', 'review']), why: 'with KYC to review' },
+    { id: 'companies', label: 'Company list', icon: 'building', on: () => S.route === 'companies' && S.coView !== 'access', attn: counting(() => COMPANIES.filter(c => !c.cp.length && !c.ip.length).length, 'setup', ['none']), why: 'not set up' },
     { id: 'companies', href: '#/companies/access', label: 'Product access', icon: 'table', on: () => S.route === 'companies' && S.coView === 'access' }] },
   // issued cards and accounts are the clients' own objects; Products below are the types they are issued from
   { label: 'Cards & accounts', icon: 'card', items: [{ id: 'cards', label: 'Cards', icon: 'card' },
@@ -1697,8 +1700,8 @@ const NAV = [
     { id: 'payout-pools', label: 'Payout pools', icon: 'payout', attn: waiting('payout-pools', 'status', ['FAILED']), why: 'failed' }, { id: 'strategies', label: 'Strategies', icon: 'strategy' }] },
   { label: 'Finance', icon: 'walletStats', items: [{ id: 'wallet-stats', label: 'Wallet statistics', icon: 'walletStats' }, { id: 'activity-stats', label: 'Operation statistics', icon: 'pieChart' }, { id: 'reserves', label: 'Reserves', icon: 'scale' }] },
   // Finance monitors: a group of its own — the dashboard across them, then one list per kind
-  { label: 'Finance monitors', icon: 'activity', items: [{ id: 'monitors', label: 'Monitors dashboard', icon: 'activity', attn: () => monitorsDue().length, why: 'monitors need attention' },
-    ...Object.entries(MON_KIND).map(([k, m]) => ({ id: m.page, label: { cards: 'Card issuers', bank: 'Bank accounts' }[k] || m.label, icon: m.icon, attn: () => monitorsDue(k).length, why: 'need attention' }))] },
+  { label: 'Finance monitors', icon: 'activity', items: [{ id: 'monitors', label: 'Monitors dashboard', icon: 'activity', attn: counting(() => monitorsDue().length, 'status', ['ALERT', 'STALE']), why: 'monitors need attention' },
+    ...Object.entries(MON_KIND).map(([k, m]) => ({ id: m.page, label: { cards: 'Card issuers', bank: 'Bank accounts' }[k] || m.label, icon: m.icon, attn: counting(() => monitorsDue(k).length, 'status', ['ALERT', 'STALE']), why: 'need attention' }))] },
   { label: 'Reference data', icon: 'sliders', items: [{ id: 'currencies', label: 'Currencies', icon: 'coins' }, { id: 'networks', label: 'Networks', icon: 'link' }, { id: 'markets', label: 'Markets', icon: 'candles' }, { id: 'countries', label: 'Country lists', icon: 'globe' }] },
   { label: 'Administration', icon: 'userCog', items: [{ id: 'admins', label: 'Administrators', icon: 'userCog' }, { id: 'roles', label: 'Roles', icon: 'key' }, { id: 'sources', label: 'Sources', icon: 'folder' },
     { id: 'verification-templates', label: 'Verification templates', icon: 'file' }, { id: 'logs', label: 'Audit log', icon: 'logs' }] },
@@ -1735,6 +1738,8 @@ function pageTabs() {
 }
 const navOn = it => it.on ? it.on() : S.route === it.id;
 const navAttn = it => it.attn ? it.attn() : 0;
+// A list tile demands attention when it filters to the work the page's sidebar counter counts (same field, values within it) and that work is there: it takes the accent colour.
+const tileAttn = (route, t, n) => { const f = NAV_FLAT.find(x => x.id === route)?.attn?.f; return !!(n && f && t.filter && t.filter.key === f.key && t.filter.values.every(v => f.values.includes(v))); };
 const navDot = it => { const n = navAttn(it); return n ? `<em class="nb" data-tip="${fmtInt(n)} ${it.why}">${fmtInt(n)}</em><i class="ndot ndot-c"></i>` : ''; };
 const navLink = (it, fly) => { const n = navAttn(it); return `<a class="nav ${navOn(it) ? 'active' : ''}" href="${it.href || '#/' + it.id}" ${fly ? '' : `data-tip="${t(it.label)}${n ? ` · ${fmtInt(n)} ${it.why}` : ''}" data-tip-collapsed`}>${icon(it.icon, 16)}<span class="${fly ? '' : 'fade'}">${t(it.label)}</span>${navDot(it)}</a>`; };
 const curSec = () => NAV.find(n => n.items?.some(navOn));
@@ -2240,7 +2245,7 @@ function renderStats() {
   $('#uStats').innerHTML = STAT_TILES.map(t => {
     const n = t.filter ? applyFilters(USERS, [t.filter]).length : 0;
     const v = t.value ? t.value(USERS) : fmtInt(n);
-    return `<button class="ust ${tileOn(t) ? 'on' : ''}" data-act="stat" data-id="${t.id}">
+    return `<button class="ust ${tileOn(t) ? 'on' : ''} ${tileAttn('users', t, n) ? 'attn' : ''}" data-act="stat" data-id="${t.id}">
       <div class="ust-l">${t.label}</div>
       <div class="ust-v"><b>${v}</b><span>${t.sub(USERS, n)}</span></div>
     </button>`;
@@ -2339,7 +2344,7 @@ const filterGroupPop = () => `<div class="pop-sec"><div class="pop-lbl">Applied 
   ${fx().list.map(f => { const { F, vt, op } = chipParts(f); return `<div class="fg-row"><button class="fg-v" data-act="edit-filter" data-key="${f.key}">${icon(F.icon, 16)}<span class="fg-l">${F.label}</span><span class="fg-o">${op}</span><b>${vt}</b></button><button class="icon-btn icon-btn-link" data-act="rm-filter" data-key="${f.key}" aria-label="Remove filter">${icon('x', 16)}</button></div>`; }).join('')}</div>`;
 // Display button shows the current layout icon; layout itself is switched inside the Display popover
 function renderLayoutSeg() {
-  $('#displayBtn').innerHTML = `${icon(S.view, 16)}<span class="sl">Display</span>${icon('chevDown', 16)}`;
+  $('#displayBtn').innerHTML = `${icon('columns', 16)}<span class="sl">Display</span>${icon('chevDown', 16)}`; // the table-settings icon, as on record-page tables
 }
 function renderResults() {
   const list = getList(); S._list = list;
@@ -3741,7 +3746,7 @@ function coTopbar() {
       <button class="icon-btn" data-act="co-more" data-tip="More">${icon('more', 16)}</button>
       <button class="btn btn-secondary" data-act="co-new-user">${icon('plus', 16, 2)}<span class="tb-lbl">Create user</span></button>` : ''}`;
   }
-  return `${S.coView === 'list' ? `<button class="btn btn-tertiary" id="displayBtn" data-act="ld-display">${icon(lvView('companies'), 16)}<span class="sl">Display</span>${icon('chevDown', 16)}</button>` : ''}
+  return `${S.coView === 'list' ? `<button class="btn btn-tertiary" id="displayBtn" data-act="ld-display">${icon('columns', 16)}<span class="sl">Display</span>${icon('chevDown', 16)}</button>` : ''}
     <button class="btn btn-tertiary" data-act="co-export">${icon('download', 16)}<span class="tb-lbl">Export</span>${icon('chevDown', 16)}</button>
     <button class="btn btn-primary" data-act="co-new">${icon('plus', 16, 2)}<span class="tb-lbl">New company</span></button>`;
 }
@@ -3807,7 +3812,7 @@ function renderCompanies() {
 }
 function coStats() {
   const el = $('#coStats'); if (!el) return;
-  el.innerHTML = CO_TILES.map(t => { const n = t.filter ? applyFilters(COMPANIES, [t.filter], null, CO_FIELDS).length : COMPANIES.length; return `<button class="ust ${tileOn(t, S.co.filters, S.co.search) ? 'on' : ''}" data-act="co-tile" data-id="${t.id}">
+  el.innerHTML = CO_TILES.map(t => { const n = t.filter ? applyFilters(COMPANIES, [t.filter], null, CO_FIELDS).length : COMPANIES.length; return `<button class="ust ${tileOn(t, S.co.filters, S.co.search) ? 'on' : ''} ${tileAttn('companies', t, t.filter && n) ? 'attn' : ''}" data-act="co-tile" data-id="${t.id}">
     <div class="ust-l">${t.label}</div><div class="ust-v"><b>${fmtInt(n)}</b><span>${t.sub(COMPANIES, n)}</span></div></button>`; }).join('');
 }
 function coResults() {
@@ -4539,7 +4544,7 @@ function renderPg() {
 function pgStats() {
   const P = pg(), el = $('#pgStats'); if (!el) return;
   const st = pgS(P.id), L = pgData(P);
-  el.innerHTML = P.tiles.map(t => { const n = t.filter ? applyFilters(L, [t.filter], null, P.fields).length : L.length; return `<button class="ust ${tileOn(t, st.filters, st.search) ? 'on' : ''}" data-act="pg-tile" data-id="${t.id}">
+  el.innerHTML = P.tiles.map(t => { const n = t.filter ? applyFilters(L, [t.filter], null, P.fields).length : L.length; return `<button class="ust ${tileOn(t, st.filters, st.search) ? 'on' : ''} ${tileAttn(P.id, t, t.filter && n) ? 'attn' : ''}" data-act="pg-tile" data-id="${t.id}">
     <div class="ust-l">${t.label}</div><div class="ust-v"><b>${t.value ? t.value(L, n) : fmtInt(n)}</b><span>${t.sub ? t.sub(L, n) : ''}</span></div></button>`; }).join('');
 }
 function pgResults() {
@@ -4585,7 +4590,7 @@ function pgTopbar() {
       <button class="icon-btn" data-act="rec-step" data-d="1" ${i < 0 || i >= l.length - 1 ? 'disabled' : ''} data-tip="Next  j">${icon('chevDown', 16)}</button>
       ${recOf(P) ? `<span class="tb-div"></span>${P.rec.acts ? P.rec.acts(recOf(P)) : ''}<button class="icon-btn" data-act="pg-rec-more" data-rid="${esc(S.recId)}" data-tip="More">${icon('more', 16)}</button>` : ''}`;
   }
-  return `<button class="btn btn-tertiary" id="displayBtn" data-act="ld-display">${icon(lvView('pg:' + P.id), 16)}<span class="sl">Display</span>${icon('chevDown', 16)}</button>
+  return `<button class="btn btn-tertiary" id="displayBtn" data-act="ld-display">${icon('columns', 16)}<span class="sl">Display</span>${icon('chevDown', 16)}</button>
     <button class="btn btn-tertiary" data-act="pg-export">${icon('download', 16)}<span class="tb-lbl">Export</span>${icon('chevDown', 16)}</button>
     ${P.form && P.form.create !== false ? `<button class="btn btn-primary" data-act="pg-new">${icon('plus', 16, 2)}<span class="tb-lbl">${P.form.newLabel || 'New ' + P.noun}</span></button>` : ''}`;
 }
@@ -5713,7 +5718,7 @@ Object.assign(ACT, {
   },
   'rec-step': a => stepRec(+a.dataset.d),
   'ld-display': a => openPop(a, listDisplayPop(), { align: 'right', width: 380, kind: 'ldisplay' }),
-  'ld-layout': a => { const t = colCtx().t; lvOf(t).view = a.dataset.v; store.set('nsc.lview', S.lv); $('#displayBtn').innerHTML = `${icon(lvView(t), 16)}<span class="sl">Display</span>${icon('chevDown', 16)}`; refreshLD(); },
+  'ld-layout': a => { const t = colCtx().t; lvOf(t).view = a.dataset.v; store.set('nsc.lview', S.lv); refreshLD(); },
   'ld-group': a => { const t = colCtx().t; lvOf(t).by = a.dataset.v; S.lbMore[t] = {}; store.set('nsc.lview', S.lv); refreshLD(); },
   'ld-col': a => { const X = colCtx(); S.tcols[X.t] = withCol(X.t, X.cols, a.dataset.k); store.set('nsc.tcols2', S.tcols); refreshLD(); },
   'ld-cols-reset': () => { resetTcols(colCtx().t); refreshLD(); toast('Columns reset to default', 'columns'); },
