@@ -660,6 +660,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 /* inline editing: values look plain until hovered or focused; a changed field tints like the Users dropdowns */
 .sel-btn{max-width:100%;min-width:0} .sel-btn .ie-v{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .kv-r:has(.ie-box)>span:first-child{flex:none;white-space:nowrap}
+.kv-v{display:flex;align-items:center;gap:var(--space-4);min-width:0} /* a value with a trailing action (Invited by → open the inviter) */
 .ie-box{display:inline-flex;align-items:center;gap:var(--space-8);flex:0 1 250px;min-width:0;height:32px;padding:0 var(--space-12);margin-right:calc(-1 * var(--space-12));border-radius:var(--r-sm);border:var(--border-width) solid transparent;cursor:text;transition:background .1s,border-color .1s}
 .ie-box:hover{background:var(--hover);border-color:var(--line)}
 .ie-box:focus-within{background:var(--surface);border-color:var(--focus);box-shadow:var(--focus-brand)}
@@ -2146,7 +2147,7 @@ function spark(data) {
 // Overview: the totals an operator checks first, every queue that waits on a decision, funds per currency and the latest admin actions
 function renderDashboard() {
   const stats = [['Users', 'users', USERS.length, '#/users'], ['Companies', 'building', COMPANIES.length, '#/companies'],
-    ['Issued cards', 'card', sum(USERS.map(u => ud(u).cards.length)), '#/cards'], ['Products', 'cardProduct', CARD_PRODUCTS.length + IBAN_PRODUCTS.length, '#/card-products']];
+    ['Issued cards', 'card', sum(USERS.map(u => ud(u).cards.length)), '#/cards'], ['IBAN accounts', 'bank', sum(USERS.map(u => ud(u).ibans.length)), '#/iban']];
   // every queue that waits on an admin and how many; a row opens the list filtered to them
   const queue = (id, l, ic, values) => { const P = PAGES[id]; return { id, l, ic, v: values.join(), n: applyFilters(pgData(P), [{ key: 'status', values }], null, P.fields).length }; };
   const queues = [queue('documents', 'Documents to review', 'documents', ['PENDING']), queue('kyc-checks', 'KYC checks', 'idcard', ['PENDING']), queue('card-orders', 'Card issue errors', 'send', ['FAILED']),
@@ -2775,7 +2776,7 @@ const tabCount = n => n ? ` <span class="tab-n">${n}</span>` : '';
 // drag (optional) = { t, keys }: column keys aligned with heads (null for fixed columns) make those headers draggable to reorder
 // Column widths come from what a column holds (an ID, a date, a status…), never from the rows, so switching records keeps every column in place.
 // Text columns (names, addresses…) get no width and share what is left; long values end in "…".
-const DT_W = [[/^(ID|#)$/, 100], [/ ID$/, 160], [/^(Created|Updated|Added|Expires|Expiry|Last used|Started|When|Requested|Request updated|Operation date|Date of birth)$/, 170],
+const DT_W = [[/^(ID|#)$/, 100], [/ ID$/, 160], [/^(Date|Created|Updated|Added|Expires|Expiry|Last used|Started|When|Requested|Request updated|Operation date|Date of birth)$/, 170],
   [/^(Status|KYC|Outcome|Risk)$/, 160], [/^(Pair|Kind|Region|Source|Version|Frozen|Active|Default|Residency)$/, 120], [/^(IDV verified|KYC verified|KYC downloaded|Default provider)$/, 120],
   [/^(Currency|Crypto currency|Type|Card type|Role|Network)$/, 170], [/^Code$/, 240], [/^(Country|Nationality|City|Post code|Provider|Masked number)$/, 150]];
 const dtColW = h => h.al === 'a' ? 0 : h.al === 'cbx' ? 44 : DT_W.find(([re]) => re.test(h.l))?.[1] ?? (h.al === 'c' ? 110 : h.al === 'r' ? 130 : null);
@@ -2894,7 +2895,7 @@ function userTab(u, d, D) {
     case 'overview': return `
       <div class="card"><div class="card-h"><span class="card-t">Profile</span></div><div class="kv2 card-b">
         ${['name', 'email', 'status', 'level', 'risk', 'country', 'type'].map(k => kv(U_EDIT[k].l, k === 'email' ? copyVal(d.email) : edField(X, k))).join('')}${kv('Company', `<a class="lnk" href="#/companies/${d.companyId}">${esc(companyOf(d).name)} #${d.companyId}</a>`)}
-        ${kv('Language', edField(X, 'lang'))}${kv('Invited by', u.invitedBy ? (i => `<a class="lnk" href="#/users/${u.invitedBy}">${esc(i?.name || 'User')} #${u.invitedBy}</a>`)(byId(u.invitedBy)) : dash)}
+        ${kv('Language', edField(X, 'lang'))}${kv('Invited by', `<span class="kv-v">${edField(X, 'invitedBy')}${d.invitedBy ? `<a class="icon-btn icon-btn-link" href="#/users/${d.invitedBy}" data-tip="Open inviter">${icon('chevRight', 16)}</a>` : ''}</span>`)}
       </div></div>
       <div class="card"><div class="card-h"><span class="card-t">Verification</span><button class="btn btn-link" data-act="u-tab" data-v="verification">Details ${icon('chevRight', 16)}</button></div><div class="kv2 card-b">
         ${ver('Email', d.emailVerified, `<span class="${d.emailVerified ? '' : 'faint'}">${d.emailVerified ? 'Verified' : 'Not verified'}</span>`, d.emailVerified ? '' : `<button class="btn btn-link" data-act="toast" data-msg="Verification email sent">Resend</button>`)}
@@ -3017,18 +3018,69 @@ function txBody(D) {
 }
 const refreshTx = () => { const el = $('#txBody'); if (el) el.innerHTML = txBody(ud(byId(S.userId))); };
 
+/* Card and IBAN account transactions — generated once per card / account from its id (same rows on the user's tabs and on the card / account page) */
+const CTX_TYPE = { CARD_PAYMENT: { label: 'Card payment', icon: 'card' }, CARD_TOPUP: { label: 'Top-up', icon: 'arrows' }, REFUND: { label: 'Refund', icon: 'refresh' }, FEE: { label: 'Card fee', icon: 'coins' } };
+const ITX_TYPE = { IN: { label: 'Incoming SEPA', icon: 'download' }, OUT: { label: 'Outgoing SEPA', icon: 'upload' } };
+const XTX_STATUS = { COMPLETED: { label: 'Completed', tone: 'success' }, PENDING: { label: 'Pending', tone: 'warning' }, DECLINED: { label: 'Declined', tone: 'error' }, RETURNED: { label: 'Returned', tone: 'neutral' } };
+const XTX = new Map();
+const xtxRand = (seed, from, n, mk) => { const r = rng(seed), t0 = from.getTime(), span = Math.max(36e5, NOW - t0), pk = a => a[Math.floor(r() * a.length)];
+  const wp = o => { const e = Object.entries(o); let x = r() * e.reduce((s, [, w]) => s + w, 0); for (const [k, w] of e) if ((x -= w) < 0) return k; return e[0][0]; };
+  return Array.from({ length: n }, (_, i) => ({ i, ...mk({ r, pk, wp }), created: new Date(t0 + r() * span) })).sort((a, b) => b.created - a.created); };
+const cardTx = c => { const k = 'c' + c.id; if (!XTX.has(k)) { const n = c.activated ? 6 + (c.id * 7) % 19 : 0;
+  XTX.set(k, xtxRand(c.id * 31 + 5, cardSteps(c).find(x => x.t === 'Activated')?.date || c.created, n, ({ r, pk, wp }) => { const type = wp({ CARD_PAYMENT: 70, CARD_TOPUP: 16, REFUND: 6, FEE: 8 });
+    const amt = type === 'CARD_PAYMENT' ? -(3 + Math.pow(r(), 2) * 180) : type === 'CARD_TOPUP' ? 20 + Math.round(r() * 48) * 10 : type === 'REFUND' ? 4 + r() * 60 : -(1 + Math.round(r() * 4));
+    return { card: c, type, merchant: type === 'CARD_PAYMENT' || type === 'REFUND' ? pk(MERCHANTS) : type === 'CARD_TOPUP' ? 'From EUR wallet' : 'Monthly fee',
+      amt, status: type === 'CARD_PAYMENT' ? wp({ COMPLETED: 90, PENDING: 6, DECLINED: 4 }) : 'COMPLETED' }; }).map(x => ({ ...x, id: c.id * 100 + x.i }))); }
+  return XTX.get(k); };
+const ibanTx = b => { const k = 'i' + b.id; if (!XTX.has(k)) { const n = b.status === 'PENDING' ? 0 : 5 + (b.id * 5) % 16;
+  if (!b.created) pgData(PAGES.iban); // the account's opening date is set by the IBAN accounts list
+  XTX.set(k, xtxRand(b.id * 17 + 3, b.created || new Date(NOW.getTime() - 120 * DAY), n, ({ r, pk, wp }) => { const type = wp({ IN: 55, OUT: 45 });
+    return { acct: b, type, party: pk(type === 'IN' ? ['Freelance client', 'Revolut Ltd', 'Wise Europe', 'Employer GmbH', 'N26 Bank'] : ['Landlord GmbH', 'Deutsche Bank', 'ING Bank', 'Utility Co', 'Tax office']),
+      ref: `${type === 'IN' ? 'INV' : 'PAY'}-${1000 + Math.floor(r() * 9000)}`, amt: type === 'IN' ? 50 + Math.round(Math.pow(r(), 2) * 3000) : -(20 + Math.round(Math.pow(r(), 2) * 1500)),
+      status: wp({ COMPLETED: 88, PENDING: 8, RETURNED: 4 }) }; }).map(x => ({ ...x, id: b.id * 100 + x.i }))); }
+  return XTX.get(k); };
+const signedEur = v => TC.num(`${v > 0 ? '+' : '−'}${fmtAmt(Math.abs(v), 'EUR')}`, v > 0 ? 'positive' : '');
+const ibanShort = b => `${b.iban.slice(0, 4)} •• ${b.iban.replace(/ /g, '').slice(-4)}`;
+// tables: Type · Card / Account · Merchant / Counterparty (+ Reference) · Status · Amount · Date; `one` leaves out the card / account column (on its own page)
+const cardTxTable = (list, one) => dtable(['Type', ...(one ? [] : ['Card']), 'Merchant', 'Status', 'Amount|r', 'Date|r'], list.map(x => [TC.iconText(CTX_TYPE[x.type].icon, CTX_TYPE[x.type].label),
+  ...(one ? [] : [TC.link(`#/cards/${x.card.id}`, `•••• ${x.card.last4}`)]), TC.text(esc(x.merchant)), TC.status(XTX_STATUS[x.status]), signedEur(x.amt), TC.num(fmtDateTime(x.created))]),
+  emptyBlock('card', 'No card transactions', 'Payments, top-ups and refunds on this card show up here.'));
+const ibanTxTable = (list, one) => dtable(['Type', ...(one ? [] : ['Account']), 'Counterparty', 'Reference', 'Status', 'Amount|r', 'Date|r'], list.map(x => [TC.iconText(ITX_TYPE[x.type].icon, ITX_TYPE[x.type].label),
+  ...(one ? [] : [TC.link(`#/iban/${x.acct.id}`, ibanShort(x.acct))]), TC.text(esc(x.party)), TC.text(x.ref), TC.status(XTX_STATUS[x.status]), signedEur(x.amt), TC.num(fmtDateTime(x.created))]),
+  emptyBlock('bank', 'No transfers yet', 'SEPA transfers in and out of this account show up here.'));
+// Card history — issue (virtual) or the plastic's order → production → shipping → delivery (physical), then activation.
+// An activated card went through every step, so its history is fitted between the order and now; a card on its way shows only the steps already done.
+function cardSteps(c) {
+  const r = rng(c.id * 13 + 1), t = c.created.getTime(), carrier = ['DHL Express', 'UPS', 'DPD', 'FedEx'][c.id % 4], track = (c.ext || '').replace(/-/g, '').slice(0, 10).toUpperCase();
+  const steps = c.physical
+    ? [{ ic: 'send', t: 'Plastic card ordered', s: `${esc(c.product)} · by the cardholder in the app`, d: 0 }, { ic: 'cardProduct', t: 'Sent to production', s: 'Wallester · design ' + esc(c.design || ''), d: .4 + r() * .6 },
+       { ic: 'card', t: 'Card issued', s: `•••• ${c.last4} · expires ${c.exp}`, d: 2 + r() }, { ic: 'send', t: 'Shipped', s: `${carrier} · tracking ${track}`, d: 3 + r() * 2 },
+       { ic: 'check', t: 'Delivered', s: carrier, d: 6 + r() * 3 }, ...(c.activated ? [{ ic: 'checkCircle', t: 'Activated', s: 'PIN set by the cardholder', d: 9 + r() * 3 }] : [])]
+    : [{ ic: 'card', t: 'Virtual card issued', s: `${esc(c.product)} · •••• ${c.last4}`, d: 0 }, ...(c.activated ? [{ ic: 'checkCircle', t: 'Activated', s: 'Added to the wallet', d: .01 + r() * .05 }] : [])];
+  const last = steps[steps.length - 1].d || 1, k = c.activated ? Math.min(1, (NOW - t) / (last * DAY * 1.05)) : 1;
+  return steps.map(x => ({ ...x, date: new Date(t + x.d * DAY * k) })).filter(x => x.date <= NOW);
+}
+function cardHistory(c) {
+  const shown = cardSteps(c).reverse();
+  if (c.frozen) shown.unshift({ ic: 'lock', t: 'Card frozen', s: 'By an administrator', date: c.updated });
+  return timeline(shown.map(x => ({ ic: x.ic, t: x.t, s: x.s, when: fmtDateTime(x.date) })));
+}
+
 /* Cards */
 function cardsTab(u, D) {
+  const tx = D.cards.flatMap(cardTx).sort((a, b) => b.created - a.created);
   return tcard('Cards', (D.cards.length ? `<button class="btn btn-tertiary" data-act="cards-update">${icon('refresh', 16)}Update balances</button>` : '') + colsBtn('cards'),
     ctable('cards', D.cards, emptyBlock('card', 'No cards', u.kyc === 'approved' ? 'This user hasn’t ordered a card yet.' : 'Cards are available after KYC approval.'),
-      { post: (c, i) => `<button class="ghost-ic" data-act="card-more" data-i="${i}" data-tip="More">${icon('more', 16)}</button>` }));
+      { post: (c, i) => `<button class="ghost-ic" data-act="card-more" data-i="${i}" data-tip="More">${icon('more', 16)}</button>` }))
+    + (D.cards.length ? tcard(`Card transactions <span class="ct">${fmtInt(tx.length)}</span>`, '', cardTxTable(tx)) : '');
 }
 
 /* IBAN */
 function ibanTab(u, D) {
-  const ok = u.kyc === 'approved';
+  const ok = u.kyc === 'approved', tx = D.ibans.flatMap(ibanTx).sort((a, b) => b.created - a.created);
   return tcard('IBAN accounts', colsBtn('iban'), ctable('iban', D.ibans,
-    emptyBlock('bank', 'No IBAN accounts', ok ? 'Issue a EUR account for this user.' : 'IBAN accounts are available after KYC approval.', ok ? `<button class="btn btn-secondary" data-act="iban-issue">${icon('plus', 16)}Issue IBAN</button>` : '')));
+    emptyBlock('bank', 'No IBAN accounts', ok ? 'Issue a EUR account for this user.' : 'IBAN accounts are available after KYC approval.', ok ? `<button class="btn btn-secondary" data-act="iban-issue">${icon('plus', 16)}Issue IBAN</button>` : '')))
+    + (D.ibans.length ? tcard(`Transfers <span class="ct">${fmtInt(tx.length)}</span>`, '', ibanTxTable(tx)) : '');
 }
 
 /* Fees & limits — readable versions of the per-operation JSON */
@@ -3213,6 +3265,9 @@ const U_EDIT = {
   status: { t: 'sel', l: 'Status', opts: STATUS, show: v => statusCell(v) }, level: { t: 'sel', l: 'Level', opts: LEVEL },
   risk: { t: 'sel', l: 'Risk level', opts: RISK, show: v => riskCell(v) }, country: { t: 'sel', l: 'Residency', opts: ctryEdit, none: 'Not set' },
   type: { t: 'sel', l: 'Type', opts: TYPE }, lang: { t: 'sel', l: 'Language', opts: ['EN', 'DE', 'FR', 'ES', 'IT', 'PL', 'PT', 'NL', 'RU'] },
+  // assigned by hand when someone signed up without a referral code: any other user, searchable by name, email or ID
+  invitedBy: { t: 'sel', l: 'Invited by', num: 1, none: 'Not set', opts: () => Object.fromEntries(USERS.filter(x => x.id !== S.userId).map(x => [String(x.id), { label: `${x.name || x.email} #${x.id}` }])),
+    show: v => `<span class="ie-v">${esc(byId(+v)?.name || 'User')} #${v}</span>` },
 };
 const CO_EDIT = {
   name: { t: 'text', l: 'Name', req: 1 }, status: { t: 'sel', l: 'Status', opts: STATUS, show: v => statusCell(v) }, type: { t: 'sel', l: 'Type', opts: CO_TYPE },
@@ -5102,7 +5157,8 @@ page({
   menu: b => [...(b.status !== 'CLOSED' ? [{ act: 'iban-close', data: { rid: b.id }, icon: 'ban', label: 'Close account' }] : []), { act: 'open-user', data: { id: b.uid }, icon: 'user', label: 'Open user' }],
   bulk: [{ icon: 'ban', label: 'Close', run: ibanClose }],
   rec: { title: b => b.iban, sub: b => `${userLink(byId(b.uid))}<span class="faint">·</span><span>${esc(b.productName)}</span>`, badges: b => badge(IBAN_STATUS[b.status]) + `<span class="badge t-neutral">${b.provider}</span>`,
-    acts: b => b.status !== 'CLOSED' ? `<button class="btn btn-tertiary" data-act="iban-close" data-rid="${b.id}">${icon('ban', 16)}Close account</button>` : '' },
+    acts: b => b.status !== 'CLOSED' ? `<button class="btn btn-tertiary" data-act="iban-close" data-rid="${b.id}">${icon('ban', 16)}Close account</button>` : '',
+    sections: b => tcard(`Transfers <span class="ct">${fmtInt(ibanTx(b).length)}</span>`, '', ibanTxTable(ibanTx(b), 1)) },
 });
 
 /* ── Financial · Cards (the same objects as each user’s Cards tab) ── */
@@ -5125,7 +5181,9 @@ page({
   menu: c => [{ act: 'card-tog', data: { rid: c.id }, icon: c.frozen ? 'refresh' : 'lock', label: c.frozen ? 'Unfreeze card' : 'Freeze card' }, { act: 'copy', data: { copy: c.ext }, icon: 'copy', label: 'Copy external ID' }, { act: 'open-user', data: { id: c.uid }, icon: 'user', label: 'Open user' }],
   bulk: [{ icon: 'lock', label: 'Freeze', run: rows => cardFreeze(rows, true) }, { icon: 'refresh', label: 'Unfreeze', run: rows => cardFreeze(rows, false) }],
   rec: { title: c => `${c.product} •••• ${c.last4}`, sub: c => `${userLink(byId(c.uid))}<span class="faint">·</span><span class="num">${fmtAmt(c.balance, 'EUR')}</span>`, badges: c => badge(CARD_STATUS[c.frozen ? 'frozen' : 'active']) + `<span class="badge t-neutral">${c.physical ? 'Physical' : 'Virtual'}</span>`,
-    acts: c => `<button class="btn btn-tertiary" data-act="card-tog" data-rid="${c.id}">${icon(c.frozen ? 'refresh' : 'lock', 16)}${c.frozen ? 'Unfreeze' : 'Freeze'}</button>` },
+    acts: c => `<button class="btn btn-tertiary" data-act="card-tog" data-rid="${c.id}">${icon(c.frozen ? 'refresh' : 'lock', 16)}${c.frozen ? 'Unfreeze' : 'Freeze'}</button>`,
+    sections: c => tcard(`Transactions <span class="ct">${fmtInt(cardTx(c).length)}</span>`, '', cardTxTable(cardTx(c), 1)),
+    side: c => `<div class="card"><div class="card-h"><span class="card-t">${c.physical ? 'Order history' : 'Card history'}</span></div><div class="card-b pad">${cardHistory(c)}</div></div>` },
 });
 
 /* ── Financial · SBP top-up ── */
