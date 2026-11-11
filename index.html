@@ -120,9 +120,13 @@ img.crop{object-fit:cover;object-position:left center}
 .sb-label{display:flex;align-items:center;gap:var(--space-8);width:100%;font-size:var(--fs-12);line-height:var(--lh-16);font-weight:var(--fw-medium);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);padding:var(--space-16) var(--space-12) var(--space-8);white-space:nowrap;
   overflow:hidden;transition:opacity .16s ease .06s}
 .sb-sec{position:relative}
+/* collapsed rail: group titles close up (40 → 0) so the icons run as one column without gaps; they slide back open on expand */
+.sb-label{height:var(--control-lg)}
+.app.sb-anim .sb-items{transition:none} /* expand / collapse: icons don't animate — titles close up and folded groups open at once; only the width moves (folding a group by hand still slides) */
+@media (prefers-reduced-motion:reduce){.sidebar,.sb-label,.sb-items{transition:none}}
+.app.collapsed .sb-label{height:0;padding-top:0;padding-bottom:0;overflow:hidden}
 .sb-sec::before{content:'';position:absolute;left:var(--space-12);top:calc(var(--space-16) + var(--space-8));width:var(--icon-md);height:var(--border-width);background:var(--line-strong);opacity:0;transition:opacity .16s ease;pointer-events:none} /* the rail's section rule: icon-wide, on the icons' x, at the title's mid-line */
-.app.collapsed .sb-sec::before{opacity:1;transition-delay:.06s}
-.app.collapsed .sb-sec.closed:has(.sb-dot)::before{background:var(--brand)} /* folded section with something pending */
+/* the collapsed rail draws no rules between groups (the ::before rule stays hidden) */
 /* sections fold from their title: the chevron shows on hover and stays (turned) while folded; a folded section with pending items gets a small brand dot */
 .sb-label .i{margin-left:auto;opacity:0;transition:opacity .12s,transform .15s} /* the sidebar keeps its chevron animation; elsewhere arrows flip instantly */
 .sb-label:hover{color:var(--ink-2)} .sb-label:hover .i{opacity:1}
@@ -132,7 +136,8 @@ img.crop{object-fit:cover;object-position:left center}
 /* folding slides the items' height (0fr ↔ 1fr) instead of popping them; the inner box clips, widened 4px so focus rings aren't cut */
 .sb-items{display:grid;grid-template-rows:1fr;transition:grid-template-rows .24s cubic-bezier(.2,.8,.2,1)}
 .sb-items>div{min-height:0;overflow:hidden;margin:0 calc(-1 * var(--space-4));padding:0 var(--space-4)}
-.sb-sec.closed .sb-items{grid-template-rows:0fr} /* stays folded in the rail too, so nothing below shifts */
+.sb-sec.closed .sb-items{grid-template-rows:0fr}
+.app.collapsed .sb-sec.closed .sb-items{grid-template-rows:1fr} /* the collapsed rail shows every group's icons, folded or not (any nav variant) */
 .sb-scroll>.nav{margin-bottom:var(--space-2)}
 .nav.active .i{color:var(--ink)}
 /* attention dot: something on that page waits on an admin; on the icon's corner while the sidebar is collapsed */
@@ -222,6 +227,12 @@ kbd{font-family:var(--font);font-size:var(--fs-12);line-height:var(--lh-16);font
 .pa-ph .btn-link{height:auto;padding:0;font-size:var(--fs-12);letter-spacing:0;text-transform:none}
 .icon-btn .dotn{position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;border-radius:var(--r-sm);background:var(--brand);color:var(--on-brand);font-size:var(--fs-12);font-weight:600;display:grid;place-items:center;border:2px solid var(--bg)}
 .menu-btn{display:none}
+.app.sb-hidden{grid-template-columns:minmax(0,1fr)}
+.app.sb-hidden .sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar);transform:translateX(-100%);transition:transform .22s ease;box-shadow:var(--shadow-lg);z-index:60}
+.app.sb-hidden.mobile-open .sidebar{transform:none}
+.app.sb-hidden .menu-btn{display:grid}
+.app.sb-hidden .topbar{padding-left:var(--space-16)}
+.app.sb-hidden .sb-toggle{opacity:1}
 main{flex:1;overflow:auto;min-height:0}
 .keys{display:flex;flex-direction:column}
 .keys>div{display:flex;align-items:center;justify-content:space-between;height:40px;border-bottom:var(--border-width) solid var(--line-soft);font-size:var(--fs-14)}
@@ -296,6 +307,9 @@ img.asset-ic{display:block;object-fit:cover}
 .ust-v span{font-size:var(--fs-12);line-height:var(--lh-16);color:var(--ink-2);overflow:hidden;text-overflow:ellipsis}
 
 .toolbar{display:flex;align-items:center;gap:var(--space-8);padding:var(--grid-gap) var(--page-padding)}
+/* Quick filters: None — no stat tiles; the search / filter bar keeps the same gap above as below (grid-gap); with filters in the columns the table starts a page padding from the top */
+:root[data-tiles="off"] .ustats{display:none}
+:root[data-tiles="off"] .ustats + .toolbar.is-empty + .results{padding-top:var(--page-padding)}
 .toolbar .search{flex:0 1 300px;min-width:160px}
 .toolbar #addFilter{margin-left:auto;flex:none}
 /* Filters: Wrapping / In columns — chips become toolbar items and wrap; the button and Clear follow the last chip as one unit */
@@ -585,6 +599,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .dt tbody tr{cursor:default}
 .dt.fx{table-layout:fixed} .dt.fx td,.dt.fx td>div{overflow:hidden;text-overflow:ellipsis}
 /* record-page tables give the actions column no width: the hover overlay sizes to its buttons and fades in over the 32px before them */
+.dt th.cbx,.dt td.cbx{padding-right:0!important} /* the Checkbox column of a record-page table */
 .dt td.act>.row-actions{left:auto;padding-left:var(--space-32);overflow:visible}
 .card.flush .tfoot{border-top:var(--border-width) solid var(--line)}
 .card .tfoot{padding:0 var(--card-padding)}
@@ -633,12 +648,12 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .card .kv-r:last-child{border-bottom:0}
 .kv-r{display:flex;align-items:center;justify-content:space-between;gap:var(--space-16);min-height:var(--row);border-bottom:var(--border-width) solid var(--line-soft);font-size:var(--fs-14);line-height:var(--lh-20)}
 .kv-r>span:first-child{color:var(--ink-2)}
-.kv-r b{font-weight:var(--fw-medium)}
+.kv-r b{font-weight:var(--fw-regular)}
 .kv2{display:grid;grid-template-columns:1fr 1fr;column-gap:var(--space-32)}
 .kv2 .kv-r:nth-last-child(2):nth-child(odd){border-bottom:0}
-.lnk{color:var(--ink);text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px;font-weight:500}
+.lnk{color:var(--ink);text-decoration:underline;text-decoration-color:var(--line-strong);text-underline-offset:3px;font-weight:var(--fw-regular)}
 .lnk:hover{text-decoration-color:currentColor} /* every name / company link: hover = a grey line, nothing else */
-.sel-btn{display:inline-flex;align-items:center;gap:var(--space-8);height:32px;padding:0 var(--space-8) 0 var(--space-12);border-radius:var(--r-sm);border:var(--border-width) solid transparent;font-weight:500;margin-right:calc(-1 * var(--space-8))}
+.sel-btn{display:inline-flex;align-items:center;gap:var(--space-8);height:32px;padding:0 var(--space-8) 0 var(--space-12);border-radius:var(--r-sm);border:var(--border-width) solid transparent;font-weight:var(--fw-regular);margin-right:calc(-1 * var(--space-8))} /* the value is Regular; a Status inside keeps its Medium label */
 .sel-btn:hover{background:var(--hover);border-color:var(--line)}
 .sel-btn.dirty{background:var(--brand-subtle);border-color:var(--brand-subtle)}
 .sel-btn>.i{color:var(--ink-3)}
@@ -650,7 +665,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .ie-box:focus-within{background:var(--surface);border-color:var(--focus);box-shadow:var(--focus-brand)}
 .ie-box.dirty{background:var(--brand-subtle);border-color:var(--brand-subtle)}
 .ie-box.err,.sel-btn.err{border-color:var(--error);box-shadow:var(--focus-error)}
-.ie-in{flex:1;min-width:0;width:100%;border:0;outline:0;background:transparent;font:inherit;font-weight:500;color:var(--ink);text-align:right;padding:0}
+.ie-in{flex:1;min-width:0;width:100%;border:0;outline:0;background:transparent;font:inherit;font-weight:var(--fw-regular);color:var(--ink);text-align:right;padding:0}
 .ie-in::placeholder{color:var(--ink-3);font-weight:400}
 .ie-sfx{color:var(--ink-3);font-size:var(--fs-12);flex:none}
 .sw-t.dirty{box-shadow:var(--focus-brand)}
@@ -806,6 +821,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 :root[data-theme="dark"] .pc-fab:hover{background:var(--neutral-bg)}
 /* Prototype config, compact: one row per setting — label on the left, choices on the right; brand tiles show the logo only */
 .modal.pc{width:min(640px,100%)} .pc .modal-b{gap:var(--space-16)}
+.pc-seg{align-self:flex-start} .pc-panel{display:flex;flex-direction:column;gap:var(--space-16);min-height:128px} .pc-panel[hidden]{display:none} /* tabs keep one height (the tallest panel), so switching doesn't resize the modal */
 .pc section{display:grid;grid-template-columns:128px minmax(0,1fr);align-items:center;gap:var(--space-16)}
 .pc-lbl{font-size:var(--fs-14);font-weight:var(--fw-medium);color:var(--ink-2)}
 .pc-brands{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-8)}
@@ -880,7 +896,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 /* List row (Figma ❖ Data display → List row): 40 tall, Key (lead + label) left, Trailing (values, chevron; gap 8) right, divider between rows; a row link gets an 8px-bleed hover band.
    Types: Text / Chevron (icon tile + Counter) · Activity (time · person · action · value) · Bar (bar chart row) · Legend (series dot · value · %) · Meter (status dot · value · meter) */
 .lis{display:flex;flex-direction:column}
-.dgrid .card:not(.ov-stat):not(.flush)>.card-h+.lis,.dgrid .card:not(.ov-stat):not(.flush)>.card-h+.stack{margin-top:var(--space-4)} .dgrid .card:not(.ov-stat):not(.flush)>.lis:last-child{margin-bottom:var(--space-8)}
+.dgrid .card:not(.ov-stat):not(.flush)>.card-h+.lis{margin-top:var(--space-4)} .dgrid .card:not(.ov-stat):not(.flush)>.lis:last-child{margin-bottom:var(--space-8)}
 .li{position:relative;isolation:isolate;display:flex;align-items:center;justify-content:space-between;gap:var(--space-16);width:100%;height:var(--row);border-bottom:var(--border-width) solid var(--line-soft);font-size:var(--fs-14);line-height:var(--lh-20);color:var(--ink);text-align:left}
 .li:last-child{border-bottom:0}
 .li.go{cursor:pointer}
@@ -893,7 +909,7 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .li-l{flex:0 1 auto;min-width:var(--space-32);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .li-l.sub{color:var(--ink-2)}
 .li-tag{flex:0 1000 auto;max-width:45%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;height:var(--control-xs);line-height:var(--control-xs);padding:0 var(--space-8);border-radius:var(--r-xs);background:var(--surface-2);color:var(--ink-2);font-size:var(--fs-12);font-weight:var(--fw-medium)}
-.li-v{font-weight:var(--fw-medium);font-variant-numeric:tabular-nums;white-space:nowrap}
+.li-v{font-weight:var(--fw-regular);font-variant-numeric:tabular-nums;white-space:nowrap}
 .li-vm{color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
 .li-vm.m5{font-weight:var(--fw-medium)}
 .li-x{min-width:40px;text-align:right;color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -926,7 +942,8 @@ mark.hit{background:var(--highlight);color:inherit;border-radius:3px;padding:0 1
 .li-meter .mt b{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:var(--surface);box-shadow:0 0 0 var(--border-width) var(--ink-3);border-radius:1px}
 .li-meter .mt-v{width:52px;text-align:right;color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
 /* Breakdown: 24px bar of shares, 2px gaps, radius 4 */
-.stack{display:flex;gap:var(--space-2);height:24px;border-radius:var(--r-xs);overflow:hidden;margin:var(--space-4) 0 0}
+/* Breakdown (Figma ❖ Charts, Card · Balances by asset 547:6231): a 12px pill bar, segments 2px apart, 16 below the card header and 16 above the legend rows */
+.stack{display:flex;gap:var(--space-2);height:12px;border-radius:var(--pill);overflow:hidden;margin:var(--space-16) var(--card-padding) var(--space-16)}
 .stack i{display:block;height:100%;min-width:2px;transition:opacity .12s}
 .stack:hover i{opacity:.55} .stack i:hover{opacity:1}
 .legend .sw{width:8px;height:8px;border-radius:2px;flex:none;display:inline-block}
@@ -1576,8 +1593,12 @@ function genUsers(n) {
     last.source = r2() < .7 ? 'APP' : r2() < .5 ? 'API' : r2() < .7 ? 'PARTNER' : 'ADMIN';
     last.riskPoints = { low: 5 + Math.floor(r2() * 25), medium: 31 + Math.floor(r2() * 29), high: 61 + Math.floor(r2() * 39), unknown: null }[risk];
     last.tempPassword = r2() < .05;
+    // Most users never fill in a profile: a name usually comes with KYC, so about a third of users have one (the rest show «No profile yet»)
+    if (i !== 0 && r2() >= { approved: .55, review: .3, pending: .25, rejected: .3, new: .05 }[kyc]) last.name = '';
     t -= (i < 40 ? .4 + R() * 1.6 : 1 + R() * 10) * 36e5;
   }
+  // an invite always comes from an older user in the list, so «Invited by» opens a real profile
+  out.forEach((u, i) => { if (u.invitedBy) u.invitedBy = i < out.length - 1 ? out[i + 1 + u.invitedBy % (out.length - i - 1)].id : null; });
   return out;
 }
 let USERS = genUsers(320);
@@ -1620,9 +1641,9 @@ const ctryCell = c => c ? `<span class="ctry" data-tip="${COUNTRIES[c].name}"><s
 
 const DEFAULT_HIDDEN = ['kycVerified', 'idv', 'emailVerified', 'riskPoints', 'type', 'cards', 'twofa', 'tempPassword', 'lang', 'referral', 'invitedBy', 'source', 'companyId', 'companyName', 'companyRef', 'companySource', 'updated'];
 const COLS = [
-  { key: 'id', label: 'ID', val: u => u.id, dir: 'desc', pin: 1, lock: 1, cell: u => `<span class="num muted">${u.id}</span>` },
+  { key: 'id', label: 'ID', val: u => u.id, dir: 'desc', pin: 1, lock: 1, cell: u => `<span class="num">${u.id}</span>` },
   { key: 'name', label: 'Name', val: u => (u.name || '~').toLowerCase(), dir: 'asc', cell: u => u.name ? TC.strong(esc(u.name)) : TC.muted('No profile yet') },
-  { key: 'email', label: 'Email', val: u => u.email, dir: 'asc', cell: u => `<span class="muted">${esc(u.email)}</span>` },
+  { key: 'email', label: 'Email', val: u => u.email, dir: 'asc', cell: u => copyVal(u.email) }, // Copy, like Unique ID
   { key: 'uid', label: 'Unique ID', val: u => u.uid, dir: 'asc', cell: u => `<button class="copy num" data-act="copy" data-copy="${u.uid}" title="Copy">${u.uid}${icon('copy', 12)}</button>` },
   { key: 'country', label: 'Residency', val: u => u.country || 'ZZZ', dir: 'asc', cell: u => ctryCell(u.country) },
   { key: 'status', label: 'Status', val: u => Object.keys(STATUS).indexOf(u.status), dir: 'asc', cell: u => statusCell(u.status) },
@@ -1632,22 +1653,22 @@ const COLS = [
   { key: 'emailVerified', label: 'Email verified', val: u => +u.emailVerified, dir: 'desc', cell: u => yes(u.emailVerified) },
   { key: 'risk', label: 'Risk', val: u => RISK[u.risk].n, dir: 'desc', cell: u => riskCell(u.risk) },
   { key: 'riskPoints', label: 'Risk points', val: u => u.riskPoints ?? -1, dir: 'desc', right: 1, cell: u => u.riskPoints == null ? '<span class="tc-empty">—</span>' : `<span class="num">${u.riskPoints}</span>` },
-  { key: 'level', label: 'Level', val: u => Object.keys(LEVEL).indexOf(u.level), dir: 'desc', cell: u => `<span class="muted">${LEVEL[u.level].label}</span>` },
-  { key: 'type', label: 'Type', val: u => u.type, dir: 'asc', cell: u => `<span class="muted">${TYPE[u.type].label}</span>` },
+  { key: 'level', label: 'Level', val: u => Object.keys(LEVEL).indexOf(u.level), dir: 'desc', cell: u => `<span class="tc-text">${LEVEL[u.level].label}</span>` },
+  { key: 'type', label: 'Type', val: u => u.type, dir: 'asc', cell: u => `<span class="tc-text">${TYPE[u.type].label}</span>` },
   { key: 'balance', label: 'Balance', val: u => u.balance, dir: 'desc', right: 1, cell: u => `<span class="num ${u.balance ? '' : 'muted'}">${fmtEur(u.balance)}</span>` },
   { key: 'cards', label: 'Cards', val: u => u.cards, dir: 'desc', right: 1, cell: u => `<span class="num ${u.cards ? '' : 'muted'}">${u.cards}</span>` },
   { key: 'twofa', label: '2FA', val: u => +u.twofa, dir: 'desc', cell: u => yes(u.twofa) },
   { key: 'tempPassword', label: 'Temporary password', val: u => +u.tempPassword, dir: 'desc', cell: u => yes(u.tempPassword) },
-  { key: 'lang', label: 'Language', val: u => u.lang, dir: 'asc', cell: u => `<span class="muted">${u.lang}</span>` },
-  { key: 'referral', label: 'Referral code', val: u => u.referral, dir: 'asc', cell: u => `<span class="num muted">${u.referral}</span>` },
+  { key: 'lang', label: 'Language', val: u => u.lang, dir: 'asc', cell: u => `<span class="tc-text">${u.lang}</span>` },
+  { key: 'referral', label: 'Referral code', val: u => u.referral, dir: 'asc', cell: u => `<span class="num">${u.referral}</span>` },
   { key: 'invitedBy', label: 'Invited by', val: u => u.invitedBy || 0, dir: 'desc', cell: u => u.invitedBy ? `<span class="num">#${u.invitedBy}</span>` : '<span class="tc-empty">—</span>' },
-  { key: 'source', label: 'Source', val: u => u.source, dir: 'asc', cell: u => `<span class="muted">${SOURCES[u.source]}</span>` },
-  { key: 'companyId', label: 'Company ID', val: u => u.companyId, dir: 'asc', cell: u => `<span class="num muted">${u.companyId}</span>` },
+  { key: 'source', label: 'Source', val: u => u.source, dir: 'asc', cell: u => `<span class="tc-text">${SOURCES[u.source]}</span>` },
+  { key: 'companyId', label: 'Company ID', val: u => u.companyId, dir: 'asc', cell: u => `<span class="num">${u.companyId}</span>` },
   { key: 'companyName', label: 'Company', val: u => companyOf(u).name, dir: 'asc', cell: u => companyOf(u).name },
-  { key: 'companyRef', label: 'Company referral code', val: u => companyOf(u).ref, dir: 'asc', cell: u => `<span class="num muted">${companyOf(u).ref}</span>` },
-  { key: 'companySource', label: 'Company source', val: u => companyOf(u).source, dir: 'asc', cell: u => `<span class="muted">${CO_SOURCES[companyOf(u).source]}</span>` },
-  { key: 'created', label: 'Created', val: u => u.created.getTime(), dir: 'desc', right: 1, cell: u => `<span class="muted" title="${fmtDateTime(u.created)}">${rel(u.created)}</span>` },
-  { key: 'updated', label: 'Updated', val: u => u.updated.getTime(), dir: 'desc', right: 1, cell: u => `<span class="muted" title="${fmtDateTime(u.updated)}">${rel(u.updated)}</span>` },
+  { key: 'companyRef', label: 'Company referral code', val: u => companyOf(u).ref, dir: 'asc', cell: u => `<span class="num">${companyOf(u).ref}</span>` },
+  { key: 'companySource', label: 'Company source', val: u => companyOf(u).source, dir: 'asc', cell: u => `<span class="tc-text">${CO_SOURCES[companyOf(u).source]}</span>` },
+  { key: 'created', label: 'Created', val: u => u.created.getTime(), dir: 'desc', right: 1, cell: u => `<span class="num" title="${fmtDateTime(u.created)}">${rel(u.created)}</span>` },
+  { key: 'updated', label: 'Updated', val: u => u.updated.getTime(), dir: 'desc', right: 1, cell: u => `<span class="num" title="${fmtDateTime(u.updated)}">${rel(u.updated)}</span>` },
 ];
 
 /* ════════════════════════════ State ════════════════════════════ */
@@ -1751,6 +1772,7 @@ const curSec = () => NAV.find(n => n.items?.some(navOn));
 const NAV_V = { classic: ['Classic', 'Sections stay as you fold them'], focus: ['Focus', 'Only the current section stays open'], fly: ['Flyout', 'Sections open in a side panel'], tabs: ['Sections', 'Pages as tabs in the header'] };
 const secNav = () => S.navV === 'tabs';
 S.navV = NAV_V[store.get('nsc.navv', 'classic')] ? store.get('nsc.navv', 'classic') : 'classic'; S.navPeek = new Set();
+document.documentElement.dataset.navv = S.navV;
 S.secLast = {};
 const navHref = it => it.href || '#/' + it.id;
 const secTabs = sec => `<nav class="tabs tb-tabs" aria-label="${t(sec.label)}">${navShown(sec.items).map(it => { const n = navAttn(it);
@@ -1791,7 +1813,7 @@ function renderSidebar() {
   $('#sidebar').innerHTML = `
     <div class="sb-head">
       <a class="logo lg-${S.brand}" style="--mark-w:${cust().logo ? 20 : brand().markW}px" href="#/dashboard" aria-label="${brand().name} home">${sideLogo()}</a>
-      <button class="sb-toggle" data-act="toggle-sidebar" data-tip="${col ? 'Expand' : 'Collapse'} sidebar  ⌘B">${icon(col ? 'panelOpen' : 'panelClose', 16)}</button>
+      <button class="sb-toggle" data-act="toggle-sidebar" data-tip="${sbToggle()[1]}">${icon(sbToggle()[0], 16)}</button>
     </div>
     <nav class="sb-scroll v-${S.navV}">
       ${NAV.map(n => n.items ? navSection(n) : navLink(n)).join('')}
@@ -1840,7 +1862,8 @@ function topbarActions() {
 function renderTopbar() {
   const c = crumbs(), acts = topbarActions(), sec = secNav() && curSec(), list = sec && c.length === 1;
   const path = sec && !list ? [[sec.label, '', '', 1], ...c] : c;
-  const menu = `<button class="icon-btn menu-btn" data-act="mobile-menu" aria-label="Menu">${icon('menu', 16)}</button>`, ctx = acts ? `<div class="tb-ctx">${acts}</div>` : '';
+  const menu = S.sbV === 'hidden' ? `<button class="icon-btn icon-btn-link menu-btn" data-act="mobile-menu" aria-label="Show menu" data-tip="Show menu  ⌘B">${icon('panelOpen', 16)}</button>`
+    : `<button class="icon-btn menu-btn" data-act="mobile-menu" aria-label="Menu">${icon('menu', 16)}</button>`, ctx = acts ? `<div class="tb-ctx">${acts}</div>` : '';
   $('#topbar').classList.toggle('sec', !!list);
   $('#topbar').innerHTML = list ? `<div class="tb-row">${menu}<h1 class="tb-title">${esc(t(sec.label))}</h1><div class="tb-sp"></div>${ctx}</div>${secTabs(sec)}` : `${menu}
     <nav class="crumbs" aria-label="Breadcrumb">${path.map(([l, h, id, plain], i) => (i ? '<span class="crumb-sep">/</span>' : '') + (h ? `<a href="${h}">${esc(t(l))}</a>` : `<span class="${plain ? '' : 'cur'}">${esc(t(l))}</span>`) + (id ? `<span class="count">${id}</span>` : '')).join('')}</nav>
@@ -1864,27 +1887,34 @@ function meMenu(view) {
     ${menuItems([{ act: 'sign-out', icon: 'logout', label: t('Sign out') }])}`;
 }
 // Prototype config: knobs for exploring the prototype, not product settings. Each choice applies at once and is kept in this browser.
+const PC_TABS = [['product', 'Product'], ['nav', 'Navigation'], ['lists', 'Lists']]; // the config's Switcher tabs
 function protoModal() {
-  const D = S.pcDraft ||= { brand: S.brand, navV: S.navV, filterV: S.filterV, tableNav: S.tableNav };
+  const D = S.pcDraft ||= { brand: S.brand, navV: S.navV, sbV: S.sbV, filterV: S.filterV, tableNav: S.tableNav, tilesV: S.tilesV };
   const opt = (k, on, act, body, cls) => `<button class="${cls} ${on ? 'on' : ''}" data-act="${act}" data-v="${k}" aria-pressed="${on}">${body}</button>`;
+  const tab = S.pcTab ||= 'product';
+  const row = ([lbl, V, cur, act, cls]) => `<section><div class="pc-lbl">${t(lbl)}</div><div class="pc-navs">${Object.entries(V).map(([k, [l]]) => opt(k, k === cur, act, `<span class="pc-rad"></span><span class="pc-n">${t(l)}</span>`, 'pc-nav' + cls)).join('')}</div></section>`;
   const html = `<div class="modal pc" role="dialog" aria-label="${t('Prototype config')}">
     <div class="modal-h">${t('Prototype config')}<button class="icon-btn icon-btn-link" data-act="modal-close" aria-label="${t('Close')}">${icon('x', 16)}</button></div>
     <div class="modal-b">
-      <section><div class="pc-lbl">${t('Product')}</div>
-        <div class="pc-brands">${Object.entries(BRANDS).map(([k, b]) => opt(k, k === D.brand, 'pc-pick-brand', `<span class="pc-logo"><span class="lg-${k}">${b.chip()}</span></span>`, 'pc-brand')).join('')}</div></section>
-${[['Navigation', NAV_V, D.navV, 'pc-pick-nav', ''], ['Filters', FILTER_V, D.filterV, 'pc-pick-filter', ' pc-fil'], ['Table navigation', TABLE_NAV, D.tableNav, 'pc-pick-tnav', ' pc-tnav']].map(([lbl, V, cur, act, cls]) => `      <section><div class="pc-lbl">${t(lbl)}</div>
-        <div class="pc-navs">${Object.entries(V).map(([k, [l]]) => opt(k, k === cur, act, `<span class="pc-rad"></span><span class="pc-n">${t(l)}</span>`, 'pc-nav' + cls)).join('')}</div></section>`).join('')}
+      <div class="seg pc-seg" role="tablist">${PC_TABS.map(([k, l]) => `<button class="${k === tab ? 'on' : ''}" role="tab" data-act="pc-tab" data-v="${k}">${t(l)}</button>`).join('')}</div>
+      <div class="pc-panel" data-p="product" ${tab === 'product' ? '' : 'hidden'}><section><div class="pc-lbl">${t('Product')}</div>
+        <div class="pc-brands">${Object.entries(BRANDS).map(([k, b]) => opt(k, k === D.brand, 'pc-pick-brand', `<span class="pc-logo"><span class="lg-${k}">${b.chip()}</span></span>`, 'pc-brand')).join('')}</div></section></div>
+      <div class="pc-panel" data-p="nav" ${tab === 'nav' ? '' : 'hidden'}>${[['Navigation', NAV_V, D.navV, 'pc-pick-nav', ''], ['Collapsed sidebar', SB_V, D.sbV, 'pc-pick-sb', ' pc-sb']].map(row).join('')}</div>
+      <div class="pc-panel" data-p="lists" ${tab === 'lists' ? '' : 'hidden'}>${[['Filters', FILTER_V, D.filterV, 'pc-pick-filter', ' pc-fil'], ['Quick filters', TILES_V, D.tilesV, 'pc-pick-tiles', ' pc-tiles'], ['Table navigation', TABLE_NAV, D.tableNav, 'pc-pick-tnav', ' pc-tnav']].map(row).join('')}</div>
     </div>
     <div class="modal-f"><button class="btn btn-tertiary btn-lg" data-act="pc-defaults" style="margin-right:auto">${t('Reset to defaults')}</button><button class="btn btn-tertiary btn-lg" data-act="modal-close">${t('Cancel')}</button><button class="btn btn-primary btn-lg" data-act="pc-done">${t('Done')}</button></div>
   </div>`;
   openModal(html);
 }
 // Picking only moves the selection; re-rendering the modal would replay its open animation
-function pcMark() { const D = S.pcDraft; $$('.pc-brand, .pc-nav', modal).forEach(b => { const on = b.dataset.v === (b.classList.contains('pc-brand') ? D.brand : b.classList.contains('pc-fil') ? D.filterV : b.classList.contains('pc-tnav') ? D.tableNav : D.navV); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); }); }
-function applyProto({ brand: b, navV: n, filterV: fv, tableNav: tn }) {
+function pcMark() { const D = S.pcDraft; $$('.pc-brand, .pc-nav', modal).forEach(b => { const on = b.dataset.v === (b.classList.contains('pc-brand') ? D.brand : b.classList.contains('pc-fil') ? D.filterV : b.classList.contains('pc-tnav') ? D.tableNav : b.classList.contains('pc-tiles') ? D.tilesV : b.classList.contains('pc-sb') ? D.sbV : D.navV); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); }); }
+function applyProto({ brand: b, navV: n, sbV: sv, filterV: fv, tableNav: tn, tilesV: tv }) {
+  if (sv && sv !== S.sbV) { S.sbV = sv; store.set('nsc.sbv', sv); document.documentElement.dataset.sb = sv; const app = $('#app'), col = store.get('nsc.sidebar', 'open') === 'collapsed';
+    app.classList.remove('mobile-open'); app.classList.toggle('collapsed', col && sv === 'docked'); app.classList.toggle('sb-hidden', col && sv === 'hidden'); }
+  if (tv && tv !== S.tilesV) { S.tilesV = tv; store.set('nsc.tiles', tv); document.documentElement.dataset.tiles = tv; }
   if (tn && tn !== S.tableNav) { S.tableNav = tn; store.set('nsc.tablenav', tn); document.documentElement.dataset.tablenav = tn; Object.keys(EXTRA).forEach(k => { EXTRA[k] = null; }); S.page = 1; if (S.co) S.co.page = 1; if (S.tx) S.tx.page = 1; S.coUserPage = 1; Object.values(S.pg || {}).forEach(x => { x.page = 1; }); }
   S.brand = b; store.set('nsc.brand', b); applyBrand();
-  if (n !== S.navV) { S.navV = n; store.set('nsc.navv', n); S.navPeek.clear(); }
+  if (n !== S.navV) { S.navV = n; store.set('nsc.navv', n); S.navPeek.clear(); document.documentElement.dataset.navv = n; }
   if (fv !== S.filterV) { S.filterV = fv; store.set('nsc.filterv', fv); closePop(); }
   route(); // the whole page redraws, so page-owned topbar controls (Display) come back filled
 }
@@ -1901,16 +1931,22 @@ function shortcutsModal() {
   </div>`);
 }
 function setTheme(t) { document.documentElement.dataset.theme = t; store.set('nsc.theme', t); }
+// [icon, tip] of the sidebar's own toggle: rail — collapse / expand; hidden — hide, or (in the overlay) dock it open again
+const sbToggle = () => { const app = $('#app'), hid = app?.classList.contains('sb-hidden'), col = app?.classList.contains('collapsed');
+  return S.sbV === 'hidden' ? (hid ? ['panelOpen', 'Keep sidebar open  ⌘B'] : ['panelClose', 'Hide sidebar  ⌘B']) : (col ? ['panelOpen', 'Expand sidebar  ⌘B'] : ['panelClose', 'Collapse sidebar  ⌘B']); };
 function toggleSidebar() {
   const app = $('#app');
   if (innerWidth <= 900) { app.classList.toggle('mobile-open'); return; }
-  app.classList.add('sb-anim'); clearTimeout(toggleSidebar.t); toggleSidebar.t = setTimeout(() => app.classList.remove('sb-anim'), 400); // labels clip, not ellipsis, while the width moves
-  const col = app.classList.toggle('collapsed');
+  let col;
+  if (S.sbV === 'hidden') { col = !app.classList.contains('sb-hidden'); app.classList.remove('mobile-open'); app.classList.toggle('sb-hidden', col); } // hide ↔ docked open (from the overlay too)
+  else { app.classList.add('sb-anim'); clearTimeout(toggleSidebar.t); toggleSidebar.t = setTimeout(() => app.classList.remove('sb-anim'), 400); // labels clip, not ellipsis, while the width moves
+    col = app.classList.toggle('collapsed'); }
   store.set('nsc.sidebar', col ? 'collapsed' : 'open');
-  const t = $('.sb-toggle'); t.innerHTML = icon(col ? 'panelOpen' : 'panelClose', 16); t.dataset.tip = `${col ? 'Expand' : 'Collapse'} sidebar  ⌘B`;
+  const t = $('.sb-toggle'), [ic, tip] = sbToggle(); t.innerHTML = icon(ic, 16); t.dataset.tip = tip;
+  if (DASHES[S.route] || S.route === 'dashboard') requestAnimationFrame(drawCharts); // the main column changed width at once
   closePop(); $('#tt').classList.remove('show'); $('#tt').dataset.for = '';
 }
-$('#sidebar').addEventListener('transitionend', e => { if (e.target.id === 'sidebar' && e.propertyName === 'width') { if (DASHES[S.route]) drawCharts(); if ($('#chips')) renderChips(); refreshHints(); } });
+$('#sidebar').addEventListener('transitionend', e => { if (e.target.id === 'sidebar' && e.propertyName === 'width') { if (DASHES[S.route] || S.route === 'dashboard') drawCharts(); if ($('#chips')) renderChips(); refreshHints(); } });
 
 /* ════════════════════════════ Router ════════════════════════════ */
 function route() {
@@ -2119,6 +2155,14 @@ function renderDashboard() {
   const funds = ASSETS.map(a => [a.c, sum(USERS.map(u => ud(u).wallets.find(w => w.c === a.c)?.amt || 0))]).filter(([, v]) => v > 0);
   const log = pgData(PAGES.logs).slice(0, 8);
   const go = (href, l) => `<a class="btn btn-link" href="${href}">${t(l)}${icon('chevRight', 16)}</a>`;
+  // Charts (same parts as the analytics dashboards: Line chart, Bar rows, Breakdown), last 30 days; each card links to the page with the full picture
+  const d = dashData({ key: '30d' }); S._charts = [];
+  const kycMix = Object.entries(KYC).map(([k, o]) => [o.label, USERS.filter(u => u.kyc === k).length]).filter(x => x[1]);
+  const funnel = [['Signed up', USERS.length], ['Email verified', USERS.filter(u => u.emailVerified).length], ['KYC approved', USERS.filter(u => u.kyc === 'approved').length], ['Card issued', USERS.filter(u => u.cards > 0).length]];
+  const charts = chartCard(8, t('Sign-ups'), { dates: d.dates, unit: d.unit, fmt: v => fmtInt(v), series: [{ l: 'Last 30 days', data: series(d, 118, 'su'), area: 1 }, { l: 'Previous', data: series(d, 108, 'sup'), dash: 1 }] }, go('#/activity-stats', 'Activity'))
+    + dcard(4, t('Onboarding funnel'), ctag('All users'), barRows(funnel))
+    + chartCard(8, t('Deposits and withdrawals'), { dates: d.dates, unit: d.unit, fmt: v => '€' + compact(v), series: [{ l: 'Deposits', data: series(d, 1.1e6, 'wd'), area: 1 }, { l: 'Withdrawals', data: series(d, .84e6, 'ww') }] }, go('#/wallet-stats', 'Wallets'))
+    + dcard(4, t('Users by KYC status'), go('#/users', 'Users'), mixRows(kycMix));
   $('#main').innerHTML = `<div class="page"><div class="dgrid">
     ${stats.map(([l, ic, n, href]) => `<a class="card span-3 ov-stat" href="${href}"><span class="os-ic">${icon(ic, 16)}</span><span class="os-l">${t(l)}<b>${fmtInt(n)}</b></span>${icon('chevRight', 16)}</a>`).join('')}
     <div class="card span-6"><div class="card-h"><span class="card-t">${t('Needs attention')}</span></div>
@@ -2127,10 +2171,12 @@ function renderDashboard() {
     <div class="card span-6"><div class="card-h"><span class="card-t">${t('Wallet funds')}</span>${go('#/reserves', 'Provider reserves')}</div>
       ${lis(funds.map(([c, v]) => li({ lead: noTip(assetIc(c, 16)), l: c, tip: assetName(c), v: fmtAmt(v, c) })))}
     </div>
+    ${charts}
     <div class="card span-12"><div class="card-h"><span class="card-t">${t('Recent changes')}</span>${go('#/logs', 'Audit log')}</div>
       ${lis(log.map(l => liAct({ time: `<span title="${fmtDateTime(l.at)}">${rel(l.at)}</span>`, who: esc(l.admin), what: esc(l.label), v: esc(l.entity || ''), link: l.href, muted: !l.href })))}
     </div>
   </div></div>`;
+  drawCharts();
 }
 
 function niceMax(m) { const p = Math.pow(10, Math.floor(Math.log10(m))); const f = m / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; }
@@ -2206,7 +2252,7 @@ document.addEventListener('mousemove', e => {
   tt.innerHTML = `<div class="tt-d">${a}</div><div class="tt-r"><b>${b}</b></div>${c ? `<div class="tt-r"><span>${c}</span></div>` : ''}`;
   placeTT(e.clientX, e.clientY);
 });
-let rsz; window.addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(() => { if (DASHES[S.route]) drawCharts(); if ($('#chips')) renderChips(); if (popAnchor) positionPop(); refreshHints(); }, 80); });
+let rsz; window.addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(() => { if (DASHES[S.route] || S.route === 'dashboard') drawCharts(); if ($('#chips')) renderChips(); if (popAnchor) positionPop(); refreshHints(); }, 80); });
 
 /* ════════════════════════════ Users list ════════════════════════════ */
 const applyFilters = (list, filters, skip, F = FIELDS) => filters.reduce((l, f) => (f.key === skip || !f.values.length) ? l : l.filter(u => matchField(f.key, u, f.values, F)), list);
@@ -2412,6 +2458,17 @@ function tableHTML(list) {
 const CHUNK = 50;
 const TABLE_NAV = { scroll: ['Infinite scroll', 'Rows load as you scroll; the footer counts them'], pages: ['Pagination', 'Rows per page and page numbers in the footer'] };
 S.tableNav = TABLE_NAV[store.get('nsc.tablenav', 'scroll')] ? store.get('nsc.tablenav', 'scroll') : 'scroll';
+// Prototype config → Quick filters: the stat tiles above a list (each a count that toggles its filter) — shown (default) or left out, so the list starts at the search and filters
+const TILES_V = { on: ['Stat tiles'], off: ['None'] };
+// Prototype config → Collapsed sidebar: what collapsing does. Expanded is always the fixed, docked sidebar.
+//   docked (default) — collapses to the icon rail (68)
+//   hidden — collapses out of the page (Figma 665:3037 «меню скрыто», class .sb-hidden): a Show menu Icon button Link before the page title opens the full
+//            sidebar over the content (Shadow/Large, .mobile-open); its toggle (or ⌘B) docks it open again; a click outside, Escape or a page change closes the overlay
+const SB_V = { docked: ['Icon rail'], hidden: ['Hidden'] };
+S.sbV = SB_V[store.get('nsc.sbv', 'docked')] ? store.get('nsc.sbv', 'docked') : 'docked';
+document.documentElement.dataset.sb = S.sbV;
+S.tilesV = TILES_V[store.get('nsc.tiles', 'on')] ? store.get('nsc.tiles', 'on') : 'on';
+document.documentElement.dataset.tiles = S.tilesV;
 document.documentElement.dataset.tablenav = S.tableNav; // the config button sits higher when the footer has a pager
 const paged = () => S.tableNav === 'pages';
 const PER_OPTS = [10, 20, 30, 40, 50];
@@ -2546,7 +2603,13 @@ function bcardHTML(u, by) {
 
 /* floating bar: bulk actions on the list, unsaved changes on a user page */
 function renderFloat() {
-  const el = $('#bulk');
+  const el = $('#bulk'), dt = dtActive();
+  if (dt) { const c = recCtx(), drafts = Object.keys(c[0] === 'u' ? S.draft : c[0] === 'c' ? { ...S.coDraft, ...S.brandDraft } : S.pgDraft).length;
+    if (!drafts) { const [k, set] = dt, id = dtId(k);
+      el.innerHTML = `<span class="bk-n"><b>${set.size}</b>selected</span><span class="sep"></span>
+        <button data-act="dt-copy" data-k="${id}">${icon('copy', 16)}Copy</button><button data-act="dt-export" data-k="${id}">${icon('download', 16)}Export</button><span class="sep"></span>
+        <button class="bk-x" data-act="dt-clear" data-k="${id}" title="Clear selection">${icon('x', 16)}</button>`;
+      el.classList.add('show'); return; } }
   if (S.route === 'companies') { coFloat(el); return; }
   if (S.route === 'settings') { stFloat(el); return; }
   if (PAGES[S.route]) { pgFloat(el); return; }
@@ -2715,9 +2778,25 @@ const tabCount = n => n ? ` <span class="tab-n">${n}</span>` : '';
 const DT_W = [[/^(ID|#)$/, 100], [/ ID$/, 160], [/^(Created|Updated|Added|Expires|Expiry|Last used|Started|When|Requested|Request updated|Operation date|Date of birth)$/, 170],
   [/^(Status|KYC|Outcome|Risk)$/, 160], [/^(Pair|Kind|Region|Source|Version|Frozen|Active|Default|Residency)$/, 120], [/^(IDV verified|KYC verified|KYC downloaded|Default provider)$/, 120],
   [/^(Currency|Crypto currency|Type|Card type|Role|Network)$/, 170], [/^Code$/, 240], [/^(Country|Nationality|City|Post code|Provider|Masked number)$/, 150]];
-const dtColW = h => h.al === 'a' ? 0 : DT_W.find(([re]) => re.test(h.l))?.[1] ?? (h.al === 'c' ? 110 : h.al === 'r' ? 130 : null);
+const dtColW = h => h.al === 'a' ? 0 : h.al === 'cbx' ? 44 : DT_W.find(([re]) => re.test(h.l))?.[1] ?? (h.al === 'c' ? 110 : h.al === 'r' ? 130 : null);
+/* Bulk select on record-page tables (a user's, a company's or a record's tabs): a Checkbox column first, the header box selects every row;
+   the floating bar then offers Copy (rows as tab-separated text) and Export. One table's selection at a time; kept per record and table. */
+const recCtx = () => S.route === 'users' && S.userId ? 'u' + S.userId : S.route === 'companies' && S.coId ? 'c' + S.coId : PAGES[S.route] && S.recId ? 'r' + S.route + ':' + S.recId : null;
+S.dtSel = {}; const DT_IDS = [];
+const dtId = k => { const i = DT_IDS.indexOf(k); return i < 0 ? DT_IDS.push(k) - 1 : i; };
+const dtSet = k => S.dtSel[k] ||= new Set();
+const dtActive = () => { const c = recCtx(); return c && Object.entries(S.dtSel).find(([k, v]) => k.startsWith(c + '|') && v.size) || null; };
+const dtRerender = () => { if (S.route === 'users') renderUserPage(); else if (S.route === 'companies') renderCompanyPage(); else renderRec(); renderFloat(); };
 function dtable(heads, rows, empty = '', drag) {
   if (!rows.length) return empty;
+  const ctx = recCtx();
+  if (ctx && rows.length > 1 && !heads.some(h => /\|(cbcell|cbx)$/.test(h))) {
+    const k = `${ctx}|${heads.join('·')}`, id = dtId(k), set = dtSet(k), all = set.size === rows.length, some = set.size > 0;
+    heads = [`<button class="cb ${all ? 'on' : some ? 'mixed' : ''}" data-act="dt-sel-all" data-k="${id}" data-n="${rows.length}" aria-label="Select all rows">${icon(all ? 'check' : 'minus', 11, 3)}</button>|cbx`, ...heads];
+    rows = rows.map((r, i) => { const cells = Array.isArray(r) ? r : r.cells, on = set.has(i);
+      return { cells: [`<button class="cb ${on ? 'on' : ''}" data-act="dt-sel" data-k="${id}" data-i="${i}" aria-label="Select row">${icon('check', 11, 3)}</button>`, ...cells], cls: `${r.cls || ''}${on ? ' sel' : ''}` }; });
+    if (drag) drag = { ...drag, keys: [null, ...drag.keys] };
+  }
   const H = heads.map(h => { const k = h.lastIndexOf('|'); return k < 0 ? { l: h, al: '' } : { l: h.slice(0, k), al: h.slice(k + 1) }; });
   const W = H.map(dtColW), minW = W.reduce((s, w) => s + (w ?? 220), 0);
   return `<div class="hs-wrap"><div class="dt-wrap hs"><table class="dt fx" style="min-width:${Math.max(720, minW)}px"><colgroup>${W.map(w => `<col${w == null ? '' : ` style="width:${w}px"`}>`).join('')}</colgroup><thead><tr>${H.map((h, i) => `<th class="${h.al}" ${drag?.keys[i] ? `draggable="true" data-t="${drag.t}" data-drag="${drag.keys[i]}"` : ''}>${h.l}</th>`).join('')}</tr></thead>
@@ -2814,8 +2893,8 @@ function userTab(u, d, D) {
   switch (S.userTab) {
     case 'overview': return `
       <div class="card"><div class="card-h"><span class="card-t">Profile</span></div><div class="kv2 card-b">
-        ${['name', 'email', 'status', 'level', 'risk', 'country', 'type'].map(k => kv(U_EDIT[k].l, edField(X, k))).join('')}${kv('Company', `<a class="lnk" href="#/companies/${d.companyId}">${esc(companyOf(d).name)} #${d.companyId}</a>`)}
-        ${kv('Language', edField(X, 'lang'))}${kv('Invited by', u.invitedBy ? `<span class="num">#${u.invitedBy}</span>` : dash)}
+        ${['name', 'email', 'status', 'level', 'risk', 'country', 'type'].map(k => kv(U_EDIT[k].l, k === 'email' ? copyVal(d.email) : edField(X, k))).join('')}${kv('Company', `<a class="lnk" href="#/companies/${d.companyId}">${esc(companyOf(d).name)} #${d.companyId}</a>`)}
+        ${kv('Language', edField(X, 'lang'))}${kv('Invited by', u.invitedBy ? (i => `<a class="lnk" href="#/users/${u.invitedBy}">${esc(i?.name || 'User')} #${u.invitedBy}</a>`)(byId(u.invitedBy)) : dash)}
       </div></div>
       <div class="card"><div class="card-h"><span class="card-t">Verification</span><button class="btn btn-link" data-act="u-tab" data-v="verification">Details ${icon('chevRight', 16)}</button></div><div class="kv2 card-b">
         ${ver('Email', d.emailVerified, `<span class="${d.emailVerified ? '' : 'faint'}">${d.emailVerified ? 'Verified' : 'Not verified'}</span>`, d.emailVerified ? '' : `<button class="btn btn-link" data-act="toast" data-msg="Verification email sent">Resend</button>`)}
@@ -2852,7 +2931,7 @@ function walletsTab(u, D) {
 const txType = h => `<span class="txt">${icon(TX[h.type].icon, 16)}${TX[h.type].label}</span>`;
 const txCur = h => `<span class="ctry">${assetIc(h.c, 16)}${h.c}</span>`;
 const txAmt = h => `<span class="num ${h.amount > 0 ? 'pos' : ''}">${fmtAmt(h.amount, h.c, true)}</span>`;
-const numM = v => `<span class="num muted">${v}</span>`, muted = v => v ? `<span class="muted">${esc(v)}</span>` : dash;
+const numM = v => `<span class="num">${v}</span>`, muted = v => v ? TC.muted(esc(v)) : dash;
 const TCOLS = {
   txw: [
     { k: 'created', l: 'Created', on: 1, cell: h => fmtDateTime(h.created) }, { k: 'id', l: 'ID', cell: h => numM(h.id) },
@@ -2969,7 +3048,7 @@ function feesTab(u, D) {
 /* Addresses */
 function addrTab(u, D) {
   return tcard('Addresses', `<button class="btn btn-tertiary" data-act="addr-add">${icon('plus', 16)}Add address</button>`,
-    dtable(['ID', 'Country', 'City', 'Address', 'Post code', '|a'], D.addresses.map((a, i) => [`<span class="num muted">${a.id}</span>`,
+    dtable(['ID', 'Country', 'City', 'Address', 'Post code', '|a'], D.addresses.map((a, i) => [`<span class="num">${a.id}</span>`,
       `<span class="ctry"><span class="flag">${flag(COUNTRIES[a.country].cc)}</span>${COUNTRIES[a.country].name}</span>`, esc(a.city), esc(a.street), `<span class="num">${esc(a.zip)}</span>`,
       `<button class="ghost-ic" data-act="addr-rm" data-i="${i}" data-tip="Remove">${icon('trash', 16)}</button>`]),
       emptyBlock('mapPin', 'No addresses', 'Add the user’s residential address.')));
@@ -3444,6 +3523,13 @@ const ACT = {
   'sel-clear': () => { S.selected.clear(); closePop(); renderResults(); renderFloat(); },
   'toggle-group': a => { const g = a.dataset.g; S.collapsed.has(g) ? S.collapsed.delete(g) : S.collapsed.add(g); a.closest('.lg').classList.toggle('collapsed'); },
 
+  'dt-sel': a => { const k = DT_IDS[+a.dataset.k], set = dtSet(k), i = +a.dataset.i; Object.keys(S.dtSel).forEach(x => x !== k && S.dtSel[x].clear()); set.has(i) ? set.delete(i) : set.add(i); dtRerender(); },
+  'dt-sel-all': a => { const k = DT_IDS[+a.dataset.k], set = dtSet(k), n = +a.dataset.n; Object.keys(S.dtSel).forEach(x => x !== k && S.dtSel[x].clear());
+    if (set.size === n) set.clear(); else for (let i = 0; i < n; i++) set.add(i); dtRerender(); },
+  'dt-clear': a => { dtSet(DT_IDS[+a.dataset.k]).clear(); dtRerender(); },
+  'dt-copy': a => { const rows = [...document.querySelectorAll('.dt tbody tr.sel')].map(tr => [...tr.cells].filter(td => !td.classList.contains('cbx') && !td.classList.contains('act')).map(td => td.innerText.trim()).join('\t'));
+    try { navigator.clipboard.writeText(rows.join('\n')); } catch {} toast(`${rows.length} row${rows.length > 1 ? 's' : ''} copied`, 'copy'); },
+  'dt-export': a => { const n = dtSet(DT_IDS[+a.dataset.k]).size; toast(`${n} row${n > 1 ? 's' : ''} exported to CSV`, 'download'); },
   'copy': a => { try { navigator.clipboard.writeText(a.dataset.copy); } catch {} closePop(); toast('Copied to clipboard', 'copy'); },
   'impersonate': a => { closePop(); const u = byId(+a.dataset.id); toast(`Opening session as ${esc(u.name || u.email)}`, 'login'); },
   'row-more': a => { const u = byId(+a.dataset.id); openPop(a, menuItems([{ act: 'open-user', data: { id: u.id }, icon: 'user', label: 'Open profile' }, { act: 'impersonate', data: { id: u.id }, icon: 'login', label: 'Login as user' }, { act: 'copy', data: { copy: u.email }, icon: 'mail', label: 'Copy email' }, { act: 'copy', data: { copy: u.uid }, icon: 'hash', label: 'Copy unique ID' }, '-', { act: 'toggle-block', data: { id: u.id }, icon: 'ban', label: u.status === 'blocked' ? 'Unblock' : 'Block user', danger: u.status !== 'blocked' }]), { align: 'right', width: 210 }); },
@@ -3608,8 +3694,11 @@ const ACT = {
   'pc-pick-nav': a => { S.pcDraft.navV = a.dataset.v; pcMark(); },
   'pc-pick-filter': a => { S.pcDraft.filterV = a.dataset.v; pcMark(); },
   'pc-pick-tnav': a => { S.pcDraft.tableNav = a.dataset.v; pcMark(); },
-  'pc-defaults': () => { S.pcDraft = { brand: 'ns', navV: 'classic', filterV: 'bar', tableNav: 'scroll' }; pcMark(); },
-  'pc-done': () => { const d = S.pcDraft; closeModal(); if (d.brand !== S.brand || d.navV !== S.navV || d.filterV !== S.filterV || d.tableNav !== S.tableNav) { applyProto(d); toast(t('Prototype config applied'), 'sliders'); } },
+  'pc-pick-tiles': a => { S.pcDraft.tilesV = a.dataset.v; pcMark(); },
+  'pc-pick-sb': a => { S.pcDraft.sbV = a.dataset.v; pcMark(); },
+  'pc-tab': a => { S.pcTab = a.dataset.v; $$('.pc-seg button', modal).forEach(b => b.classList.toggle('on', b === a)); $$('.pc-panel', modal).forEach(p => { p.hidden = p.dataset.p !== S.pcTab; }); },
+  'pc-defaults': () => { S.pcDraft = { brand: 'ns', navV: 'classic', sbV: 'docked', filterV: 'bar', tableNav: 'scroll', tilesV: 'on' }; pcMark(); },
+  'pc-done': () => { const d = S.pcDraft; closeModal(); if (d.brand !== S.brand || d.navV !== S.navV || d.filterV !== S.filterV || d.tableNav !== S.tableNav || d.tilesV !== S.tilesV || d.sbV !== S.sbV) { applyProto(d); toast(t('Prototype config applied'), 'sliders'); } },
 };
 
 /* ════════════════════════════ Companies ════════════════════════════ */
@@ -3652,10 +3741,10 @@ Object.assign(TCOLS, {
     { k: 'level', l: 'Min. user level', on: 1, val: c => Object.keys(LEVEL).indexOf(c.minLevel), dir: 'desc', cell: c => muted(LEVEL[c.minLevel].label) },
     { k: 'kyc', l: 'KYC required on', on: 1, val: c => c.kycLevel ? Object.keys(LEVEL).indexOf(c.kycLevel) : -1, dir: 'desc', cell: c => kycCell(c.kycLevel) },
     { k: 'type', l: 'Type', val: c => c.type, dir: 'asc', cell: c => muted(CO_TYPE[c.type].label) },
-    { k: 'emboss', l: 'Emboss name', val: c => c.emboss, dir: 'asc', cell: c => `<span class="num muted">${esc(c.emboss)}</span>` },
+    { k: 'emboss', l: 'Emboss name', val: c => c.emboss, dir: 'asc', cell: c => `<span class="num">${esc(c.emboss)}</span>` },
     { k: 'country', l: 'Country', val: c => c.country, dir: 'asc', cell: c => ctryCell(c.country) },
-    { k: 'created', l: 'Created', al: 'r', on: 1, val: c => c.created.getTime(), dir: 'desc', cell: c => `<span class="muted" title="${fmtDateTime(c.created)}">${rel(c.created)}</span>` },
-    { k: 'updated', l: 'Updated', al: 'r', val: c => c.updated.getTime(), dir: 'desc', cell: c => `<span class="muted" title="${fmtDateTime(c.updated)}">${rel(c.updated)}</span>` },
+    { k: 'created', l: 'Created', al: 'r', on: 1, val: c => c.created.getTime(), dir: 'desc', cell: c => `<span class="num" title="${fmtDateTime(c.created)}">${rel(c.created)}</span>` },
+    { k: 'updated', l: 'Updated', al: 'r', val: c => c.updated.getTime(), dir: 'desc', cell: c => `<span class="num" title="${fmtDateTime(c.updated)}">${rel(c.updated)}</span>` },
   ],
   coCards: [
     { k: 'id', l: 'ID', on: 1, cell: a => numM(a.id) },
@@ -3995,7 +4084,7 @@ function coUsersBody(c) {
   if (!list.length) return emptyBlock('search', 'No users match', 'Try a different name, email or ID.');
   const rows = loaded(list, S.coUserPage, 'cou');
   return `<div class="hs-wrap"><div class="dt-wrap hs"><table class="dt"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Residency</th><th>Status</th><th>KYC</th><th>Risk</th><th class="r">Balance</th><th class="r">Created</th></tr></thead>
-    <tbody>${rows.map(u => `<tr data-uid="${u.id}" style="cursor:pointer"><td>${numM(u.id)}</td><td>${u.name ? TC.strong(esc(u.name)) : TC.muted('No profile yet')}</td><td>${muted(u.email)}</td><td>${ctryCell(u.country)}</td><td>${statusCell(u.status)}</td><td>${badge(KYC[u.kyc])}</td><td>${riskCell(u.risk)}</td><td class="r"><span class="num ${u.balance ? '' : 'muted'}">${fmtEur(u.balance)}</span></td><td class="r"><span class="muted">${rel(u.created)}</span></td></tr>`).join('')}</tbody></table></div></div>
+    <tbody>${rows.map(u => `<tr data-uid="${u.id}" style="cursor:pointer"><td>${numM(u.id)}</td><td>${u.name ? TC.strong(esc(u.name)) : TC.muted('No profile yet')}</td><td>${copyVal(u.email)}</td><td>${ctryCell(u.country)}</td><td>${statusCell(u.status)}</td><td>${badge(KYC[u.kyc])}</td><td>${riskCell(u.risk)}</td><td class="r"><span class="num ${u.balance ? '' : 'muted'}">${fmtEur(u.balance)}</span></td><td class="r"><span class="num">${rel(u.created)}</span></td></tr>`).join('')}</tbody></table></div></div>
     ${tfoot(list, rows, 'user', 'users', 'cou', S.coUserPage)}`;
 }
 function coUsersTab(c) {
@@ -4006,8 +4095,8 @@ function coUsersTab(c) {
 function coKeysTab(c, D) {
   const btn = `<button class="btn btn-secondary" data-act="key-new">${icon('plus', 16)}Add API key</button>`;
   return tcard('API keys', D.keys.length ? btn : '', dtable(['Name', 'Key', 'Permissions', 'IP allowlist', 'Status', 'Last used', 'Created|r', '|a'], D.keys.map((k, i) => [
-    `${TC.strong(esc(k.name))}`, `<span class="num muted">${k.key.slice(0, 14)}••••${k.key.slice(-4)}</span>`,
-    `<span class="pchips">${k.scopes.map(s => `<span class="tag">${s}</span>`).join('')}</span>`, k.ips.length ? `<span class="num muted">${esc(k.ips.join(', '))}</span>` : '<span class="faint">Any IP</span>',
+    `${TC.strong(esc(k.name))}`, `<span class="num">${k.key.slice(0, 14)}••••${k.key.slice(-4)}</span>`,
+    `<span class="pchips">${k.scopes.map(s => `<span class="tag">${s}</span>`).join('')}</span>`, k.ips.length ? `<span class="num">${esc(k.ips.join(', '))}</span>` : '<span class="faint">Any IP</span>',
     badge(k.status === 'ACTIVE' ? { label: 'Active', tone: 'success' } : { label: 'Revoked', tone: 'neutral' }), k.lastUsed ? muted(rel(k.lastUsed)) : '<span class="faint">Never</span>', muted(fmtDay(k.created)),
     k.status === 'ACTIVE' ? `<button class="ghost-ic" data-act="key-revoke" data-i="${i}" data-tip="Revoke">${icon('ban', 16)}</button>` : '']),
     emptyBlock('key', 'No API keys', 'Issue a key so this company can manage users and cards through the API.', btn)));
@@ -4057,7 +4146,7 @@ function coCurTab(c, D) {
   return tcard('Currencies', D.currencies.length ? `<select class="fsel sm" data-curprov="1"><option value="">All providers</option>${provs.map(p => `<option value="${p}" ${S.curProv === p ? 'selected' : ''}>${p}</option>`).join('')}</select>${btn}` : '',
     dtable(['ID', 'Currency', 'Network', 'Type', 'Network ID', 'Provider ID', 'Provider', 'Created', 'Updated|r', '|a'], list.map(x => {
       const a = ASSET[x.c];
-      return [numM(x.id), TC.currency(x.c, a.n), muted(a.net), a.fiat ? 'Fiat' : 'Crypto', `<span class="muted">${NET_ID[x.c]}</span>`,
+      return [numM(x.id), TC.currency(x.c, a.n), muted(a.net), a.fiat ? 'Fiat' : 'Crypto', `<span class="tc-text">${NET_ID[x.c]}</span>`,
         copyVal(x.providerId), x.provider, muted(fmtDay(x.created)), muted(rel(x.updated)), `<button class="ghost-ic" data-act="cur-rm" data-id="${x.id}" data-tip="Remove">${icon('trash', 16)}</button>`];
     }), D.currencies.length ? emptyBlock('search', 'No currencies for this provider', 'Pick another provider.') : emptyBlock('coins', 'No currencies enabled', 'Enable the assets this company’s users can hold and exchange.', btn)));
 }
@@ -4692,19 +4781,21 @@ const TC_DASH = '<span class="tc-empty">—</span>';
 // tcCell: a table cell that came back as plain text (no DS markup) is wrapped as Table cell Text, or Number in a right-aligned column; empty → dash
 const tcCell = (c, right) => c === undefined || c === null || c === '' ? TC_DASH : /^\s*</.test(String(c)) ? c : right ? TC.num(c) : TC.text(c);
 const tcE = v => v === undefined || v === null || v === '';
+// Blank = carries no data: a dash, a zero («0», «€0.00», «0 BTC», «Free»), a placeholder («No profile yet», «Not required», «Flexible»). Only these read grey.
+const tcBlank = v => { const t = String(v).replace(/<[^>]*>/g, '').trim(); return !t || /^[—–-]$/.test(t) || /^(no |not |none\b|free$|flexible$|any |and above$|n\/a$)/i.test(t) || (/\d/.test(t) && !/[1-9]/.test(t)); };
 const TC = {
   text: (v, b) => tcE(v) ? TC_DASH : b ? `<span class="tc-tb"><span class="tc-text">${v}</span>${b}</span>` : `<span class="tc-text">${v}</span>`, // Text (+ Show badge: a Badge at the end of the cell)                                     // Text — Body/Medium, text/primary
   strong: v => tcE(v) ? TC_DASH : `<span class="tc-strong">${v}</span>`,                                 // Text strong — Label/Medium: the row's main name
   iconText: (ic, v) => tcE(v) ? TC_DASH : `<span class="txt">${icon(ic, 16)}<span>${v}</span></span>`,    // Icon + text — icon 16 in text/tertiary, gap 8
-  muted: v => tcE(v) ? TC_DASH : `<span class="muted">${v}</span>`,                                      // Text muted — text/secondary (also empty values)
+  muted: v => tcE(v) ? TC_DASH : tcBlank(v) ? `<span class="muted">${v}</span>` : TC.text(v),                  // Text muted — only a blank value; data passed here reads as Text                                      // Text muted — text/secondary (also empty values)
   num: (v, tone) => tcE(v) ? TC_DASH : `<span class="num${tone === 'positive' ? ' pos' : ''}">${v}</span>`, // Number — Tone Default / Positive
-  numMuted: v => tcE(v) ? TC_DASH : `<span class="num muted">${v}</span>`,                               // Number muted — dates, zeros
+  numMuted: v => tcE(v) ? TC_DASH : `<span class="num${tcBlank(v) ? ' muted' : ''}">${v}</span>`,          // Number muted — only zero / empty; ids, dates, amounts read as Number                               // Number muted — dates, zeros
   meter: (p, tone, scale = 200, label) => meterEl(p, tone, scale, label),                               // Meter — headroom to a threshold
   copy: (v, shown) => tcE(v) ? TC_DASH : copyVal(v, shown),                                              // Copy — value + copy icon
   country: (code, name) => name ? `<span class="ctry" data-tip="${name}"><span class="flag">${noTip(flag(COUNTRIES[code]?.cc || code))}</span>${name}</span>` : ctryCell(code), // name: the full name instead of the ISO code                                                                       // Country — flag + ISO-3
   countries: (ccs, total = ccs.length) => !ccs.length ? TC_DASH : `<span class="tc-flags" data-tip="${ccs.map(ccName).join(', ')}"><span class="ics">${ccs.slice(0, 4).map(cc => `<span class="flag">${noTip(flag(cc))}</span>`).join('')}</span>${total > 4 ? `<span class="muted">+${total - 4}</span>` : ''}</span>`, // Countries — up to 4 flags + «+N»
   currency: (c, name) => tcE(c) ? TC_DASH : name ? `<span class="ctry" data-tip="${name}">${noTip(assetIc(c, 16))}${name}</span>` : curCell(c), // name: the full name instead of the ticker                                                          // Currency — icon + ticker
-  currencies: cs => !cs.length ? TC_DASH : `<span class="tc-curs" data-tip="${cs.map(assetName).join(', ')}"><span class="ics">${cs.slice(0, 3).map(c => noTip(assetIc(c, 16))).join('')}</span><span class="muted">${cs.join(', ')}</span></span>`, // Currencies — up to 3 icons + tickers
+  currencies: cs => !cs.length ? TC_DASH : `<span class="tc-curs" data-tip="${cs.map(assetName).join(', ')}"><span class="ics">${cs.slice(0, 3).map(c => noTip(assetIc(c, 16))).join('')}</span><span>${cs.join(', ')}</span></span>`, // Currencies — up to 3 icons + tickers
   card: (last4, physical) => `<span class="tc-card"><span class="mc ${physical ? 'phys' : ''}">${brand().card()}</span>•••• ${last4}</span>`, // Card — .Mini card + last 4
   yes: v => yes(v),                                                                                      // Yes / No
   status: o => o ? dotCell(o) : TC_DASH,                                                                 // Status — dot + label
@@ -4736,7 +4827,7 @@ const K = {
   currencies: (k, l, on = 1) => ({ k, l, on, val: r => (r[k] || []).length, cell: r => TC.currencies(r[k] || []) }),
   risk: (k = 'risk', l = 'Risk', on = 1) => ({ k, l, on, val: r => Object.keys(RISK).indexOf(r[k]), cell: r => TC.risk(r[k]) }),
   sw: (k, l, act) => ({ k, l, on: 1, dir: 'desc', val: r => +!!r[k], cell: r => `<button class="sw-t ${r[k] ? 'on' : ''}" data-act="${act}" data-rid="${esc(pgKey(pg(), r))}" data-tip="${r[k] ? 'Turn off' : 'Turn on'}" aria-label="${l}"></button>`, kv: r => r[k] ? 'On' : '<span class="faint">Off</span>' }),
-  date: (k = 'created', l = 'Created', on = 1) => ({ k, l, al: 'r', on, dir: 'desc', val: r => r[k] ? r[k].getTime() : 0, cell: r => r[k] ? `<span class="muted" title="${fmtDateTime(r[k])}">${rel(r[k])}</span>` : dash, kv: r => r[k] ? fmtDateTime(r[k]) : dash }),
+  date: (k = 'created', l = 'Created', on = 1) => ({ k, l, al: 'r', on, dir: 'desc', val: r => r[k] ? r[k].getTime() : 0, cell: r => r[k] ? `<span class="num" title="${fmtDateTime(r[k])}">${rel(r[k])}</span>` : dash, kv: r => r[k] ? fmtDateTime(r[k]) : dash }),
   when: (k, l, on = 1) => ({ k, l, on, dir: 'desc', val: r => r[k] ? r[k].getTime() : 0, cell: r => TC.text(r[k] ? fmtDateTime(r[k]) : '') }),
 };
 const gen = seed => {
@@ -4876,8 +4967,8 @@ page({
     tile('high', 'High value', { key: 'value', values: ['high'] }, () => '€10,000 and above'), tile('ok', 'Approved', { key: 'status', values: ['APPROVED'] }, share), tile('no', 'Rejected', { key: 'status', values: ['REJECTED'] }, share)],
   cols: [K.id(), K.user(), { k: 'type', l: 'Type', on: 1, cell: r => `<span class="txt">${icon(CONF_TYPE[r.type].icon, 16)}${CONF_TYPE[r.type].label}</span>` },
     { k: 'amount', l: 'Amount', al: 'r', on: 1, dir: 'desc', val: r => r.eur, cell: r => r.type === 'LIMIT' ? `<span class="num">${fmtEur(r.eur)}</span>` : `<span class="num">${fmtAmt(r.amount, r.c)}</span>` },
-    { k: 'eur', l: 'In EUR', al: 'r', on: 1, dir: 'desc', val: r => r.eur, cell: r => r.type !== 'LIMIT' && r.c !== 'EUR' ? `<span class="num muted">${fmtEur(r.eur)}</span>` : dash },
-    { k: 'dest', l: 'Destination', on: 1, cell: r => `<span class="num muted">${esc(r.dest)}</span>` },
+    { k: 'eur', l: 'In EUR', al: 'r', on: 1, dir: 'desc', val: r => r.eur, cell: r => r.type !== 'LIMIT' && r.c !== 'EUR' ? `<span class="num">${fmtEur(r.eur)}</span>` : dash },
+    { k: 'dest', l: 'Destination', on: 1, cell: r => `<span class="num">${esc(r.dest)}</span>` },
     { k: 'risk', l: 'User risk', on: 1, dir: 'desc', val: r => RISK[byId(r.uid).risk].n, cell: r => riskCell(byId(r.uid).risk) },
     K.status(CONF_STATUS), K.date('created', 'Requested'), K.muted('by', 'Decided by', 0), K.date('decided', 'Decided', 0)],
   sort: { k: 'created', dir: 'desc' },
@@ -4941,8 +5032,8 @@ page({
     { k: 'status', l: 'Status', on: 1, val: r => r.C.status, cell: r => dotCell(CC_STATUS[r.C.status]) }, { k: 'kyc', l: 'KYC status', on: 1, val: ccKyc, cell: r => badge(CC_KYC[ccKyc(r)]) },
     { k: 'docs', l: 'Documents', al: 'r', on: 1, dir: 'desc', val: r => r.C.docs.length, cell: r => `<span class="num ${r.C.docs.length ? '' : 'muted'}">${r.C.docs.length}</span>` },
     { k: 'remark', l: 'KYC remark', val: r => r.C.remark || '', cell: r => muted(r.C.remark) },
-    { k: 'created', l: 'Created', al: 'r', on: 1, dir: 'desc', val: r => r.C.created?.getTime() || 0, cell: r => r.C.created ? `<span class="muted">${rel(r.C.created)}</span>` : dash, kv: r => r.C.created ? fmtDateTime(r.C.created) : dash },
-    { k: 'updated', l: 'Updated', al: 'r', dir: 'desc', val: r => r.C.updated?.getTime() || 0, cell: r => r.C.updated ? `<span class="muted">${rel(r.C.updated)}</span>` : dash, kv: r => r.C.updated ? fmtDateTime(r.C.updated) : dash }],
+    { k: 'created', l: 'Created', al: 'r', on: 1, dir: 'desc', val: r => r.C.created?.getTime() || 0, cell: r => r.C.created ? `<span class="num">${rel(r.C.created)}</span>` : dash, kv: r => r.C.created ? fmtDateTime(r.C.created) : dash },
+    { k: 'updated', l: 'Updated', al: 'r', dir: 'desc', val: r => r.C.updated?.getTime() || 0, cell: r => r.C.updated ? `<span class="num">${rel(r.C.updated)}</span>` : dash, kv: r => r.C.updated ? fmtDateTime(r.C.updated) : dash }],
   sort: { k: 'created', dir: 'desc' },
   quick: () => ({ act: 'cc-fetch', icon: 'refresh', tip: 'Fetch KYC status' }),
   menu: r => [...(r.C.status !== 'APPROVED' ? [{ act: 'cc-req', data: { rid: r.id }, icon: 'key', label: 'Request access' }] : []), { act: 'cc-fetch', data: { rid: r.id }, icon: 'refresh', label: 'Fetch KYC status' }, { act: 'open-user', data: { id: r.uid }, icon: 'user', label: 'Open user' }],
@@ -5129,7 +5220,7 @@ page({
     tile('unb', 'Unbonding', { key: 'status', values: ['UNBONDING'] }, () => 'Releasing funds'), tile('done', 'Completed', { key: 'status', values: ['COMPLETED'] }, share), tile('lock', 'Locked', { key: 'term', values: ['lock'] }, share)],
   cols: [K.id(), K.user(), { k: 'sid', l: 'Strategy', on: 1, val: x => stratOf(x.sid).name, cell: x => esc(stratOf(x.sid).name), kv: x => recLink('strategies', x.sid, stratOf(x.sid).name) }, K.asset(), K.amt('amount', 'Amount'), K.pct('apy', 'APY'),
     { ...K.amt('rewards', 'Rewards earned'), cell: x => `<span class="num pos">+${fmtAmt(x.rewards, x.c)}</span>` }, K.status(STAKE_STATUS), K.date('created', 'Started'),
-    { k: 'ends', l: 'Ends', al: 'r', on: 1, dir: 'desc', val: x => x.ends ? x.ends.getTime() : 9e15, cell: x => x.ends ? `<span class="muted">${fmtDay(x.ends)}</span>` : TC.numMuted('Flexible') }],
+    { k: 'ends', l: 'Ends', al: 'r', on: 1, dir: 'desc', val: x => x.ends ? x.ends.getTime() : 9e15, cell: x => x.ends ? `<span class="num">${fmtDay(x.ends)}</span>` : TC.numMuted('Flexible') }],
   sort: { k: 'created', dir: 'desc' },
   quick: x => ({ act: 'open-user', icon: 'user', tip: 'Open user', data: { id: x.uid } }),
   menu: x => [...(x.status === 'ACTIVE' ? [{ act: 'stake-un', data: { rid: x.id }, icon: 'minus', label: 'Force unstake' }] : []), { act: 'open-user', data: { id: x.uid }, icon: 'user', label: 'Open user' }],
@@ -5598,7 +5689,7 @@ page({
   data: () => NETWORKS, search: n => `${n.id} ${n.name} ${n.assets.join(' ')}`,
   fields: { status: fE('Status', 'activity', ON_OFF, n => n.status), type: fE('Type', 'link', { chain: { label: 'Blockchain' }, fiat: { label: 'Fiat rail' } }, n => n.fiat ? 'fiat' : 'chain') },
   cols: [{ k: 'id', l: 'Code', on: 1, cell: n => `${TC.strong(n.id)}` }, K.text('name', 'Network'), { k: 'type', l: 'Type', on: 1, val: n => n.fiat, cell: n => muted(n.fiat ? 'Fiat rail' : 'Blockchain') },
-    { k: 'assets', l: 'Currencies', on: 1, val: n => n.assets.length, cell: n => `<span class="ctry" style="gap:var(--space-8)">${n.assets.map(c => assetIc(c, 16)).join('')}<span class="muted">${n.assets.join(', ')}</span></span>`, kv: n => n.assets.join(', ') },
+    { k: 'assets', l: 'Currencies', on: 1, val: n => n.assets.length, cell: n => `<span class="ctry" style="gap:var(--space-8)">${n.assets.map(c => assetIc(c, 16)).join('')}<span>${n.assets.join(', ')}</span></span>`, kv: n => n.assets.join(', ') },
     K.num('conf', 'Confirmations'), { k: 'fee', l: 'Withdrawal fee', al: 'r', on: 1, dir: 'desc', cell: n => n.fee ? `<span class="num">${money(n.fee)}</span>` : TC.numMuted('Free') },
     K.eur('min', 'Min. withdrawal', 0), K.status(ON_OFF), K.date('updated', 'Updated')],
   sort: { k: 'id', dir: 'asc' },
@@ -5766,7 +5857,7 @@ document.addEventListener('click', e => {
   if (r && !e.target.closest('.pop')) goUser(+r.dataset.uid, e);
   const rc = e.target.closest('[data-cid]');
   if (rc && !e.target.closest('.pop')) goCo(+rc.dataset.cid, e);
-  if (e.target.closest('.nav') && innerWidth <= 900) $('#app').classList.remove('mobile-open');
+  if (e.target.closest('.nav') && (innerWidth <= 900 || $('#app').classList.contains('sb-hidden'))) $('#app').classList.remove('mobile-open');
 });
 function onChange(t) {
   if (t.dataset.tx && t.tagName === 'SELECT') { S.tx[t.dataset.tx] = t.value; S.tx.page = 1; S.tx.sel.clear(); renderUserPage(); }
@@ -5808,6 +5899,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.target.id === 'ieQ') { const b = $('#ieList .pi:not([hidden])'); b && b.click(); }
   if (e.key === 'Escape') {
     if (cfm.classList.contains('open')) closeConfirm();
+    else if ($('#app').classList.contains('sb-hidden') && $('#app').classList.contains('mobile-open') && !pop.classList.contains('open') && !modal.classList.contains('open')) $('#app').classList.remove('mobile-open');
     else if (pop.classList.contains('open')) closePop();
     else if (modal.classList.contains('open')) closeModal();
     else if (typing) document.activeElement.blur();
@@ -6044,7 +6136,8 @@ document.addEventListener('submit', e => {
 /* ════════════════════════════ Boot ════════════════════════════ */
 if (S.me) ME = S.me.name;
 $('#pcFab').innerHTML = icon('sliders', 20); $('#pcFab').dataset.tip = 'Prototype config';
-if (store.get('nsc.sidebar', 'open') === 'collapsed') $('#app').classList.add('collapsed');
+if (store.get('nsc.sidebar', 'open') === 'collapsed') $('#app').classList.add(S.sbV === 'hidden' ? 'sb-hidden' : 'collapsed'); // collapsed = the rail, or out of the page
+document.addEventListener('click', e => { const app = $('#app'); if (app.classList.contains('sb-hidden') && app.classList.contains('mobile-open') && !e.target.closest('#sidebar, .menu-btn, .pop, .modal, #tt')) app.classList.remove('mobile-open'); });
 route();
 </script>
 </body>
